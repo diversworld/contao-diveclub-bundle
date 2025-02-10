@@ -17,12 +17,12 @@ use Diversworld\ContaoDiveclubBundle\Controller\FrontendModule\DcListingControll
 /**
  * Backend modules
  */
-$GLOBALS['TL_LANG']['MOD']['dc_modules'] = 'Diveclub';
-$GLOBALS['TL_LANG']['MOD']['dc_collection'] = ['Diveclub', 'Diveclub management'];
+$GLOBALS['TL_LANG']['MOD']['dc_modules'] = 'Diveclub Manager';
+$GLOBALS['TL_LANG']['MOD']['dc_tank_collection'] = ['Tauchgeräte', 'Verwaltung der Tauchgeräte'];
 
 /**
  * Frontend modules
  */
-$GLOBALS['TL_LANG']['FMD']['dc_modules'] = 'Diveclub';
+$GLOBALS['TL_LANG']['FMD']['dc_modules'] = 'Diveclub Manager';
 $GLOBALS['TL_LANG']['FMD'][DcListingController::TYPE] = ['Diveclub Modul', 'Diveclub Frontend module'];
 

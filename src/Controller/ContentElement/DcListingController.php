@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 #[AsContentElement(category: 'dc_elements', template: 'ce_dc_liusting')]
-class DcLiustingController extends AbstractContentElementController
+class DcListingController extends AbstractContentElementController
 {
     public const TYPE = 'dc_liusting';
 

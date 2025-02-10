@@ -15,9 +15,11 @@ use Diversworld\ContaoDiveclubBundle\Model\DcTanksModel;
 /**
  * Backend modules
  */
-$GLOBALS['BE_MOD']['dc_modules']['dc_collection'] = array(
-    'tables' => array('tl_dc_tanks')
-);
+$GLOBALS['BE_MOD']['dc_modules'] = [
+    'dc_tank_collection' => [
+        'tables' => ['tl_dc_tanks']
+    ]
+];
 
 /**
  * Models

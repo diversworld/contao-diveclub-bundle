@@ -31,8 +31,8 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[AsFrontendModule(category: 'dc_modules', template: 'mod_duc_listing')]
-class DucListingController extends AbstractFrontendModuleController
+#[AsFrontendModule(category: 'dc_modules', template: 'mod_dc_listing')]
+class DcListingController extends AbstractFrontendModuleController
 {
     public const TYPE = 'duc_listing';
 

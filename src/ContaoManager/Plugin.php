@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Diversworld\ContaoDiveclubBundle\ContaoManager;
 
+use Contao\CalendarBundle\ContaoCalendarBundle;
 use Diversworld\ContaoDiveclubBundle\DiversworldContaoDiveclubBundle;
 use Contao\CoreBundle\ContaoCoreBundle;
 use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
@@ -33,7 +34,9 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface
     {
         return [
             BundleConfig::create(DiversworldContaoDiveclubBundle::class)
-                ->setLoadAfter([ContaoCoreBundle::class]),
+                ->setLoadAfter([
+                    ContaoCoreBundle::class,
+                    ContaoCalendarBundle::class])
         ];
     }
 
