@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Diversworld\ContaoDiveclubBundle\DataContainer;
 
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Database;
 use Contao\DataContainer;
@@ -22,6 +23,13 @@ use Diversworld\ContaoDiveclubBundle\Model\CheckInvoiceModel;
 
 class DcCheckInvoice
 {
+    private ContaoFramework $framework;
+
+    public function __construct(ContaoFramework $framework)
+    {
+        $this->framework = $framework;
+    }
+
     public function calculateAllGrossPrices(DataContainer $dc): void
     {
         $logger = System::getContainer()->get('monolog.logger.contao');

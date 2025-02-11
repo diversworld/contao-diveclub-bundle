@@ -20,7 +20,6 @@ use Diversworld\ContaoDiveclubBundle\Model\CoursesModel;
 
 // Add child table tl_calendar_events_member to tl_calendar_events
 $GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_dc_tanks';
-$GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_dc_check_articles';
 
 $GLOBALS['BE_MOD']['diversworld'] = [
     'dc_tank_collection' => [

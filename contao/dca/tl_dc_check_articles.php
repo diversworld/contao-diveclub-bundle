@@ -23,7 +23,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 /**
  * Table tl_dc_check_article
  */
-$GLOBALS['TL_DCA']['tl_dc_check_article'] = array(
+$GLOBALS['TL_DCA']['tl_dc_check_articles'] = array(
     'config'      => array(
         'dataContainer'     => DC_Table::class,
         'ptable'            => 'tl_calendar_events',

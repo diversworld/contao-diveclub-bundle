@@ -101,3 +101,33 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addVendorInfo'] = [
             return $options;
     }
 ];
+
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseFee'] = [
+    'inputType' => 'text',
+    'exclude'   => true,
+    'search'    => true,
+    'filter'    => true,
+    'sorting'   => true,
+    'eval'      => array('tl_class'=>'w25', 'alwaysSave' => true, 'rgxp' => 'digit',),
+    'sql'       => "DECIMAL(10,2) NOT NULL default '0.00'"
+];
+
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['category'] = [
+    'inputType' => 'select',
+    'exclude'   => true,
+    'search'    => true,
+    'filter'    => true,
+    'sorting'   => true,
+    'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
+    'options'   => array('basicOption', 'advancedOption', 'professionalOption','technicalOption'),
+    'eval'      => array('includeBlankOption' => true, 'tl_class' => 'w25'),
+    'sql'       => "varchar(255) NOT NULL default ''",
+];
+
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addCourseInfo'] = [
+    'exclude'   => true,
+    'filter'    => true,
+    'inputType' => 'checkbox',
+    'eval'      => ['submitOnChange' => true, 'tl_class' => 'clr w25',],
+    'sql'       => "char(1) NOT NULL default ''",
+];

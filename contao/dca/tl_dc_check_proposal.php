@@ -208,11 +208,11 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = array(
 /**
  * Provide miscellaneous methods that are used by the data configuration array.
  *
- * @property Tanks $Tanks
+ * @property DcTanks $Tanks
  *
  * @internal
  */
-class tl_dc_check_invoice extends Backend
+class tl_dc_check_proposal extends Backend
 {
     /**
      * Auto-generate the event alias if it has not been set yet
