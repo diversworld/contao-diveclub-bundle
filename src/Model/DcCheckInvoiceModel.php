@@ -16,7 +16,7 @@ namespace Diversworld\ContaoDiveclubBundle\Model;
 
 use Contao\Model;
 
-class DCCheckInvoiceModel extends Model
+class DcCheckInvoiceModel extends Model
 {
     protected static $strTable = 'tl_dc_check_invoice';
 }

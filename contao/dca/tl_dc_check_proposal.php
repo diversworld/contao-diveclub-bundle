@@ -17,16 +17,15 @@ use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
 use Diversworld\ContaoDiveclubBundle\DataContainer\Tanks;
-use Diversworld\ContaoDiveclubBundle\Model\CheckInvoiceModel;
+use \Diversworld\ContaoDiveclubBundle\Model\DcCheckProposalModel;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 /**
- * Table tl_dc_check_article
+ * Table tl_dc_check_invoice
  */
-$GLOBALS['TL_DCA']['tl_dc_check_article'] = array(
+$GLOBALS['TL_DCA']['tl_dc_check_proposal'] = array(
     'config'      => array(
         'dataContainer'     => DC_Table::class,
-        'ptable'            => 'tl_calendar_events',
         'enableVersioning'  => true,
         'sql'               => array(
             'keys' => array(
@@ -57,6 +56,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_article'] = array(
         ),
         'operations'        => array(
             'edit',
+            'children',
             'copy',
             'delete',
             'show',
@@ -88,7 +88,6 @@ $GLOBALS['TL_DCA']['tl_dc_check_article'] = array(
         ),
         'title'         => array(
             'inputType'     => 'text',
-            'label'         => &$GLOBALS['TL_LANG']['tl_dc_check_article']['articleName'],
             'exclude'       => true,
             'search'        => true,
             'filter'        => true,
@@ -104,7 +103,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_article'] = array(
             'eval'          => array('rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w33'),
             'save_callback' => array
             (
-                array('tl_dc_check_article', 'generateAlias')
+                array('tl_dc_check_proposal', 'generateAlias')
             ),
             'sql'           => "varchar(255) BINARY NOT NULL default ''"
         ),
@@ -114,58 +113,76 @@ $GLOBALS['TL_DCA']['tl_dc_check_article'] = array(
             'eval'          => ['submitOnChange' => true,'mandatory'=>true, 'tl_class' => 'w33 '],
             'sql'           => "int(10) unsigned NOT NULL default 0",
         ),
-        'articleName' => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_dc_check_article']['articleName'],
+        'vendorName' => [
+            'exclude'   => true,
+            'flag'      => SORT_STRING,
             'inputType' => 'text',
-            'eval'      => ['groupStyle' => 'width:300px'],
-            'sql'       => "varchar(255) NOT NULL default ''"
+            'search'    => true,
+            'sorting'   => true,
+            'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w33',],
+            'sql'       => "varchar(255) NOT NULL default ''",
         ],
-        'articleSize' => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_dc_check_article']['articleSize'],
-            'inputType' => 'select',
-            'options'   => ['2','3','5','7','8','10','12','15','18','20','40','80'],
-            'eval'      => ['includeBlankOption' => true, 'groupStyle' => 'width:60px'],
-            'sql'               => "varchar(20) NOT NULL default ''",
+        'street' => [
+            'exclude'   => true,
+            'flag'      => SORT_STRING,
+            'inputType' => 'text',
+            'search'    => true,
+            'sorting'   => true,
+            'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w33 clr',],
+            'sql'       => "varchar(255) NOT NULL default ''",
         ],
-        'articleNotes'  => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_dc_check_article']['articleNotes'],
+        'postal' => [
+            'exclude'   => true,
+            'inputType' => 'text',
+            'search'    => true,
+            'sorting'   => true,
+            'eval'      => ['maxlength' => 12, 'tl_class' => 'w25',],
+            'sql'       => "varchar(32) NOT NULL default ''",
+        ],
+        'city' => [
+            'exclude'   => true,
+            'flag'      => SORT_STRING,
+            'inputType' => 'text',
+            'search'    => true,
+            'sorting'   => true,
+            'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w33',],
+            'sql'       => "varchar(255) NOT NULL default ''",
+        ],
+        'vendorEmail' => [
+            'default'   => null,
+            'exclude'   => true,
+            'inputType' => 'text',
+            'sorting'   => true,
+            'eval'      => ['mandatory' => false, 'doNotCopy' => true, 'tl_class' => 'clr w33 wizard',],
+            'sql'       => 'int(10) unsigned NULL',
+        ],
+        'vendorPhone' => [
+            'default'   => null,
+            'exclude'   => true,
+            'inputType' => 'text',
+            'sorting'   => true,
+            'eval'      => ['mandatory' => false, 'doNotCopy' => true, 'tl_class' => 'w33 wizard',],
+            'sql'       => 'int(10) unsigned NULL',
+        ],
+        'vendorMobile' => [
+            'default'   => null,
+            'exclude'   => true,
+            'inputType' => 'text',
+            'sorting'   => true,
+            'eval'      => ['mandatory' => false, 'doNotCopy' => true, 'tl_class' => 'w33 wizard',],
+            'sql'       => 'int(10) unsigned NULL',
+        ],
+        'notes'         => array(
             'inputType'     => 'textarea',
             'exclude'       => true,
             'search'        => false,
-            'filter'        => false,
+            'filter'        => true,
             'sorting'       => false,
             'eval'          => array('rte' => 'tinyMCE', 'tl_class' => 'clr'),
             'sql'           => 'text NULL'
-        ],
-        'articlePriceNetto' => [
-            'label'         => &$GLOBALS['TL_LANG']['tl_dc_check_article']['articlePriceNetto'],
-            'inputType'     => 'text',
-            'save_callback' => ['tl_dc_check_article', 'calculateBruttoFromNetto'],
-            'eval'          => ['groupStyle' => 'width:100px', 'submitOnChange' => true],
-            'sql'       => "DECIMAL(10,2) NOT NULL default '0.00'"
-        ],
-        'articlePriceBrutto' => [
-            'label'          => &$GLOBALS['TL_LANG']['tl_dc_check_article']['articlePriceBrutto'],
-            'inputType'      => 'text',
-            'save_callback'  => array(
-                array('tl_dc_check_article', 'calculateBruttoFromNetto')
-            ),
-            'eval'      => ['groupStyle' => 'width:100px'],
-            'sql'       => "DECIMAL(10,2) NOT NULL default '0.00'",
-        ],
-        'default' => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_dc_check_article']['default'],
-            'inputType' => 'checkbox',
-            'eval'      => ['groupStyle' => 'width:40px'],
-            'sql'               => "char(1) NOT NULL default ''"
-        ],
-        'priceTotal'    => array(
-            'inputType'     => 'text',
-            'eval'          => array('tl_class'=>'w25 clr'),
-            'save_callback' => ['tl_dc_check_article', 'calculateTotalPrice'],
-            'sql'           => "DECIMAL(10,2) NOT NULL default '0.00'"
         ),
-        'published'     => array(
+        'published'     => array
+        (
             'toggle'        => true,
             'filter'        => true,
             'flag'          => DataContainer::SORT_INITIAL_LETTER_DESC,
@@ -173,12 +190,14 @@ $GLOBALS['TL_DCA']['tl_dc_check_article'] = array(
             'eval'          => array('doNotCopy'=>true, 'tl_class' => 'w50'),
             'sql'           => array('type' => 'boolean', 'default' => false)
         ),
-        'start'         => array(
+        'start'         => array
+        (
             'inputType'     => 'text',
             'eval'          => array('rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 clr wizard'),
             'sql'           => "varchar(10) NOT NULL default ''"
         ),
-        'stop'          => array(
+        'stop'          => array
+        (
             'inputType'     => 'text',
             'eval'          => array('rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
             'sql'           => "varchar(10) NOT NULL default ''"
@@ -193,7 +212,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_article'] = array(
  *
  * @internal
  */
-class tl_dc_check_article extends Backend
+class tl_dc_check_invoice extends Backend
 {
     /**
      * Auto-generate the event alias if it has not been set yet
@@ -209,18 +228,23 @@ class tl_dc_check_article extends Backend
     {
         $aliasExists = static function (string $alias) use ($dc): bool {
             $result = Database::getInstance()
-                ->prepare("SELECT id FROM tl_dc_check_article WHERE alias=? AND id!=?")
+                ->prepare("SELECT id FROM tl_dc_check_invoice WHERE alias=? AND id!=?")
                 ->execute($alias, $dc->id);
 
             return $result->numRows > 0;
         };
 
         // Generate the alias if there is none
-        if (!$varValue) {
-            $varValue = System::getContainer()->get('contao.slug')->generate($dc->activeRecord->title, CheckInvoiceModel::findById($dc->activeRecord->pid)->jumpTo, $aliasExists);
-        } elseif (preg_match('/^[1-9]\d*$/', $varValue)) {
+        if (!$varValue)
+        {
+            $varValue = System::getContainer()->get('contao.slug')->generate($dc->activeRecord->title, DcCheckProposalModel::Model::findById($dc->activeRecord->pid)->jumpTo, $aliasExists);
+        }
+        elseif (preg_match('/^[1-9]\d*$/', $varValue))
+        {
             throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
-        } elseif ($aliasExists($varValue)) {
+        }
+        elseif ($aliasExists($varValue))
+        {
             throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
         }
 

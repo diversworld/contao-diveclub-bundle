@@ -24,11 +24,14 @@ $GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_dc_check_articles';
 
 $GLOBALS['BE_MOD']['diversworld'] = [
     'dc_tank_collection' => [
-        'tables' => ['tl_dc_tanks','tl_dc_check_invoice','tl_dc_check_articles'],
+        'tables' => ['tl_dc_tanks','tl_dc_check_invoice'],
     ],
     'dc_course_collection' => [
         'tables' => ['tl_dc_courses'],
-    ]
+    ],
+    'dc_check_collection' => [
+        'tables' => ['tl_dc_check_proposal','tl_dc_check_articles'],
+    ],
 ];
 
 /**

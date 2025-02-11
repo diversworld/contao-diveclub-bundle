@@ -66,52 +66,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations'] = array_slice($GL
     ] + array_slice($GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations'], 6, count($GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']) - 1, true);
 
 //Fields
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['checkArticles'] = [
-    'inputType' => 'multiColumnEditor',
-    'tl_class'  => 'compact',
-    'eval'      => [
-        'multiColumnEditor' => [
-            'skipCopyValuesOnAdd' => true,
-            'editorTemplate' => 'multi_column_editor_backend_default',
-            'fields' => [
-                'articleName' => [
-                    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['articleName'],
-                    'inputType' => 'text',
-                    'eval'      => ['groupStyle' => 'width:300px']
-                ],
-                'articleSize' => [
-                    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['articleSize'],
-                    'inputType' => 'select',
-                    'options'   => ['2','3','5','7','8','10','12','15','18','20','40','80'],
-                    'eval'      => ['includeBlankOption' => true, 'groupStyle' => 'width:60px']
-                ],
-                'articleNotes' => [
-                    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['articleNotes'],
-                    'inputType' => 'textarea',
-                    'eval'      => ['groupStyle' => 'width:400px']
-                ],
-                'articlePriceNetto' => [
-                    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['articlePriceNetto'],
-                    'inputType' => 'text',
-                    'eval'      => ['groupStyle' => 'width:100px', 'submitOnChange' => true],
-                    'save_callback' => [CalendarEvents::class, 'calculateAllGrossPrices'],
-                ],
-                'articlePriceBrutto' => [
-                    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['articlePriceBrutto'],
-                    'inputType' => 'text',
-                    'eval'      => ['groupStyle' => 'width:100px']
-                ],
-                'default' => [
-                    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['default'],
-                    'inputType' => 'checkbox',
-                    'eval'      => ['groupStyle' => 'width:40px']
-                ],
-            ]
-        ]
-    ],
-    'sql' => "blob NULL"
-];
-
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['is_tuv_appointment'] = [
     'exclude'   => true,
     'filter'    => true,
@@ -129,113 +83,21 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addCheckInfo'] = [
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addVendorInfo'] = [
-    'exclude'   => true,
-    'filter'    => true,
-    'inputType' => 'checkbox',
-    'eval'      => ['submitOnChange' => true, 'tl_class' => 'clr w25',],
-    'sql'       => "char(1) NOT NULL default ''",
-];
+    'inputType'         => 'select',
+    'foreignKey'        => 'tl_dc_check_proposal.vendorName',
+    'eval'              => array('submitOnChange' => true, 'alwaysSave' => true,'mandatory'=> false, 'includeBlankOption'=> true, 'tl_class' => 'w33 clr'),
+    'sql'               => "int(10) unsigned NOT NULL default 0",
+    'relation'          => array('type'=>'hasOne', 'load'=>'lazy'),
+    'options_callback'  => function () {
+            $options = [];
+            $db = Database::getInstance();
+            $result = $db->execute("SELECT id, title FROM tl_dc_check_proposal WHERE publisched = '1'");
 
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addArticleInfo'] = [
-    'exclude'   => true,
-    'filter'    => true,
-    'inputType' => 'checkbox',
-    'eval'      => ['submitOnChange' => true, 'tl_class' => 'clr w25'],
-    'sql'       => "char(1) NOT NULL default ''",
-];
+            if ($result->numRows > 0) {
+                $data = $result->fetchAllAssoc();
+                $options = array_column($data, 'vendorName', 'id');
+            }
 
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addCourseInfo'] = [
-    'exclude'   => true,
-    'filter'    => true,
-    'inputType' => 'checkbox',
-    'eval'      => ['submitOnChange' => true, 'tl_class' => 'clr w25',],
-    'sql'       => "char(1) NOT NULL default ''",
-];
-
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseFee'] = [
-    'inputType' => 'text',
-    'exclude'   => true,
-    'search'    => true,
-    'filter'    => true,
-    'sorting'   => true,
-    'eval'      => array('tl_class'=>'w25', 'alwaysSave' => true, 'rgxp' => 'digit',),
-    'sql'       => "DECIMAL(10,2) NOT NULL default '0.00'"
-];
-
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['category'] = [
-    'inputType' => 'select',
-    'exclude'   => true,
-    'search'    => true,
-    'filter'    => true,
-    'sorting'   => true,
-    'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-    'options'   => array('basicOption', 'advancedOption', 'professionalOption','technicalOption'),
-    'eval'      => array('includeBlankOption' => true, 'tl_class' => 'w25'),
-    'sql'       => "varchar(255) NOT NULL default ''",
-];
-
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['vendorName'] = [
-    'exclude'   => true,
-    'flag'      => SORT_STRING,
-    'inputType' => 'text',
-    'search'    => true,
-    'sorting'   => true,
-    'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w33',],
-    'sql'       => "varchar(255) NOT NULL default ''",
-];
-
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['street'] = [
-    'exclude'   => true,
-    'flag'      => SORT_STRING,
-    'inputType' => 'text',
-    'search'    => true,
-    'sorting'   => true,
-    'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w33 clr',],
-    'sql'       => "varchar(255) NOT NULL default ''",
-];
-
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['postal'] = [
-    'exclude'   => true,
-    'inputType' => 'text',
-    'search'    => true,
-    'sorting'   => true,
-    'eval'      => ['maxlength' => 12, 'tl_class' => 'w25',],
-    'sql'       => "varchar(32) NOT NULL default ''",
-];
-
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['city'] = [
-    'exclude'   => true,
-    'flag'      => SORT_STRING,
-    'inputType' => 'text',
-    'search'    => true,
-    'sorting'   => true,
-    'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w33',],
-    'sql'       => "varchar(255) NOT NULL default ''",
-];
-
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['vendorEmail'] = [
-    'default'   => null,
-    'exclude'   => true,
-    'inputType' => 'text',
-    'sorting'   => true,
-    'eval'      => ['mandatory' => false, 'doNotCopy' => true, 'tl_class' => 'clr w33 wizard',],
-    'sql'       => 'int(10) unsigned NULL',
-];
-
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['vendorPhone'] = [
-    'default'   => null,
-    'exclude'   => true,
-    'inputType' => 'text',
-    'sorting'   => true,
-    'eval'      => ['mandatory' => false, 'doNotCopy' => true, 'tl_class' => 'w33 wizard',],
-    'sql'       => 'int(10) unsigned NULL',
-];
-
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['vendorMobile'] = [
-    'default'   => null,
-    'exclude'   => true,
-    'inputType' => 'text',
-    'sorting'   => true,
-    'eval'      => ['mandatory' => false, 'doNotCopy' => true, 'tl_class' => 'w33 wizard',],
-    'sql'       => 'int(10) unsigned NULL',
+            return $options;
+    }
 ];
