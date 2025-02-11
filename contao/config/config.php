@@ -11,7 +11,7 @@
  */
 
 use Diversworld\ContaoDiveclubBundle\Model\CheckInvoiceModel;
-use Diversworld\ContaoDiveclubBundle\Model\TanksModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcTanksModel;
 use Diversworld\ContaoDiveclubBundle\Model\CoursesModel;
 
 /**
@@ -22,10 +22,10 @@ use Diversworld\ContaoDiveclubBundle\Model\CoursesModel;
 $GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_dc_tanks';
 
 $GLOBALS['BE_MOD']['diversworld'] = [
-    'check_collection' => [
+    'dc_tank_collection' => [
         'tables' => ['tl_dc_tanks','tl_dc_check_invoice'],
     ],
-    'course_collection' => [
+    'dc_course_collection' => [
         'tables' => ['tl_dc_courses'],
     ]
 ];
@@ -34,5 +34,5 @@ $GLOBALS['BE_MOD']['diversworld'] = [
  * Models
  */
 $GLOBALS['TL_MODELS']['tl_dc_courses']          = CoursesModel::class;
-$GLOBALS['TL_MODELS']['tl_dc_tanks']            = TanksModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_tanks']            = DcTanksModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_check_invoice']    = CheckInvoiceModel::class;

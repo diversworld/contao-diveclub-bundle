@@ -70,13 +70,13 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = array(
             'show',
             'children'=> array(
                 'label' => &$GLOBALS['TL_LANG']['tl_dc_tanks']['tanks'],
-                'href' => 'do=check_collection&table=tl_dc_check_invoice',
+                'href' => 'do=dc_tank_collection&table=tl_dc_check_invoice',
                 'icon' => 'editor.svg'
             ),
         ),
     ),
     'palettes'          => array(
-        '__selector__'      => array('addSubpalette'),
+        '__selector__'      => array('addNotes'),
         'default'           => '{title_legend},title,alias;
                                 {details_legend},serialNumber,size,o2clean,member,pid,lastCheckDate,nextCheckDate;
                                 {notes_legend},addNotes;
