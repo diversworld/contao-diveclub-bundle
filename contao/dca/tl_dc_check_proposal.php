@@ -66,8 +66,8 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = array(
     'palettes'          => array(
         '__selector__'      => array('addArticleInfo'),
         'default'           => '{title_legend},title,alias;
-                                {details_legend},member,checkId;
-                                {article_legend},invoiceArticles,priceTotal;
+                                {details_legend},checkId;
+                                {vendor_legend},vendorName,vendorStreet,vendorPostal,vendorCity,vendorEmail,vendorPhone,vendorMobile;
                                 {notes_legend},notes;
                                 {publish_legend},published,start,stop;'
     ),
@@ -122,7 +122,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = array(
             'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w33',],
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
-        'street' => [
+        'vendorStreet' => [
             'exclude'   => true,
             'flag'      => SORT_STRING,
             'inputType' => 'text',
@@ -131,7 +131,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = array(
             'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w33 clr',],
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
-        'postal' => [
+        'vendorPostal' => [
             'exclude'   => true,
             'inputType' => 'text',
             'search'    => true,
@@ -139,7 +139,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = array(
             'eval'      => ['maxlength' => 12, 'tl_class' => 'w25',],
             'sql'       => "varchar(32) NOT NULL default ''",
         ],
-        'city' => [
+        'vendorCity' => [
             'exclude'   => true,
             'flag'      => SORT_STRING,
             'inputType' => 'text',
