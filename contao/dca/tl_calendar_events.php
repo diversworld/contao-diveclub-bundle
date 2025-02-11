@@ -26,6 +26,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'] = [
     [CalendarEvents::class, 'calculateAllGrossPrices']
 ];
 
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['ctable'][] = 'tl_dc_check_articles';
+
 // Palettes
 PaletteManipulator::create()
     ->addLegend('dive_legend', 'details_legend')
@@ -47,16 +49,21 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['addArticleInfo']   = 'c
 $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['addCourseInfo']    = 'category, courseFee';
 
 // Operations
-$GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['tanks'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tanks'],
-    'href'  => 'do=calendar&table=tl_dc_tanks',
-    'icon'  => 'bundles/diversworldcontaodiveclub/icons/tanks.svg',
-];
-$GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['check_articles'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['check_articles'],
-    'href'  => 'do=calendar&table=tl_dc_check_articles',
-    'icon'  => 'bundles/diversworldcontaodiveclub/icons/parent.svg',
-];
+$GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations'] = array_slice($GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations'], 0, 6, true) + [
+        'registrations' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tanks'],
+            'href' => 'table=tl_dc_tanks',
+            'icon' => 'bundles/diversworldcontaodiveclub/icons/tanks.svg',
+        ],
+    ] + array_slice($GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations'], 6, count($GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']) - 1, true);
+
+$GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations'] = array_slice($GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations'], 0, 7, true) + [
+        'registrations' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['check_articles'],
+            'href' => 'table=tl_dc_check_articles',
+            'icon' => 'bundles/diversworldcontaodiveclub/icons/tanks.svg',
+        ],
+    ] + array_slice($GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations'], 6, count($GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']) - 1, true);
 
 //Fields
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['checkArticles'] = [

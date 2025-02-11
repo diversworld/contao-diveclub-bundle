@@ -10,7 +10,7 @@
  * @link https://github.com/diversworld/contao-diveclub-bundle
  */
 
-use Diversworld\ContaoDiveclubBundle\Model\CheckInvoiceModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcCheckInvoiceModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcTanksModel;
 use Diversworld\ContaoDiveclubBundle\Model\CoursesModel;
 
@@ -20,7 +20,7 @@ use Diversworld\ContaoDiveclubBundle\Model\CoursesModel;
 
 // Add child table tl_calendar_events_member to tl_calendar_events
 $GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_dc_tanks';
-$GLOBALS['BE_MOD']['content']['calendar_events']['tables'][] = 'tl_dc_check_articles';
+$GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_dc_check_articles';
 
 $GLOBALS['BE_MOD']['diversworld'] = [
     'dc_tank_collection' => [
@@ -34,6 +34,6 @@ $GLOBALS['BE_MOD']['diversworld'] = [
 /**
  * Models
  */
-$GLOBALS['TL_MODELS']['tl_dc_courses']          = CoursesModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_courses']          = DcCoursesModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_tanks']            = DcTanksModel::class;
-$GLOBALS['TL_MODELS']['tl_dc_check_invoice']    = CheckInvoiceModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_check_invoice']    = DcCheckInvoiceModel::class;

@@ -17,7 +17,7 @@ use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
 use Diversworld\ContaoDiveclubBundle\DataContainer\Tanks;
-use Diversworld\ContaoDiveclubBundle\Model\CheckInvoiceModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcCheckInvoiceModel;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 /**

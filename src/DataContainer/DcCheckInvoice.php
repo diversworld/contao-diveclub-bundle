@@ -20,7 +20,7 @@ use Contao\DataContainer;
 use Contao\System;
 use Diversworld\ContaoDiveclubBundle\Model\CheckInvoiceModel;
 
-class CheckInvoice
+class DcCheckInvoice
 {
     public function calculateAllGrossPrices(DataContainer $dc): void
     {

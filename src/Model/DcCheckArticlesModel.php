@@ -16,7 +16,7 @@ namespace Diversworld\ContaoDiveclubBundle\Model;
 
 use Contao\Model;
 
-class CheckArticlesModel extends Model
+class DcCheckArticlesModel extends Model
 {
     protected static $strTable = 'tl_dc_check_articles';
 }

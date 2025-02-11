@@ -1,10 +1,9 @@
 <?php
 
-
 declare(strict_types=1);
 
 /*
- * This file is part of DiveclubManager.
+ * This file is part of Diveclub.
  *
  * (c) DiversWorld 2024 <eckhard@diversworld.eu>
  * @license GPL-3.0-or-later
@@ -17,7 +16,7 @@ namespace Diversworld\ContaoDiveclubBundle\Model;
 
 use Contao\Model;
 
-class CheckInvoiceModel extends Model
+class DCCheckInvoiceModel extends Model
 {
     protected static $strTable = 'tl_dc_check_invoice';
 }

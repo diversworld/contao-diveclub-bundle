@@ -21,7 +21,7 @@ use Contao\Input;
 use Contao\System;
 
 #[AsCallback(table: 'tl_dc_courses', target: 'edit.buttons', priority: 100)]
-class Courses
+class DcCourses
 {
     private ContaoFramework $framework;
 
