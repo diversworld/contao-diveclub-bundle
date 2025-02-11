@@ -50,7 +50,12 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['addCourseInfo']    = 'c
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['tanks'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tanks'],
     'href'  => 'do=calendar&table=tl_dc_tanks',
-    'icon'  => 'bundles/diversworldcontaodiveclub/icons/tanks.png',
+    'icon'  => 'bundles/diversworldcontaodiveclub/icons/tanks.svg',
+];
+$GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['check_articles'] = [
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['check_articles'],
+    'href'  => 'do=calendar&table=tl_dc_check_articles',
+    'icon'  => 'bundles/diversworldcontaodiveclub/icons/parent.svg',
 ];
 
 //Fields

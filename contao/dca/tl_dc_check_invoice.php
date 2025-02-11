@@ -27,7 +27,6 @@ $GLOBALS['TL_DCA']['tl_dc_check_invoice'] = array(
     'config'      => array(
         'dataContainer'     => DC_Table::class,
         'ptable'            => 'tl_dc_tanks',
-        'ctable'            => array('tl_content'),
         'enableVersioning'  => true,
         'sql'               => array(
             'keys' => array(
