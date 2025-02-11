@@ -11,6 +11,7 @@ declare(strict_types=1);
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/diversworld/contao-diveclub-bundle
  */
+
 use Contao\Backend;
 use Contao\Database;
 use Contao\DataContainer;
@@ -26,6 +27,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = array(
     'config'      => array(
         'dataContainer'     => DC_Table::class,
+        'ctable'            => array('tl_dc_check_article'),
         'enableVersioning'  => true,
         'sql'               => array(
             'keys' => array(
@@ -39,13 +41,13 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = array(
     'list'        => array(
         'sorting'           => array(
             'mode'          => DataContainer::MODE_SORTABLE,
-            'fields'        => array('title','alias','member','published'),
+            'fields'        => array('title','alias','published'),
             'flag'          => DataContainer::SORT_ASC,
             'panelLayout'   => 'filter;sort,search,limit'
         ),
         'label'             => array(
-            'fields' => array('title','priceTotal','member','checkId'),
-            'format' => '%s - Summe: %s€ %s %s',
+            'fields' => array('title'),
+            'format' => '%s %s %s',
         ),
         'global_operations' => array(
             'all' => array(
@@ -109,8 +111,8 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = array(
         ),
         'checkId'           => array(
             'inputType'     => 'text',
-            'foreignKey'    => 'tl_dc_tanks.pid',
-            'eval'          => ['submitOnChange' => true,'mandatory'=>true, 'tl_class' => 'w33 '],
+            //'foreignKey'    => 'tl_dc_tanks.pid',
+            'eval'          => ['submitOnChange' => true,'mandatory'=>false, 'tl_class' => 'w25 '],
             'sql'           => "int(10) unsigned NOT NULL default 0",
         ),
         'vendorName' => [
@@ -228,23 +230,24 @@ class tl_dc_check_proposal extends Backend
     {
         $aliasExists = static function (string $alias) use ($dc): bool {
             $result = Database::getInstance()
-                ->prepare("SELECT id FROM tl_dc_check_invoice WHERE alias=? AND id!=?")
+                ->prepare("SELECT id FROM tl_dc_check_proposal WHERE alias=? AND id!=?")
                 ->execute($alias, $dc->id);
 
             return $result->numRows > 0;
         };
 
         // Generate the alias if there is none
-        if (!$varValue)
-        {
-            $varValue = System::getContainer()->get('contao.slug')->generate($dc->activeRecord->title, DcCheckProposalModel::Model::findById($dc->activeRecord->pid)->jumpTo, $aliasExists);
+        if (!$varValue) {
+            $varValue = System::getContainer()->get('contao.slug')->generate(
+                $dc->activeRecord->title,
+                [],
+                $aliasExists
+            );
         }
-        elseif (preg_match('/^[1-9]\d*$/', $varValue))
-        {
+        elseif (preg_match('/^[1-9]\d*$/', $varValue)) {
             throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
         }
-        elseif ($aliasExists($varValue))
-        {
+        elseif ($aliasExists($varValue)) {
             throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
         }
 

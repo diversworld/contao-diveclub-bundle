@@ -12,7 +12,9 @@
 
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckInvoiceModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcTanksModel;
-use Diversworld\ContaoDiveclubBundle\Model\CoursesModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcCheckProposalModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcCoursesModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcCheckArticlesModel;
 
 /**
  * Backend modules
@@ -39,3 +41,5 @@ $GLOBALS['BE_MOD']['diversworld'] = [
 $GLOBALS['TL_MODELS']['tl_dc_courses']          = DcCoursesModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_tanks']            = DcTanksModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_check_invoice']    = DcCheckInvoiceModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_check_proposal']   = DcCheckProposalModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_check_articles']   = DcCheckArticlesModel::class;
