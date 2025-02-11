@@ -79,11 +79,11 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = array(
         '__selector__'      => array('addSubpalette'),
         'default'           => '{title_legend},title,alias;
                                 {details_legend},serialNumber,size,o2clean,member,pid,lastCheckDate,nextCheckDate;
-                                {notes_legend},addSubpalette;
+                                {notes_legend},addNotes;
                                 {publish_legend},published,start,stop;'
     ),
     'subpalettes'       => array(
-        'addSubpalette'     => 'notes',
+        'addNotes'     => 'notes',
     ),
     'fields'            => array(
         'id'                => array(
@@ -98,18 +98,9 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = array(
             'save_callback'     => array(
                 array('tl_dc_tanks', 'setLastCheckDate')
             ),
-            'options_callback'  => function() {
-                $options = [];
-                $db = Database::getInstance();
-                $result = $db->execute("SELECT id, title FROM tl_calendar_events WHERE addCheckInfo = '1'");
-
-                if ($result->numRows > 0) {
-                    $data = $result->fetchAllAssoc();
-                    $options = array_column($data, 'title', 'id');
-                }
-
-                return $options;
-            }
+            'options_callback'  => array(
+                array('tl_dc_tanks', 'getCalenarOptions')
+            ),
         ),
         'tstamp'            => array(
             'sql'               => "int(10) unsigned NOT NULL default '0'"
@@ -185,7 +176,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = array(
             'options_callback'  => array('tl_dc_tanks', 'getMemberOptions'),
             'sql'               => "varchar(255) NOT NULL default ''",
         ),
-        'addSubpalette'     => array(
+        'addNotes'     => array(
             'exclude'           => true,
             'inputType'         => 'checkbox',
             'eval'              => array('submitOnChange' => true, 'tl_class' => 'w50'),
@@ -390,6 +381,20 @@ class tl_dc_tanks extends Backend
         foreach($members as $member)
         {
             $options[$member['id']] = $member['name'];
+        }
+
+        return $options;
+    }
+
+    function getCalenarOptions():array
+    {
+        $options = [];
+        $db = Database::getInstance();
+        $result = $db->execute("SELECT id, title FROM tl_calendar_events WHERE addCheckInfo = '1'");
+
+        if ($result->numRows > 0) {
+            $data = $result->fetchAllAssoc();
+            $options = array_column($data, 'title', 'id');
         }
 
         return $options;
