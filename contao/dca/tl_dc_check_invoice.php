@@ -1,64 +1,62 @@
 <?php
 
-
 declare(strict_types=1);
 
 /*
- * This file is part of DiCoMa.
+ * This file is part of DiveClub.
  *
  * (c) Diversworld 2024 <eckhard@diversworld.eu>
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
- * @link https://github.com/diversworld/contao-dicoma-bundle
+ * @link https://github.com/diversworld/contao-diveclub-bundle
  */
-
 use Contao\Backend;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
-use Diversworld\ContaoDiveclubBundle\DataContainer\DcTanks;
+use Diversworld\ContaoDiveclubBundle\DataContainer\Tanks;
 use Diversworld\ContaoDiveclubBundle\Model\CheckInvoiceModel;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 /**
- * Table tl_dw_check_invoice
+ * Table tl_dc_check_invoice
  */
 $GLOBALS['TL_DCA']['tl_dc_check_invoice'] = array(
-    'config' => array(
-        'dataContainer' => DC_Table::class,
-        'ptable' => 'tl_dc_tanks',
-        'ctable' => array('tl_content'),
-        'enableVersioning' => true,
-        'sql' => array(
+    'config'      => array(
+        'dataContainer'     => DC_Table::class,
+        'ptable'            => 'tl_dc_tanks',
+        'ctable'            => array('tl_content'),
+        'enableVersioning'  => true,
+        'sql'               => array(
             'keys' => array(
-                'id' => 'primary',
-                'tstamp' => 'index',
-                'alias' => 'index',
+                'id'        => 'primary',
+                'tstamp'    => 'index',
+                'alias'     => 'index',
                 'published,start,stop' => 'index'
             )
         ),
     ),
-    'list' => array(
-        'sorting' => array(
-            'mode' => DataContainer::MODE_SORTABLE,
-            'fields' => array('title', 'alias', 'member', 'published'),
-            'flag' => DataContainer::SORT_ASC,
-            'panelLayout' => 'filter;sort,search,limit'
+    'list'        => array(
+        'sorting'           => array(
+            'mode'          => DataContainer::MODE_SORTABLE,
+            'fields'        => array('title','alias','member','published'),
+            'flag'          => DataContainer::SORT_ASC,
+            'panelLayout'   => 'filter;sort,search,limit'
         ),
-        'label' => array(
-            'fields' => array('title', 'priceTotal', 'member', 'checkId'),
+        'label'             => array(
+            'fields' => array('title','priceTotal','member','checkId'),
             'format' => '%s - Summe: %s€ %s %s',
         ),
         'global_operations' => array(
             'all' => array(
-                'href' => 'act=select',
-                'class' => 'header_edit_all',
+                'href'       => 'act=select',
+                'class'      => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"'
             )
         ),
-        'operations' => array(
+        'operations'        => array(
             'edit',
             'children',
             'copy',
@@ -67,72 +65,73 @@ $GLOBALS['TL_DCA']['tl_dc_check_invoice'] = array(
             'toggle'
         )
     ),
-    'palettes' => array(
-        '__selector__' => array('addArticleInfo'),
-        'default' => '{title_legend},title,alias;
+    'palettes'          => array(
+        '__selector__'      => array('addArticleInfo'),
+        'default'           => '{title_legend},title,alias;
                                 {details_legend},member,checkId;
                                 {article_legend},invoiceArticles,priceTotal;
                                 {notes_legend},notes;
                                 {publish_legend},published,start,stop;'
     ),
-    'subpalettes' => array(),
-    'fields' => array(
-        'id' => array(
-            'sql' => "int(10) unsigned NOT NULL auto_increment"
+    'subpalettes'       => array(
+    ),
+    'fields'            => array(
+        'id'                => array(
+            'sql'           => "int(10) unsigned NOT NULL auto_increment"
         ),
-        'pid' => [
-            'inputType' => 'text',
-            'foreignKey' => 'tl_dc_tanks.title',
-            'eval' => ['submitOnChange' => true, 'mandatory' => true, 'tl_class' => 'w33 clr'],
-            'sql' => "int(10) unsigned NOT NULL default 0",
+        'pid'           => [
+            'inputType'     => 'text',
+            'foreignKey'    => 'tl_dc_tanks.title',
+            'eval'          => ['submitOnChange' => true,'mandatory'=>true, 'tl_class' => 'w33 clr'],
+            'sql'           => "int(10) unsigned NOT NULL default 0",
         ],
-        'tstamp' => array(
-            'sql' => "int(10) unsigned NOT NULL default '0'"
+        'tstamp'        => array(
+            'sql'           => "int(10) unsigned NOT NULL default '0'"
         ),
-        'title' => array(
-            'inputType' => 'text',
-            'exclude' => true,
-            'search' => true,
-            'filter' => true,
-            'sorting' => true,
-            'flag' => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'eval' => array('mandatory' => true, 'maxlength' => 25, 'tl_class' => 'w33'),
-            'sql' => "varchar(255) NOT NULL default ''"
+        'title'         => array(
+            'inputType'     => 'text',
+            'exclude'       => true,
+            'search'        => true,
+            'filter'        => true,
+            'sorting'       => true,
+            'flag'          => DataContainer::SORT_INITIAL_LETTER_ASC,
+            'eval'          => array('mandatory' => true, 'maxlength' => 25, 'tl_class' => 'w33'),
+            'sql'           => "varchar(255) NOT NULL default ''"
         ),
-        'alias' => array
+        'alias'         => array
         (
-            'search' => true,
-            'inputType' => 'text',
-            'eval' => array('rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w33'),
+            'search'        => true,
+            'inputType'     => 'text',
+            'eval'          => array('rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w33'),
             'save_callback' => array
             (
                 array('tl_dc_check_invoice', 'generateAlias')
             ),
-            'sql' => "varchar(255) BINARY NOT NULL default ''"
+            'sql'           => "varchar(255) BINARY NOT NULL default ''"
         ),
-        'member' => array(
-            'inputType' => 'select',
-            'exclude' => true,
-            'search' => true,
-            'filter' => true,
-            'sorting' => true,
-            'eval' => array('includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w33'),
-            'options_callback' => array('tl_dc_check_invoice', 'getMemberOptions'),
-            'sql' => "varchar(255) NOT NULL default ''",
+        'member'            => array(
+            'inputType'         => 'select',
+            'exclude'           => true,
+            'search'            => true,
+            'filter'            => true,
+            'sorting'           => true,
+            'eval'              => array('includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w33'),
+            'options_callback'  => array('tl_dc_check_invoice', 'getMemberOptions'),
+            'sql'               => "varchar(255) NOT NULL default ''",
         ),
-        'checkId' => array(
-            'inputType' => 'text',
-            'foreignKey' => 'tl_dc_tanks.pid',
-            'eval' => ['submitOnChange' => true, 'mandatory' => true, 'tl_class' => 'w33 '],
-            'sql' => "int(10) unsigned NOT NULL default 0",
+        'checkId'           => array(
+            'inputType'     => 'text',
+            'foreignKey'    => 'tl_dc_tanks.pid',
+            'eval'          => ['submitOnChange' => true,'mandatory'=>true, 'tl_class' => 'w33 '],
+            'sql'           => "int(10) unsigned NOT NULL default 0",
         ),
-        'invoiceArticles' => array(
+        'invoiceArticles'  => array(
             'inputType' => 'multiColumnEditor',
-            'eval' => [
-                'tl_class' => 'clr compact',
+            'tl_class'  => 'compact',
+            'eval'      => [
                 'submitCallback' => ['tl_dc_check_invoice', 'calculateTotalPrice'],
                 'multiColumnEditor' => [
-                    'skipCopyValuesOnAdd' => false,
+                    'skipCopyValuesOnAdd' => true,
                     'editorTemplate' => 'multi_column_editor_backend_default',
                     'fields' => [
                         'articleName' => [
@@ -141,31 +140,31 @@ $GLOBALS['TL_DCA']['tl_dc_check_invoice'] = array(
                             'eval' => ['groupStyle' => 'width:300px']
                         ],
                         'articleSize' => [
-                            'label' => &$GLOBALS['TL_LANG']['tl_dc_check_invoice']['articleSize'],
+                            'label'     => &$GLOBALS['TL_LANG']['tl_dc_check_invoice']['articleSize'],
                             'inputType' => 'select',
-                            'options' => ['2', '3', '5', '7', '8', '10', '12', '15', '18', '20', '40', '80'],
-                            'eval' => ['includeBlankOption' => true, 'groupStyle' => 'width:60px']
+                            'options'   => ['2','3','5','7','8','10','12','15','18','20','40','80'],
+                            'eval'      => ['includeBlankOption' => true, 'groupStyle' => 'width:60px']
                         ],
-                        'articleNotes' => [
-                            'label' => &$GLOBALS['TL_LANG']['tl_dc_check_invoice']['articleNotes'],
+                        'articleNotes'  => [
+                            'label'     => &$GLOBALS['TL_LANG']['tl_dc_check_invoice']['articleNotes'],
                             'inputType' => 'textarea',
-                            'eval' => ['groupStyle' => 'width:400px']
+                            'eval'      => ['groupStyle' => 'width:400px']
                         ],
                         'articlePriceNetto' => [
-                            'label' => &$GLOBALS['TL_LANG']['tl_dc_check_invoice']['articlePriceNetto'],
+                            'label'     => &$GLOBALS['TL_LANG']['tl_dc_check_invoice']['articlePriceNetto'],
                             'inputType' => 'text',
                             'save_callback' => ['tl_dc_check_invoice', 'calculateBruttoFromNetto'],
-                            'eval' => ['groupStyle' => 'width:100px', 'submitOnChange' => true],
+                            'eval'      => ['groupStyle' => 'width:100px', 'submitOnChange' => true],
                         ],
                         'articlePriceBrutto' => [
-                            'label' => &$GLOBALS['TL_LANG']['tl_dc_check_invoice']['articlePriceBrutto'],
+                            'label'     => &$GLOBALS['TL_LANG']['tl_dc_check_invoice']['articlePriceBrutto'],
                             'inputType' => 'text',
-                            'eval' => ['groupStyle' => 'width:100px']
+                            'eval'      => ['groupStyle' => 'width:100px']
                         ],
                         'default' => [
-                            'label' => &$GLOBALS['TL_LANG']['tl_dc_check_invoice']['default'],
+                            'label'     => &$GLOBALS['TL_LANG']['tl_dc_check_invoice']['default'],
                             'inputType' => 'checkbox',
-                            'eval' => ['groupStyle' => 'width:40px']
+                            'eval'      => ['groupStyle' => 'width:40px']
                         ],
                     ]
                 ]
@@ -173,44 +172,44 @@ $GLOBALS['TL_DCA']['tl_dc_check_invoice'] = array(
             'save_callback' => array(
                 array('tl_dc_check_invoice', 'calculateBruttoFromNetto')
             ),
-            'sql' => "blob NULL"
+            'sql'       => "blob NULL"
         ),
-        'priceTotal' => array
+        'priceTotal'         => array
         (
-            'inputType' => 'text',
-            'eval' => array('tl_class' => 'w25 clr'),
+            'inputType'     => 'text',
+            'eval'          => array('tl_class'=>'w25 clr'),
             'save_callback' => ['tl_dc_check_invoice', 'calculateTotalPrice'],
-            'sql' => "DECIMAL(10,2) NOT NULL default '0.00'"
+            'sql'           => "DECIMAL(10,2) NOT NULL default '0.00'"
         ),
-        'notes' => array(
-            'inputType' => 'textarea',
-            'exclude' => true,
-            'search' => false,
-            'filter' => true,
-            'sorting' => false,
-            'eval' => array('rte' => 'tinyMCE', 'tl_class' => 'clr'),
-            'sql' => 'text NULL'
+        'notes'         => array(
+            'inputType'     => 'textarea',
+            'exclude'       => true,
+            'search'        => false,
+            'filter'        => true,
+            'sorting'       => false,
+            'eval'          => array('rte' => 'tinyMCE', 'tl_class' => 'clr'),
+            'sql'           => 'text NULL'
         ),
-        'published' => array
+        'published'     => array
         (
-            'toggle' => true,
-            'filter' => true,
-            'flag' => DataContainer::SORT_INITIAL_LETTER_DESC,
-            'inputType' => 'checkbox',
-            'eval' => array('doNotCopy' => true, 'tl_class' => 'w50'),
-            'sql' => array('type' => 'boolean', 'default' => false)
+            'toggle'        => true,
+            'filter'        => true,
+            'flag'          => DataContainer::SORT_INITIAL_LETTER_DESC,
+            'inputType'     => 'checkbox',
+            'eval'          => array('doNotCopy'=>true, 'tl_class' => 'w50'),
+            'sql'           => array('type' => 'boolean', 'default' => false)
         ),
-        'start' => array
+        'start'         => array
         (
-            'inputType' => 'text',
-            'eval' => array('rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 clr wizard'),
-            'sql' => "varchar(10) NOT NULL default ''"
+            'inputType'     => 'text',
+            'eval'          => array('rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 clr wizard'),
+            'sql'           => "varchar(10) NOT NULL default ''"
         ),
-        'stop' => array
+        'stop'          => array
         (
-            'inputType' => 'text',
-            'eval' => array('rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'),
-            'sql' => "varchar(10) NOT NULL default ''"
+            'inputType'     => 'text',
+            'eval'          => array('rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
+            'sql'           => "varchar(10) NOT NULL default ''"
         )
     )
 );
@@ -222,7 +221,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_invoice'] = array(
  *
  * @internal
  */
-class tl_dw_check_invoice extends Backend
+class tl_dc_check_invoice extends Backend
 {
     /**
      * Auto-generate the event alias if it has not been set yet
@@ -245,11 +244,16 @@ class tl_dw_check_invoice extends Backend
         };
 
         // Generate the alias if there is none
-        if (!$varValue) {
+        if (!$varValue)
+        {
             $varValue = System::getContainer()->get('contao.slug')->generate($dc->activeRecord->title, CheckInvoiceModel::findById($dc->activeRecord->pid)->jumpTo, $aliasExists);
-        } elseif (preg_match('/^[1-9]\d*$/', $varValue)) {
+        }
+        elseif (preg_match('/^[1-9]\d*$/', $varValue))
+        {
             throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
-        } elseif ($aliasExists($varValue)) {
+        }
+        elseif ($aliasExists($varValue))
+        {
             throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
         }
 
@@ -261,7 +265,8 @@ class tl_dw_check_invoice extends Backend
         $members = Database::getInstance()->execute("SELECT id, CONCAT(firstname, ' ', lastname) as name FROM tl_member")->fetchAllAssoc();
         $options = array();
 
-        foreach ($members as $member) {
+        foreach($members as $member)
+        {
             $options[$member['id']] = $member['name'];
         }
 
@@ -274,7 +279,7 @@ class tl_dw_check_invoice extends Backend
 
         foreach ($invoiceArticles as &$item) {
             // Konvertieren Sie den String-Wert zu einem numerischen Wert
-            $nettoPrice = (float)str_replace(',', '.', $item['articlePriceNetto']);
+            $nettoPrice = (float) str_replace(',', '.', $item['articlePriceNetto']);
 
             // Berechnen Sie den Brutto-Wert basierend auf dem MwSt.-Satz (angenommen 19%)
             $grossPrice = $nettoPrice * 1.19;

@@ -1,5 +1,5 @@
-![Diversworld Logo](./docs/dw-logo-k.png "Logo")
+![Diversworld](docs/dw-logo-kws.png "Diversworld Logo")
 
 
-# Welcome to Diveclub Manager
+# Welcome to Diveclub App
 This bundle is still under construction.

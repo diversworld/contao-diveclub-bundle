@@ -22,8 +22,9 @@
         "source": "https://github.com/diversworld/contao-diveclub-bundle"
     },
     "require": {
-        "php": "^8.2",
-        "contao/core-bundle": "^5.0"
+        "php": "^8.1",
+        "contao/core-bundle": "^5.0",
+        "inspiredminds/contao-event-registration": "^2.1"
     },
     "require-dev": {
         "contao/manager-plugin": "^2.12"

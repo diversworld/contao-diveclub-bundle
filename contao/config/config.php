@@ -1,27 +1,38 @@
 <?php
 
 /*
- * This file is part of Diveclub App.
+ * This file is part of Diveclub.
  *
- * (c) Eckhard Becker 2025 <info@diversworld.eu>
+ * (c) DiversWorld 2024 <eckhard@diversworld.eu>
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/diversworld/contao-diveclub-bundle
  */
 
-use Diversworld\ContaoDiveclubBundle\Model\DcTanksModel;
+use Diversworld\ContaoDiveclubBundle\Model\CheckInvoiceModel;
+use Diversworld\ContaoDiveclubBundle\Model\TanksModel;
+use Diversworld\ContaoDiveclubBundle\Model\CoursesModel;
 
 /**
  * Backend modules
  */
-$GLOBALS['BE_MOD']['dc_modules'] = [
-    'dc_tank_collection' => [
-        'tables' => ['tl_dc_tanks']
+
+// Add child table tl_calendar_events_member to tl_calendar_events
+$GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_dc_tanks';
+
+$GLOBALS['BE_MOD']['diversworld'] = [
+    'check_collection' => [
+        'tables' => ['tl_dc_tanks','tl_dc_check_invoice'],
+    ],
+    'course_collection' => [
+        'tables' => ['tl_dc_courses'],
     ]
 ];
 
 /**
  * Models
  */
-$GLOBALS['TL_MODELS']['tl_dc_tanks'] = DcTanksModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_courses']          = CoursesModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_tanks']            = TanksModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_check_invoice']    = CheckInvoiceModel::class;

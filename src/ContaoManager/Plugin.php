@@ -36,7 +36,7 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface
             BundleConfig::create(DiversworldContaoDiveclubBundle::class)
                 ->setLoadAfter([
                     ContaoCoreBundle::class,
-                    ContaoCalendarBundle::class])
+                    ContaoCalendarBundle::class]),
         ];
     }
 

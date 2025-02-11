@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Diversworld\ContaoDiveclubBundle\Model;
 
 use Contao\Model;
-use Contao\Model\Collection;
 
 class DcTanksModel extends Model
 {

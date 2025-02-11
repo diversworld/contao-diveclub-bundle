@@ -13,12 +13,12 @@ declare(strict_types=1);
  */
 
 /**
- * Miscellaneous
+ * Legends
  */
-//$GLOBALS['TL_LANG']['MSC'][''] = '';
-$GLOBALS['TL_LANG']['MSC']['tanks'] = 'Tauchgeräte';
+$GLOBALS['TL_LANG']['tl_calendar']['dive_check_legend'] = "Tauchkurs Manager Einstellungen";
 
 /**
- * Errors
+ * Fields
  */
-//$GLOBALS['TL_LANG']['ERR'][''] = '';
+$GLOBALS['TL_LANG']['tl_calendar']['tankChecks'] = ["TÜV-Termine", "Der Kalender enthält TÜV-Termine."];
+$GLOBALS['TL_LANG']['tl_calendar']['diveCourse'] = ["Tauchkurs", "Der Kalender enthält Tauchkurstermine."];

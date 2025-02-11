@@ -1,10 +1,9 @@
 <?php
 
-
 declare(strict_types=1);
 
 /*
- * This file is part of DiveclubManager.
+ * This file is part of ContaoDiveclubBundle.
  *
  * (c) DiversWorld 2024 <eckhard@diversworld.eu>
  * @license GPL-3.0-or-later
@@ -13,11 +12,11 @@ declare(strict_types=1);
  * @link https://github.com/diversworld/contao-diveclub-bundle
  */
 
-namespace Diversworld\ContaoDiveclubBundle\Model;
+namespace Diversworld\ContaoDiveclubBundle\DataContainer;
 
-use Contao\Model;
+use Contao\Input;
 
-class CheckInvoiceModel extends Model
+class CalendarTanks
 {
-    protected static $strTable = 'tl_dc_check_invoice';
+
 }
