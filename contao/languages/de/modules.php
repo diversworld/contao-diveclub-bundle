@@ -20,4 +20,5 @@ $GLOBALS['TL_LANG']['MOD']['diversworld'] = ['Tauchclub Manager', 'Verwalten von
 $GLOBALS['TL_LANG']['MOD']['check_modules'] = ['Equipment', 'Verwalten von Ausrüstung'];
 $GLOBALS['TL_LANG']['MOD']['dc_course_collection'] = ['Tauchkurse', 'Verwalten von Tauchkursen'];
 $GLOBALS['TL_LANG']['MOD']['dc_tanks_collection'] = ['Tauchgeräte', 'Verwalten von Tauchgeräten'];
+$GLOBALS['TL_LANG']['MOD']['dc_check_collection'] = ['TÜV Prüfungen', 'Verwalten der Angebote für TÜV Prüfungen'];
 

@@ -37,7 +37,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = array(
                 'title' => 'index',
                 'alias' => 'index',
                 'serialNumber' => 'index',
-                'pid,published,start,stop' => 'index'
+                'published,start,stop' => 'index'
             )
         ),
     ),
@@ -78,7 +78,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = array(
     'palettes'          => array(
         '__selector__'      => array('addNotes'),
         'default'           => '{title_legend},title,alias;
-                                {details_legend},serialNumber,size,o2clean,member,pid,lastCheckDate,nextCheckDate;
+                                {details_legend},serialNumber,size,o2clean,member,lastCheckDate,nextCheckDate;
                                 {notes_legend},addNotes;
                                 {publish_legend},published,start,stop;'
     ),
@@ -89,18 +89,11 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = array(
         'id'                => array(
             'sql'               => "int(10) unsigned NOT NULL auto_increment"
         ),
-        'pid'               => array(
-            'inputType'         => 'select',
-            'foreignKey'        => 'tl_calendar_events.title',
-            'eval'              => array('submitOnChange' => true, 'alwaysSave' => true,'mandatory'=> false, 'includeBlankOption'=> true, 'tl_class' => 'w33 clr'),
-            'sql'               => "int(10) unsigned NOT NULL default 0",
-            'relation'          => array('type'=>'hasOne', 'load'=>'lazy'),
-            'save_callback'     => array(
-                array('tl_dc_tanks', 'setLastCheckDate')
-            ),
-            'options_callback'  => array(
-                array('tl_dc_tanks', 'getCalenarOptions')
-            ),
+        'pid' => array
+        (
+            'foreignKey'              => 'tl_calendar_events.title',
+            'sql'                     => "int(10) unsigned NOT NULL default 0",
+            'relation'                => array('type'=>'belongsTo', 'load'=>'lazy')
         ),
         'tstamp'            => array(
             'sql'               => "int(10) unsigned NOT NULL default '0'"
@@ -119,7 +112,10 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = array(
             'search'            => true,
             'inputType'         => 'text',
             'eval'              => array('rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w50'),
-            'save_callback'     => array('tl_dc_tanks', 'generateAlias'),
+            'save_callback' => array
+            (
+                array('tl_dc_tanks', 'generateAlias')
+            ),
             'sql'           => "varchar(255) BINARY NOT NULL default ''"
         ),
         'serialNumber'      => array(
@@ -149,6 +145,19 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = array(
             'inputType'         => 'checkbox',
             'eval'              => array('submitOnChange' => true, 'tl_class' => 'w50'),
             'sql'               => "char(1) NOT NULL default ''"
+        ),
+        'checkId'               => array(
+            'inputType'         => 'select',
+            'foreignKey'        => 'tl_calendar_events.title',
+            'eval'              => array('submitOnChange' => true, 'alwaysSave' => true,'mandatory'=> false, 'includeBlankOption'=> true, 'tl_class' => 'w33 clr'),
+            'sql'               => "int(10) unsigned NOT NULL default 0",
+            'relation'          => array('type'=>'hasOne', 'load'=>'lazy'),
+            'save_callback'     => array(
+                array('tl_dc_tanks', 'setLastCheckDate')
+            ),
+            'options_callback'  => array(
+                array('tl_dc_tanks', 'getCalenarOptions')
+            ),
         ),
         'lastCheckDate'     => array(
             'inputType'         => 'text',
@@ -233,6 +242,8 @@ class tl_dc_tanks extends Backend
      */
     public function generateAlias(mixed $varValue, DataContainer $dc): mixed
     {
+        $logger = System::getContainer()->get('monolog.logger.contao');
+        $logger->info('Taks 1 generateAlias: ' . $varValue,  ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)]);
         $aliasExists = static function (string $alias) use ($dc): bool {
             $result = Database::getInstance()
                 ->prepare("SELECT id FROM tl_dc_tanks WHERE alias=? AND id!=?")
@@ -247,6 +258,7 @@ class tl_dc_tanks extends Backend
                 [],
                 $aliasExists
             );
+            $logger->info('Taks 2 generateAlias: ' . $varValue,  ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)]);
         } elseif (preg_match('/^[1-9]\d*$/', $varValue)) {
             throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
         } elseif ($aliasExists($varValue)) {
@@ -337,8 +349,6 @@ class tl_dc_tanks extends Backend
      */
     public function setLastCheckDate($varValue, DataContainer $dc)
     {
-        var_dump($varValue);
-        var_dump($dc->pid);
         $logger = System::getContainer()->get('monolog.logger.contao');
         $logger->error(
             'Varvalue: ' . $varValue,

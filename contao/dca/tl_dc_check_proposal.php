@@ -17,7 +17,6 @@ use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
-use Diversworld\ContaoDiveclubBundle\DataContainer\Tanks;
 use \Diversworld\ContaoDiveclubBundle\Model\DcCheckProposalModel;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
@@ -27,7 +26,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = array(
     'config'      => array(
         'dataContainer'     => DC_Table::class,
-        'ctable'            => array('tl_dc_check_article'),
+        'ctable'            => array('tl_dc_check_articles'),
         'enableVersioning'  => true,
         'sql'               => array(
             'keys' => array(
@@ -46,7 +45,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = array(
             'panelLayout'   => 'filter;sort,search,limit'
         ),
         'label'             => array(
-            'fields' => array('title'),
+            'fields' => array('title','vendorName','checkId'),
             'format' => '%s %s %s',
         ),
         'global_operations' => array(
@@ -56,7 +55,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = array(
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"'
             )
         ),
-        'operations'        => array(
+        'operations'    => array(
             'edit',
             'children',
             'copy',
@@ -79,12 +78,6 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = array(
         'id'                => array(
             'sql'           => "int(10) unsigned NOT NULL auto_increment"
         ),
-        'pid'           => [
-            'inputType'     => 'text',
-            'foreignKey'    => 'tl_dc_tanks.title',
-            'eval'          => ['submitOnChange' => true,'mandatory'=>true, 'tl_class' => 'w33 clr'],
-            'sql'           => "int(10) unsigned NOT NULL default 0",
-        ],
         'tstamp'        => array(
             'sql'           => "int(10) unsigned NOT NULL default '0'"
         ),
@@ -98,20 +91,17 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = array(
             'eval'          => array('mandatory' => true, 'maxlength' => 25, 'tl_class' => 'w33'),
             'sql'           => "varchar(255) NOT NULL default ''"
         ),
-        'alias'         => array
-        (
+        'alias'         => array(
             'search'        => true,
             'inputType'     => 'text',
             'eval'          => array('rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w33'),
-            'save_callback' => array
-            (
-                array('tl_dc_check_proposal', 'generateAlias')
-            ),
+            'save_callback' => array('tl_dc_check_proposal', 'generateAlias'),
             'sql'           => "varchar(255) BINARY NOT NULL default ''"
         ),
         'checkId'           => array(
             'inputType'     => 'text',
-            //'foreignKey'    => 'tl_dc_tanks.pid',
+            'foreignKey'    => 'tl_calendar_events.title',
+            'options_callback' => array('tl_dc_check_proposal', 'getCalenarOptions'),
             'eval'          => ['submitOnChange' => true,'mandatory'=>false, 'tl_class' => 'w25 '],
             'sql'           => "int(10) unsigned NOT NULL default 0",
         ),
@@ -183,8 +173,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = array(
             'eval'          => array('rte' => 'tinyMCE', 'tl_class' => 'clr'),
             'sql'           => 'text NULL'
         ),
-        'published'     => array
-        (
+        'published'     => array(
             'toggle'        => true,
             'filter'        => true,
             'flag'          => DataContainer::SORT_INITIAL_LETTER_DESC,
@@ -192,14 +181,12 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = array(
             'eval'          => array('doNotCopy'=>true, 'tl_class' => 'w50'),
             'sql'           => array('type' => 'boolean', 'default' => false)
         ),
-        'start'         => array
-        (
+        'start'         => array(
             'inputType'     => 'text',
             'eval'          => array('rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 clr wizard'),
             'sql'           => "varchar(10) NOT NULL default ''"
         ),
-        'stop'          => array
-        (
+        'stop'          => array(
             'inputType'     => 'text',
             'eval'          => array('rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
             'sql'           => "varchar(10) NOT NULL default ''"
@@ -252,5 +239,19 @@ class tl_dc_check_proposal extends Backend
         }
 
         return $varValue;
+    }
+
+    function getCalenarOptions():array
+    {
+        $options = [];
+        $db = Database::getInstance();
+        $result = $db->execute("SELECT id, title FROM tl_calendar_events WHERE addCheckInfo = '1' and published = '1' ORDER BY title ASC");
+
+        if ($result->numRows > 0) {
+            $data = $result->fetchAllAssoc();
+            $options = array_column($data, 'title', 'id');
+        }
+
+        return $options;
     }
 }
