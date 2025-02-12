@@ -75,13 +75,13 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
     'subpalettes'       => [
     ],
     'fields'            => [
-        'id'            => [
+        'id'                => [
             'sql'           => "int(10) unsigned NOT NULL auto_increment"
         ],
-        'tstamp'        => [
+        'tstamp'            => [
             'sql'           => "int(10) unsigned NOT NULL default '0'"
         ],
-        'title'         => [
+        'title'             => [
             'inputType'     => 'text',
             'exclude'       => true,
             'search'        => true,
@@ -91,111 +91,113 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
             'eval'          => array('mandatory' => true, 'maxlength' => 25, 'tl_class' => 'w33'),
             'sql'           => "varchar(255) NOT NULL default ''"
         ],
-        'alias'         => [
+        'alias'             => [
             'search'        => true,
             'inputType'     => 'text',
             'eval'          => array('rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w33'),
             'save_callback' => array('tl_dc_check_proposal', 'generateAlias'),
             'sql'           => "varchar(255) BINARY NOT NULL default ''"
         ],
-        'checkId'       => [
-            'inputType'     => 'text',
-            'foreignKey'    => 'tl_calendar_events.title',
-            'options_callback' => array('tl_dc_check_proposal', 'getCalenarOptions'),
-            'eval'          => ['submitOnChange' => true,'mandatory'=>false, 'tl_class' => 'w25 '],
-            'sql'           => "int(10) unsigned NOT NULL default 0",
+        'checkId'           => [
+            'inputType'         => 'text',
+            'foreignKey'        => 'tl_calendar_events.title',
+            'options_callback'  => [
+                ['tl_dc_check_proposal', 'getCalenarOptions']
+            ],
+            'eval'              => ['submitOnChange' => true,'mandatory'=>false, 'tl_class' => 'w25 '],
+            'sql'               => "int(10) unsigned NOT NULL default 0",
         ],
-        'proposalDate'  => [
-            'label'         => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['proposalDate'],
-            'inputType'     => 'text',
-            'eval'          => array('rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w25 clr wizard'),
-            'sql'           => "varchar(10) NOT NULL default ''"
+        'proposalDate'      => [
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['proposalDate'],
+            'inputType'         => 'text',
+            'eval'              => array('rgxp'=>'date', 'datepicker'=>true, 'tl_class'=>'w25 clr wizard'),
+            'sql'               => "varchar(10) NOT NULL default ''"
         ],
-        'vendorName'    => [
-            'exclude'   => true,
-            'flag'      => SORT_STRING,
-            'inputType' => 'text',
-            'search'    => true,
-            'sorting'   => true,
-            'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w33',],
-            'sql'       => "varchar(255) NOT NULL default ''",
+        'vendorName'        => [
+            'exclude'           => true,
+            'flag'              => SORT_STRING,
+            'inputType'         => 'text',
+            'search'            => true,
+            'sorting'           => true,
+            'eval'              => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w33',],
+            'sql'               => "varchar(255) NOT NULL default ''",
         ],
-        'vendorStreet'  => [
-            'exclude'   => true,
-            'flag'      => SORT_STRING,
-            'inputType' => 'text',
-            'search'    => true,
-            'sorting'   => true,
-            'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w33 clr',],
-            'sql'       => "varchar(255) NOT NULL default ''",
+        'vendorStreet'      => [
+            'exclude'           => true,
+            'flag'              => SORT_STRING,
+            'inputType'         => 'text',
+            'search'            => true,
+            'sorting'           => true,
+            'eval'              => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w33 clr',],
+            'sql'               => "varchar(255) NOT NULL default ''",
         ],
-        'vendorPostal'  => [
-            'exclude'   => true,
-            'inputType' => 'text',
-            'search'    => true,
-            'sorting'   => true,
-            'eval'      => ['maxlength' => 12, 'tl_class' => 'w25',],
-            'sql'       => "varchar(32) NOT NULL default ''",
+        'vendorPostal'      => [
+            'exclude'           => true,
+            'inputType'         => 'text',
+            'search'            => true,
+            'sorting'           => true,
+            'eval'              => ['maxlength' => 12, 'tl_class' => 'w25',],
+            'sql'               => "varchar(32) NOT NULL default ''",
         ],
-        'vendorCity'    => [
-            'exclude'   => true,
-            'flag'      => SORT_STRING,
-            'inputType' => 'text',
-            'search'    => true,
-            'sorting'   => true,
-            'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w33',],
-            'sql'       => "varchar(255) NOT NULL default ''",
+        'vendorCity'        => [
+            'exclude'           => true,
+            'flag'              => SORT_STRING,
+            'inputType'         => 'text',
+            'search'            => true,
+            'sorting'           => true,
+            'eval'              => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w33',],
+            'sql'               => "varchar(255) NOT NULL default ''",
         ],
-        'vendorEmail'   => [
-            'default'   => null,
-            'exclude'   => true,
-            'inputType' => 'text',
-            'sorting'   => true,
-            'eval'      => ['mandatory' => false, 'doNotCopy' => true, 'tl_class' => 'clr w33 wizard',],
-            'sql'       => 'int(10) unsigned NULL',
+        'vendorEmail'       => [
+            'default'           => null,
+            'exclude'           => true,
+            'inputType'         => 'text',
+            'sorting'           => true,
+            'eval'              => ['mandatory' => false, 'doNotCopy' => true, 'tl_class' => 'clr w33 wizard',],
+            'sql'               => 'int(10) unsigned NULL',
         ],
-        'vendorPhone'   => [
-            'default'   => null,
-            'exclude'   => true,
-            'inputType' => 'text',
-            'sorting'   => true,
-            'eval'      => ['mandatory' => false, 'doNotCopy' => true, 'tl_class' => 'w33 wizard',],
-            'sql'       => 'int(10) unsigned NULL',
+        'vendorPhone'       => [
+            'default'           => null,
+            'exclude'           => true,
+            'inputType'         => 'text',
+            'sorting'           => true,
+            'eval'              => ['mandatory' => false, 'doNotCopy' => true, 'tl_class' => 'w33 wizard',],
+            'sql'               => 'int(10) unsigned NULL',
         ],
-        'vendorMobile'  => [
-            'default'   => null,
-            'exclude'   => true,
-            'inputType' => 'text',
-            'sorting'   => true,
-            'eval'      => ['mandatory' => false, 'doNotCopy' => true, 'tl_class' => 'w33 wizard',],
-            'sql'       => 'int(10) unsigned NULL',
+        'vendorMobile'      => [
+            'default'           => null,
+            'exclude'           => true,
+            'inputType'         => 'text',
+            'sorting'           => true,
+            'eval'              => ['mandatory' => false, 'doNotCopy' => true, 'tl_class' => 'w33 wizard',],
+            'sql'               => 'int(10) unsigned NULL',
         ],
-        'notes'         => [
-            'inputType'     => 'textarea',
-            'exclude'       => true,
-            'search'        => false,
-            'filter'        => true,
-            'sorting'       => false,
-            'eval'          => array('rte' => 'tinyMCE', 'tl_class' => 'clr'),
-            'sql'           => 'text NULL'
+        'notes'             => [
+            'inputType'         => 'textarea',
+            'exclude'           => true,
+            'search'            => false,
+            'filter'            => true,
+            'sorting'           => false,
+            'eval'              => array('rte' => 'tinyMCE', 'tl_class' => 'clr'),
+            'sql'               => 'text NULL'
         ],
-        'published'     => [
-            'toggle'        => true,
-            'filter'        => true,
-            'flag'          => DataContainer::SORT_INITIAL_LETTER_DESC,
-            'inputType'     => 'checkbox',
-            'eval'          => array('doNotCopy'=>true, 'tl_class' => 'w50'),
-            'sql'           => array('type' => 'boolean', 'default' => false)
+        'published'         => [
+            'toggle'            => true,
+            'filter'            => true,
+            'flag'              => DataContainer::SORT_INITIAL_LETTER_DESC,
+            'inputType'         => 'checkbox',
+            'eval'              => array('doNotCopy'=>true, 'tl_class' => 'w50'),
+            'sql'               => array('type' => 'boolean', 'default' => false)
         ],
-        'start'         => [
-            'inputType'     => 'text',
-            'eval'          => array('rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 clr wizard'),
-            'sql'           => "varchar(10) NOT NULL default ''"
+        'start'             => [
+            'inputType'         => 'text',
+            'eval'              => array('rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 clr wizard'),
+            'sql'               => "varchar(10) NOT NULL default ''"
         ],
-        'stop'          => [
-            'inputType'     => 'text',
-            'eval'          => array('rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-            'sql'           => "varchar(10) NOT NULL default ''"
+        'stop'              => [
+            'inputType'         => 'text',
+            'eval'              => array('rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
+            'sql'               => "varchar(10) NOT NULL default ''"
         ]
     ]
 ];
