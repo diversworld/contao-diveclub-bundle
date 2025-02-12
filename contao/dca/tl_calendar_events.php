@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Diversworld\ContaoDiveclubBundle\DataContainer\CalendarEvents;
+use Contao\Database;
 
 // Overwrite child record callback
 /*
@@ -21,11 +22,11 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['sorting']['child_record_callba
     CalendarEvents::class,
     'listEvents',
 ];*/
-
+/*
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'] = [
     [CalendarEvents::class, 'calculateAllGrossPrices']
 ];
-
+*/
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['ctable'][] = 'tl_dc_check_articles';
 
 // Palettes
@@ -84,22 +85,20 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addCheckInfo'] = [
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addVendorInfo'] = [
     'inputType'         => 'select',
-    'foreignKey'        => 'tl_dc_check_proposal.vendorName',
-    'eval'              => array('submitOnChange' => true, 'alwaysSave' => true,'mandatory'=> false, 'includeBlankOption'=> true, 'tl_class' => 'w33 clr'),
-    'sql'               => "int(10) unsigned NOT NULL default 0",
     'relation'          => array('type'=>'hasOne', 'load'=>'lazy'),
     'options_callback'  => function () {
             $options = [];
             $db = Database::getInstance();
-            $result = $db->execute("SELECT id, title FROM tl_dc_check_proposal WHERE publisched = '1'");
+            $result = $db->execute("SELECT id, title FROM tl_dc_check_proposal WHERE published = '1'");
 
             if ($result->numRows > 0) {
                 $data = $result->fetchAllAssoc();
-                $options = array_column($data, 'vendorName', 'id');
+                $options = array_column($data, 'title', 'id');
             }
-
             return $options;
-    }
+    },
+    'eval'              => array('submitOnChange' => true, 'alwaysSave' => true,'mandatory'=> false, 'includeBlankOption'=> true, 'tl_class' => 'w33 clr'),
+    'sql'               => "int(10) unsigned NOT NULL default 0",
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseFee'] = [

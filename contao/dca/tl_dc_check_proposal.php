@@ -17,8 +17,10 @@ use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
-use \Diversworld\ContaoDiveclubBundle\Model\DcCheckProposalModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcCheckProposalModel;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Contao\CoreBundle\Monolog\ContaoContext;
+use Contao\CoreBundle\EventListener\Widget\HttpUrlListener;
 
 /**
  * Table tl_dc_check_invoice
@@ -68,7 +70,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
         '__selector__'      => ['addArticleInfo'],
         'default'           => '{title_legend},title,alias;
                                 {details_legend},proposalDate,checkId;
-                                {vendor_legend},vendorName,vendorStreet,vendorPostal,vendorCity,vendorEmail,vendorPhone,vendorMobile;
+                                {vendor_legend},vendorName,vendorWebsite,vendorStreet,vendorPostal,vendorCity,vendorEmail,vendorPhone,vendorMobile;
                                 {notes_legend},notes;
                                 {publish_legend},published,start,stop;'
     ],
@@ -83,6 +85,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
         ],
         'title'             => [
             'inputType'     => 'text',
+            'label'         => &$GLOBALS['TL_LANG']['tl_dc_check_proposal']['title'],
             'exclude'       => true,
             'search'        => true,
             'filter'        => true,
@@ -99,12 +102,29 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
             'sql'           => "varchar(255) BINARY NOT NULL default ''"
         ],
         'checkId'           => [
-            'inputType'         => 'text',
+            'inputType'         => 'select', // 'select' für Dropdown
             'foreignKey'        => 'tl_calendar_events.title',
-            'options_callback'  => [
-                ['tl_dc_check_proposal', 'getCalenarOptions']
+            //'options_callback'  => [['tl_dc_check_proposal', 'getCalenarOptions']],
+            'options_callback'  => function() {
+                $options = [];
+                $db = Database::getInstance();
+                $result = $db->execute("SELECT id, title FROM tl_calendar_events WHERE addCheckInfo = '1'");
+
+                if ($result->numRows > 0) {
+                    $data = $result->fetchAllAssoc();
+                    $options = array_column($data, 'title', 'id');
+                }
+                return $options;
+            },
+            'save_callback'     => [
+                ['tl_dc_check_proposal', 'updateEventVendorInfo']
+            ], // Spezifische Callback-Methode
+            'eval'              => [
+                'includeBlankOption' => true, // Ermöglicht eine leere Auswahl als Standardvalue
+                'mandatory'          => false,
+                'chosen'             => true, // Bessere Darstellung des Dropdowns
+                'tl_class'           => 'w25', // CSS-Klasse fürs Layout
             ],
-            'eval'              => ['submitOnChange' => true,'mandatory'=>false, 'tl_class' => 'w25 '],
             'sql'               => "int(10) unsigned NOT NULL default 0",
         ],
         'proposalDate'      => [
@@ -121,6 +141,12 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
             'sorting'           => true,
             'eval'              => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w33',],
             'sql'               => "varchar(255) NOT NULL default ''",
+        ],
+        'vendorWebsite'     => [
+            'search'            => true,
+            'inputType'         => 'text',
+            'eval'              => ['rgxp'=>HttpUrlListener::RGXP_NAME, 'maxlength'=>255, 'feEditable'=>true, 'feGroup'=>'contact', 'tl_class'=>'w33'],
+            'sql'               => "varchar(255) NOT NULL default ''"
         ],
         'vendorStreet'      => [
             'exclude'           => true,
@@ -153,24 +179,24 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
             'exclude'           => true,
             'inputType'         => 'text',
             'sorting'           => true,
-            'eval'              => ['mandatory' => false, 'doNotCopy' => true, 'tl_class' => 'clr w33 wizard',],
-            'sql'               => 'int(10) unsigned NULL',
-        ],
+            'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'rgxp'=>'email', 'unique'=>true, 'decodeEntities'=>true, 'feEditable'=>true, 'feGroup'=>'contact', 'tl_class'=>'w25 clr'),
+            'sql'                     => "varchar(255) NOT NULL default ''"
+		],
         'vendorPhone'       => [
             'default'           => null,
             'exclude'           => true,
             'inputType'         => 'text',
             'sorting'           => true,
-            'eval'              => ['mandatory' => false, 'doNotCopy' => true, 'tl_class' => 'w33 wizard',],
-            'sql'               => 'int(10) unsigned NULL',
+            'eval'              => array('maxlength'=>64, 'rgxp'=>'phone', 'decodeEntities'=>true, 'feEditable'=>true, 'feGroup'=>'contact', 'tl_class'=>'w25'),
+            'sql'               => "varchar(64) NOT NULL default ''"
         ],
         'vendorMobile'      => [
             'default'           => null,
             'exclude'           => true,
             'inputType'         => 'text',
             'sorting'           => true,
-            'eval'              => ['mandatory' => false, 'doNotCopy' => true, 'tl_class' => 'w33 wizard',],
-            'sql'               => 'int(10) unsigned NULL',
+            'eval'              => array('maxlength'=>64, 'rgxp'=>'phone', 'decodeEntities'=>true, 'feEditable'=>true, 'feGroup'=>'contact', 'tl_class'=>'w25'),
+            'sql'               => "varchar(64) NOT NULL default ''"
         ],
         'notes'             => [
             'inputType'         => 'textarea',
@@ -249,17 +275,57 @@ class tl_dc_check_proposal extends Backend
         return $varValue;
     }
 
-    function getCalenarOptions():array
+    function getCalenarOptions(): array
     {
         $options = [];
         $db = Database::getInstance();
-        $result = $db->execute("SELECT id, title FROM tl_calendar_events WHERE addCheckInfo = '1' and published = '1' ORDER BY title ASC");
+        $result = $db->execute("SELECT id, title FROM tl_calendar_events WHERE addCheckInfo = '1'");
 
         if ($result->numRows > 0) {
             $data = $result->fetchAllAssoc();
             $options = array_column($data, 'title', 'id');
         }
+        return $options; // Rückgabe eines sauberen Arrays
+    }
 
-        return $options;
+    /**
+     * Funktion, um die Vendor-Info in das zugehörige Event zu schreiben
+     *
+     * @param mixed          $varValue Der neue Wert des Feldes (checkId)
+     * @param DataContainer  $dc       Das DataContainer-Objekt des aktuellen Datensatzes
+     *
+     * @return mixed
+     */
+    public function updateEventVendorInfo(mixed $varValue, DataContainer $dc): mixed
+    {
+        // Prüfe, ob der Wert gesetzt ist (keine leere Auswahl)
+        if (!empty($varValue)) {
+            // Hole die Datenbank-Instanz
+            $db = Database::getInstance();
+
+            // Lade die vorhandenen Event-Daten aus der Tabelle tl_calendar_events
+            $event = $db->prepare("SELECT * FROM tl_calendar_events WHERE id = ?")
+                ->execute($varValue);
+
+            if ($event->numRows > 0) {
+                // Hole den Vendor-Namen aus dem aktuellen tl_dc_check_proposal-Datensatz
+                $vendor = $dc->activeRecord->id;
+
+                // Update der Vendor-Info für das Event
+                $db->prepare("UPDATE tl_calendar_events SET addVendorInfo = ? WHERE id = ?")
+                    ->execute($vendor, $varValue);
+
+                // Optional: Protokollieren, dass der Vendor eingetragen wurde
+                $logger = System::getContainer()->get('monolog.logger.contao');
+                $logger->info(
+                    'Vendor-Info für Event-ID ' . $varValue . ' aktualisiert: ' . $vendor,
+                    ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)]
+                );
+            } else {
+                throw new \RuntimeException(sprintf('Das Event mit der ID %d existiert nicht.', $varValue));
+            }
+        }
+        // Rückgabe des gespeicherten Wertes
+        return $varValue;
     }
 }

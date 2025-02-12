@@ -215,11 +215,6 @@ class tl_dc_check_articles extends Backend
 
     public function calculatePrices(mixed $varValue, DataContainer $dc): mixed
     {
-        // Logger aktivieren, um Debugging-Informationen zu erhalten
-        $logger = System::getContainer()->get('monolog.logger.contao');
-        $logger->info('1 calculatePrices: ' . print_r($dc->activeRecord,true), ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)]);
-        $logger->info('2 calculatePrices: ' . print_r($dc->field,true), ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)]);
-        $logger->info('3 calculatePrices: ' . ($dc->field > 'articlePriceBrutto'), ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)]);
         // Fall: Netto-Wert wurde eingegeben
         if ($dc->field === 'articlePriceNetto') {
             $priceNetto = (float) $varValue; // Netto-Wert speichern
@@ -228,9 +223,6 @@ class tl_dc_check_articles extends Backend
             // Synchronisierung über activeRecord
             $dc->activeRecord->articlePriceBrutto = $priceBrutto;
 
-            $logger->info('Brutto berechnet aus Netto: ' . $priceNetto . '-'.$priceBrutto, [
-                'contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)
-            ]);
             // Preise speichern
             Database::getInstance()
                 ->prepare("UPDATE tl_dc_check_articles SET articlePriceBrutto=? WHERE id=?")
@@ -244,9 +236,6 @@ class tl_dc_check_articles extends Backend
             // Synchronisierung über activeRecord
             $dc->activeRecord->articlePriceNetto = $priceNetto;
 
-            $logger->info('Netto berechnet aus Brutto: ' . $priceNetto . '-'.$priceBrutto, [
-                'contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)
-            ]);
             // Preise speichern
             Database::getInstance()
                 ->prepare("UPDATE tl_dc_check_articles SET articlePriceNetto=? WHERE id=?")
