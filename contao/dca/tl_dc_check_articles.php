@@ -24,64 +24,64 @@ use Contao\CoreBundle\Monolog\ContaoContext;
 /**
  * Table tl_dc_check_articles
  */
-$GLOBALS['TL_DCA']['tl_dc_check_articles'] = array(
-    'config'      => array(
+$GLOBALS['TL_DCA']['tl_dc_check_articles'] = [
+    'config'        => [
         'dataContainer'     => DC_Table::class,
         'ptable'            => 'tl_dc_check_proposal',
         'enableVersioning'  => true,
-        'sql'               => array(
-            'keys' => array(
+        'sql'               => [
+            'keys'          => [
                 'id'        => 'primary',
                 'tstamp'    => 'index',
                 'alias'     => 'index',
                 'published,start,stop' => 'index'
-            )
-        ),
-    ),
-    'list'              => array(
-        'sorting'           => array(
+            ]
+        ],
+    ],
+    'list'          => [
+        'sorting'           => [
             'mode'          => DataContainer::MODE_SORTABLE,
             'fields'        => array('title','alias','published'),
             'flag'          => DataContainer::SORT_ASC,
             'panelLayout'   => 'filter;sort,search,limit'
-        ),
-        'label'         => array(
-            'fields'        => array('title','articlePriceNetto','articlePriceBrutto'),
+        ],
+        'label'             => [
+            'fields'        => ['title','articlePriceNetto','articlePriceBrutto'],
             'format'        => '%s - Netto: %s€ Brutto: %s€',
-        ),
-        'global_operations' => array(
-            'all'       => array(
+        ],
+        'global_operations' => [
+            'all'       => [
                 'href'      => 'act=select',
                 'class'     => 'header_edit_all',
                 'attributes'=> 'onclick="Backend.getScrollOffset()" accesskey="e"'
-            )
-        ),
-        'operations'    => array(
+            ]
+        ],
+        'operations'        => [
             'edit',
             'copy',
             'delete',
             'show',
             'toggle'
-        )
-    ),
-    'palettes'          => array(
-        '__selector__'      => array('addArticleInfo'),
+        ]
+    ],
+    'palettes'      => [
+        '__selector__'      => ['addArticleInfo'],
         'default'           => '{title_legend},title,alias;
                                 {article_legend},articleSize,articlePriceNetto,articlePriceBrutto,default;
                                 {notes_legend},addNotes;
                                 {publish_legend},published,start,stop;'
-    ),
-    'subpalettes'       => array(
-        'addNotes'      => 'notes',
-    ),
-    'fields'            => array(
+    ],
+    'subpalettes'   => [
+        'addNotes'          => 'notes',
+    ],
+    'fields'        => [
         'id'                => [
             'sql'           => "int(10) unsigned NOT NULL auto_increment"
         ],
         'pid'               => [
-            'foreignKey'              => 'tl_dc_check_proposal.title',
-            'sql'                     => "int(10) unsigned NOT NULL default 0",
-            'relation'                => array('type'=>'belongsTo', 'load'=>'lazy')
+            'foreignKey'    => 'tl_dc_check_proposal.title',
+            'sql'           => "int(10) unsigned NOT NULL default 0",
+            'relation'      => ['type'=>'belongsTo', 'load'=>'lazy']
         ],
         'tstamp'            => [
             'sql'           => "int(10) unsigned NOT NULL default '0'"
@@ -117,16 +117,16 @@ $GLOBALS['TL_DCA']['tl_dc_check_articles'] = array(
         'articlePriceNetto' => [
             'label'         => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['articlePriceNetto'],
             'inputType'     => 'text',
-            'save_callback'  => array(
+            'save_callback' => array(
                 array('tl_dc_check_articles', 'calculatePrices')
             ),
             'eval'          => ['groupStyle' => 'width:100px', 'submitOnChange' => true, 'tl_class'=>'w25'],
             'sql'           => "DECIMAL(10,2) NOT NULL default '0.00'"
         ],
         'articlePriceBrutto'=> [
-            'label'          => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['articlePriceBrutto'],
-            'inputType'      => 'text',
-            'save_callback'  => array(
+            'label'         => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['articlePriceBrutto'],
+            'inputType'     => 'text',
+            'save_callback' => array(
                 array('tl_dc_check_articles', 'calculatePrices')
             ),
             'eval'          => ['groupStyle' => 'width:100px', 'submitOnChange' => true, 'tl_class'=>'w25'],
@@ -166,8 +166,8 @@ $GLOBALS['TL_DCA']['tl_dc_check_articles'] = array(
             'eval'          => array('rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
             'sql'           => "varchar(10) NOT NULL default ''"
         ]
-    )
-);
+    ]
+];
 
 /**
  * Provide miscellaneous methods that are used by the data configuration array.
@@ -190,8 +190,6 @@ class tl_dc_check_articles extends Backend
      */
     public function generateAlias(mixed $varValue, DataContainer $dc): mixed
     {
-        $logger = System::getContainer()->get('monolog.logger.contao');
-        $logger->info('Taks 1 generateAlias: ' . $varValue,  ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)]);
         $aliasExists = static function (string $alias) use ($dc): bool {
             $result = Database::getInstance()
                 ->prepare("SELECT id FROM tl_dc_check_articles WHERE alias=? AND id!=?")
@@ -206,7 +204,6 @@ class tl_dc_check_articles extends Backend
                 [],
                 $aliasExists
             );
-            $logger->info('Taks 2 generateAlias: ' . $varValue,  ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)]);
         } elseif (preg_match('/^[1-9]\d*$/', $varValue)) {
             throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
         } elseif ($aliasExists($varValue)) {
@@ -218,27 +215,39 @@ class tl_dc_check_articles extends Backend
 
     public function calculatePrices(mixed $varValue, DataContainer $dc): mixed
     {
+        $logger = System::getContainer()->get('monolog.logger.contao');
+
         // Wenn das Feld Netto ausgefüllt ist
         if ($dc->field === 'articlePriceNetto') {
             $priceNetto = (float) $varValue; // Netto-Wert auslesen
             $priceBrutto = round($priceNetto * 1.19, 2); // Brutto berechnen
+            $logger->info('articles 4 calculatePrices: ' . $priceBrutto,  ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)]);
+
+            $dc->activeRecord->articlePriceBrutto = $priceBrutto;
+            $dc->activeRecord->articlePriceNetto = $priceNetto;
+            $dc->activeRecord->save();
 
             // Brutto-Preis speichern
-            Database::getInstance()
+            /*Database::getInstance()
                 ->prepare("UPDATE tl_dc_check_articles SET articlePriceBrutto=?, articlePriceNetto=? WHERE id=?")
                 ->execute($priceBrutto, $priceNetto, $dc->id);
-
+            */
         } elseif ($dc->field === 'articlePriceBrutto') {
             $priceBrutto = (float) $varValue; // Brutto-Wert auslesen
             $priceNetto = round($priceBrutto / 1.19, 2); // Netto berechnen
+            $logger->info('articles 5 calculatePrices: ' . $priceNetto,  ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)]);
+
+            $dc->activeRecord->articlePriceNetto = $priceNetto;
+            $dc->activeRecord->articlePriceBrutto = $priceBrutto;
+            $dc->activeRecord->save();
 
             // Netto-Preis speichern
-            Database::getInstance()
+            /*Database::getInstance()
                 ->prepare("UPDATE tl_dc_check_articles SET articlePriceNetto=?, articlePriceBrutto=? WHERE id=?")
                 ->execute($priceNetto,$priceBrutto, $dc->id);
+            */
         }
 
         return $varValue; // Immer den Originalwert zurückgeben
     }
-
 }
