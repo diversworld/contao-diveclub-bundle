@@ -107,6 +107,12 @@ $GLOBALS['TL_DCA']['tl_dc_check_articles'] = [
             ),
             'sql'           => "varchar(255) BINARY NOT NULL default ''"
         ],
+        'proposalDate'      => [
+            'label'         => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['proposalDate'],
+            'inputType'     => 'text',
+            'eval'          => array('rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w25 clr wizard'),
+            'sql'           => "varchar(10) NOT NULL default ''"
+        ],
         'articleSize'       => [
             'label'     => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['articleSize'],
             'inputType' => 'select',
@@ -120,7 +126,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_articles'] = [
             'save_callback' => array(
                 array('tl_dc_check_articles', 'calculatePrices')
             ),
-            'eval'          => ['groupStyle' => 'width:100px', 'submitOnChange' => true, 'tl_class'=>'w25'],
+            'eval'          => ['submitOnChange' => true, 'tl_class'=>'w25'],
             'sql'           => "DECIMAL(10,2) NOT NULL default '0.00'"
         ],
         'articlePriceBrutto'=> [
@@ -129,13 +135,13 @@ $GLOBALS['TL_DCA']['tl_dc_check_articles'] = [
             'save_callback' => array(
                 array('tl_dc_check_articles', 'calculatePrices')
             ),
-            'eval'          => ['groupStyle' => 'width:100px', 'submitOnChange' => true, 'tl_class'=>'w25'],
+            'eval'          => ['submitOnChange' => true, 'tl_class'=>'w25'],
             'sql'           => "DECIMAL(10,2) NOT NULL default '0.00'",
         ],
         'default'           => [
             'label'         => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['default'],
             'inputType'     => 'checkbox',
-            'eval'          => ['groupStyle' => 'width:40px', 'tl_class'=>'w25'],
+            'eval'          => ['tl_class'=>'w25'],
             'sql'               => "char(1) NOT NULL default ''"
         ],
         'articleNotes'      => [
@@ -215,39 +221,45 @@ class tl_dc_check_articles extends Backend
 
     public function calculatePrices(mixed $varValue, DataContainer $dc): mixed
     {
+        // Logger aktivieren, um Debugging-Informationen zu erhalten
         $logger = System::getContainer()->get('monolog.logger.contao');
-
-        // Wenn das Feld Netto ausgefüllt ist
+        $logger->info('1 calculatePrices: ' . print_r($dc->activeRecord,true), ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)]);
+        $logger->info('2 calculatePrices: ' . print_r($dc->field,true), ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)]);
+        $logger->info('3 calculatePrices: ' . ($dc->field > 'articlePriceBrutto'), ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)]);
+        // Fall: Netto-Wert wurde eingegeben
         if ($dc->field === 'articlePriceNetto') {
-            $priceNetto = (float) $varValue; // Netto-Wert auslesen
+            $priceNetto = (float) $varValue; // Netto-Wert speichern
             $priceBrutto = round($priceNetto * 1.19, 2); // Brutto berechnen
-            $logger->info('articles 4 calculatePrices: ' . $priceBrutto,  ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)]);
 
+            // Synchronisierung über activeRecord
             $dc->activeRecord->articlePriceBrutto = $priceBrutto;
-            $dc->activeRecord->articlePriceNetto = $priceNetto;
-            $dc->activeRecord->save();
 
-            // Brutto-Preis speichern
-            /*Database::getInstance()
-                ->prepare("UPDATE tl_dc_check_articles SET articlePriceBrutto=?, articlePriceNetto=? WHERE id=?")
-                ->execute($priceBrutto, $priceNetto, $dc->id);
-            */
+            $logger->info('Brutto berechnet aus Netto: ' . $priceNetto . '-'.$priceBrutto, [
+                'contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)
+            ]);
+            // Preise speichern
+            Database::getInstance()
+                ->prepare("UPDATE tl_dc_check_articles SET articlePriceBrutto=? WHERE id=?")
+                ->execute($priceBrutto, $dc->id);
+
         } elseif ($dc->field === 'articlePriceBrutto') {
-            $priceBrutto = (float) $varValue; // Brutto-Wert auslesen
+            // Fall: Brutto-Wert wurde eingegeben
+            $priceBrutto = (float) $varValue; // Brutto-Wert speichern
             $priceNetto = round($priceBrutto / 1.19, 2); // Netto berechnen
-            $logger->info('articles 5 calculatePrices: ' . $priceNetto,  ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)]);
 
+            // Synchronisierung über activeRecord
             $dc->activeRecord->articlePriceNetto = $priceNetto;
-            $dc->activeRecord->articlePriceBrutto = $priceBrutto;
-            $dc->activeRecord->save();
 
-            // Netto-Preis speichern
-            /*Database::getInstance()
-                ->prepare("UPDATE tl_dc_check_articles SET articlePriceNetto=?, articlePriceBrutto=? WHERE id=?")
-                ->execute($priceNetto,$priceBrutto, $dc->id);
-            */
+            $logger->info('Netto berechnet aus Brutto: ' . $priceNetto . '-'.$priceBrutto, [
+                'contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)
+            ]);
+            // Preise speichern
+            Database::getInstance()
+                ->prepare("UPDATE tl_dc_check_articles SET articlePriceNetto=? WHERE id=?")
+                ->execute($priceNetto, $dc->id);
         }
 
-        return $varValue; // Immer den Originalwert zurückgeben
+        // Rückgabe des aktuellen Feldes: Immer den eingegebenen Wert zurückgeben
+        return $varValue;
     }
 }
