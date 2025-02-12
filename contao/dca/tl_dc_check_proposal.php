@@ -23,8 +23,8 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 /**
  * Table tl_dc_check_invoice
  */
-$GLOBALS['TL_DCA']['tl_dc_check_proposal'] = array(
-    'config'      => array(
+$GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
+    'config'            => [
         'dataContainer'     => DC_Table::class,
         'ctable'            => array('tl_dc_check_articles'),
         'enableVersioning'  => true,
@@ -36,52 +36,52 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = array(
                 'published,start,stop' => 'index'
             )
         ),
-    ),
-    'list'        => array(
-        'sorting'           => array(
+    ],
+    'list'              => [
+        'sorting'           => [
             'mode'          => DataContainer::MODE_SORTABLE,
             'fields'        => array('title','alias','published'),
             'flag'          => DataContainer::SORT_ASC,
             'panelLayout'   => 'filter;sort,search,limit'
-        ),
-        'label'             => array(
-            'fields' => array('title','vendorName','checkId'),
+        ],
+        'label'             => [
+            'fields' => ['title','vendorName','checkId'],
             'format' => '%s %s %s',
-        ),
-        'global_operations' => array(
-            'all' => array(
+        ],
+        'global_operations' => [
+            'all' => [
                 'href'       => 'act=select',
                 'class'      => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"'
-            )
-        ),
-        'operations'    => array(
+            ]
+        ],
+        'operations'        => [
             'edit',
             'children',
             'copy',
             'delete',
             'show',
             'toggle'
-        )
-    ),
-    'palettes'          => array(
-        '__selector__'      => array('addArticleInfo'),
+        ]
+    ],
+    'palettes'          => [
+        '__selector__'      => ['addArticleInfo'],
         'default'           => '{title_legend},title,alias;
-                                {details_legend},checkId;
+                                {details_legend},proposalDate,checkId;
                                 {vendor_legend},vendorName,vendorStreet,vendorPostal,vendorCity,vendorEmail,vendorPhone,vendorMobile;
                                 {notes_legend},notes;
                                 {publish_legend},published,start,stop;'
-    ),
-    'subpalettes'       => array(
-    ),
-    'fields'            => array(
-        'id'                => array(
+    ],
+    'subpalettes'       => [
+    ],
+    'fields'            => [
+        'id'            => [
             'sql'           => "int(10) unsigned NOT NULL auto_increment"
-        ),
-        'tstamp'        => array(
+        ],
+        'tstamp'        => [
             'sql'           => "int(10) unsigned NOT NULL default '0'"
-        ),
-        'title'         => array(
+        ],
+        'title'         => [
             'inputType'     => 'text',
             'exclude'       => true,
             'search'        => true,
@@ -90,22 +90,28 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = array(
             'flag'          => DataContainer::SORT_INITIAL_LETTER_ASC,
             'eval'          => array('mandatory' => true, 'maxlength' => 25, 'tl_class' => 'w33'),
             'sql'           => "varchar(255) NOT NULL default ''"
-        ),
-        'alias'         => array(
+        ],
+        'alias'         => [
             'search'        => true,
             'inputType'     => 'text',
             'eval'          => array('rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w33'),
             'save_callback' => array('tl_dc_check_proposal', 'generateAlias'),
             'sql'           => "varchar(255) BINARY NOT NULL default ''"
-        ),
-        'checkId'           => array(
+        ],
+        'checkId'       => [
             'inputType'     => 'text',
             'foreignKey'    => 'tl_calendar_events.title',
             'options_callback' => array('tl_dc_check_proposal', 'getCalenarOptions'),
             'eval'          => ['submitOnChange' => true,'mandatory'=>false, 'tl_class' => 'w25 '],
             'sql'           => "int(10) unsigned NOT NULL default 0",
-        ),
-        'vendorName' => [
+        ],
+        'proposalDate'  => [
+            'label'         => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['proposalDate'],
+            'inputType'     => 'text',
+            'eval'          => array('rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w25 clr wizard'),
+            'sql'           => "varchar(10) NOT NULL default ''"
+        ],
+        'vendorName'    => [
             'exclude'   => true,
             'flag'      => SORT_STRING,
             'inputType' => 'text',
@@ -114,7 +120,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = array(
             'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w33',],
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
-        'vendorStreet' => [
+        'vendorStreet'  => [
             'exclude'   => true,
             'flag'      => SORT_STRING,
             'inputType' => 'text',
@@ -123,7 +129,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = array(
             'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w33 clr',],
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
-        'vendorPostal' => [
+        'vendorPostal'  => [
             'exclude'   => true,
             'inputType' => 'text',
             'search'    => true,
@@ -131,7 +137,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = array(
             'eval'      => ['maxlength' => 12, 'tl_class' => 'w25',],
             'sql'       => "varchar(32) NOT NULL default ''",
         ],
-        'vendorCity' => [
+        'vendorCity'    => [
             'exclude'   => true,
             'flag'      => SORT_STRING,
             'inputType' => 'text',
@@ -140,7 +146,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = array(
             'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w33',],
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
-        'vendorEmail' => [
+        'vendorEmail'   => [
             'default'   => null,
             'exclude'   => true,
             'inputType' => 'text',
@@ -148,7 +154,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = array(
             'eval'      => ['mandatory' => false, 'doNotCopy' => true, 'tl_class' => 'clr w33 wizard',],
             'sql'       => 'int(10) unsigned NULL',
         ],
-        'vendorPhone' => [
+        'vendorPhone'   => [
             'default'   => null,
             'exclude'   => true,
             'inputType' => 'text',
@@ -156,7 +162,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = array(
             'eval'      => ['mandatory' => false, 'doNotCopy' => true, 'tl_class' => 'w33 wizard',],
             'sql'       => 'int(10) unsigned NULL',
         ],
-        'vendorMobile' => [
+        'vendorMobile'  => [
             'default'   => null,
             'exclude'   => true,
             'inputType' => 'text',
@@ -164,7 +170,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = array(
             'eval'      => ['mandatory' => false, 'doNotCopy' => true, 'tl_class' => 'w33 wizard',],
             'sql'       => 'int(10) unsigned NULL',
         ],
-        'notes'         => array(
+        'notes'         => [
             'inputType'     => 'textarea',
             'exclude'       => true,
             'search'        => false,
@@ -172,27 +178,27 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = array(
             'sorting'       => false,
             'eval'          => array('rte' => 'tinyMCE', 'tl_class' => 'clr'),
             'sql'           => 'text NULL'
-        ),
-        'published'     => array(
+        ],
+        'published'     => [
             'toggle'        => true,
             'filter'        => true,
             'flag'          => DataContainer::SORT_INITIAL_LETTER_DESC,
             'inputType'     => 'checkbox',
             'eval'          => array('doNotCopy'=>true, 'tl_class' => 'w50'),
             'sql'           => array('type' => 'boolean', 'default' => false)
-        ),
-        'start'         => array(
+        ],
+        'start'         => [
             'inputType'     => 'text',
             'eval'          => array('rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 clr wizard'),
             'sql'           => "varchar(10) NOT NULL default ''"
-        ),
-        'stop'          => array(
+        ],
+        'stop'          => [
             'inputType'     => 'text',
             'eval'          => array('rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
             'sql'           => "varchar(10) NOT NULL default ''"
-        )
-    )
-);
+        ]
+    ]
+];
 
 /**
  * Provide miscellaneous methods that are used by the data configuration array.

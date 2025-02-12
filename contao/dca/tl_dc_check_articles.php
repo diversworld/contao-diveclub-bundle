@@ -107,12 +107,6 @@ $GLOBALS['TL_DCA']['tl_dc_check_articles'] = [
             ),
             'sql'           => "varchar(255) BINARY NOT NULL default ''"
         ],
-        'proposalDate'      => [
-            'label'         => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['proposalDate'],
-            'inputType'     => 'text',
-            'eval'          => array('rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w25 clr wizard'),
-            'sql'           => "varchar(10) NOT NULL default ''"
-        ],
         'articleSize'       => [
             'label'     => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['articleSize'],
             'inputType' => 'select',
