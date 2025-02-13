@@ -26,6 +26,7 @@ use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\System;
 use Contao\Template;
+use Diversworld\ContaoDiveclubBundle\Model\DcCheckProposalModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,6 +35,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckArticlesModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcCalendarEventsModel;
 
 #[AsFrontendModule(DcListingController::TYPE, category: 'dc_modules', template: 'mod_dc_listing')]
 class DcListingController extends AbstractFrontendModuleController
@@ -78,71 +80,30 @@ class DcListingController extends AbstractFrontendModuleController
 
     protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
     {
-        $logger = System::getContainer()->get('monolog.logger.contao');
-
-        $userFirstname = 'DUDE';
-        $user = $this->container->get('security.helper')->getUser();
-
-        // Get the logged in frontend user... if there is one
-        if ($user instanceof FrontendUser) {
-            $userFirstname = $user->firstname;
-        }
-
-        /** @var Session $session */
-        $session = $request->getSession();
-        $bag = $session->getBag('contao_frontend');
-        $bag->set('foo', 'bar');
-
-        /** @var Date $dateAdapter */
-        $dateAdapter = $this->container->get('contao.framework')->getAdapter(Date::class);
-
-        $intWeekday = $dateAdapter->parse('w');
-        $translator = $this->container->get('translator');
-        $strWeekday = $translator->trans('DAYS.'.$intWeekday, [], 'contao_default');
-
-        $arrGuests = [];
+        $eventAlias = Input::get('auto_item');
 
         // Get the database connection
         $db = $this->container->get('database_connection');
 
-        /** @var Result $stmt */
-        $stmt = $db->executeQuery('SELECT * FROM tl_member WHERE gender = ? ORDER BY lastname', ['female']);
+        /** @var Result $eventStmt */
+        $event = DcCalendarEventsModel::findByAlias($eventAlias);
 
-        $logger->info('stmt: ' . print_r($stmt, true));
+        $proposal = DcCheckProposalModel::findById($event->addVendorInfo);
 
-        while (false !== ($row = $stmt->fetchAssociative())) {
-            $arrGuests[] = $row['firstname'];
-        }
-        //----------------------
-        // Den Alias aus der URL holen (z. B. Parameter "id")
-        $eventAlias = Input::get('auto_item'); // Contao-Funktion für GET-Parameter
-        $logger->info('eventAlias: ' . $eventAlias);
+        $articles = DcCheckArticlesModel::findBy('pid', $proposal->id);
 
-        // Das Event aus der Datenbank holen
-        $event = CalendarEventsModel::findByAlias($eventAlias);
-        $logger->info('event: ' . print_r($event, true));
+        $this->logger->info('articles: '.print_r($articles, true));
 
-        // Die Details für das Angebot (über addVendorInfo verbunden)
-        $articles = DcCheckArticlesModel::findByPid($event->addVendorInfo);
-        $logger->info('articles: ' . print_r($articles, true));
-
-        if ($event !== null) {
-            // Daten an das Template übergeben
-            $this->Template->event = $event; // Event-Daten im Template verfügbar
-            $this->Template->articles = $articles ?: []; // Artikel im Template verfügbar
-        }
-
-        //----------------------
-        $template->helloTitle = sprintf(
-            'Hi %s, and welcome to the "Hello World Module". Today is %s.',
-            $userFirstname,
-            $strWeekday,
-        );
-
-        $template->helloText = '';
-
-        if (!empty($arrGuests)) {
-            $template->helloText = 'Our guests today are: '.implode(', ', $arrGuests);
+        // Prüfen, ob ein Event gefunden wurde
+        if ($event !== false) {
+            // Daten vorbereiten und ans Template übergeben
+            $template->event = $event ?: [];
+            $template->proposal = $proposal ?: [];
+            $template->articles = $articles ?: [];
+        } else {
+            $template->event = null; // Falls kein Event gefunden wurde
+            $template->proposal = [];
+            $template->articles = [];
         }
 
         return $template->getResponse();

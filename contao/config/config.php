@@ -15,6 +15,8 @@ use Diversworld\ContaoDiveclubBundle\Model\DcTanksModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckProposalModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCoursesModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckArticlesModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcCalendarEventsModel;
+
 /**
  * Backend modules
  */
@@ -31,7 +33,7 @@ $GLOBALS['BE_MOD']['diversworld'] = [
     ],
     'dc_check_collection' => [
         'tables' => ['tl_dc_check_proposal','tl_dc_check_articles'],
-    ],
+    ]
 ];
 
 /**
@@ -42,3 +44,5 @@ $GLOBALS['TL_MODELS']['tl_dc_tanks']            = DcTanksModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_check_invoice']    = DcCheckInvoiceModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_check_proposal']   = DcCheckProposalModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_check_articles']   = DcCheckArticlesModel::class;
+$GLOBALS['TL_MODELS']['tl_calendar_events']     = DcCalendarEventsModel::class;
+

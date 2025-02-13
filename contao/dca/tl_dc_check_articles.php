@@ -32,6 +32,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_articles'] = [
         'sql'               => [
             'keys'          => [
                 'id'        => 'primary',
+                'pid'       => 'index',
                 'tstamp'    => 'index',
                 'alias'     => 'index',
                 'published,start,stop' => 'index'

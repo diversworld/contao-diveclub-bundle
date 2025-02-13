@@ -30,7 +30,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[AsFrontendModule(category: 'dc_modules', template: 'mod_dc_check_listing')]
+#[AsFrontendModule(ModuleEventCheckDetail::TYPE, 'dc_modules', template: 'mod_dc_check_listing')]
 class ModuleEventCheckDetail extends AbstractFrontendModuleController
 {
     public const TYPE = 'dc_check_listing';

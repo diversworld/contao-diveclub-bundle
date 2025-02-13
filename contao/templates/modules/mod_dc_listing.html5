@@ -1,19 +1,36 @@
-<div class="event-details">
-    <h2><?php echo htmlspecialchars($this->event->title); ?></h2>
-    <p><?php echo htmlspecialchars(date('d.m.Y', strtotime($this->event->date))); ?></p>
-    <p><?php echo htmlspecialchars($this->event->description); ?></p>
-
-    <h3>Angebot zum Event - <?php echo $this->helloTitle; ?></h3>
-    <div><?php echo $this->helloText; ?>
-    <?php if (!empty($this->articles) && count($this->articles) > 0): ?>
-        <ul>
-            <?php foreach ($this->articles as $article): ?>
-                <li>
-                    <strong><?php echo htmlspecialchars($article['articleName']); ?></strong>: <?php echo htmlspecialchars($article['articlePriceBrutto']); ?> EUR
-                </li>
-            <?php endforeach; ?>
-        </ul>
-    <?php else: ?>
-        <p>Keine Artikel zum Angebot verfügbar.</p>
-    <?php endif; ?>
+<div class="check-details">
+    <h3>Angebot: <?php echo htmlspecialchars($this->proposal->title); ?> - <?php echo htmlspecialchars($this->proposal->vendorName); ?></h3>
+    <div proposal-detail">
+        Angebotsdatum:<?php echo htmlspecialchars(date('d.m.Y', $this->proposal->proposalDate)); ?>
+    </div>
+    <div class="proposal-articles">
+        <?php if ($this->articles !== null && $this->articles->count() > 0): ?>
+            <table class="">
+                <th class="" style="width: 150px;">
+                    Artikel
+                </th>
+                <th class="" style="width: 40px;">
+                    Preis Netto
+                </th>
+                <th class="" style="width: 40px;">
+                    Preis Brutto
+                </th>
+                <?php foreach ($this->articles as $article): ?>
+                    <tr class="">
+                        <td class="" style="width: 150px;">
+                            <strong><?php echo htmlspecialchars($article->title); ?></strong>:
+                        </td>
+                        <td class="" style="width: 40px;">
+                            <?php echo htmlspecialchars($article->articlePriceNetto); ?> EUR
+                        </td>
+                        <td class="" style="width: 40px;">
+                            <?php echo htmlspecialchars($article->articlePriceBrutto); ?> EUR
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </table>
+        <?php else: ?>
+            <p>Keine Artikel zum Angebot verfügbar.</p>
+        <?php endif; ?>
+    </div>
 </div>
