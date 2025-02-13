@@ -15,7 +15,6 @@ use Diversworld\ContaoDiveclubBundle\Model\DcTanksModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckProposalModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCoursesModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckArticlesModel;
-
 /**
  * Backend modules
  */

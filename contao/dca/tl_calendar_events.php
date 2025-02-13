@@ -85,7 +85,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addCheckInfo'] = [
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addVendorInfo'] = [
     'inputType'         => 'select',
-    'relation'          => array('type'=>'hasOne', 'load'=>'lazy'),
     'options_callback'  => function () {
             $options = [];
             $db = Database::getInstance();

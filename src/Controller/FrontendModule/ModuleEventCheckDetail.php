@@ -11,20 +11,16 @@ declare(strict_types=1);
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/diversworld/contao-diveclub-bundle
  */
-
 namespace Diversworld\ContaoDiveclubBundle\Controller\FrontendModule;
 
-use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\Date;
 use Contao\FrontendUser;
-use Contao\Input;
 use Contao\ModuleModel;
 use Contao\PageModel;
-use Contao\System;
 use Contao\Template;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
@@ -33,12 +29,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Diversworld\ContaoDiveclubBundle\Model\DcCheckArticlesModel;
 
-#[AsFrontendModule(DcListingController::TYPE, category: 'dc_modules', template: 'mod_dc_listing')]
-class DcListingController extends AbstractFrontendModuleController
+#[AsFrontendModule(category: 'dc_modules', template: 'mod_dc_check_listing')]
+class ModuleEventCheckDetail extends AbstractFrontendModuleController
 {
-    public const TYPE = 'dc_listing';
+    public const TYPE = 'dc_check_listing';
 
     protected ?PageModel $page;
 
@@ -78,8 +73,6 @@ class DcListingController extends AbstractFrontendModuleController
 
     protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
     {
-        $logger = System::getContainer()->get('monolog.logger.contao');
-
         $userFirstname = 'DUDE';
         $user = $this->container->get('security.helper')->getUser();
 
@@ -108,31 +101,10 @@ class DcListingController extends AbstractFrontendModuleController
         /** @var Result $stmt */
         $stmt = $db->executeQuery('SELECT * FROM tl_member WHERE gender = ? ORDER BY lastname', ['female']);
 
-        $logger->info('stmt: ' . print_r($stmt, true));
-
         while (false !== ($row = $stmt->fetchAssociative())) {
             $arrGuests[] = $row['firstname'];
         }
-        //----------------------
-        // Den Alias aus der URL holen (z. B. Parameter "id")
-        $eventAlias = Input::get('auto_item'); // Contao-Funktion für GET-Parameter
-        $logger->info('eventAlias: ' . $eventAlias);
 
-        // Das Event aus der Datenbank holen
-        $event = CalendarEventsModel::findByAlias($eventAlias);
-        $logger->info('event: ' . print_r($event, true));
-
-        // Die Details für das Angebot (über addVendorInfo verbunden)
-        $articles = DcCheckArticlesModel::findByPid($event->addVendorInfo);
-        $logger->info('articles: ' . print_r($articles, true));
-
-        if ($event !== null) {
-            // Daten an das Template übergeben
-            $this->Template->event = $event; // Event-Daten im Template verfügbar
-            $this->Template->articles = $articles ?: []; // Artikel im Template verfügbar
-        }
-
-        //----------------------
         $template->helloTitle = sprintf(
             'Hi %s, and welcome to the "Hello World Module". Today is %s.',
             $userFirstname,

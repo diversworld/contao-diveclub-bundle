@@ -1,0 +1,19 @@
+<div class="event-details">
+    <h2><?php echo htmlspecialchars($this->event->title); ?></h2>
+    <p><?php echo htmlspecialchars(date('d.m.Y', strtotime($this->event->date))); ?></p>
+    <p><?php echo htmlspecialchars($this->event->description); ?></p>
+
+    <h3>Angebot zum Event - <?php echo $this->helloTitle; ?></h3>
+    <div><?php echo $this->helloText; ?>
+    <?php if (!empty($this->articles) && count($this->articles) > 0): ?>
+        <ul>
+            <?php foreach ($this->articles as $article): ?>
+                <li>
+                    <strong><?php echo htmlspecialchars($article['articleName']); ?></strong>: <?php echo htmlspecialchars($article['articlePriceBrutto']); ?> EUR
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    <?php else: ?>
+        <p>Keine Artikel zum Angebot verfügbar.</p>
+    <?php endif; ?>
+</div>
