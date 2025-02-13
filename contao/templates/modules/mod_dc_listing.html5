@@ -1,5 +1,5 @@
 <div class="check-details">
-    <h3>Angebot: <?php echo htmlspecialchars($this->proposal->title); ?> - <?php echo htmlspecialchars($this->proposal->vendorName); ?></h3>
+    <h4>Angebot: <?php echo htmlspecialchars($this->proposal->title); ?> - <?php echo htmlspecialchars($this->proposal->vendorName); ?></h4>
     <div proposal-detail">
         Angebotsdatum:<?php echo htmlspecialchars(date('d.m.Y', $this->proposal->proposalDate)); ?>
     </div>
