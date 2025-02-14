@@ -45,4 +45,3 @@ $GLOBALS['TL_MODELS']['tl_dc_check_invoice']    = DcCheckInvoiceModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_check_proposal']   = DcCheckProposalModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_check_articles']   = DcCheckArticlesModel::class;
 $GLOBALS['TL_MODELS']['tl_calendar_events']     = DcCalendarEventsModel::class;
-

@@ -15,47 +15,64 @@ declare(strict_types=1);
 /**
  * Legends
  */
-$GLOBALS['TL_LANG']['tl_dc_tanks']['first_legend'] = "Stammdaten";
-$GLOBALS['TL_LANG']['tl_dc_tanks']['details_legend'] = "Details zum Tauchgerät";
-$GLOBALS['TL_LANG']['tl_dc_tanks']['notes_legend}'] = "Bemerkungen";
-$GLOBALS['TL_LANG']['tl_dc_tanks']['publish_legend'] ="Veröffentlichen";
+$GLOBALS['TL_LANG']['tl_dc_tanks']['title_legend']      = "Basic Information";
+$GLOBALS['TL_LANG']['tl_dc_tanks']['details_legend']    = "Details about the dive tank";
+$GLOBALS['TL_LANG']['tl_dc_tanks']['notes_legend']      = "Notes";
+$GLOBALS['TL_LANG']['tl_dc_tanks']['publish_legend']    = "Publish";
 
 /**
-* Global operations
-*/
-$GLOBALS['TL_LANG']['tl_dc_tanks']['new'] = ["Neu", "Ein neues Element anlegen"];
+ * Global operations
+ */
+$GLOBALS['TL_LANG']['tl_dc_tanks']['new'] = ["New", "Add a new item"];
 
 /**
  * Operations
  */
-$GLOBALS['TL_LANG']['tl_dc_tanks']['edit'] = "Datensatz mit ID: %s bearbeiten";
-$GLOBALS['TL_LANG']['tl_dc_tanks']['copy'] = "Datensatz mit ID: %s kopieren";
-$GLOBALS['TL_LANG']['tl_dc_tanks']['delete'] = "Datensatz mit ID: %s löschen";
-$GLOBALS['TL_LANG']['tl_dc_tanks']['show'] = "Datensatz mit ID: %s ansehen";
-$GLOBALS['TL_LANG']['tl_dc_tanks']['toggle'] = "Datensatz mit ID: %s veröffentlichen";
+$GLOBALS['TL_LANG']['tl_dc_tanks']['edit']      = "Edit record with ID: %s";
+$GLOBALS['TL_LANG']['tl_dc_tanks']['copy']      = "Copy record with ID: %s";
+$GLOBALS['TL_LANG']['tl_dc_tanks']['delete']    = "Delete record with ID: %s";
+$GLOBALS['TL_LANG']['tl_dc_tanks']['show']      = "View record with ID: %s";
+$GLOBALS['TL_LANG']['tl_dc_tanks']['toggle']    = "Publish record with ID: %s";
 
 /**
  * Fields
  */
-$GLOBALS['TL_LANG']['tl_dc_tanks']['title'] = ["Inventarnummer", "Geben Sie die Inventarnummer ein"];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['serialnumber'] = ["Seriennummer", "Geben Sie die Seriennummer ein."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['lastCheckDate'] = ["letzter TÜV", "Datum der letzten TÜV Prüfung."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['nextCheckDate'] = ["nächster TÜV", "Datum der nächsten TÜV Prüfung."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['size'] = ["Größe", "Bitte die Flaschengröße auswählen."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['member'] = ["Eigentümer", "Eigentümer der Flasche."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['addNotes'] = ["Bemerkungen eingeben", "Bemerkungen zum Tauchgerät erfassen."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['published'] = ["Veröffentlichen", "Den Datensatz veröffentlichen."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['start'] = ["Anzeigen ab", "Ab wann soll der Datensatz angezeigt werden."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['stop'] = ["Anzeigen bis", "Bis wann soll der Datensatz angezeigt werden."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['title']         = ["Inventory Number", "Enter the inventory number"];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['alias']         = ["Alias", "Dive tank alias"];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['serialNumber']  = ["Serial Number", "Enter the serial number."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['o2clean']       = ["O2 Clean", "The tank is for oxygen and must be O2 clean."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['manufacturer']  = ["Manufacturer", "Manufacturer of the dive tank."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['bazNumber']     = ["BAZ Nummere", "BAZ Nummer."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['lastCheckDate'] = ["Last Inspection", "Date of the last inspection."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['nextCheckDate'] = ["Next Inspection", "Date of the next inspection."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['pid']           = ["Next Inspection Date", "Select the next inspection date."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['size']          = ["Size", "Please select the tank size."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['member']        = ["Owner", "Owner of the dive tank."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['addNotes']      = ["Enter Notes", "Record notes about the dive tank."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['published']     = ["Publish", "Publish the record."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['start']         = ["Show from", "From when should the record be displayed."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['stop']          = ["Show until", "Until when should the record be displayed."];
 
 /**
  * References
  */
-$GLOBALS['TL_LANG']['tl_dc_tanks']['basic'] = "Starter Courses";
-$GLOBALS['TL_LANG']['tl_dc_tanks']['advanced'] = "Specialties";
-$GLOBALS['TL_LANG']['tl_dc_tanks']['professional'] = "Professional Courses";
+$GLOBALS['TL_LANG']['tl_dc_tanks']['sizes'] = [
+    '2' => '2 L',
+    '3' => '3 L',
+    '4' => '4 L',
+    '5' => '5 L',
+    '7' => '7 L',
+    '8' => '8 L',
+    '10' => '10 L',
+    '12' => '12 L',
+    '15' => '15 L',
+    '18' => '18 L',
+    '20' => '20 L',
+    '40' => '40 cft',
+    '80' => '80 cft'
+];
 
 /**
  * Buttons
  */
-$GLOBALS['TL_LANG']['tl_dc_tanks']['customButton'] = "Custom Routine starten";
+$GLOBALS['TL_LANG']['tl_dc_tanks']['createInvoiceButton'] = "Create invoice";

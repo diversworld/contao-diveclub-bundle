@@ -17,7 +17,6 @@ use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
 use Diversworld\ContaoDiveclubBundle\DataContainer\Tanks;
-use Diversworld\ContaoDiveclubBundle\Model\DcCheckInvoiceModel;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Contao\CoreBundle\Monolog\ContaoContext;
 
@@ -31,10 +30,10 @@ $GLOBALS['TL_DCA']['tl_dc_check_articles'] = [
         'enableVersioning'  => true,
         'sql'               => [
             'keys'          => [
-                'id'        => 'primary',
-                'pid'       => 'index',
-                'tstamp'    => 'index',
-                'alias'     => 'index',
+                'id'            => 'primary',
+                'pid'           => 'index',
+                'tstamp'        => 'index',
+                'alias'         => 'index',
                 'published,start,stop' => 'index'
             ]
         ],
@@ -42,7 +41,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_articles'] = [
     'list'          => [
         'sorting'           => [
             'mode'          => DataContainer::MODE_SORTABLE,
-            'fields'        => array('title','alias','published'),
+            'fields'        => ['title','alias','published'],
             'flag'          => DataContainer::SORT_ASC,
             'panelLayout'   => 'filter;sort,search,limit'
         ],
@@ -80,92 +79,91 @@ $GLOBALS['TL_DCA']['tl_dc_check_articles'] = [
             'sql'           => "int(10) unsigned NOT NULL auto_increment"
         ],
         'pid'               => [
-            'foreignKey'    => 'tl_dc_check_proposal.title',
-            'sql'           => "int(10) unsigned NOT NULL default 0",
-            'relation'      => ['type'=>'belongsTo', 'load'=>'lazy']
+            'foreignKey'        => 'tl_dc_check_proposal.title',
+            'sql'               => "int(10) unsigned NOT NULL default 0",
+            'relation'          => ['type' => 'belongsTo', 'load' => 'lazy'], // Typ anpassen, falls notwendig
         ],
         'tstamp'            => [
-            'sql'           => "int(10) unsigned NOT NULL default '0'"
+            'sql'               => "int(10) unsigned NOT NULL default '0'"
         ],
         'title'             => [
-            'inputType'     => 'text',
-            'label'         => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['articleName'],
-            'exclude'       => true,
-            'search'        => true,
-            'filter'        => true,
-            'sorting'       => true,
-            'flag'          => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'eval'          => array('mandatory' => true, 'maxlength' => 25, 'tl_class' => 'w33'),
-            'sql'           => "varchar(255) NOT NULL default ''"
+            'inputType'         => 'text',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['articleName'],
+            'exclude'           => true,
+            'search'            => true,
+            'filter'            => true,
+            'sorting'           => true,
+            'flag'              => DataContainer::SORT_INITIAL_LETTER_ASC,
+            'eval'              => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w33'],
+            'sql'               => "varchar(255) NOT NULL default ''",
         ],
         'alias'             => [
             'search'        => true,
             'inputType'     => 'text',
-            'eval'          => array('rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w33'),
-            'save_callback' => array
-            (
-                array('tl_dc_check_articles', 'generateAlias')
-            ),
-            'sql'           => "varchar(255) BINARY NOT NULL default ''"
+            'eval'          => ['rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w33'],
+            'save_callback' => [
+                ['tl_dc_check_articles', 'generateAlias']
+            ],
+            'sql'           => "varchar(255) BINARY NOT NULL default ''",
         ],
         'articleSize'       => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['articleSize'],
-            'inputType' => 'select',
-            'options'   => ['2','3','5','7','8','10','12','15','18','20','40','80'],
-            'eval'      => ['includeBlankOption' => true, 'groupStyle' => 'width:60px', 'tl_class'=>'w25'],
-            'sql'       => "varchar(20) NOT NULL default ''",
+            'label'         => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['articleSize'],
+            'inputType'     => 'select',
+            'options'       => ['2','3','5','7','8','10','12','15','18','20','40','80'],
+            'eval'          => ['includeBlankOption' => true, 'groupStyle' => 'width:60px', 'tl_class'=>'w25'],
+            'sql'           => "varchar(20) NOT NULL default ''",
         ],
         'articlePriceNetto' => [
             'label'         => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['articlePriceNetto'],
             'inputType'     => 'text',
-            'save_callback' => array(
-                array('tl_dc_check_articles', 'calculatePrices')
-            ),
+            'save_callback' => [
+                ['tl_dc_check_articles', 'calculatePrices']
+            ],
             'eval'          => ['submitOnChange' => true, 'tl_class'=>'w25'],
-            'sql'           => "DECIMAL(10,2) NOT NULL default '0.00'"
+            'sql'           => "DECIMAL(10,2) NOT NULL default '0.00'",
         ],
         'articlePriceBrutto'=> [
-            'label'         => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['articlePriceBrutto'],
-            'inputType'     => 'text',
-            'save_callback' => array(
-                array('tl_dc_check_articles', 'calculatePrices')
-            ),
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['articlePriceBrutto'],
+            'inputType'         => 'text',
+            'save_callback'     => [
+                ['tl_dc_check_articles', 'calculatePrices']
+            ],
             'eval'          => ['submitOnChange' => true, 'tl_class'=>'w25'],
             'sql'           => "DECIMAL(10,2) NOT NULL default '0.00'",
         ],
         'default'           => [
-            'label'         => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['default'],
-            'inputType'     => 'checkbox',
-            'eval'          => ['tl_class'=>'w25'],
-            'sql'               => "char(1) NOT NULL default ''"
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['default'],
+            'inputType'         => 'checkbox',
+            'eval'              => ['tl_class'=>'w25'],
+            'sql'               => "char(1) NOT NULL default ''",
         ],
         'articleNotes'      => [
-            'label'         => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['articleNotes'],
-            'inputType'     => 'textarea',
-            'exclude'       => true,
-            'search'        => false,
-            'filter'        => false,
-            'sorting'       => false,
-            'eval'          => array('rte' => 'tinyMCE', 'tl_class'=>'w33'),
-            'sql'           => 'text NULL'
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['articleNotes'],
+            'inputType'         => 'textarea',
+            'exclude'           => true,
+            'search'            => false,
+            'filter'            => false,
+            'sorting'           => false,
+            'eval'              => ['rte' => 'tinyMCE', 'tl_class'=>'w33'],
+            'sql'               => 'text NULL',
         ],
         'published'         => [
-            'toggle'        => true,
-            'filter'        => true,
-            'flag'          => DataContainer::SORT_INITIAL_LETTER_DESC,
-            'inputType'     => 'checkbox',
-            'eval'          => array('doNotCopy'=>true, 'tl_class' => 'w50'),
-            'sql'           => array('type' => 'boolean', 'default' => false)
+            'toggle'            => true,
+            'filter'            => true,
+            'flag'              => DataContainer::SORT_INITIAL_LETTER_DESC,
+            'inputType'         => 'checkbox',
+            'eval'              => ['doNotCopy'=>true, 'tl_class' => 'w50'],
+            'sql'               => ['type' => 'boolean', 'default' => false],
         ],
         'start'             => [
-            'inputType'     => 'text',
-            'eval'          => array('rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 clr wizard'),
-            'sql'           => "varchar(10) NOT NULL default ''"
+            'inputType'         => 'text',
+            'eval'              => ['rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 clr wizard'],
+            'sql'               => "varchar(10) NOT NULL default ''",
         ],
         'stop'              => [
-            'inputType'     => 'text',
-            'eval'          => array('rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-            'sql'           => "varchar(10) NOT NULL default ''"
+            'inputType'         => 'text',
+            'eval'              => ['rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 wizard'],
+            'sql'               => "varchar(10) NOT NULL default ''",
         ]
     ]
 ];

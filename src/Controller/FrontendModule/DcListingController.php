@@ -90,9 +90,12 @@ class DcListingController extends AbstractFrontendModuleController
 
         $proposal = DcCheckProposalModel::findById($event->addVendorInfo);
 
-        $articles = DcCheckArticlesModel::findBy('pid', $proposal->id);
+        if( !$proposal){
+            $articles = DcCheckArticlesModel::findBy('pid', $proposal->id);
+        } else {
+            $articles = [];
+        }
 
-        $this->logger->info('articles: '.print_r($articles, true));
 
         // Prüfen, ob ein Event gefunden wurde
         if ($event !== false) {

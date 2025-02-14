@@ -22,6 +22,8 @@ use Contao\FrontendUser;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\Template;
+use Diversworld\ContaoDiveclubBundle\Model\DcCalendarEventsModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcTanksModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,10 +32,10 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[AsFrontendModule(ModuleEventCheckDetail::TYPE, 'dc_modules', template: 'mod_dc_check_listing')]
-class ModuleEventCheckDetail extends AbstractFrontendModuleController
+#[AsFrontendModule(ModuleTanksDetail::TYPE, category: 'dc_modules', template: 'mod_dc_tanks_listing')]
+class ModuleTanksDetail extends AbstractFrontendModuleController
 {
-    public const TYPE = 'dc_check_listing';
+    public const TYPE = 'dc_tanks_listing';
 
     protected ?PageModel $page;
 
@@ -73,48 +75,18 @@ class ModuleEventCheckDetail extends AbstractFrontendModuleController
 
     protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
     {
-        $userFirstname = 'DUDE';
-        $user = $this->container->get('security.helper')->getUser();
-
-        // Get the logged in frontend user... if there is one
-        if ($user instanceof FrontendUser) {
-            $userFirstname = $user->firstname;
-        }
-
-        /** @var Session $session */
-        $session = $request->getSession();
-        $bag = $session->getBag('contao_frontend');
-        $bag->set('foo', 'bar');
-
-        /** @var Date $dateAdapter */
-        $dateAdapter = $this->container->get('contao.framework')->getAdapter(Date::class);
-
-        $intWeekday = $dateAdapter->parse('w');
-        $translator = $this->container->get('translator');
-        $strWeekday = $translator->trans('DAYS.'.$intWeekday, [], 'contao_default');
-
-        $arrGuests = [];
-
         // Get the database connection
         $db = $this->container->get('database_connection');
 
-        /** @var Result $stmt */
-        $stmt = $db->executeQuery('SELECT * FROM tl_member WHERE gender = ? ORDER BY lastname', ['female']);
+        /** @var Result $eventStmt */
+        $tanks = DcTanksModel::findAll();
 
-        while (false !== ($row = $stmt->fetchAssociative())) {
-            $arrGuests[] = $row['firstname'];
-        }
-
-        $template->helloTitle = sprintf(
-            'Hi %s, and welcome to the "Hello World Module". Today is %s.',
-            $userFirstname,
-            $strWeekday,
-        );
-
-        $template->helloText = '';
-
-        if (!empty($arrGuests)) {
-            $template->helloText = 'Our guests today are: '.implode(', ', $arrGuests);
+        // Prüfen, ob ein Event gefunden wurde
+        if ($tanks !== false) {
+            // Daten vorbereiten und ans Template übergeben
+            $template->tanks = $tanks ?: []; // Falls keine Tanks gefunden wurden
+        } else {
+            $template->tanks = [];
         }
 
         return $template->getResponse();

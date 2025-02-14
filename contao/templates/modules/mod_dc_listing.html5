@@ -1,10 +1,12 @@
+<?php $this->extend('block_unsearchable'); ?>
+<?php $this->block('content'); ?>
 <div class="check-details">
     <h4>Angebot: <?php echo htmlspecialchars($this->proposal->title); ?> - <?php echo htmlspecialchars($this->proposal->vendorName); ?></h4>
     <div proposal-detail">
         Angebotsdatum:<?php echo htmlspecialchars(date('d.m.Y', $this->proposal->proposalDate)); ?>
     </div>
     <div class="proposal-articles">
-        <?php if ($this->articles !== null && $this->articles->count() > 0): ?>
+        <?php if ($this->articles !== null && count($this->articles) > 0): ?>
             <table class="">
                 <th class="" style="width: 150px;">
                     Artikel
@@ -34,3 +36,5 @@
         <?php endif; ?>
     </div>
 </div>
+
+<?php $this->endblock(); ?>

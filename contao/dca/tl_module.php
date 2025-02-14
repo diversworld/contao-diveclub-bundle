@@ -12,7 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/resource-booking-bundle
  */
 
-use Diversworld\ContaoDiveclubBundle\Controller\FrontendModule\ModuleEventCheckDetail;
+use Diversworld\ContaoDiveclubBundle\Controller\FrontendModule\ModuleTanksDetail;
 use Diversworld\ContaoDiveclubBundle\Controller\FrontendModule\DcListingController;
 
 /*
@@ -24,7 +24,7 @@ $GLOBALS['TL_DCA']['tl_module']['palettes'][DcListingController::TYPE] =
      {protected_legend:hide},protected;
      {expert_legend:hide},guests,cssID';
 
-$GLOBALS['TL_DCA']['tl_module']['palettes'][ModuleEventCheckDetail::TYPE] =
+$GLOBALS['TL_DCA']['tl_module']['palettes'][ModuleTanksDetail::TYPE] =
     '{title_legend},name,headline,type;
      {template_legend:hide},customTpl;
      {protected_legend:hide},protected;

@@ -27,7 +27,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'] = [
     [CalendarEvents::class, 'calculateAllGrossPrices']
 ];
 */
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['ctable'][] = 'tl_dc_check_articles';
 
 // Palettes
 PaletteManipulator::create()
