@@ -20,32 +20,33 @@ use Contao\System;
 use Contao\Input;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Diversworld\ContaoDiveclubBundle\DataContainer\DcTanks;
+use Psr\Log\LoggerInterface;
+use Contao\TemplateLoader;
 
 /**
  * Table tl_dc_tanks
  */
 $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
-    'config'            => [
+    'config'        => [
         'dataContainer'     => DC_Table::class,
-        'ptable' => 'tl_dc_equipment_type',
+        'ptable'            => 'tl_dc_equipment_type',
         'enableVersioning'  => true,
-        'onload_callback'   => ['tl_dc_tanks', 'filterTanksByEventId'],
-        'ondelete_callback' => [],
         'sql'               => [
             'keys'          => [
                 'id'            => 'primary',
-                'title'         => 'index',
+                'pid'           => 'index',
+                'tstamp'        => 'index',
                 'alias'         => 'index',
                 'published,start,stop' => 'index'
             ]
         ],
     ],
-    'list'              => [
+    'list'          => [
         'sorting'           => [
-            'mode'              => DataContainer::MODE_PARENT,
-            'fields'            => ['title','type','manufacturer','size'],
-            'flag'              => DataContainer::SORT_ASC,
-            'panelLayout'       => 'filter;sort,search,limit',
+            'mode'          => DataContainer::MODE_PARENT,
+            'fields'        => ['title','alias','published'],
+            'flag'          => DataContainer::SORT_INITIAL_LETTER_ASC,
+            'panelLayout'   => 'filter;sort,search,limit'
         ],
         'label'             => [
             'fields'            => ['title','manufacturer','size'],
@@ -217,15 +218,32 @@ class tl_dc_equipment extends Backend
 
     private function getTemplateOptions($templateName)
     {
-        // Die Template-Datei laden, z. B. aus `templates/`
-        $templatePath = TL_ROOT . '/templates/' . $templateName . '.html5';
+        $this->logger = System::getContainer()->get('monolog.logger.contao.general');
+        // Templatepfad über Contao ermitteln
+        $templatePath = TemplateLoader::getPath($templateName, 'html5');
 
-        if (file_exists($templatePath)) {
-            $content = file_get_contents($templatePath);
-            $options = explode("\n", $content);
-            return array_filter(array_map('trim', $options));
+        // Überprüfen, ob die Datei existiert
+        if (!$templatePath || !file_exists($templatePath)) {
+            $this->logger->error('Template file not found: ' . $templatePath);
+            return [];
         }
 
-        return [];
+        // Dateiinhalt lesen
+        $content = file_get_contents($templatePath);
+
+        $options = [];
+        // Entferne PHP-Tags und wandle Daten in ein Array um
+        $content = trim($content);
+        $content = trim($content, '<?php');
+        $content = trim($content, '?>');
+
+        eval('$options = ' . $content . ';');
+
+        if (!is_array($options)) {
+            $this->logger->error('Failed to parse template content into an array: ' . $content);
+            return [];
+        }
+
+        return $options;
     }
 }

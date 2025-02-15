@@ -28,41 +28,41 @@ use Contao\TemplateLoader;
  * Table tl_dc_tanks
  */
 $GLOBALS['TL_DCA']['tl_dc_equipment_type'] = [
-    'config'        => [
+    'config'            => [
         'dataContainer'     => DC_Table::class,
         'ctable'            => ['tl_dc_equipment'],
         'enableVersioning'  => true,
-        'ondelete_callback' => [],
-        'sql'               => [
-            'keys' => [
-                'id' => 'primary',
-                'title' => 'index',
-                'alias' => 'index',
+        'sql'               => array(
+            'keys' => array(
+                'id'        => 'primary',
+                'tstamp'    => 'index',
+                'alias'     => 'index',
                 'published,start,stop' => 'index'
-            ]
-        ],
+            )
+        ),
     ],
-    'list'          => [
-        'sorting'       => [
-            'mode' => DataContainer::MODE_PARENT,
-            'fields' => ['title'],
-            'flag' => DataContainer::SORT_ASC,
-            'panelLayout' => 'filter;sort,search,limit',
+    'list'              => [
+        'sorting'           => [
+            'mode'          => DataContainer::MODE_SORTED,
+            'fields'        => ['title','subType'],
+            'flag'          => DataContainer::MODE_SORTED,
+            'panelLayout'   => 'filter;search,limit'
         ],
         'label'         => [
-            'fields' => ['title'],
-            'showColumns' => false,
-            'format' => '%s',
-            ],
+            'label' => &$GLOBALS['TL_LANG']['MSC']['all'],
+            'fields'        => ['title','subType'],
+            'label_callback' => ['tl_dc_equipment_type', 'subTypeLabel'], // Callback zum Anpassen
+        ],
         'global_operations' => [
-            'all' => [
-                'href' => 'act=select',
-                'class' => 'header_edit_all',
-                'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"'
+            'all'       => [
+                'href'      => 'act=select',
+                'class'     => 'header_edit_all',
+                'attributes'=> 'onclick="Backend.getScrollOffset()" accesskey="e"'
             ]
         ],
         'operations' => [
             'edit',
+            'children',
             'copy',
             'delete',
             'toggle',
@@ -71,10 +71,9 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_type'] = [
     ],
     'palettes'      => [
         '__selector__'  => ['addNotes'],
-        'default'       => '{title_legend},title,alias;
-                                {details_legend},type;
-                                {notes_legend},addNotes;
-                                {publish_legend},published,start,stop;'
+        'default'       => '{title_legend},title,subType,alias;
+                            {notes_legend},addNotes;
+                            {publish_legend},published,start,stop;'
     ],
     'subpalettes'   => [
         'addNotes'  => 'notes',
@@ -83,40 +82,38 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_type'] = [
         'id'            => [
             'sql'               => "int(10) unsigned NOT NULL auto_increment"
         ],
-        'pid'           => [
-            'foreignKey'        => 'tl_dc_equipment_type.title',
-            'sql'               => "int(10) unsigned NOT NULL default 0",
-            'relation'          => ['type' => 'belongsTo', 'load' => 'lazy'], // Typ anpassen, falls notwendig
-        ],
         'tstamp'        => [
             'sql'               => "int(10) unsigned NOT NULL default 0"
         ],
         'title'         => [
             'inputType'         => 'select',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_type']['type'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_type']['title'],
             'exclude'           => true,
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
-            'flag'              => DataContainer::MODE_TREE,
             'options_callback'  => ['tl_dc_equipment_type', 'getTypes'],
-            'eval'              => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
+            'eval'              => ['submitOnChange' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w33'],
             'sql'               => "varchar(255) NOT NULL default ''"
         ],
         'alias'         => [
             'search'            => true,
             'inputType'         => 'text',
-            'eval'              => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
+            'eval'              => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w33'],
             'save_callback'     => [
                 ['tl_dc_equipment_type', 'generateAlias']
             ],
             'sql'               => "varchar(255) BINARY NOT NULL default ''"
         ],
-        'type'          => [
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_type']['type'],
+        'subType'          => [
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_type']['subType'],
             'inputType'         => 'select',
-            'options_callback'  => ['tl_dc_equipment_type', 'getTypes'],
-            'eval'              => ['mandatory' => true, 'tl_class' => 'w50'],
+            'exclude'           => true,
+            'search'            => true,
+            'filter'            => true,
+            'sorting'           => true,
+            'options_callback'  => ['tl_dc_equipment_type', 'getSubTypes'],
+            'eval'              => ['mandatory' => false, 'tl_class' => 'w33'],
             'sql'               => "varchar(255) NOT NULL default ''",
         ],
         'addNotes'      => [
@@ -197,40 +194,52 @@ class tl_dc_equipment_type extends Backend
         return $varValue;
     }
 
-    public function getManufacturers()
+    public function getManufacturers():array
     {
         return $this->getTemplateOptions('equipment_manufacturers');
     }
 
-    public function getSizes()
+    public function getSizes():array
     {
         return $this->getTemplateOptions('equipment_sizes');
     }
 
-    public function getTypes()
+    public function getTypes():array
     {
-        $types = $this->getTemplateOptions('equipment_types');
-
-        // Logge die Rückgabe und prüfe, ob die Werte korrekt geladen werden
-        $this->logger = System::getContainer()->get('monolog.logger.contao.general');
-        $this->logger->info('getTypes Output: ' . print_r($types, true));
-
-        // Absicherung, dass immer ein Array zurückgegeben wird
-        if (!is_array($types)) {
-            $types = [];
-        }
-        //return $this->getTemplateOptions('equipment_types');
-        return $types;
+        return $this->getTemplateOptions('equipment_types');
     }
 
-    private function getTemplateOptions($templateName)
+    public function getSubTypes(DataContainer $dc): array
     {
         $this->logger = System::getContainer()->get('monolog.logger.contao.general');
+        // Sicherstellen, dass ein aktiver Datensatz vorhanden ist
+        if (!$dc->activeRecord) {
+            return [];
+        }
 
+        // Ermittle den aktuellen Typ aus dem aktiven Datensatz
+        $currentType = $dc->activeRecord->title;
+        $this->logger->info('getSubTypes: Current type: ' . $currentType);
+
+        $subTypes = $this->getTemplateOptions('equipment_subTypes');
+        $this->logger->info('getSubTypes: Subtypes: ' . print_r($subTypes, true));
+
+        // Prüfen, ob für den aktuellen Typ Subtypen definiert wurden
+        if (!isset($subTypes[$currentType]) || !is_array($subTypes[$currentType])) {
+            // Keine passenden Subtypen gefunden -> leere Liste zurückgeben
+            return [];
+        }
+        $this->logger->info('getSubTypes: Subtypes for current type: ' . print_r($options[$currentType], true));
+
+        // Nur die relevanten Subtypen für diesen Typ zurückgeben
+        return $subTypes[$currentType];
+    }
+
+    private function getTemplateOptions($templateName):array
+    {
+        $this->logger = System::getContainer()->get('monolog.logger.contao.general');
         // Templatepfad über Contao ermitteln
         $templatePath = TemplateLoader::getPath($templateName, 'html5');
-
-        $this->logger->info('getTemplateOptions: Resolved template path: ' . $templatePath);
 
         // Überprüfen, ob die Datei existiert
         if (!$templatePath || !file_exists($templatePath)) {
@@ -240,8 +249,6 @@ class tl_dc_equipment_type extends Backend
 
         // Dateiinhalt lesen
         $content = file_get_contents($templatePath);
-
-        $this->logger->info('Template content: ' . $content);
 
         $options = [];
         // Entferne PHP-Tags und wandle Daten in ein Array um
@@ -256,8 +263,28 @@ class tl_dc_equipment_type extends Backend
             return [];
         }
 
-        $this->logger->info('Parsed options: ' . print_r($options, true));
         return $options;
-        // Rückgabe leer, wenn kein Array generiert werden konnte
     }
+
+    public function subTypeLabel(array $row, string $label, DataContainer $dc = null): string
+    {
+        // Lade die Subtypen aus der Template-Datei
+        $subTypes = $this->getTemplateOptions('equipment_subTypes');
+
+        // Ermittle den aktuellen Subtypen-Text basierend auf dem gespeicherten Typ und Subtyp
+        $currentType = $row['title']; // Titel/Typ aus der Datenbankzeile
+        $subTypeId = $row['subType']; // Subtype-ID aus der Datenbankzeile
+
+        // Standardwert, falls keine Zuordnung gefunden wird
+        $subTypeName = $subTypeId;
+
+        // Überprüfen, ob der Titel/Subtype im Array existiert
+        if (isset($subTypes[$currentType]) && isset($subTypes[$currentType][$subTypeId])) {
+            $subTypeName = $subTypes[$currentType][$subTypeId];
+        }
+
+        // Label als Kombination aus Titel und Subtype-Name zurückgeben
+        return sprintf('%s', $subTypeName);
+    }
+
 }

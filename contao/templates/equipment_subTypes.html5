@@ -1,0 +1,21 @@
+[
+    '1' => [
+        '1' => 'Anzüge shorties',
+        '2' => 'Anzüge nass',
+        '3' => 'Anzüge halbtrocken ',
+        '4' => 'Anzüge trocken',
+    ],
+    '2' => [
+        '1' => 'Primäre Regler',
+        '2' => 'Sekundäre Regler',
+        '3' => 'Finimeter',
+        '4' => 'Kompasse',
+        '5' => 'Sonstiges',
+    ],
+    '3' => [
+        '1' => 'Masken',
+        '2' => 'Schnorchel',
+        '3' => 'Schwimmbadflossen',
+        '4' => 'Geräteflossen',
+    ],
+]

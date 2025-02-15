@@ -11,6 +11,8 @@
  */
 
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckInvoiceModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentTypeModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcTanksModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckProposalModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCoursesModel;
@@ -24,19 +26,19 @@ use Diversworld\ContaoDiveclubBundle\Model\DcCalendarEventsModel;
 // Add child table tl_calendar_events_member to tl_calendar_events
 $GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_dc_tanks';
 
-$GLOBALS['BE_MOD']['diversworld'] = [
-    'dc_equipment_collection' => [
-        'tables' => ['tl_dc_equipment_type', 'tl_dc_equipment'],
-    ],
-    'dc_tank_collection' => [
-        'tables' => ['tl_dc_tanks','tl_dc_check_invoice'],
-    ],
-    'dc_course_collection' => [
-        'tables' => ['tl_dc_courses'],
-    ],
-    'dc_check_collection' => [
-        'tables' => ['tl_dc_check_proposal','tl_dc_check_articles'],
-    ]
+$GLOBALS['BE_MOD']['diveclub'] = [
+        'dc_equipment_collection' => [
+            'tables' => ['tl_dc_equipment_type', 'tl_dc_equipment'],
+        ],
+        'dc_tanks_collection' => [
+            'tables' => ['tl_dc_tanks','tl_dc_check_invoice'],
+        ],
+        'dc_course_collection' => [
+            'tables' => ['tl_dc_courses'],
+        ],
+        'dc_check_collection' => [
+            'tables' => ['tl_dc_check_proposal','tl_dc_check_articles'],
+        ]
 ];
 
 /**
@@ -47,4 +49,6 @@ $GLOBALS['TL_MODELS']['tl_dc_tanks']            = DcTanksModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_check_invoice']    = DcCheckInvoiceModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_check_proposal']   = DcCheckProposalModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_check_articles']   = DcCheckArticlesModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_eqipment_type']    = DcEquipmentTypeModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_equipment']        = DcEquipmentModel::class;
 $GLOBALS['TL_MODELS']['tl_calendar_events']     = DcCalendarEventsModel::class;

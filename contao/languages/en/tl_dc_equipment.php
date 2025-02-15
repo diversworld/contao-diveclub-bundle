@@ -1,5 +1,18 @@
 <?php
 
+/**
+ * Global operations
+ */
+$GLOBALS['TL_LANG']['tl_dc_equipment']['new'] = ["Neu", "Ein neues Element anlegen"];
+
+/**
+ * Operations
+ */
+$GLOBALS['TL_LANG']['tl_dc_equipment']['edit'] = "Datensatz mit ID: %s bearbeiten";
+$GLOBALS['TL_LANG']['tl_dc_equipment']['copy'] = "Datensatz mit ID: %s kopieren";
+$GLOBALS['TL_LANG']['tl_dc_equipment']['delete'] = "Datensatz mit ID: %s löschen";
+$GLOBALS['TL_LANG']['tl_dc_equipment']['show'] = "Datensatz mit ID: %s ansehen";
+
 // Legends
 $GLOBALS['TL_LANG']['tl_dc_equipment']['title_legend'] = 'Titel und Alias';
 $GLOBALS['TL_LANG']['tl_dc_equipment']['details_legend'] = 'Details';

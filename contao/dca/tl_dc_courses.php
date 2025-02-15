@@ -166,7 +166,7 @@ $GLOBALS['TL_DCA']['tl_dc_courses'] = array(
         ),
         'size' => array
         (
-            'label'     => &$GLOBALS['TL_LANG']['MSC']['imgSize'],
+            'label'     => &$GLOBALS['TL_LANG']['tl_dc_courses']['imgSize'],
             'inputType' => 'imageSize',
             'reference' => &$GLOBALS['TL_LANG']['MSC'],
             'eval'      => array('rgxp'=>'natural', 'includeBlankOption'=>true, 'nospace'=>true, 'helpwizard'=>true, 'tl_class'=>'w50 clr'),
@@ -177,7 +177,7 @@ $GLOBALS['TL_DCA']['tl_dc_courses'] = array(
         ),
         'imageUrl' => array
         (
-            'label'         => &$GLOBALS['TL_LANG']['tl_content']['imageUrl'],
+            'label'         => &$GLOBALS['TL_LANG']['tl_dc_courses']['imageUrl'],
             'search'        => true,
             'inputType'     => 'text',
             'eval'          => array('rgxp'=>'url', 'decodeEntities'=>true, 'maxlength'=>2048, 'dcaPicker'=>true, 'tl_class'=>'w50 wizard'),
@@ -185,14 +185,14 @@ $GLOBALS['TL_DCA']['tl_dc_courses'] = array(
         ),
         'fullsize' => array
         (
-            'label'         => &$GLOBALS['TL_LANG']['tl_content']['fullsize'],
+            'label'         => &$GLOBALS['TL_LANG']['tl_dc_courses']['fullsize'],
             'inputType'     => 'checkbox',
             'eval'          => array('tl_class'=>'w50'),
             'sql'           => array('type' => 'boolean', 'default' => false)
         ),
         'caption' => array
         (
-            'label'         => &$GLOBALS['TL_LANG']['tl_content']['caption'],
+            'label'         => &$GLOBALS['TL_LANG']['tl_dc_courses']['caption'],
             'search'        => true,
             'inputType'     => 'text',
             'eval'          => array('maxlength'=>255, 'allowHtml'=>true, 'tl_class'=>'w50'),
@@ -200,7 +200,7 @@ $GLOBALS['TL_DCA']['tl_dc_courses'] = array(
         ),
         'floating' => array
         (
-            'label'         => &$GLOBALS['TL_LANG']['tl_content']['floating'],
+            'label'         => &$GLOBALS['TL_LANG']['tl_dc_courses']['floating'],
             'inputType'     => 'radioTable',
             'options'       => array('above', 'left', 'right', 'below'),
             'eval'          => array('cols'=>4, 'tl_class'=>'w50'),

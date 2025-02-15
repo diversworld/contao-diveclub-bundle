@@ -31,6 +31,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_invoice'] = array(
         'sql'               => array(
             'keys' => array(
                 'id'        => 'primary',
+                'pid'       => 'index',
                 'tstamp'    => 'index',
                 'alias'     => 'index',
                 'published,start,stop' => 'index'

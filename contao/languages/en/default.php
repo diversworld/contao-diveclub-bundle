@@ -21,3 +21,5 @@ declare(strict_types=1);
  * Errors
  */
 //$GLOBALS['TL_LANG']['ERR'][''] = '';
+$GLOBALS['TL_LANG']['ERR']['aliasNumeric'] = 'Der Alias "%s" darf nicht nur aus Zahlen bestehen.';
+$GLOBALS['TL_LANG']['ERR']['aliasExists'] = 'Der Alias "%s" existiert bereits.';
