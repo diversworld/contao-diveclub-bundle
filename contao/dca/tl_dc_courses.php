@@ -79,7 +79,7 @@ $GLOBALS['TL_DCA']['tl_dc_courses'] = array(
             'sql'       => "int(10) unsigned NOT NULL auto_increment"
         ),
         'tstamp'        => array(
-            'sql'       => "int(10) unsigned NOT NULL default '0'"
+            'sql'       => "int(10) unsigned NOT NULL default 0"
         ),
         'title'     => array(
             'inputType' => 'text',
@@ -132,14 +132,14 @@ $GLOBALS['TL_DCA']['tl_dc_courses'] = array(
         (
             'inputType' => 'checkbox',
             'eval'      => array('submitOnChange'=>true),
-            'sql'               => "char(1) NOT NULL default ''"
+            'sql'       => ['type' => 'boolean', 'default' => false],
         ),
         'overwriteMeta' => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_dc_courses']['overwriteMeta'],
             'inputType' => 'checkbox',
             'eval'      => array('submitOnChange'=>true, 'tl_class'=>'w50 clr'),
-            'sql'               => "char(1) NOT NULL default ''"
+            'sql'       => ['type' => 'boolean', 'default' => false],
         ),
         'singleSRC' => array
         (

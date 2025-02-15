@@ -15,9 +15,14 @@ declare(strict_types=1);
 /**
  * Backend modules
  */
-$GLOBALS['TL_LANG']['MOD']['diversworld'] = ['Tauchclub Manager', 'Verwalten von Equipment, Tauchkursen, usw.'];
-$GLOBALS['TL_LANG']['MOD']['check_modules'] = ['Equipment', 'Verwalten von Ausrüstung'];
-$GLOBALS['TL_LANG']['MOD']['dc_course_collection'] = ['Tauchkurse', 'Verwalten von Tauchkursen'];
-$GLOBALS['TL_LANG']['MOD']['dc_tank_collection'] = ['Tauchgeräte', 'Verwalten von Tauchgeräten'];
-$GLOBALS['TL_LANG']['MOD']['dc_check_collection'] = ['TÜV Prüfungen', 'Verwalten der Angebote für TÜV Prüfungen'];
 
+$GLOBALS['TL_LANG']['MOD']['diversworld']               = ['Tauchclub Manager', 'Verwalten von Equipment, Tauchkursen, usw.'];
+
+$GLOBALS['TL_LANG']['MOD']['dc_course_collection']      = ['Tauchkurse', 'Verwalten von Tauchkursen'];
+$GLOBALS['TL_LANG']['MOD']['dc_tanks_collection']       = ['Tauchgeräte', 'Verwalten von Tauchgeräten'];
+$GLOBALS['TL_LANG']['MOD']['dc_check_collection']       = ['TÜV Prüfungen', 'Verwalten der Angebote für TÜV Prüfungen'];
+$GLOBALS['TL_LANG']['MOD']['dc_equipment_collection']   = ['Equipment', 'Verwalten von Ausrüstung'];
+
+$GLOBALS['TL_LANG']['FMD']['dc_modules']                = ['Tauchclubmanager', 'Module des Tauchclubmanagers'];
+$GLOBALS['TL_LANG']['FMD']['dc_listing']                = ['Angebotsdetails', 'Diveclub Manager'];
+$GLOBALS['TL_LANG']['FMD']['dc_tanks_listing']          = ['Tauchgeräte', 'Liste der erfassten Tauchgeräte'];

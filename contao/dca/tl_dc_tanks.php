@@ -18,6 +18,7 @@ use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
 use Contao\Input;
+use Contao\CoreBundle\Monolog\ContaoContext;
 use Diversworld\ContaoDiveclubBundle\DataContainer\DcTanks;
 
 /**
@@ -28,7 +29,6 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
         'dataContainer'     => DC_Table::class,
         'ctable'            => ['tl_dc_check_invoice'],
         'enableVersioning'  => true,
-        'onload_callback'   => ['tl_dc_tanks', 'filterTanksByEventId'],
         'ondelete_callback' => [],
         'sql'               => [
             'keys'          => [
@@ -89,7 +89,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'sql'               => "int(10) unsigned NOT NULL auto_increment"
         ],
         'tstamp'            => [
-            'sql'               => "int(10) unsigned NOT NULL default '0'"
+            'sql'               => "int(10) unsigned NOT NULL default 0"
         ],
         'title'             => [
             'inputType'         => 'text',
@@ -138,7 +138,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'sorting'           => true,
             'flag'              => DataContainer::SORT_INITIAL_LETTER_ASC,
             'eval'              => ['mandatory' => false, 'tl_class' => 'w25'],
-            'sql'               => "varchar(255) NOT NULL default ''"
+            'sql'               => "varchar(50) NOT NULL default ''"
         ],
         'size'              => [
             'inputType'         => 'select',
@@ -156,7 +156,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'filter'            => true,
             'inputType'         => 'checkbox',
             'eval'              => ['submitOnChange' => true, 'tl_class' => 'w50'],
-            'sql'               => "tinyint(1) NOT NULL default ''"
+            'sql'               => ['type' => 'boolean', 'default' => false]
         ],
         'checkId'           => [
             'inputType'         => 'select',                        // Typ ist "select"
@@ -167,7 +167,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
                 ['tl_dc_tanks', 'setLastCheckDate']
             ],
             'eval'              => [
-                'includeBlankOption' => true,                      // Option "Bitte wählen" hinzufügen
+                'includeBlankOption'=> true,                      // Option "Bitte wählen" hinzufügen
                 'chosen'            => true,                       // Dropdown mit Suchfunktion
                 'submitOnChange'    => true,                       // Lade-Seite bei Änderung reload
                 'tl_class'          => 'w33 clr'                   // Layout-Klasse
@@ -206,7 +206,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'exclude'           => true,
             'inputType'         => 'checkbox',
             'eval'              => ['submitOnChange' => true, 'tl_class' => 'w50'],
-            'sql'               => "char(1) NOT NULL default ''"
+            'sql'       => ['type' => 'boolean', 'default' => false]
         ],
         'notes'             => [
             'inputType'         => 'textarea',
@@ -241,7 +241,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
 /**
  * Provide miscellaneous methods that are used by the data configuration array.
  *
- * @property DcTanks $Tanks
+ * @property DcTanks $DcTanks
  *
  * @internal
  */

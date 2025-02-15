@@ -26,7 +26,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['tankChecks'] = [
     'exclude'   => true,
     'filter'    => true,
     'inputType' => 'checkbox',
-    'sql'       => "char(1) NOT NULL default ''",
+    'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['diveCourse'] = [
@@ -34,5 +34,5 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['diveCourse'] = [
     'exclude'   => true,
     'filter'    => true,
     'inputType' => 'checkbox',
-    'sql'       => "char(1) NOT NULL default ''",
+    'sql'       => ['type' => 'boolean', 'default' => false],
 ];

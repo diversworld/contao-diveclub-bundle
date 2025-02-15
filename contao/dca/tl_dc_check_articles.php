@@ -84,7 +84,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_articles'] = [
             'relation'          => ['type' => 'belongsTo', 'load' => 'lazy'], // Typ anpassen, falls notwendig
         ],
         'tstamp'            => [
-            'sql'               => "int(10) unsigned NOT NULL default '0'"
+            'sql'               => "int(10) unsigned NOT NULL default 0"
         ],
         'title'             => [
             'inputType'         => 'text',
@@ -135,7 +135,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_articles'] = [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['default'],
             'inputType'         => 'checkbox',
             'eval'              => ['tl_class'=>'w25'],
-            'sql'               => "char(1) NOT NULL default ''",
+            'sql'               => ['type' => 'boolean', 'default' => false]
         ],
         'articleNotes'      => [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['articleNotes'],

@@ -71,7 +71,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['is_tuv_appointment'] = [
     'filter'    => true,
     'inputType' => 'checkbox',
     'eval'      => ['tl_class' => 'clr w25'],
-    'sql'       => "char(1) NOT NULL default ''",
+    'sql'       => ['type' => 'boolean', 'default' => false]
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addCheckInfo'] = [
@@ -79,7 +79,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addCheckInfo'] = [
     'filter'    => true,
     'inputType' => 'checkbox',
     'eval'      => ['submitOnChange' => true, 'tl_class' => 'clr w25',],
-    'sql'       => "char(1) NOT NULL default ''",
+    'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addVendorInfo'] = [
@@ -126,5 +126,5 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addCourseInfo'] = [
     'filter'    => true,
     'inputType' => 'checkbox',
     'eval'      => ['submitOnChange' => true, 'tl_class' => 'clr w25',],
-    'sql'       => "char(1) NOT NULL default ''",
+    'sql'       => ['type' => 'boolean', 'default' => false],
 ];

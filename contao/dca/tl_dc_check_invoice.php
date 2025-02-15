@@ -85,7 +85,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_invoice'] = array(
             'sql'           => "int(10) unsigned NOT NULL default 0",
         ],
         'tstamp'        => array(
-            'sql'           => "int(10) unsigned NOT NULL default '0'"
+            'sql'           => "int(10) unsigned NOT NULL default 0"
         ),
         'title'         => array(
             'inputType'     => 'text',
