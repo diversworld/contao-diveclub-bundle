@@ -52,6 +52,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'fields'            => ['title','manufacturer','regModel1st','regModel2ndPri','regModel2ndSec'],
             'showColumns'       => false,
             'format'            => '%s %s %s %s %s',
+            'label_callback'  => ['tl_dc_regulators', 'customLabelCallback'],
         ],
         'global_operations' => [
             'all'               => [
@@ -341,4 +342,35 @@ class tl_dc_regulators extends Backend
         // Rückgabe der Modelle für die zweite Stufe
         return $models[$manufacturer]['regModel2nd'];
     }
+
+    public function customLabelCallback(array $row, string $label, DataContainer $dc = null, array $args = null): array
+    {
+        // Hersteller auslesen
+        $manufacturer = $row['manufacturer'];
+
+        // Modelle für die erste und zweite Stufe basierend auf dem Hersteller laden
+        $models = $this->getTemplateOptions('regulator_data');
+
+        // Namen der Modelle statt der Indexwerte benutzen
+        if (isset($models[$manufacturer]['regModel1st'][$row['regModel1st']])) {
+            $args[2] = $models[$manufacturer]['regModel1st'][$row['regModel1st']];
+        } else {
+            $args[2] = '-'; // Fallback, falls nichts gefunden wird
+        }
+
+        if (isset($models[$manufacturer]['regModel2nd'][$row['regModel2ndPri']])) {
+            $args[3] = $models[$manufacturer]['regModel2nd'][$row['regModel2ndPri']];
+        } else {
+            $args[3] = '-'; // Fallback
+        }
+
+        if (isset($models[$manufacturer]['regModel2nd'][$row['regModel2ndSec']])) {
+            $args[4] = $models[$manufacturer]['regModel2nd'][$row['regModel2ndSec']];
+        } else {
+            $args[4] = '-'; // Fallback
+        }
+
+        return $args;
+    }
+
 }
