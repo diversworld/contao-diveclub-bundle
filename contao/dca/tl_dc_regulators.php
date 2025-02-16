@@ -72,7 +72,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
     'palettes'          => [
         '__selector__'      => ['addNotes'],
         'default'           => '{title_legend},title,alias;
-                                {1stStage_legend},serialNumber1st,manufacturer;
+                                {1stStage_legend},manufacturer,serialNumber1st,regModel1st;
                                 {2ndstage_legend},serialNumber2ndPri,regModel2ndPri,serialNumber2ndSec,regModel2ndSec;
                                 {notes_legend},addNotes;
                                 {publish_legend},published,start,stop;'
@@ -140,8 +140,8 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
-            'options_callback'  => ['tl_dc_regulators', 'getRegModels'],
-            'eval'              => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
+            'options_callback'  => ['tl_dc_regulators', 'getRegModels1st'],
+            'eval'              => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql'               => "varchar(255) NOT NULL default ''"
         ],
         'serialNumber2ndPri'    => [
@@ -156,12 +156,12 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
         ],
         'regModel2ndPri'        => [
             'inputType'         => 'select',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulators']['regModel'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulators']['regModel2ndPri'],
             'exclude'           => true,
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
-            'options_callback'  => ['tl_dc_regulators', 'getRegModels'],
+            'options_callback'  => ['tl_dc_regulators', 'getRegModels2nd'],
             'eval'              => ['submitOnChange' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql'               => "varchar(255) NOT NULL default ''"
         ],
@@ -176,12 +176,12 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
         ],
         'regModel2ndSec'        => [
             'inputType'         => 'select',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulators']['regModel2ndPri'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulators']['regModel2ndSec'],
             'exclude'           => true,
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
-            'options_callback'  => ['tl_dc_regulators', 'getRegModels'],
+            'options_callback'  => ['tl_dc_regulators', 'getRegModels2nd'],
             'eval'              => ['submitOnChange' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql'               => "varchar(255) NOT NULL default ''"
         ],
@@ -304,24 +304,41 @@ class tl_dc_regulators extends Backend
 
         return $options;
     }
-    public function getRegModels(DataContainer $dc): array
+    public function getRegModels1st(DataContainer $dc): array
     {
         // Sicherstellen, dass ein aktiver Datensatz vorhanden ist
-        if (!$dc->activeRecord) {
+        if (!$dc->activeRecord || !$dc->activeRecord->manufacturer) {
             return [];
         }
 
         // Ermittle den aktuellen Typ aus dem aktiven Datensatz
-        $currentType = $dc->activeRecord->manufacturer;
+        $manufacturer = $dc->activeRecord->manufacturer; // Aktueller Hersteller
+        $models = $this->getTemplateOptions('regulater_data');
 
-        $subTypes = $this->getTemplateOptions('equipment_regulatermodels');
-
-        // Prüfen, ob für den aktuellen Typ Subtypen definiert wurden
-        if (!isset($subTypes[$currentType]) || !is_array($subTypes[$currentType])) {
-            // Keine passenden Subtypen gefunden -> leere Liste zurückgeben
+        // Prüfen, ob der Hersteller existiert und Modelle für die erste Stufe definiert sind
+        if (!isset($models[$manufacturer]['regModel1st']) || !is_array($models[$manufacturer]['regModel1st'])) {
             return [];
         }
-        // Nur die relevanten Subtypen für diesen Typ zurückgeben
-        return $subTypes[$currentType];
+
+        // Rückgabe der Modelle für die erste Stufe
+        return $models[$manufacturer]['regModel1st'];
+    }
+
+    public function getRegModels2nd(DataContainer $dc): array
+    {
+        if (!$dc->activeRecord || !$dc->activeRecord->manufacturer) {
+            return [];
+        }
+
+        $manufacturer = $dc->activeRecord->manufacturer; // Aktueller Hersteller
+        $models = $this->getTemplateOptions('equipment_regulatermodels');
+
+        // Prüfen, ob der Hersteller existiert und Modelle für die zweite Stufe definiert sind
+        if (!isset($models[$manufacturer]['regModel2nd']) || !is_array($models[$manufacturer]['regModel2nd'])) {
+            return [];
+        }
+
+        // Rückgabe der Modelle für die zweite Stufe
+        return $models[$manufacturer]['regModel2nd'];
     }
 }
