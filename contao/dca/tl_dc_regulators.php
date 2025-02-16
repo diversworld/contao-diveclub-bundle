@@ -347,6 +347,7 @@ class tl_dc_regulators extends Backend
     {
         // Hersteller auslesen
         $manufacturer = $row['manufacturer'];
+        $args[1] = $manufacturers[$row['manufacturer']] ?? '-'; // Hersteller-Name einsetzen
 
         // Modelle für die erste und zweite Stufe basierend auf dem Hersteller laden
         $models = $this->getTemplateOptions('regulator_data');
