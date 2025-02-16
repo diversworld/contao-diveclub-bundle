@@ -3,34 +3,34 @@
 /**
  * Global operations
  */
-$GLOBALS['TL_LANG']['tl_dc_equipment']['new'] = ["Neu", "Ein neues Element anlegen"];
+$GLOBALS['TL_LANG']['tl_dc_equipment']['new'] = ["New", "Create a new element"];
 
 /**
  * Operations
  */
-$GLOBALS['TL_LANG']['tl_dc_equipment']['edit'] = "Datensatz mit ID: %s bearbeiten";
-$GLOBALS['TL_LANG']['tl_dc_equipment']['copy'] = "Datensatz mit ID: %s kopieren";
-$GLOBALS['TL_LANG']['tl_dc_equipment']['delete'] = "Datensatz mit ID: %s löschen";
-$GLOBALS['TL_LANG']['tl_dc_equipment']['show'] = "Datensatz mit ID: %s ansehen";
+$GLOBALS['TL_LANG']['tl_dc_equipment']['edit'] = "Edit record with ID: %s";
+$GLOBALS['TL_LANG']['tl_dc_equipment']['copy'] = "Copy record with ID: %s";
+$GLOBALS['TL_LANG']['tl_dc_equipment']['delete'] = "Delete record with ID: %s";
+$GLOBALS['TL_LANG']['tl_dc_equipment']['show'] = "View record with ID: %s";
 
 // Legends
-$GLOBALS['TL_LANG']['tl_dc_equipment']['title_legend'] = 'Titel und Alias';
+$GLOBALS['TL_LANG']['tl_dc_equipment']['title_legend'] = 'Title and Alias';
 $GLOBALS['TL_LANG']['tl_dc_equipment']['details_legend'] = 'Details';
-$GLOBALS['TL_LANG']['tl_dc_equipment']['notes_legend'] = 'Notizen';
-$GLOBALS['TL_LANG']['tl_dc_equipment']['publish_legend'] = 'Veröffentlichung';
+$GLOBALS['TL_LANG']['tl_dc_equipment']['notes_legend'] = 'Notes';
+$GLOBALS['TL_LANG']['tl_dc_equipment']['publish_legend'] = 'Publication';
 
 // Fields
-$GLOBALS['TL_LANG']['tl_dc_equipment']['title'] = ['Titel', 'Geben Sie bitte den Titel des Equipments ein.'];
-$GLOBALS['TL_LANG']['tl_dc_equipment']['alias'] = ['Alias', 'Der Alias wird automatisch generiert, wenn kein Alias angegeben wird.'];
-$GLOBALS['TL_LANG']['tl_dc_equipment']['manufacturer'] = ['Hersteller', 'Wählen Sie den Hersteller aus.'];
-$GLOBALS['TL_LANG']['tl_dc_equipment']['size'] = ['Größe', 'Wählen Sie eine Größe aus.'];
-$GLOBALS['TL_LANG']['tl_dc_equipment']['addNotes'] = ['Zusätzliche Notizen', 'Fügen Sie optionale Notizen hinzu.'];
-$GLOBALS['TL_LANG']['tl_dc_equipment']['notes'] = ['Notizen', 'Geben Sie bitte die Notizen ein.'];
-$GLOBALS['TL_LANG']['tl_dc_equipment']['published'] = ['Veröffentlicht', 'Markieren Sie das Equipment als veröffentlicht.'];
-$GLOBALS['TL_LANG']['tl_dc_equipment']['start'] = ['Startdatum', 'Geben Sie ein Startdatum an.'];
-$GLOBALS['TL_LANG']['tl_dc_equipment']['stop'] = ['Enddatum', 'Geben Sie ein Enddatum an.'];
+$GLOBALS['TL_LANG']['tl_dc_equipment']['title'] = ['Title', 'Please enter the title of the equipment.'];
+$GLOBALS['TL_LANG']['tl_dc_equipment']['alias'] = ['Alias', 'The alias will be automatically generated if no alias is provided.'];
+$GLOBALS['TL_LANG']['tl_dc_equipment']['manufacturer'] = ['Manufacturer', 'Select the manufacturer.'];
+$GLOBALS['TL_LANG']['tl_dc_equipment']['size'] = ['Size', 'Select a size.'];
+$GLOBALS['TL_LANG']['tl_dc_equipment']['addNotes'] = ['Additional Notes', 'Add optional notes.'];
+$GLOBALS['TL_LANG']['tl_dc_equipment']['notes'] = ['Notes', 'Please enter the notes.'];
+$GLOBALS['TL_LANG']['tl_dc_equipment']['published'] = ['Published', 'Mark the equipment as published.'];
+$GLOBALS['TL_LANG']['tl_dc_equipment']['start'] = ['Start Date', 'Enter a start date.'];
+$GLOBALS['TL_LANG']['tl_dc_equipment']['stop'] = ['End Date', 'Enter an end date.'];
 
-$GLOBALS['TL_DCA']['tl_dc_equipment_type']['stage']         = ['Stufe', 'Welche Stufe ist das Equipment?'];
-$GLOBALS['TL_DCA']['tl_dc_equipment_type']['stage']         = ['1' => '1st Stage', '2' => '2nd Stage'];
-$GLOBALS['TL_DCA']['tl_dc_equipment_type']['regulator']     = ['Atemregler', 'Welcher Atemregler ist das Equipment?'];
-$GLOBALS['TL_DCA']['tl_dc_equipment_type']['regulator']     = ['1' => 'Primary', '2' => 'Secondary'];
+$GLOBALS['TL_DCA']['tl_dc_equipment_type']['stage'] = ['Stage', 'What stage is the equipment?'];
+$GLOBALS['TL_DCA']['tl_dc_equipment_type']['stage'] = ['1' => '1st Stage', '2' => '2nd Stage'];
+$GLOBALS['TL_DCA']['tl_dc_equipment_type']['regulator'] = ['Regulator', 'Which regulator is the equipment?'];
+$GLOBALS['TL_DCA']['tl_dc_equipment_type']['regulator'] = ['1' => 'Primary', '2' => 'Secondary'];

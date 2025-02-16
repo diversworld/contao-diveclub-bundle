@@ -12,37 +12,36 @@ declare(strict_types=1);
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/diversworld/contao-diveclub-bundle
  */
-
 /**
  * Legends
  */
-$GLOBALS['TL_LANG']['tl_dc_check_articles']['title_legend'] = "Rechnungsdaten";
-$GLOBALS['TL_LANG']['tl_dc_check_articles']['details_legend'] = "Details zur Rechnung";
-$GLOBALS['TL_LANG']['tl_dc_check_articles']['notes_legend'] = "Bemerkungen zur Rechnung";
-$GLOBALS['TL_LANG']['tl_dc_check_articles']['publish_legend'] ="Veröffentlichen";
+$GLOBALS['TL_LANG']['tl_dc_check_articles']['title_legend'] = "Article Data";
+$GLOBALS['TL_LANG']['tl_dc_check_articles']['details_legend'] = "Article Details";
+$GLOBALS['TL_LANG']['tl_dc_check_articles']['notes_legend'] = "Article Notes";
+$GLOBALS['TL_LANG']['tl_dc_check_articles']['publish_legend'] = "Publish";
 
 /**
  * Fields
  */
-$GLOBALS['TL_LANG']['tl_dc_check_articles']['addCheckInfo'] = ["Daten zum TÜV-Termin erfassen", "Informationen zum TÜV-Termin erfassen"];
-$GLOBALS['TL_LANG']['tl_dc_check_articles']['addVendorInfo'] = ["Prüfungsunternehmen", "Informationen zum Prüfungsunternehmen erfassen."];
-$GLOBALS['TL_LANG']['tl_dc_check_articles']['addArticleInfo'] = ["Preisliste erstellen", "Preisliste für den TÜV-Termin erfassen"];
+$GLOBALS['TL_LANG']['tl_dc_check_articles']['addCheckInfo'] = ["Record TÜV Appointment Data", "Enter information about the TÜV appointment."];
+$GLOBALS['TL_LANG']['tl_dc_check_articles']['addVendorInfo'] = ["Inspection Company", "Enter information about the inspection company."];
+$GLOBALS['TL_LANG']['tl_dc_check_articles']['addArticleInfo'] = ["Create Price List", "Record the price list for the TÜV appointment."];
 
-$GLOBALS['TL_LANG']['tl_dc_check_articles']['title'] = ["Rechnungstitel", "Geben Sie den Rechnungsnamen ein. Wird automatisch erstellt."];
-$GLOBALS['TL_LANG']['tl_dc_check_articles']['alias'] = ["Alias", "Alias der Rechnung"];
-$GLOBALS['TL_LANG']['tl_dc_check_articles']['member'] = ["Mitglied", "Name des Eigentümers"];
+$GLOBALS['TL_LANG']['tl_dc_check_articles']['title'] = ["Invoice Title", "Enter the invoice name. It will be created automatically."];
+$GLOBALS['TL_LANG']['tl_dc_check_articles']['alias'] = ["Alias", "Alias for the invoice"];
+$GLOBALS['TL_LANG']['tl_dc_check_articles']['member'] = ["Member", "Name of the owner"];
 
-$GLOBALS['TL_LANG']['tl_dc_check_articles']['invoiceArticles'] = ["Preisliste", "Geben Sie die Preise für die Prüfung ein."];
-$GLOBALS['TL_LANG']['tl_dc_check_articles']['articleName'] = ["Artikelname", "Geben Sie eine Artikelbezeichnung ein"];
-$GLOBALS['TL_LANG']['tl_dc_check_articles']['articleSize'] = ["Volumen", "Geben Sie die Flaschengröße für den der Artikel gilt ein."];
-$GLOBALS['TL_LANG']['tl_dc_check_articles']['articleNotes'] = ["Beschreibung", "Geben Sie eine Beschreibung des Artikels ein"];
-$GLOBALS['TL_LANG']['tl_dc_check_articles']['articlePriceNetto'] = ["Preis Netto", "Geben Sie den Nettopreis ein"];
-$GLOBALS['TL_LANG']['tl_dc_check_articles']['articlePriceBrutto'] = ["Preis Brutto", "Der Bruttopreis wird automatisch beim speichern berechnet. Gerundet auf 5 cent."];
-$GLOBALS['TL_LANG']['tl_dc_check_articles']['default'] = ["Defaultpreis", "Defaultpreise gelten für alle Flaschen größen gleich."];
+$GLOBALS['TL_LANG']['tl_dc_check_articles']['invoiceArticles'] = ["Price List", "Enter the prices for the inspection."];
+$GLOBALS['TL_LANG']['tl_dc_check_articles']['articleName'] = ["Article Name", "Enter an article name"];
+$GLOBALS['TL_LANG']['tl_dc_check_articles']['articleSize'] = ["Volume", "Enter the bottle size applicable to the article."];
+$GLOBALS['TL_LANG']['tl_dc_check_articles']['articleNotes'] = ["Description", "Enter a description of the article"];
+$GLOBALS['TL_LANG']['tl_dc_check_articles']['articlePriceNetto'] = ["Net Price", "Enter the net price"];
+$GLOBALS['TL_LANG']['tl_dc_check_articles']['articlePriceBrutto'] = ["Gross Price", "The gross price is calculated automatically when saving, rounded to 5 cents."];
+$GLOBALS['TL_LANG']['tl_dc_check_articles']['default'] = ["Default Price", "Default prices apply equally to all bottle sizes."];
 
-$GLOBALS['TL_LANG']['tl_dc_check_articles']['priceTotal'] = ["Gesamtpreis", "Der gesamtpreis der rechnung wird automatisch berechnet."];
-$GLOBALS['TL_LANG']['tl_dc_check_articles']['notes'] = ["Bemerkungen", "Geben Sie eine Bemerkung ein"];
+$GLOBALS['TL_LANG']['tl_dc_check_articles']['priceTotal'] = ["Total Price", "The total price of the invoice will be calculated automatically."];
+$GLOBALS['TL_LANG']['tl_dc_check_articles']['notes'] = ["Notes", "Enter a note"];
 
-$GLOBALS['TL_LANG']['tl_dc_check_articles']['published'] = ["Veröffentlichen", "Den Datensatz veröffentlichen."];
-$GLOBALS['TL_LANG']['tl_dc_check_articles']['start'] = ["Anzeigen ab", "Ab wann soll der Datensatz angezeigt werden."];
-$GLOBALS['TL_LANG']['tl_dc_check_articles']['stop'] = ["Anzeigen bis", "Bis wann soll der Datensatz angezeigt werden."];
+$GLOBALS['TL_LANG']['tl_dc_check_articles']['published'] = ["Publish", "Publish the record."];
+$GLOBALS['TL_LANG']['tl_dc_check_articles']['start'] = ["Show from", "From when should the record be displayed."];
+$GLOBALS['TL_LANG']['tl_dc_check_articles']['stop'] = ["Show until", "Until when should the record be displayed."];

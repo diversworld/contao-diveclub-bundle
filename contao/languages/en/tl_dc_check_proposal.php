@@ -15,9 +15,9 @@ declare(strict_types=1);
 /**
  * Legends
  */
-$GLOBALS['TL_LANG']['tl_dc_check_articles']['title_legend'] = "Invoice Data";
-$GLOBALS['TL_LANG']['tl_dc_check_articles']['details_legend'] = "Invoice Details";
-$GLOBALS['TL_LANG']['tl_dc_check_articles']['notes_legend'] = "Notes about the Invoice";
+$GLOBALS['TL_LANG']['tl_dc_check_articles']['title_legend'] = "Proposal Data";
+$GLOBALS['TL_LANG']['tl_dc_check_articles']['details_legend'] = "Proposal Details";
+$GLOBALS['TL_LANG']['tl_dc_check_articles']['notes_legend'] = "Notes about the Proposal";
 $GLOBALS['TL_LANG']['tl_dc_check_articles']['publish_legend'] = "Publish";
 
 /**

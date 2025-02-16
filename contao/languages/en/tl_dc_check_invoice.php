@@ -16,27 +16,27 @@ declare(strict_types=1);
 /**
  * Legends
  */
-$GLOBALS['TL_LANG']['tl_dc_check_invoice']['tuv_legend'] = "TÜV-Termin Einstellungen";
-$GLOBALS['TL_LANG']['tl_dc_check_invoice']['vendor_legend'] = "Prüfunternehmen";
-$GLOBALS['TL_LANG']['tl_dc_check_invoice']['article_legend'] = "Preise für die TÜV-Prüfung";
+$GLOBALS['TL_LANG']['tl_dc_check_invoice']['tuv_legend'] = "TÜV Appointment Settings";
+$GLOBALS['TL_LANG']['tl_dc_check_invoice']['vendor_legend'] = "Inspection Company";
+$GLOBALS['TL_LANG']['tl_dc_check_invoice']['article_legend'] = "Prices for the TÜV Inspection";
 
 /**
  * Fields
  */
-$GLOBALS['TL_LANG']['tl_dc_check_invoice']['addCheckInfo'] = ["Daten zum TÜV-Termin erfassen", "Informationen zum TÜV-Termin erfassen"];
-$GLOBALS['TL_LANG']['tl_dc_check_invoice']['addVendorInfo'] = ["Prüfungsunternehmen", "Informationen zum Prüfungsunternehmen erfassen."];
-$GLOBALS['TL_LANG']['tl_dc_check_invoice']['addArticleInfo'] = ["Preisliste erstellen", "Preisliste für den TÜV-Termin erfassen"];
+$GLOBALS['TL_LANG']['tl_dc_check_invoice']['addCheckInfo'] = ["Record TÜV Appointment Data", "Enter information about the TÜV appointment."];
+$GLOBALS['TL_LANG']['tl_dc_check_invoice']['addVendorInfo'] = ["Inspection Company", "Enter information about the inspection company."];
+$GLOBALS['TL_LANG']['tl_dc_check_invoice']['addArticleInfo'] = ["Create Price List", "Record the price list for the TÜV appointment."];
 
-$GLOBALS['TL_LANG']['tl_dc_check_invoice']['is_tuv_appointment'] = ["TÜV-Termin", "Dieser Event ein TÜV-Termin?"];
-$GLOBALS['TL_LANG']['tl_dc_check_invoice']['vendorName'] = ["Firma", "Firmenname des Prüfungsunternehmens"];
-$GLOBALS['TL_LANG']['tl_dc_check_invoice']['street'] = ["Straße", "Geben Sie die Straße ein."];
-$GLOBALS['TL_LANG']['tl_dc_check_invoice']['postal'] = ["PLZ", "Geben Sie die PLZ ein"];
-$GLOBALS['TL_LANG']['tl_dc_check_invoice']['city'] = ["Ort", "Geben Sie den Ort ein"];
-$GLOBALS['TL_LANG']['tl_dc_check_invoice']['vendorEmail'] = ["E-Mail", "Geben Sie die E-Mail-Adresse ein"];
-$GLOBALS['TL_LANG']['tl_dc_check_invoice']['vendorPhone'] = ["Telefonnummer", "Geben Sie die Telefonnummer ein"];
-$GLOBALS['TL_LANG']['tl_dc_check_invoice']['vendorMobile'] = ["Mobilnnummer", "Geben Sie die Mobilnummer ein"];
-$GLOBALS['TL_LANG']['tl_dc_check_invoice']['checkArticles'] = ["TÜV-Preisliste", "Geben Sie die Preise für die Prüfungsartikel ein"];
-$GLOBALS['TL_LANG']['tl_dc_check_invoice']['articleName'] = ["Artikel", "Geben ie Artikelbezeichnung ein"];
-$GLOBALS['TL_LANG']['tl_dc_check_invoice']['articleNotes'] = ["Beschreibung", "Geben Sie eine Beschreibung ein"];
-$GLOBALS['TL_LANG']['tl_dc_check_invoice']['articlePriceNetto'] = ["Preis netto", "Geben Sie den Nettopreis ein"];
-$GLOBALS['TL_LANG']['tl_dc_check_invoice']['articlePriceBrutto'] = ["Preis brutto", "Der Bruttopreis wird beim speichern berechnet."];
+$GLOBALS['TL_LANG']['tl_dc_check_invoice']['is_tuv_appointment'] = ["TÜV Appointment", "Is this event a TÜV appointment?"];
+$GLOBALS['TL_LANG']['tl_dc_check_invoice']['vendorName'] = ["Company", "Name of the inspection company"];
+$GLOBALS['TL_LANG']['tl_dc_check_invoice']['street'] = ["Street", "Enter the street."];
+$GLOBALS['TL_LANG']['tl_dc_check_invoice']['postal'] = ["Postal Code", "Enter the postal code"];
+$GLOBALS['TL_LANG']['tl_dc_check_invoice']['city'] = ["City", "Enter the city"];
+$GLOBALS['TL_LANG']['tl_dc_check_invoice']['vendorEmail'] = ["Email", "Enter the email address"];
+$GLOBALS['TL_LANG']['tl_dc_check_invoice']['vendorPhone'] = ["Phone Number", "Enter the phone number"];
+$GLOBALS['TL_LANG']['tl_dc_check_invoice']['vendorMobile'] = ["Mobile Number", "Enter the mobile number"];
+$GLOBALS['TL_LANG']['tl_dc_check_invoice']['checkArticles'] = ["TÜV Price List", "Enter the prices for inspection articles"];
+$GLOBALS['TL_LANG']['tl_dc_check_invoice']['articleName'] = ["Article", "Enter the article name"];
+$GLOBALS['TL_LANG']['tl_dc_check_invoice']['articleNotes'] = ["Description", "Enter a description"];
+$GLOBALS['TL_LANG']['tl_dc_check_invoice']['articlePriceNetto'] = ["Net Price", "Enter the net price"];
+$GLOBALS['TL_LANG']['tl_dc_check_invoice']['articlePriceBrutto'] = ["Gross Price", "The gross price will be calculated upon saving."];

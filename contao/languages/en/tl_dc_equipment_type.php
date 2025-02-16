@@ -3,28 +3,28 @@
 /**
  * Global operations
  */
-$GLOBALS['TL_LANG']['tl_dc_equipment_type']['new'] = ["Neu", "Ein neues Element anlegen"];
+$GLOBALS['TL_LANG']['tl_dc_equipment_type']['new'] = ["New", "Create a new element"];
 
 /**
  * Operations
  */
-$GLOBALS['TL_LANG']['tl_dc_equipment_type']['edit'] = "Datensatz mit ID: %s bearbeiten";
-$GLOBALS['TL_LANG']['tl_dc_equipment_type']['copy'] = "Datensatz mit ID: %s kopieren";
-$GLOBALS['TL_LANG']['tl_dc_equipment_type']['delete'] = "Datensatz mit ID: %s löschen";
-$GLOBALS['TL_LANG']['tl_dc_equipment_type']['show'] = "Datensatz mit ID: %s ansehen";
+$GLOBALS['TL_LANG']['tl_dc_equipment_type']['edit'] = "Edit record with ID: %s";
+$GLOBALS['TL_LANG']['tl_dc_equipment_type']['copy'] = "Copy record with ID: %s";
+$GLOBALS['TL_LANG']['tl_dc_equipment_type']['delete'] = "Delete record with ID: %s";
+$GLOBALS['TL_LANG']['tl_dc_equipment_type']['show'] = "View record with ID: %s";
 
 // Legends
-$GLOBALS['TL_LANG']['tl_dc_equipment_type']['title_legend'] = 'Titel-Einstellungen';
+$GLOBALS['TL_LANG']['tl_dc_equipment_type']['title_legend'] = 'Title Settings';
 $GLOBALS['TL_LANG']['tl_dc_equipment_type']['details_legend'] = 'Details';
-$GLOBALS['TL_LANG']['tl_dc_equipment_type']['notes_legend'] = 'Notizen';
-$GLOBALS['TL_LANG']['tl_dc_equipment_type']['publish_legend'] = 'Veröffentlichung';
+$GLOBALS['TL_LANG']['tl_dc_equipment_type']['notes_legend'] = 'Notes';
+$GLOBALS['TL_LANG']['tl_dc_equipment_type']['publish_legend'] = 'Publication';
 
 // Labels
-$GLOBALS['TL_LANG']['tl_dc_equipment_type']['title'] = ['Typ', 'Wählen Sie einen Typ aus.'];
-$GLOBALS['TL_LANG']['tl_dc_equipment_type']['addNotes'] = ['Bemerkungen', 'Fügen Sie zusätzliche Informationen hinzu.'];
-$GLOBALS['TL_LANG']['tl_dc_equipment_type']['notes'] = ['Notizen', 'Geben Sie Ihre Notizen ein.'];
-$GLOBALS['TL_LANG']['tl_dc_equipment_type']['published'] = ['Veröffentlicht', 'Markieren Sie das Element als veröffentlicht.'];
-$GLOBALS['TL_LANG']['tl_dc_equipment_type']['start'] = ['Startdatum', 'Geben Sie ein Startdatum an.'];
-$GLOBALS['TL_LANG']['tl_dc_equipment_type']['stop'] = ['Enddatum', 'Geben Sie ein Enddatum an.'];
+$GLOBALS['TL_LANG']['tl_dc_equipment_type']['title'] = ['Type', 'Select a type.'];
+$GLOBALS['TL_LANG']['tl_dc_equipment_type']['addNotes'] = ['Remarks', 'Add additional information.'];
+$GLOBALS['TL_LANG']['tl_dc_equipment_type']['notes'] = ['Notes', 'Enter your notes.'];
+$GLOBALS['TL_LANG']['tl_dc_equipment_type']['published'] = ['Published', 'Mark the item as published.'];
+$GLOBALS['TL_LANG']['tl_dc_equipment_type']['start'] = ['Start Date', 'Enter a start date.'];
+$GLOBALS['TL_LANG']['tl_dc_equipment_type']['stop'] = ['End Date', 'Enter an end date.'];
 
-$GLOBALS['TL_LANG']['tl_dc_equipment_type']['new'] = ['Neuer Eintrag', 'Einen neuen Eintrag anlegen'];
+$GLOBALS['TL_LANG']['tl_dc_equipment_type']['new'] = ['New Entry', 'Create a new entry'];

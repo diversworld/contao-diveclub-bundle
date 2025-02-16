@@ -15,37 +15,37 @@ declare(strict_types=1);
 /**
  * Legends
  */
-$GLOBALS['TL_LANG']['tl_calendar_events']['tuv_legend'] = "TÜV-Termin Einstellungen";
-$GLOBALS['TL_LANG']['tl_calendar_events']['vendor_legend'] = "Prüfunternehmen";
-$GLOBALS['TL_LANG']['tl_calendar_events']['article_legend'] = "Preise für die TÜV-Prüfung";
+$GLOBALS['TL_LANG']['tl_calendar_events']['tuv_legend'] = "TÜV Appointment Settings";
+$GLOBALS['TL_LANG']['tl_calendar_events']['vendor_legend'] = "Inspection Company";
+$GLOBALS['TL_LANG']['tl_calendar_events']['article_legend'] = "Prices for the TÜV Inspection";
 
 /**
  * Fields
  */
-$GLOBALS['TL_LANG']['tl_calendar_events']['addCheckInfo'] = ["Daten zum TÜV-Termin erfassen", "Informationen zum TÜV-Termin erfassen"];
-$GLOBALS['TL_LANG']['tl_calendar_events']['addVendorInfo'] = ["Prüfungsunternehmen", "Informationen zum Prüfungsunternehmen erfassen."];
-$GLOBALS['TL_LANG']['tl_calendar_events']['addArticleInfo'] = ["Preisliste erstellen", "Preisliste für den TÜV-Termin erfassen"];
+$GLOBALS['TL_LANG']['tl_calendar_events']['addCheckInfo'] = ["Record TÜV Appointment Data", "Enter information about the TÜV appointment."];
+$GLOBALS['TL_LANG']['tl_calendar_events']['addVendorInfo'] = ["Inspection Company", "Enter information about the inspection company."];
+$GLOBALS['TL_LANG']['tl_calendar_events']['addArticleInfo'] = ["Create Price List", "Record the price list for the TÜV appointment."];
 
-$GLOBALS['TL_LANG']['tl_calendar_events']['is_tuv_appointment'] = ["TÜV-Termin", "Dieser Event ein TÜV-Termin?"];
-$GLOBALS['TL_LANG']['tl_calendar_events']['vendorName'] = ["Firma", "Firmenname des Prüfungsunternehmens"];
-$GLOBALS['TL_LANG']['tl_calendar_events']['street'] = ["Straße", "Geben Sie die Straße ein."];
-$GLOBALS['TL_LANG']['tl_calendar_events']['postal'] = ["PLZ", "Geben Sie die PLZ ein"];
-$GLOBALS['TL_LANG']['tl_calendar_events']['city'] = ["Ort", "Geben Sie den Ort ein"];
-$GLOBALS['TL_LANG']['tl_calendar_events']['vendorEmail'] = ["E-Mail", "Geben Sie die E-Mail-Adresse ein"];
-$GLOBALS['TL_LANG']['tl_calendar_events']['vendorPhone'] = ["Telefonnummer", "Geben Sie die Telefonnummer ein"];
-$GLOBALS['TL_LANG']['tl_calendar_events']['vendorMobile'] = ["Mobilnnummer", "Geben Sie die Mobilnummer ein"];
-$GLOBALS['TL_LANG']['tl_calendar_events']['checkArticles'] = ["TÜV-Preisliste", "Geben Sie die Preise für die Prüfungsartikel ein"];
-$GLOBALS['TL_LANG']['tl_calendar_events']['articleName'] = ["Artikel", "Geben ie Artikelbezeichnung ein"];
-$GLOBALS['TL_LANG']['tl_calendar_events']['articleSize'] = ["Volumen", "Geben Sie die Flaschengröße für den der Artikel gilt ein."];
-$GLOBALS['TL_LANG']['tl_calendar_events']['articleNotes'] = ["Beschreibung", "Geben Sie eine Beschreibung ein"];
-$GLOBALS['TL_LANG']['tl_calendar_events']['articlePriceNetto'] = ["Preis netto", "Geben Sie den Nettopreis ein"];
-$GLOBALS['TL_LANG']['tl_calendar_events']['articlePriceBrutto'] = ["Preis brutto", "Der Bruttopreis wird beim speichern berechnet."];
-$GLOBALS['TL_LANG']['tl_calendar_events']['default'] = ["Standard", "Dieser Artikel muss immer bezahlt werden."];
+$GLOBALS['TL_LANG']['tl_calendar_events']['is_tuv_appointment'] = ["TÜV Appointment", "Is this event a TÜV appointment?"];
+$GLOBALS['TL_LANG']['tl_calendar_events']['vendorName'] = ["Company", "Company name of the inspection company"];
+$GLOBALS['TL_LANG']['tl_calendar_events']['street'] = ["Street", "Enter the street."];
+$GLOBALS['TL_LANG']['tl_calendar_events']['postal'] = ["Postal Code", "Enter the postal code"];
+$GLOBALS['TL_LANG']['tl_calendar_events']['city'] = ["City", "Enter the city"];
+$GLOBALS['TL_LANG']['tl_calendar_events']['vendorEmail'] = ["Email", "Enter the email address"];
+$GLOBALS['TL_LANG']['tl_calendar_events']['vendorPhone'] = ["Phone Number", "Enter the phone number"];
+$GLOBALS['TL_LANG']['tl_calendar_events']['vendorMobile'] = ["Mobile Number", "Enter the mobile number"];
+$GLOBALS['TL_LANG']['tl_calendar_events']['checkArticles'] = ["TÜV Price List", "Enter the prices for the inspection articles"];
+$GLOBALS['TL_LANG']['tl_calendar_events']['articleName'] = ["Article", "Enter the article name"];
+$GLOBALS['TL_LANG']['tl_calendar_events']['articleSize'] = ["Volume", "Enter the bottle size applicable to the article."];
+$GLOBALS['TL_LANG']['tl_calendar_events']['articleNotes'] = ["Description", "Enter a description"];
+$GLOBALS['TL_LANG']['tl_calendar_events']['articlePriceNetto'] = ["Net Price", "Enter the net price"];
+$GLOBALS['TL_LANG']['tl_calendar_events']['articlePriceBrutto'] = ["Gross Price", "The gross price is calculated when saving."];
+$GLOBALS['TL_LANG']['tl_calendar_events']['default'] = ["Standard", "This article must always be paid."];
 
 /**
  * References
  */
 $GLOBALS['TL_LANG']['tl_dc_courses']['courseCategory'] = "Beginner";
 $GLOBALS['TL_LANG']['tl_dc_courses']['courseCategory'] = "Specialty";
-$GLOBALS['TL_LANG']['tl_dc_courses']['courseCategory'] = "Professionell";
-$GLOBALS['TL_LANG']['tl_dc_courses']['courseCategory'] = "Technisch";
+$GLOBALS['TL_LANG']['tl_dc_courses']['courseCategory'] = "Professional";
+$GLOBALS['TL_LANG']['tl_dc_courses']['courseCategory'] = "Technical";
