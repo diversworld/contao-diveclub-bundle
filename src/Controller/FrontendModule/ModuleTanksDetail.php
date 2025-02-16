@@ -75,9 +75,6 @@ class ModuleTanksDetail extends AbstractFrontendModuleController
 
     protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
     {
-        // Get the database connection
-        $db = $this->container->get('database_connection');
-
         /** @var Result $eventStmt */
         $tanks = DcTanksModel::findAll();
 
