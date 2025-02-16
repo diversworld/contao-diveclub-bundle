@@ -82,9 +82,6 @@ class DcListingController extends AbstractFrontendModuleController
     {
         $eventAlias = Input::get('auto_item');
 
-        // Get the database connection
-        $db = $this->container->get('database_connection');
-
         /** @var Result $eventStmt */
         $event = DcCalendarEventsModel::findByAlias($eventAlias);
 
