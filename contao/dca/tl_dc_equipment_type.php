@@ -211,7 +211,6 @@ class tl_dc_equipment_type extends Backend
 
     public function getSubTypes(DataContainer $dc): array
     {
-        $this->logger = System::getContainer()->get('monolog.logger.contao.general');
         // Sicherstellen, dass ein aktiver Datensatz vorhanden ist
         if (!$dc->activeRecord) {
             return [];
@@ -222,14 +221,12 @@ class tl_dc_equipment_type extends Backend
         $this->logger->info('getSubTypes: Current type: ' . $currentType);
 
         $subTypes = $this->getTemplateOptions('equipment_subTypes');
-        $this->logger->info('getSubTypes: Subtypes: ' . print_r($subTypes, true));
 
         // Prüfen, ob für den aktuellen Typ Subtypen definiert wurden
         if (!isset($subTypes[$currentType]) || !is_array($subTypes[$currentType])) {
             // Keine passenden Subtypen gefunden -> leere Liste zurückgeben
             return [];
         }
-        $this->logger->info('getSubTypes: Subtypes for current type: ' . print_r($options[$currentType], true));
 
         // Nur die relevanten Subtypen für diesen Typ zurückgeben
         return $subTypes[$currentType];

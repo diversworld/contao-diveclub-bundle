@@ -29,3 +29,8 @@ $GLOBALS['TL_LANG']['tl_dc_equipment']['notes'] = ['Notizen', 'Geben Sie bitte d
 $GLOBALS['TL_LANG']['tl_dc_equipment']['published'] = ['Veröffentlicht', 'Markieren Sie das Equipment als veröffentlicht.'];
 $GLOBALS['TL_LANG']['tl_dc_equipment']['start'] = ['Startdatum', 'Geben Sie ein Startdatum an.'];
 $GLOBALS['TL_LANG']['tl_dc_equipment']['stop'] = ['Enddatum', 'Geben Sie ein Enddatum an.'];
+
+$GLOBALS['TL_DCA']['tl_dc_equipment_type']['stage']         = ['Stufe', 'Welche Stufe ist das Equipment?'];
+$GLOBALS['TL_DCA']['tl_dc_equipment_type']['stage']         = ['1' => '1st Stage', '2' => '2nd Stage'];
+$GLOBALS['TL_DCA']['tl_dc_equipment_type']['regulator']     = ['Atemregler', 'Welcher Atemregler ist das Equipment?'];
+$GLOBALS['TL_DCA']['tl_dc_equipment_type']['regulator']     = ['1' => 'Primary', '2' => 'Secondary'];

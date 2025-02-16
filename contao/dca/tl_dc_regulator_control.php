@@ -26,10 +26,10 @@ use Contao\TemplateLoader;
 /**
  * Table tl_dc_tanks
  */
-$GLOBALS['TL_DCA']['tl_dc_equipment'] = [
+$GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
     'config'        => [
         'dataContainer'     => DC_Table::class,
-        'ptable'            => 'tl_dc_equipment_type',
+        'ptable'            => 'tl_dc_regulators',
         'enableVersioning'  => true,
         'sql'               => [
             'keys'          => [
@@ -43,9 +43,9 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
     ],
     'list'          => [
         'sorting'           => [
-            'mode'          => DataContainer::MODE_PARENT,
+            'mode'          => DataContainer::MODE_SORTABLE,
             'fields'        => ['title','alias','published'],
-            'flag'          => DataContainer::SORT_INITIAL_LETTER_ASC,
+            'flag'          => DataContainer::SORT_YEAR_DESC,
             'panelLayout'   => 'filter;sort,search,limit'
         ],
         'label'             => [
@@ -71,8 +71,9 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
     'palettes'          => [
         '__selector__'      => ['addNotes'],
         'default'           => '{title_legend},title,alias;
-                                {details_legend},manufacturer,size;
-                                {Regulator_legend},serialnumber,regType,lastCheckDate,nextCheckDate;
+                                {pre_legend},midPreussurePre,inhalePressurePre,exhalePressurePre;
+                                {post_legend},midPreussurePost,inhalePressurePost,exhalePressurePost;
+                                {nextCheck_legend},nextCheckDate;
                                 {notes_legend},addNotes;
                                 {publish_legend},published,start,stop;'
     ],
@@ -84,7 +85,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
             'sql'               => "int(10) unsigned NOT NULL auto_increment"
         ],
         'pid'               => [
-            'foreignKey'        => 'tl_dc_equipment_type.title',
+            'foreignKey'        => 'tl_dc_regulators.title',
             'sql'               => "int(10) unsigned NOT NULL default 0",
             'relation'          => ['type' => 'belongsTo', 'load' => 'lazy'], // Typ anpassen, falls notwendig
         ],
@@ -93,94 +94,83 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
         ],
         'title'             => [
             'inputType'         => 'text',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['title'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['actualCheckDate'],
             'exclude'           => true,
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
-            'flag'              => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'eval'              => ['mandatory' => true, 'maxlength'=>255, 'tl_class' => 'w50'],
-            'sql'               => "varchar(255) NOT NULL default ''"
+            'flag'              => DataContainer::SORT_YEAR_DESC,
+            'eval'              => ['submitOnChange' => true, 'rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w33 wizard'],
+            'sql'               => "varchar(10) NOT NULL default ''"
         ],
         'alias'             => [
             'search'            => true,
             'inputType'         => 'text',
             'eval'              => ['rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w50'],
             'save_callback' => [
-                ['tl_dc_equipment', 'generateAlias']
+                ['tl_dc_regulator_control', 'generateAlias']
             ],
             'sql'           => "varchar(255) BINARY NOT NULL default ''"
         ],
-        'manufacturer'      => [
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['manufacturer'],
-            'inputType'         => 'select',
-            'search'            => true,
-            'filter'            => true,
-            'sorting'           => true,
-            'options_callback'  => array('tl_dc_equipment', 'getManufacturers'),
-            'eval'              => array('mandatory' => true, 'tl_class' => 'w33 clr'),
-            'sql'               => "varchar(255) NOT NULL default ''",
-        ],
-        'size'              => [
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['size'],
-            'inputType'         => 'select',
-            'search'            => true,
-            'filter'            => true,
-            'sorting'           => true,
-            'options_callback'  => ['tl_dc_equipment', 'getSizes'],
-            'eval'              => ['mandatory' => false, 'tl_class' => 'w25'],
-            'sql'               => "varchar(255) NOT NULL default ''",
-        ],
-        'stage'           => [
-            'inputType'         => 'option',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_type']['stage'],
-            'exclude'           => true,
-            'filter'            => true,
-            'options'           => &$GLOBALS['TL_DCA']['tl_dc_equipment_type']['stage'],
-            'reference'         => &$GLOBALS['TL_DCA']['tl_dc_equipment_type']['stage'],
-            'eval'              => ['submitOnChange' => true, 'tl_class' => 'w25 clr'],
-            'sql'               => ['type' => 'boolean', 'default' => false]
-        ],
-        'regulator'           => [
-            'inputType'         => 'option',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_type']['regulator'],
-            'exclude'           => true,
-            'filter'            => true,
-            'options'           => &$GLOBALS['TL_DCA']['tl_dc_equipment_type']['regType'],
-            'reference'         => &$GLOBALS['TL_DCA']['tl_dc_equipment_type']['regType'],
-            'eval'              => ['submitOnChange' => true, 'tl_class' => 'w25'],
-            'sql'               => ['type' => 'boolean', 'default' => false]
-        ],
-        'regModel'         => [
-            'inputType'         => 'select',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_type']['regModel'],
-            'exclude'           => true,
-            'search'            => true,
-            'filter'            => true,
-            'sorting'           => true,
-            'options_callback'  => ['tl_dc_equipment_type', 'getRegModeles'],
-            'eval'              => ['submitOnChange' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
-            'sql'               => "varchar(255) NOT NULL default ''"
-        ],
-        'serialNumber'      => [
+        'midPreussurePre'   => [
             'inputType'         => 'text',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['midPreussurePre'],
+            'search'            => true,
+            'filter'            => true,
+            'sorting'           => true,
+            'eval'              => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25 clr'],
+            'sql'               => "varchar(50) NOT NULL default ''"
+        ],
+        'inhalePressurePre' => [
+            'inputType'         => 'text',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['inhalePressurePre'],
+            'search'            => true,
+            'filter'            => true,
+            'sorting'           => true,
+            'eval'              => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25'],
+            'sql'               => "varchar(50) NOT NULL default ''"
+        ],
+        'exhalePressurePre' => [
+            'inputType'         => 'text',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['exhalePressurePre'],
+            'search'            => true,
+            'filter'            => true,
+            'sorting'           => true,
+            'eval'              => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25'],
+            'sql'               => "varchar(50) NOT NULL default ''"
+        ],
+        'midPreussurePost'  => [
+            'inputType'         => 'text',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['midPreussurePost'],
+            'search'            => true,
+            'filter'            => true,
+            'sorting'           => true,
+            'eval'              => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25 clr'],
+            'sql'               => "varchar(50) NOT NULL default ''"
+        ],
+        'inhalePressurePost'=> [
+            'inputType'         => 'text',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['inhalePressurePost'],
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
             'flag'              => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'eval'              => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25 clr'],
+            'eval'              => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25'],
             'sql'               => "varchar(50) NOT NULL default ''"
         ],
-        'lastCheckDate'     => [
+        'exhalePressurePost'=> [
             'inputType'         => 'text',
-            'sorting'           => true,
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['exhalePressurePost'],
+            'search'            => true,
             'filter'            => true,
-            'flag'              => DataContainer::SORT_YEAR_DESC,
-            'eval'              => ['submitOnChange' => true, 'rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w33 wizard'],
-            'sql'               => "varchar(10) NOT NULL default ''"
+            'sorting'           => true,
+            'flag'              => DataContainer::SORT_INITIAL_LETTER_ASC,
+            'eval'              => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25'],
+            'sql'               => "varchar(50) NOT NULL default ''"
         ],
         'nextCheckDate'     => [
             'inputType'         => 'text',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['nextCheckDate'],
             'sorting'           => true,
             'filter'            => true,
             'flag'              => DataContainer::SORT_YEAR_DESC,
@@ -189,14 +179,14 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
         ],
         'addNotes'          => [
             'inputType'         => 'checkbox',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['addNotes'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['addNotes'],
             'exclude'           => true,
             'eval'              => ['submitOnChange' => true, 'tl_class' => 'w50'],
             'sql'       => ['type' => 'boolean', 'default' => false]
         ],
         'notes'             => [
             'inputType'         => 'textarea',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['notes'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['notes'],
             'exclude'           => true,
             'search'            => false,
             'filter'            => false,
@@ -206,7 +196,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
         ],
         'published'         => [
             'inputType'         => 'checkbox',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['published'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['published'],
             'toggle'            => true,
             'filter'            => true,
             'flag'              => DataContainer::SORT_INITIAL_LETTER_DESC,
@@ -215,20 +205,20 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
         ],
         'start'             => [
             'inputType'         => 'text',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['start'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['start'],
             'eval'              => ['rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 clr wizard'],
             'sql'               => "varchar(10) NOT NULL default ''"
         ],
         'stop'              => [
             'inputType'         => 'text',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['stop'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['stop'],
             'eval'              => ['rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 wizard'],
             'sql'               => "varchar(10) NOT NULL default ''"
         ]
     ]
 ];
 
-class tl_dc_equipment extends Backend
+class tl_dc_regulator_control extends Backend
 {
     public LoggerInterface $logger;
 
@@ -246,7 +236,7 @@ class tl_dc_equipment extends Backend
     {
         $aliasExists = static function (string $alias) use ($dc): bool {
             $result = Database::getInstance()
-                ->prepare("SELECT id FROM tl_dc_equipment WHERE alias=? AND id!=?")
+                ->prepare("SELECT id FROM tl_dc_regulator_control WHERE alias=? AND id!=?")
                 ->execute($alias, $dc->id);
             return $result->numRows > 0;
         };

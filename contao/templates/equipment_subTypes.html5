@@ -10,7 +10,7 @@
         '2' => 'Sekundäre Regler',
         '3' => 'Finimeter',
         '4' => 'Kompasse',
-        '5' => 'Sonstiges',
+        '5' => 'Sonstiges'
     ],
     '3' => [
         '1' => 'Masken',
