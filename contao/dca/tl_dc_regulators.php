@@ -120,7 +120,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'filter'            => true,
             'sorting'           => true,
             'options_callback'  => array('tl_dc_regulators', 'getManufacturers'),
-            'eval'              => array('submitOnChange' => true, 'mandatory' => true, 'tl_class' => 'w33 clr'),
+            'eval'              => array('includeBlankOption' => true, 'submitOnChange' => true, 'mandatory' => true, 'tl_class' => 'w33 clr'),
             'sql'               => "varchar(255) NOT NULL default ''",
         ],
         'serialNumber1st'       => [
@@ -141,7 +141,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'filter'            => true,
             'sorting'           => true,
             'options_callback'  => ['tl_dc_regulators', 'getRegModels1st'],
-            'eval'              => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w25'],
+            'eval'              => ['includeBlankOption' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql'               => "varchar(255) NOT NULL default ''"
         ],
         'serialNumber2ndPri'    => [
@@ -162,7 +162,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'filter'            => true,
             'sorting'           => true,
             'options_callback'  => ['tl_dc_regulators', 'getRegModels2nd'],
-            'eval'              => ['submitOnChange' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
+            'eval'              => ['includeBlankOption' => true, 'submitOnChange' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql'               => "varchar(255) NOT NULL default ''"
         ],
         'serialNumber2ndSec'    => [
@@ -182,7 +182,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'filter'            => true,
             'sorting'           => true,
             'options_callback'  => ['tl_dc_regulators', 'getRegModels2nd'],
-            'eval'              => ['submitOnChange' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w25'],
+            'eval'              => ['includeBlankOption' => true,'submitOnChange' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql'               => "varchar(255) NOT NULL default ''"
         ],
         'addNotes'              => [
@@ -313,7 +313,7 @@ class tl_dc_regulators extends Backend
 
         // Ermittle den aktuellen Typ aus dem aktiven Datensatz
         $manufacturer = $dc->activeRecord->manufacturer; // Aktueller Hersteller
-        $models = $this->getTemplateOptions('regulater_data');
+        $models = $this->getTemplateOptions('regulator_data');
 
         // Prüfen, ob der Hersteller existiert und Modelle für die erste Stufe definiert sind
         if (!isset($models[$manufacturer]['regModel1st']) || !is_array($models[$manufacturer]['regModel1st'])) {
@@ -331,7 +331,7 @@ class tl_dc_regulators extends Backend
         }
 
         $manufacturer = $dc->activeRecord->manufacturer; // Aktueller Hersteller
-        $models = $this->getTemplateOptions('equipment_regulatermodels');
+        $models = $this->getTemplateOptions('regulator_data');
 
         // Prüfen, ob der Hersteller existiert und Modelle für die zweite Stufe definiert sind
         if (!isset($models[$manufacturer]['regModel2nd']) || !is_array($models[$manufacturer]['regModel2nd'])) {
