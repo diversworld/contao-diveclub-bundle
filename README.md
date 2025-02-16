@@ -1,4 +1,4 @@
-![Diversworld](docs/dw-logo-kws.png "Diversworld Logo")
+![Diversworld](docs/dw-logo-k.png "Diversworld Logo")
 
 
 # Welcome to ContaoDiveclubBundle
