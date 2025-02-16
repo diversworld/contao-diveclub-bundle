@@ -125,13 +125,13 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
                 'chosen'             => true, // Bessere Darstellung des Dropdowns
                 'tl_class'           => 'w25', // CSS-Klasse fürs Layout
             ],
-            'sql'               => "int(10) unsigned NOT NULL default 0",
+            'sql'               => "int(10) unsigned NULL default 0",
         ],
         'proposalDate'      => [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_check_proposal']['proposalDate'],
             'inputType'         => 'text',
             'eval'              => array('rgxp'=>'date', 'datepicker'=>true, 'tl_class'=>'w25 clr wizard'),
-            'sql'               => "varchar(10) NOT NULL default ''"
+            'sql'               => "varchar(10) NULL default ''"
         ],
         'vendorName'        => [
             'exclude'           => true,
@@ -140,13 +140,13 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
             'search'            => true,
             'sorting'           => true,
             'eval'              => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w33',],
-            'sql'               => "varchar(255) NOT NULL default ''",
+            'sql'               => "varchar(255) NULL default ''",
         ],
         'vendorWebsite'     => [
             'search'            => true,
             'inputType'         => 'text',
             'eval'              => ['rgxp'=>HttpUrlListener::RGXP_NAME, 'maxlength'=>255, 'feEditable'=>true, 'feGroup'=>'contact', 'tl_class'=>'w33'],
-            'sql'               => "varchar(255) NOT NULL default ''"
+            'sql'               => "varchar(255) NULL default ''"
         ],
         'vendorStreet'      => [
             'exclude'           => true,
@@ -163,7 +163,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
             'search'            => true,
             'sorting'           => true,
             'eval'              => ['maxlength' => 12, 'tl_class' => 'w25',],
-            'sql'               => "varchar(32) NOT NULL default ''",
+            'sql'               => "varchar(32) NULL default ''",
         ],
         'vendorCity'        => [
             'exclude'           => true,
@@ -172,15 +172,15 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
             'search'            => true,
             'sorting'           => true,
             'eval'              => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w33',],
-            'sql'               => "varchar(255) NOT NULL default ''",
+            'sql'               => "varchar(255) NULL default ''",
         ],
         'vendorEmail'       => [
             'default'           => null,
             'exclude'           => true,
             'inputType'         => 'text',
             'sorting'           => true,
-            'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'rgxp'=>'email', 'unique'=>true, 'decodeEntities'=>true, 'feEditable'=>true, 'feGroup'=>'contact', 'tl_class'=>'w25 clr'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'eval'              => array('mandatory'=>false, 'maxlength'=>255, 'rgxp'=>'email', 'unique'=>false, 'decodeEntities'=>true, 'feEditable'=>true, 'feGroup'=>'contact', 'tl_class'=>'w25 clr'),
+            'sql'               => "varchar(255) NULL default ''"
 		],
         'vendorPhone'       => [
             'default'           => null,
@@ -188,7 +188,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
             'inputType'         => 'text',
             'sorting'           => true,
             'eval'              => array('maxlength'=>64, 'rgxp'=>'phone', 'decodeEntities'=>true, 'feEditable'=>true, 'feGroup'=>'contact', 'tl_class'=>'w25'),
-            'sql'               => "varchar(64) NOT NULL default ''"
+            'sql'               => "varchar(64) NULL default ''"
         ],
         'vendorMobile'      => [
             'default'           => null,
@@ -196,7 +196,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
             'inputType'         => 'text',
             'sorting'           => true,
             'eval'              => array('maxlength'=>64, 'rgxp'=>'phone', 'decodeEntities'=>true, 'feEditable'=>true, 'feGroup'=>'contact', 'tl_class'=>'w25'),
-            'sql'               => "varchar(64) NOT NULL default ''"
+            'sql'               => "varchar(64) NULL default ''"
         ],
         'notes'             => [
             'inputType'         => 'textarea',
