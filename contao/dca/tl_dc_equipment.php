@@ -71,8 +71,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
     'palettes'          => [
         '__selector__'      => ['addNotes'],
         'default'           => '{title_legend},title,alias;
-                                {details_legend},manufacturer,size,color;
-                                {Regulator_legend},serialnumber,regType,lastCheckDate,nextCheckDate;
+                                {details_legend},manufacturer,model,color,size;
                                 {notes_legend},addNotes;
                                 {publish_legend},published,start,stop;'
     ],
@@ -119,6 +118,15 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
             'sorting'           => true,
             'options_callback'  => array('tl_dc_equipment', 'getManufacturers'),
             'eval'              => array('mandatory' => true, 'tl_class' => 'w25 clr'),
+            'sql'               => "varchar(255) NOT NULL default ''",
+        ],
+        'model'             => [
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['model'],
+            'inputType'         => 'text',
+            'search'            => true,
+            'filter'            => true,
+            'sorting'           => true,
+            'eval'              => array('mandatory' => false, 'tl_class' => 'w25'),
             'sql'               => "varchar(255) NOT NULL default ''",
         ],
         'color'             => [

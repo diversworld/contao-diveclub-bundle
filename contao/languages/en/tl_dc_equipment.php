@@ -14,15 +14,16 @@ $GLOBALS['TL_LANG']['tl_dc_equipment']['delete'] = "Delete record with ID: %s";
 $GLOBALS['TL_LANG']['tl_dc_equipment']['show'] = "View record with ID: %s";
 
 // Legends
-$GLOBALS['TL_LANG']['tl_dc_equipment']['title_legend'] = 'Title and Alias';
+$GLOBALS['TL_LANG']['tl_dc_equipment']['title_legend'] = 'Inventorynumber and Alias';
 $GLOBALS['TL_LANG']['tl_dc_equipment']['details_legend'] = 'Details';
 $GLOBALS['TL_LANG']['tl_dc_equipment']['notes_legend'] = 'Notes';
 $GLOBALS['TL_LANG']['tl_dc_equipment']['publish_legend'] = 'Publication';
 
 // Fields
-$GLOBALS['TL_LANG']['tl_dc_equipment']['title'] = ['Title', 'Please enter the title of the equipment.'];
+$GLOBALS['TL_LANG']['tl_dc_equipment']['title'] = ['Inventorynumber', 'Please enter the Inventorynumber of the equipment.'];
 $GLOBALS['TL_LANG']['tl_dc_equipment']['alias'] = ['Alias', 'The alias will be automatically generated if no alias is provided.'];
 $GLOBALS['TL_LANG']['tl_dc_equipment']['manufacturer'] = ['Manufacturer', 'Select the manufacturer.'];
+$GLOBALS['TL_DCA']['tl_dc_equipment']['model']     = ['Model', 'What the Modelname.'];
 $GLOBALS['TL_LANG']['tl_dc_equipment']['size'] = ['Size', 'Select a size.'];
 $GLOBALS['TL_DCA']['tl_dc_equipment']['color'] = ['Color', 'What color has the equipment?'];
 $GLOBALS['TL_LANG']['tl_dc_equipment']['addNotes'] = ['Additional Notes', 'Add optional notes.'];
