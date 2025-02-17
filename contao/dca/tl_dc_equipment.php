@@ -118,7 +118,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
             'filter'            => true,
             'sorting'           => true,
             'options_callback'  => array('tl_dc_equipment', 'getManufacturers'),
-            'eval'              => array('mandatory' => true, 'tl_class' => 'w33 clr'),
+            'eval'              => array('mandatory' => true, 'tl_class' => 'w25 clr'),
             'sql'               => "varchar(255) NOT NULL default ''",
         ],
         'color'             => [
@@ -127,7 +127,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
-            'eval'              => array('mandatory' => false, 'tl_class' => 'w33 clr'),
+            'eval'              => array('mandatory' => false, 'tl_class' => 'w25'),
             'sql'               => "varchar(255) NOT NULL default ''",
         ],
         'size'              => [
