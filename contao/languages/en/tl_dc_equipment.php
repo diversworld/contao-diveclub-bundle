@@ -24,13 +24,13 @@ $GLOBALS['TL_LANG']['tl_dc_equipment']['title'] = ['Title', 'Please enter the ti
 $GLOBALS['TL_LANG']['tl_dc_equipment']['alias'] = ['Alias', 'The alias will be automatically generated if no alias is provided.'];
 $GLOBALS['TL_LANG']['tl_dc_equipment']['manufacturer'] = ['Manufacturer', 'Select the manufacturer.'];
 $GLOBALS['TL_LANG']['tl_dc_equipment']['size'] = ['Size', 'Select a size.'];
+$GLOBALS['TL_DCA']['tl_dc_equipment']['color'] = ['Color', 'What color has the equipment?'];
 $GLOBALS['TL_LANG']['tl_dc_equipment']['addNotes'] = ['Additional Notes', 'Add optional notes.'];
 $GLOBALS['TL_LANG']['tl_dc_equipment']['notes'] = ['Notes', 'Please enter the notes.'];
 $GLOBALS['TL_LANG']['tl_dc_equipment']['published'] = ['Published', 'Mark the equipment as published.'];
 $GLOBALS['TL_LANG']['tl_dc_equipment']['start'] = ['Start Date', 'Enter a start date.'];
 $GLOBALS['TL_LANG']['tl_dc_equipment']['stop'] = ['End Date', 'Enter an end date.'];
 
-$GLOBALS['TL_DCA']['tl_dc_equipment']['color'] = ['Color', 'What color has the equipment?'];
 $GLOBALS['TL_DCA']['tl_dc_equipment']['stage'] = ['1' => '1st Stage', '2' => '2nd Stage'];
 $GLOBALS['TL_DCA']['tl_dc_equipment']['regulator'] = ['Regulator', 'Which regulator is the equipment?'];
 $GLOBALS['TL_DCA']['tl_dc_equipment']['regulator'] = ['1' => 'Primary', '2' => 'Secondary'];
