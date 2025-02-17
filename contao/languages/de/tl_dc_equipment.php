@@ -30,7 +30,7 @@ $GLOBALS['TL_LANG']['tl_dc_equipment']['published']         = ['Veröffentlicht'
 $GLOBALS['TL_LANG']['tl_dc_equipment']['start']             = ['Startdatum', 'Geben Sie ein Startdatum an.'];
 $GLOBALS['TL_LANG']['tl_dc_equipment']['stop']              = ['Enddatum', 'Geben Sie ein Enddatum an.'];
 
-$GLOBALS['TL_DCA']['tl_dc_equipment_type']['stage']         = ['Stufe', 'Welche Stufe ist das Equipment?'];
-$GLOBALS['TL_DCA']['tl_dc_equipment_type']['stageType']     = ['1' => 'Erste Stufe', '2' => 'Zweite Stufe'];
-$GLOBALS['TL_DCA']['tl_dc_equipment_type']['regulator']     = ['Atemregler', 'Welcher Atemregler ist das Equipment?'];
-$GLOBALS['TL_DCA']['tl_dc_equipment_type']['regType']       = ['1' => 'Primär', '2' => 'Sekundär'];
+$GLOBALS['TL_DCA']['tl_dc_equipment']['color']         = ['Farbe', 'Welche Frabe hat das Equipment?'];
+$GLOBALS['TL_DCA']['tl_dc_equipment']['stageType']     = ['1' => 'Erste Stufe', '2' => 'Zweite Stufe'];
+$GLOBALS['TL_DCA']['tl_dc_equipment']['regulator']     = ['Atemregler', 'Welcher Atemregler ist das Equipment?'];
+$GLOBALS['TL_DCA']['tl_dc_equipment']['regType']       = ['1' => 'Primär', '2' => 'Sekundär'];

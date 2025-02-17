@@ -30,7 +30,7 @@ $GLOBALS['TL_LANG']['tl_dc_equipment']['published'] = ['Published', 'Mark the eq
 $GLOBALS['TL_LANG']['tl_dc_equipment']['start'] = ['Start Date', 'Enter a start date.'];
 $GLOBALS['TL_LANG']['tl_dc_equipment']['stop'] = ['End Date', 'Enter an end date.'];
 
-$GLOBALS['TL_DCA']['tl_dc_equipment_type']['stage'] = ['Stage', 'What stage is the equipment?'];
-$GLOBALS['TL_DCA']['tl_dc_equipment_type']['stage'] = ['1' => '1st Stage', '2' => '2nd Stage'];
-$GLOBALS['TL_DCA']['tl_dc_equipment_type']['regulator'] = ['Regulator', 'Which regulator is the equipment?'];
-$GLOBALS['TL_DCA']['tl_dc_equipment_type']['regulator'] = ['1' => 'Primary', '2' => 'Secondary'];
+$GLOBALS['TL_DCA']['tl_dc_equipment']['color'] = ['Color', 'What color has the equipment?'];
+$GLOBALS['TL_DCA']['tl_dc_equipment']['stage'] = ['1' => '1st Stage', '2' => '2nd Stage'];
+$GLOBALS['TL_DCA']['tl_dc_equipment']['regulator'] = ['Regulator', 'Which regulator is the equipment?'];
+$GLOBALS['TL_DCA']['tl_dc_equipment']['regulator'] = ['1' => 'Primary', '2' => 'Secondary'];

@@ -4,10 +4,10 @@
     "keywords": [
         "contao",
         "bundle",
-        "tag 3",
-        "tag 4"
+        "diveclub",
+        "manager"
     ],
-    "version": "1.0.3",
+    "version": "1.0.4",
     "type": "contao-bundle",
     "license": "GPL-3.0-or-later",
     "authors": [

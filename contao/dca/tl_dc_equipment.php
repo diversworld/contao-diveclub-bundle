@@ -71,7 +71,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
     'palettes'          => [
         '__selector__'      => ['addNotes'],
         'default'           => '{title_legend},title,alias;
-                                {details_legend},manufacturer,size;
+                                {details_legend},manufacturer,size,color;
                                 {Regulator_legend},serialnumber,regType,lastCheckDate,nextCheckDate;
                                 {notes_legend},addNotes;
                                 {publish_legend},published,start,stop;'
@@ -121,6 +121,15 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
             'eval'              => array('mandatory' => true, 'tl_class' => 'w33 clr'),
             'sql'               => "varchar(255) NOT NULL default ''",
         ],
+        'color'             => [
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['color'],
+            'inputType'         => 'text',
+            'search'            => true,
+            'filter'            => true,
+            'sorting'           => true,
+            'eval'              => array('mandatory' => false, 'tl_class' => 'w33 clr'),
+            'sql'               => "varchar(255) NOT NULL default ''",
+        ],
         'size'              => [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['size'],
             'inputType'         => 'select',
@@ -131,37 +140,6 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
             'eval'              => ['mandatory' => false, 'tl_class' => 'w25'],
             'sql'               => "varchar(255) NOT NULL default ''",
         ],
-        'stage'           => [
-            'inputType'         => 'option',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_type']['stage'],
-            'exclude'           => true,
-            'filter'            => true,
-            'options'           => &$GLOBALS['TL_DCA']['tl_dc_equipment_type']['stage'],
-            'reference'         => &$GLOBALS['TL_DCA']['tl_dc_equipment_type']['stage'],
-            'eval'              => ['submitOnChange' => true, 'tl_class' => 'w25 clr'],
-            'sql'               => ['type' => 'boolean', 'default' => false]
-        ],
-        'regulator'           => [
-            'inputType'         => 'option',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_type']['regulator'],
-            'exclude'           => true,
-            'filter'            => true,
-            'options'           => &$GLOBALS['TL_DCA']['tl_dc_equipment_type']['regType'],
-            'reference'         => &$GLOBALS['TL_DCA']['tl_dc_equipment_type']['regType'],
-            'eval'              => ['submitOnChange' => true, 'tl_class' => 'w25'],
-            'sql'               => ['type' => 'boolean', 'default' => false]
-        ],
-        'regModel'         => [
-            'inputType'         => 'select',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_type']['regModel'],
-            'exclude'           => true,
-            'search'            => true,
-            'filter'            => true,
-            'sorting'           => true,
-            'options_callback'  => ['tl_dc_equipment_type', 'getRegModeles'],
-            'eval'              => ['submitOnChange' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
-            'sql'               => "varchar(255) NOT NULL default ''"
-        ],
         'serialNumber'      => [
             'inputType'         => 'text',
             'search'            => true,
@@ -170,22 +148,6 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
             'flag'              => DataContainer::SORT_INITIAL_LETTER_ASC,
             'eval'              => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25 clr'],
             'sql'               => "varchar(50) NOT NULL default ''"
-        ],
-        'lastCheckDate'     => [
-            'inputType'         => 'text',
-            'sorting'           => true,
-            'filter'            => true,
-            'flag'              => DataContainer::SORT_YEAR_DESC,
-            'eval'              => ['submitOnChange' => true, 'rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w33 wizard'],
-            'sql'               => "varchar(10) NOT NULL default ''"
-        ],
-        'nextCheckDate'     => [
-            'inputType'         => 'text',
-            'sorting'           => true,
-            'filter'            => true,
-            'flag'              => DataContainer::SORT_YEAR_DESC,
-            'eval'              => ['submitOnChange' => true,'rgxp'=>'date', 'doNotCopy'=>false, 'datepicker'=>true, 'tl_class'=>'w33 wizard'],
-            'sql'               => "varchar(10) NOT NULL default ''"
         ],
         'addNotes'          => [
             'inputType'         => 'checkbox',
@@ -306,6 +268,7 @@ class tl_dc_equipment extends Backend
 
         return $options;
     }
+
     public function getRegModels(DataContainer $dc): array
     {
         // Sicherstellen, dass ein aktiver Datensatz vorhanden ist

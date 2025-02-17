@@ -28,21 +28,21 @@ use Contao\CoreBundle\EventListener\Widget\HttpUrlListener;
 $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
     'config'            => [
         'dataContainer'     => DC_Table::class,
-        'ctable'            => array('tl_dc_check_articles'),
+        'ctable'            => ['tl_dc_check_articles'],
         'enableVersioning'  => true,
-        'sql'               => array(
-            'keys' => array(
+        'sql'               => [
+            'keys' => [
                 'id'        => 'primary',
                 'tstamp'    => 'index',
                 'alias'     => 'index',
                 'published,start,stop' => 'index'
-            )
-        ),
+            ]
+        ],
     ],
     'list'              => [
         'sorting'           => [
             'mode'          => DataContainer::MODE_SORTABLE,
-            'fields'        => array('title','alias','published'),
+            'fields'        => ['title','alias','published'],
             'flag'          => DataContainer::SORT_ASC,
             'panelLayout'   => 'filter;sort,search,limit'
         ],
@@ -91,14 +91,14 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
             'filter'        => true,
             'sorting'       => true,
             'flag'          => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'eval'          => array('mandatory' => true, 'maxlength' => 25, 'tl_class' => 'w33'),
+            'eval'          => ['mandatory' => true, 'maxlength' => 25, 'tl_class' => 'w33'],
             'sql'           => "varchar(255) NOT NULL default ''"
         ],
         'alias'             => [
             'search'        => true,
             'inputType'     => 'text',
-            'eval'          => array('rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w33'),
-            'save_callback' => array('tl_dc_check_proposal', 'generateAlias'),
+            'eval'          => ['rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w33'],
+            'save_callback' => [['tl_dc_check_proposal', 'generateAlias']],
             'sql'           => "varchar(255) BINARY NOT NULL default ''"
         ],
         'checkId'           => [
@@ -130,7 +130,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
         'proposalDate'      => [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_check_proposal']['proposalDate'],
             'inputType'         => 'text',
-            'eval'              => array('rgxp'=>'date', 'datepicker'=>true, 'tl_class'=>'w25 clr wizard'),
+            'eval'              => ['rgxp'=>'date', 'datepicker'=>true, 'tl_class'=>'w25 clr wizard'],
             'sql'               => "varchar(10) NULL default ''"
         ],
         'vendorName'        => [
@@ -179,7 +179,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
             'exclude'           => true,
             'inputType'         => 'text',
             'sorting'           => true,
-            'eval'              => array('mandatory'=>false, 'maxlength'=>255, 'rgxp'=>'email', 'unique'=>false, 'decodeEntities'=>true, 'feEditable'=>true, 'feGroup'=>'contact', 'tl_class'=>'w25 clr'),
+            'eval'              => ['mandatory'=>false, 'maxlength'=>255, 'rgxp'=>'email', 'unique'=>false, 'decodeEntities'=>true, 'feEditable'=>true, 'feGroup'=>'contact', 'tl_class'=>'w25 clr'],
             'sql'               => "varchar(255) NULL default ''"
 		],
         'vendorPhone'       => [
@@ -187,7 +187,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
             'exclude'           => true,
             'inputType'         => 'text',
             'sorting'           => true,
-            'eval'              => array('maxlength'=>64, 'rgxp'=>'phone', 'decodeEntities'=>true, 'feEditable'=>true, 'feGroup'=>'contact', 'tl_class'=>'w25'),
+            'eval'              => ['maxlength'=>64, 'rgxp'=>'phone', 'decodeEntities'=>true, 'feEditable'=>true, 'feGroup'=>'contact', 'tl_class'=>'w25'],
             'sql'               => "varchar(64) NULL default ''"
         ],
         'vendorMobile'      => [
@@ -195,7 +195,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
             'exclude'           => true,
             'inputType'         => 'text',
             'sorting'           => true,
-            'eval'              => array('maxlength'=>64, 'rgxp'=>'phone', 'decodeEntities'=>true, 'feEditable'=>true, 'feGroup'=>'contact', 'tl_class'=>'w25'),
+            'eval'              => ['maxlength'=>64, 'rgxp'=>'phone', 'decodeEntities'=>true, 'feEditable'=>true, 'feGroup'=>'contact', 'tl_class'=>'w25'],
             'sql'               => "varchar(64) NULL default ''"
         ],
         'notes'             => [
@@ -204,7 +204,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
             'search'            => false,
             'filter'            => true,
             'sorting'           => false,
-            'eval'              => array('rte' => 'tinyMCE', 'tl_class' => 'clr'),
+            'eval'              => ['rte' => 'tinyMCE', 'tl_class' => 'clr'],
             'sql'               => 'text NULL'
         ],
         'published'         => [
@@ -212,17 +212,17 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
             'filter'            => true,
             'flag'              => DataContainer::SORT_INITIAL_LETTER_DESC,
             'inputType'         => 'checkbox',
-            'eval'              => array('doNotCopy'=>true, 'tl_class' => 'w50'),
-            'sql'               => array('type' => 'boolean', 'default' => false)
+            'eval'              => ['doNotCopy'=>true, 'tl_class' => 'w50'],
+            'sql'               => ['type' => 'boolean', 'default' => false]
         ],
         'start'             => [
             'inputType'         => 'text',
-            'eval'              => array('rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 clr wizard'),
+            'eval'              => ['rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 clr wizard'],
             'sql'               => "varchar(10) NOT NULL default ''"
         ],
         'stop'              => [
             'inputType'         => 'text',
-            'eval'              => array('rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
+            'eval'              => ['rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 wizard'],
             'sql'               => "varchar(10) NOT NULL default ''"
         ]
     ]
