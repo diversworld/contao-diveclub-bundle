@@ -31,10 +31,6 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
         'dataContainer'         => DC_Table::class,
         'ptable'                => 'tl_dc_regulators',
         'enableVersioning'      => true,
-        'onload_callback'   => [
-            ['tl_dc_regulator_control', 'debugHeaderFields']
-        ],
-
         'sql'               => [
             'keys'              => [
                 'id'            => 'primary',
@@ -322,20 +318,4 @@ class tl_dc_regulator_control extends Backend
         // Nur die relevanten Subtypen für diesen Typ zurückgeben
         return $subTypes[$currentType];
     }
-
-    public function debugHeaderFields(DataContainer $dc): void
-    {
-        $this->logger = System::getContainer()->get('monolog.logger.contao.general');
-        $parentId = Input::get('id');
-        $headerFields = Database::getInstance()
-            ->prepare("SELECT * FROM tl_dc_regulators WHERE id = ?")
-            ->execute($parentId);
-
-        if ($headerFields->numRows) {
-            $this->logger->info('Header Data: ' . print_r($headerFields->fetchAssoc(), true));
-        } else {
-            $this->logger->error('No header data found for parent ID: ' . $parentId);
-        }
-    }
-
 }

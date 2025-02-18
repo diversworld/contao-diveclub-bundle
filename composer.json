@@ -7,7 +7,7 @@
         "diveclub",
         "manager"
     ],
-    "version": "1.0.6",
+    "version": "1.0.7",
     "type": "contao-bundle",
     "license": "GPL-3.0-or-later",
     "authors": [
