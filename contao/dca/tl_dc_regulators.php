@@ -95,14 +95,14 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'filter'            => true,
             'sorting'           => true,
             'flag'              => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'eval'              => ['mandatory' => true, 'maxlength'=>255, 'tl_class' => 'w50'],
+            'eval'              => ['mandatory' => true, 'maxlength'=>255, 'tl_class' => 'w25'],
             'sql'               => "varchar(255) NOT NULL default ''"
         ],
         'alias'                 => [
             'search'            => true,
             'inputType'         => 'text',
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulators']['alias'],
-            'eval'              => ['rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w50'],
+            'eval'              => ['rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w25'],
             'save_callback' => [
                 ['tl_dc_regulators', 'generateAlias']
             ],
@@ -115,7 +115,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'filter'            => true,
             'sorting'           => true,
             'options_callback'  => array('tl_dc_regulators', 'getManufacturers'),
-            'eval'              => array('includeBlankOption' => true, 'submitOnChange' => true, 'mandatory' => true, 'tl_class' => 'w33 clr'),
+            'eval'              => array('includeBlankOption' => true, 'submitOnChange' => true, 'mandatory' => true, 'tl_class' => 'w25 clr'),
             'sql'               => "varchar(255) NOT NULL default ''",
         ],
         'serialNumber1st'       => [
