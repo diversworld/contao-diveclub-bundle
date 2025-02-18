@@ -22,223 +22,209 @@ use Diversworld\ContaoDiveclubBundle\Model\CoursesModel;
 /**
  * Table tl_dc_courses
  */
-$GLOBALS['TL_DCA']['tl_dc_courses'] = array(
-    'config'            => array(
+$GLOBALS['TL_DCA']['tl_dc_courses'] = [
+    'config'        => [
         'dataContainer'     => DC_Table::class,
-        'ctable'            => array('tl_content'),
+        'ctable'            => ['tl_content'],
         'enableVersioning'  => true,
-        'sql'               => array(
-            'keys'      => array(
+        'sql'               => [
+            'keys'      => [
                 'id'        => 'primary',
                 'tstamp'    => 'index',
                 'alias'     => 'index',
                 'published,start,stop' => 'index'
-            )
-        ),
-    ),
-    'list'        => array(
-        'sorting'           => array(
+            ]
+        ],
+    ],
+    'list'          => [
+        'sorting'           => [
             'mode'          => DataContainer::MODE_SORTABLE,
-            'fields'        => array('title','category','published'),
+            'fields'        => ['title','category','published'],
             'flag'          => DataContainer::SORT_ASC,
             'panelLayout'   => 'filter;sort,search,limit'
-        ),
-        'label'             => array(
-            'fields' => array('title','category'),
-            'format' => '%s %s',
-        ),
-        'global_operations' => array(
-            'all' => array(
-                'href'       => 'act=select',
-                'class'      => 'header_edit_all',
-                'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"'
-            )
-        ),
-        'operations'        => array(
+        ],
+        'label'             => [
+            'fields'        => ['title','category'],
+            'format'        => '%s %s',
+        ],
+        'global_operations' => [
+            'all'               => [
+                'href'          => 'act=select',
+                'class'         => 'header_edit_all',
+                'attributes'    => 'onclick="Backend.getScrollOffset()" accesskey="e"'
+            ]
+        ],
+        'operations'        => [
             'edit',
             'children',
             'copy',
             'delete',
             'show',
             'toggle'
-        )
-    ),
-    'palettes'    => array(
-        '__selector__' => array('addImage', 'overwriteMeta'),
+        ]
+    ],
+    'palettes'      => [
+        '__selector__' => ['addImage', 'overwriteMeta'],
         'default'      => '{first_legend},title,alias;
                            {details_section},category,description,requirements;
                            {image_legend},addImage;
-                           {publish_legend},published,start,stop'
-    ),
-    'subpalettes' => array(
+                           {publish_legend},published,start,stop;'
+    ],
+    'subpalettes'   => [
         'addImage'      => 'singleSRC,fullsize,size,floating,overwriteMeta',
         'overwriteMeta' => 'alt,imageTitle,imageUrl,caption'
-    ),
-    'fields'      => array(
-        'id'        => array(
+    ],
+    'fields'        => [
+        'id'            => [
             'sql'       => "int(10) unsigned NOT NULL auto_increment"
-        ),
-        'tstamp'        => array(
+        ],
+        'tstamp'        => [
             'sql'       => "int(10) unsigned NOT NULL default 0"
-        ),
-        'title'     => array(
+        ],
+        'title'         => [
             'inputType' => 'text',
             'exclude'   => true,
             'search'    => true,
             'filter'    => true,
             'sorting'   => true,
             'flag'      => DataContainer::SORT_ASC,
-            'eval'      => array('mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'),
-            'sql'       => "varchar(255) NOT NULL default ''"
-        ),
-        'alias'     => array
-        (
+            'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
+            'sql'       => "varchar(255) NOT NULL default ''",
+        ],
+        'alias'         => [
             'search'    => true,
             'inputType' => 'text',
-            'eval'      => array('rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w50'),
-            'save_callback' => array('tl_dc_courses', 'generateAlias'),
-            'sql'       => "varchar(255) BINARY NOT NULL default ''"
-        ),
-        'description' => array(
+            'eval'      => ['rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w50'],
+            'save_callback' => ['tl_dc_courses', 'generateAlias'],
+            'sql'       => "varchar(255) BINARY NOT NULL default ''",
+        ],
+        'description'   => [
             'inputType' => 'textarea',
             'exclude'   => true,
             'search'    => true,
             'filter'    => true,
             'sorting'   => true,
-            'eval'      => array('rte' => 'tinyMCE', 'tl_class' => 'clr'),
+            'eval'      => ['rte' => 'tinyMCE', 'tl_class' => 'clr'],
             'sql'       => 'text NULL'
-        ),
-        'requirements'  => array(
+        ],
+        'requirements'  => [
             'inputType' => 'textarea',
             'exclude'   => true,
             'search'    => true,
             'filter'    => true,
             'sorting'   => true,
-            'eval'      => array('rte' => 'tinyMCE', 'tl_class' => 'clr'),
+            'eval'      => ['rte' => 'tinyMCE', 'tl_class' => 'clr'],
             'sql'       => 'text NULL'
-        ),
-        'category'    => array(
+        ],
+        'category'      => [
             'inputType' => 'select',
             'exclude'   => true,
             'search'    => true,
             'filter'    => true,
             'sorting'   => true,
             'reference' => &$GLOBALS['TL_LANG']['tl_dc_courses'],
-            'options'   => array('basic', 'specialty', 'professional'),
-            'eval'      => array('includeBlankOption' => true, 'tl_class' => 'w50'),
+            'options'   => ['basic', 'specialty', 'professional'],
+            'eval'      => ['includeBlankOption' => true, 'tl_class' => 'w50'],
             'sql'       => "varchar(255) NOT NULL default ''",
-        ),
-        'addImage' => array
-        (
+        ],
+        'addImage'      => [
             'inputType' => 'checkbox',
-            'eval'      => array('submitOnChange'=>true),
+            'eval'      => ['submitOnChange'=>true],
             'sql'       => ['type' => 'boolean', 'default' => false],
-        ),
-        'overwriteMeta' => array
-        (
+        ],
+        'overwriteMeta' => [
             'label'     => &$GLOBALS['TL_LANG']['tl_dc_courses']['overwriteMeta'],
             'inputType' => 'checkbox',
-            'eval'      => array('submitOnChange'=>true, 'tl_class'=>'w50 clr'),
+            'eval'      => ['submitOnChange'=>true, 'tl_class'=>'w50 clr'],
             'sql'       => ['type' => 'boolean', 'default' => false],
-        ),
-        'singleSRC' => array
-        (
+        ],
+        'singleSRC'     => [
             'label'     => &$GLOBALS['TL_LANG']['tl_dc_courses']['singleSRC'],
             'inputType' => 'fileTree',
-            'eval'      => array('filesOnly'=>true, 'fieldType'=>'radio', 'extensions'=>'%contao.image.valid_extensions%', 'mandatory'=>true),
+            'eval'      => ['filesOnly'=>true, 'fieldType'=>'radio', 'extensions'=>'%contao.image.valid_extensions%', 'mandatory'=>true],
             'sql'       => "binary(16) NULL"
-        ),
-        'alt' => array
-        (
+        ],
+        'alt'           => [
             'label'     => &$GLOBALS['TL_LANG']['tl_dc_courses']['alt'],
             'search'    => true,
             'inputType' => 'text',
-            'eval'      => array('maxlength'=>255, 'tl_class'=>'w50'),
+            'eval'      => ['maxlength'=>255, 'tl_class'=>'w50'],
             'sql'       => "varchar(255) NOT NULL default ''"
-        ),
-        'imageTitle' => array
-        (
+        ],
+        'imageTitle'    => [
             'label'     => &$GLOBALS['TL_LANG']['tl_dc_courses']['imageTitle'],
             'search'    => true,
             'inputType' => 'text',
-            'eval'      => array('maxlength'=>255, 'tl_class'=>'w50'),
+            'eval'      => ['maxlength'=>255, 'tl_class'=>'w50'],
             'sql'       => "varchar(255) NOT NULL default ''"
-        ),
-        'size' => array
-        (
+        ],
+        'size'          => [
             'label'     => &$GLOBALS['TL_LANG']['tl_dc_courses']['imgSize'],
             'inputType' => 'imageSize',
             'reference' => &$GLOBALS['TL_LANG']['MSC'],
-            'eval'      => array('rgxp'=>'natural', 'includeBlankOption'=>true, 'nospace'=>true, 'helpwizard'=>true, 'tl_class'=>'w50 clr'),
+            'eval'      => ['rgxp'=>'natural', 'includeBlankOption'=>true, 'nospace'=>true, 'helpwizard'=>true, 'tl_class'=>'w50 clr'],
             'options_callback' => static function () {
                 return System::getContainer()->get('contao.image.sizes')->getOptionsForUser(BackendUser::getInstance());
             },
             'sql'           => "varchar(64) NOT NULL default ''"
-        ),
-        'imageUrl' => array
-        (
+        ],
+        'imageUrl'      => [
             'label'         => &$GLOBALS['TL_LANG']['tl_dc_courses']['imageUrl'],
             'search'        => true,
             'inputType'     => 'text',
-            'eval'          => array('rgxp'=>'url', 'decodeEntities'=>true, 'maxlength'=>2048, 'dcaPicker'=>true, 'tl_class'=>'w50 wizard'),
+            'eval'          => ['rgxp'=>'url', 'decodeEntities'=>true, 'maxlength'=>2048, 'dcaPicker'=>true, 'tl_class'=>'w50 wizard'],
             'sql'           => "varchar(2048) NOT NULL default ''"
-        ),
-        'fullsize' => array
-        (
+        ],
+        'fullsize'      => [
             'label'         => &$GLOBALS['TL_LANG']['tl_dc_courses']['fullsize'],
             'inputType'     => 'checkbox',
-            'eval'          => array('tl_class'=>'w50'),
-            'sql'           => array('type' => 'boolean', 'default' => false)
-        ),
-        'caption' => array
-        (
+            'eval'          => ['tl_class'=>'w50'],
+            'sql'           => ['type' => 'boolean', 'default' => false]
+        ],
+        'caption'       => [
             'label'         => &$GLOBALS['TL_LANG']['tl_dc_courses']['caption'],
             'search'        => true,
             'inputType'     => 'text',
-            'eval'          => array('maxlength'=>255, 'allowHtml'=>true, 'tl_class'=>'w50'),
+            'eval'          => ['maxlength'=>255, 'allowHtml'=>true, 'tl_class'=>'w50'],
             'sql'           => "varchar(255) NOT NULL default ''"
-        ),
-        'floating' => array
-        (
+        ],
+        'floating'      => [
             'label'         => &$GLOBALS['TL_LANG']['tl_dc_courses']['floating'],
             'inputType'     => 'radioTable',
-            'options'       => array('above', 'left', 'right', 'below'),
-            'eval'          => array('cols'=>4, 'tl_class'=>'w50'),
+            'options'       => ['above', 'left', 'right', 'below'],
+            'eval'          => ['cols'=>4, 'tl_class'=>'w50'],
             'reference'     => &$GLOBALS['TL_LANG']['MSC'],
             'sql'           => "varchar(32) NOT NULL default 'above'"
-        ),
-        'remarks'  => array(
+        ],
+        'remarks'       => [
             'inputType'     => 'textarea',
             'exclude'       => true,
             'search'        => true,
             'filter'        => true,
             'sorting'       => true,
-            'eval'          => array('rte' => 'tinyMCE', 'tl_class' => 'clr'),
+            'eval'          => ['rte' => 'tinyMCE', 'tl_class' => 'clr'],
             'sql'           => 'text NULL'
-        ),
-        'published' => array
-        (
+        ],
+        'published'     => [
             'toggle'        => true,
             'filter'        => true,
             'flag'          => DataContainer::SORT_INITIAL_LETTER_DESC,
             'inputType'     => 'checkbox',
-            'eval'          => array('doNotCopy'=>true, 'tl_class' => 'w50 clr'),
-            'sql'           => array('type' => 'boolean', 'default' => false)
-        ),
-        'start' => array
-        (
+            'eval'          => ['doNotCopy'=>true, 'tl_class' => 'w50 clr'],
+            'sql'           => ['type' => 'boolean', 'default' => false]
+        ],
+        'start'         => [
             'inputType'     => 'text',
-            'eval'          => array('rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'clr w50 wizard'),
+            'eval'          => ['rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'clr w50 wizard'],
             'sql'           => "varchar(10) NOT NULL default ''"
-        ),
-        'stop' => array
-        (
+        ],
+        'stop'          => [
             'inputType'     => 'text',
-            'eval'          => array('rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
+            'eval'          => ['rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 wizard'],
             'sql'           => "varchar(10) NOT NULL default ''"
-        )
-    )
-);
+        ]
+    ]
+];
 /**
  * Provide miscellaneous methods that are used by the data configuration array.
  *

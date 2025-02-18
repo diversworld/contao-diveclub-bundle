@@ -37,7 +37,7 @@ $GLOBALS['BE_MOD']['diveclub'] = [
             'tables' => ['tl_dc_tanks','tl_dc_check_invoice'],
         ],
         'dc_course_collection' => [
-            'tables' => ['tl_dc_courses'],
+            'tables' => ['tl_dc_courses','tl_content'],
         ],
         'dc_check_collection' => [
             'tables' => ['tl_dc_check_proposal','tl_dc_check_articles'],

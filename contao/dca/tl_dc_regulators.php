@@ -27,11 +27,11 @@ use Contao\TemplateLoader;
  * Table tl_dc_tanks
  */
 $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
-    'config'        => [
-        'dataContainer'     => DC_Table::class,
-        'ctable'            => ['tl_dc_regulator_control'],
-        'enableVersioning'  => true,
-        'sql'               => [
+    'config'            => [
+        'dataContainer'         => DC_Table::class,
+        'ctable'                => ['tl_dc_regulator_control'],
+        'enableVersioning'      => true,
+        'sql'                   => [
             'keys'          => [
                 'id'            => 'primary',
                 'tstamp'        => 'index',
@@ -40,27 +40,27 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             ]
         ],
     ],
-    'list'          => [
-        'sorting'           => [
+    'list'              => [
+        'sorting'               => [
             'mode'          => DataContainer::MODE_SORTABLE,
             'fields'        => ['title','alias','manufacturer','regModel1st','regModel2ndPri','regModel2ndSec','published'],
-            'flag'          => DataContainer::SORT_INITIAL_LETTER_ASC,
+            'flag'          => DataContainer::SORT_ASC,
             'panelLayout'   => 'filter;sort,search,limit'
         ],
-        'label'             => [
+        'label'                 => [
             'fields'            => ['title','manufacturer','regModel1st','regModel2ndPri','regModel2ndSec'],
             'showColumns'       => false,
             'format'            => '%s %s %s %s %s',
             'label_callback'    => ['tl_dc_regulators', 'customLabelCallback'],
         ],
-        'global_operations' => [
+        'global_operations'     => [
             'all'               => [
                 'href'          => 'act=select',
                 'class'         => 'header_edit_all',
                 'attributes'    => 'onclick="Backend.getScrollOffset()" accesskey="e"'
             ]
         ],
-        'operations'        => [
+        'operations'            => [
             'edit',
             'children',
             'copy',

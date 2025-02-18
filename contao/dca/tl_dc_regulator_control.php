@@ -27,10 +27,14 @@ use Contao\TemplateLoader;
  * Table tl_dc_tanks
  */
 $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
-    'config'        => [
+    'config'            => [
         'dataContainer'     => DC_Table::class,
         'ptable'            => 'tl_dc_regulators',
         'enableVersioning'  => true,
+        'onload_callback' => [
+            ['tl_dc_regulator_control', 'debugHeaderFields']
+        ],
+
         'sql'               => [
             'keys'          => [
                 'id'            => 'primary',
@@ -41,18 +45,18 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             ]
         ],
     ],
-    'list'          => [
+    'list'              => [
         'sorting'           => [
             'mode'          => DataContainer::MODE_PARENT,
             'fields'        => ['title','alias','published'],
-            'header_fields' => ['title','manufacturer','serialNumber1st','regModel1st','serialNumber2ndPri','regModel2ndPri','serialNumber2ndSec','regModel2ndSec'],
+            'header_fields' => ['title','serialNumber1st','serialNumber2ndPri','serialNumber2ndSec'],//,'manufacturer','serialNumber1st','regModel1st','serialNumber2ndPri','regModel2ndPri','serialNumber2ndSec','regModel2ndSec'],
             'flag'          => DataContainer::SORT_ASC,
             'panelLayout'   => 'filter;sort,search,limit'
         ],
         'label'             => [
             'fields'            => ['title','midPreussurePre','inhalePressurePre','exhalePressurePre','midPressurePost','inhalePressurePost','exhalePressurePost'],
             'showColumns'       => false,
-            'format'            => '%s: %s %s %s - %s %s %s',
+            'format'            => '%s: Vorher MD %s bar EAW%s AAW %s - Nachher MD %s bar EAW %s AAW %s',
         ],
         'global_operations' => [
             'all'               => [
@@ -79,7 +83,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
                                 {publish_legend},published,start,stop;'
     ],
     'subpalettes'       => [
-        'addNotes'     => 'notes',
+        'addNotes'          => 'notes',
     ],
     'fields'            => [
         'id'                => [
@@ -318,4 +322,20 @@ class tl_dc_regulator_control extends Backend
         // Nur die relevanten Subtypen für diesen Typ zurückgeben
         return $subTypes[$currentType];
     }
+
+    public function debugHeaderFields(DataContainer $dc): void
+    {
+        $this->logger = System::getContainer()->get('monolog.logger.contao.general');
+        $parentId = Input::get('id');
+        $headerFields = Database::getInstance()
+            ->prepare("SELECT * FROM tl_dc_regulators WHERE id = ?")
+            ->execute($parentId);
+
+        if ($headerFields->numRows) {
+            $this->logger->info('Header Data: ' . print_r($headerFields->fetchAssoc(), true));
+        } else {
+            $this->logger->error('No header data found for parent ID: ' . $parentId);
+        }
+    }
+
 }
