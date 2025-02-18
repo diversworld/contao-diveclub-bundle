@@ -40,8 +40,9 @@ $GLOBALS['TL_DCA']['tl_dc_check_invoice'] = array(
     ),
     'list'        => array(
         'sorting'           => array(
-            'mode'          => DataContainer::MODE_SORTABLE,
+            'mode'          => DataContainer::MODE_PARENT,
             'fields'        => array('title','alias','member','published'),
+            'headerFields'  => ['title', 'manufacturer', 'size', 'lastCheckDate', 'nextCheckDate'],
             'flag'          => DataContainer::SORT_ASC,
             'panelLayout'   => 'filter;sort,search,limit'
         ),
@@ -80,10 +81,9 @@ $GLOBALS['TL_DCA']['tl_dc_check_invoice'] = array(
             'sql'           => "int(10) unsigned NOT NULL auto_increment"
         ),
         'pid'           => [
-            'inputType'     => 'text',
             'foreignKey'    => 'tl_dc_tanks.title',
-            'eval'          => ['submitOnChange' => true,'mandatory'=>true, 'tl_class' => 'w33 clr'],
-            'sql'           => "int(10) unsigned NOT NULL default 0",
+            'sql'               => "int(10) unsigned NOT NULL default 0",
+            'relation'          => ['type' => 'belongsTo', 'load' => 'lazy'], // Typ anpassen, falls notwendig
         ],
         'tstamp'        => array(
             'sql'           => "int(10) unsigned NOT NULL default 0"

@@ -19,6 +19,7 @@ use Contao\System;
 use Diversworld\ContaoDiveclubBundle\DataContainer\Tanks;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Contao\CoreBundle\Monolog\ContaoContext;
+use Diversworld\ContaoDiveclubBundle\DataContainer\DcCheckProposal;
 
 /**
  * Table tl_dc_check_articles
@@ -40,10 +41,11 @@ $GLOBALS['TL_DCA']['tl_dc_check_articles'] = [
     ],
     'list'          => [
         'sorting'           => [
-            'mode'          => DataContainer::MODE_SORTABLE,
+            'mode'          => DataContainer::MODE_PARENT,
             'fields'        => ['title','alias','published'],
+            'headerFields'  => ['title', 'vendorName', 'proposalDate'],
             'flag'          => DataContainer::SORT_ASC,
-            'panelLayout'   => 'filter;sort,search,limit'
+            'panelLayout'   => 'filter;sort,search,limit',
         ],
         'label'             => [
             'fields'        => ['title','articlePriceNetto','articlePriceBrutto'],
@@ -171,7 +173,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_articles'] = [
 /**
  * Provide miscellaneous methods that are used by the data configuration array.
  *
- * @property Tanks $Tanks
+ * @property DcTanks $DcTanks
  *
  * @internal
  */

@@ -63,15 +63,11 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
         ],
         'operations'        => [
             'edit',
+            'children',
             'copy',
             'delete',
             'toggle',
             'show',
-            'children'=> [
-                'label' => &$GLOBALS['TL_LANG']['tl_dc_tanks']['tanks'],
-                'href' => 'do=dc_tank_collection&table=tl_dc_check_invoice',
-                'icon' => 'editor.svg'
-            ],
         ],
     ],
     'palettes'          => [

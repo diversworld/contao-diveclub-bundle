@@ -34,7 +34,6 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
         'sql'               => [
             'keys'          => [
                 'id'            => 'primary',
-                'pid'           => 'index',
                 'tstamp'        => 'index',
                 'alias'         => 'index',
                 'published,start,stop' => 'index'
@@ -52,7 +51,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'fields'            => ['title','manufacturer','regModel1st','regModel2ndPri','regModel2ndSec'],
             'showColumns'       => false,
             'format'            => '%s %s %s %s %s',
-            'label_callback'  => ['tl_dc_regulators', 'customLabelCallback'],
+            'label_callback'    => ['tl_dc_regulators', 'customLabelCallback'],
         ],
         'global_operations' => [
             'all'               => [
@@ -84,11 +83,6 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
     'fields'            => [
         'id'                    => [
             'sql'               => "int(10) unsigned NOT NULL auto_increment"
-        ],
-        'pid'                   => [
-            'foreignKey'        => 'tl_dc_regulators.title',
-            'sql'               => "int(10) unsigned NOT NULL default 0",
-            'relation'          => ['type' => 'belongsTo', 'load' => 'lazy'], // Typ anpassen, falls notwendig
         ],
         'tstamp'                => [
             'sql'               => "int(10) unsigned NOT NULL default 0"

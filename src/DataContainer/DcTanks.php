@@ -23,7 +23,7 @@ use Contao\Input;
 use Contao\System;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
-#[AsCallback(table: 'tl_dc_tanks', target: 'edit.buttons', priority: 100)]
+//#[AsCallback(table: 'tl_dc_tanks', target: 'edit.buttons', priority: 100)]
 class DcTanks
 {
     private ContaoFramework $framework;
@@ -32,7 +32,7 @@ class DcTanks
     {
         $this->framework = $framework;
     }
-
+/*
     #[AsCallback(table: 'tl_dc_tanks', target: 'edit.buttons', priority: 100)]
     public function __invoke(array $arrButtons, DataContainer $dc): array
     {
@@ -119,4 +119,5 @@ class DcTanks
 
         return new RedirectResponse($url);
     }
+*/
 }

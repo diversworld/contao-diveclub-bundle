@@ -45,6 +45,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
         'sorting'           => [
             'mode'          => DataContainer::MODE_PARENT,
             'fields'        => ['title','alias','published'],
+            'headerFields'  => ['title', 'subType'],
             'flag'          => DataContainer::SORT_INITIAL_LETTER_ASC,
             'panelLayout'   => 'filter;sort,search,limit'
         ],
