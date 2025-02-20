@@ -40,17 +40,17 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             ]
         ],
     ],
-    'list'          => [
-        'sorting'           => [
-            'mode'          => DataContainer::MODE_PARENT,
-            'fields'        => ['title','alias','published'],
-            'headerFields'  => ['title'],
-            //'header_fields'         => ['title','manufacturer','serialNumber1st','regModel1st','serialNumber2ndPri','regModel2ndPri','serialNumber2ndSec','regModel2ndSec'],
-            'flag'          => DataContainer::SORT_ASC,
-            'panelLayout'   => 'filter;sort,search,limit',
+    'list'                  => [
+        'sorting'               => [
+            'mode'                  => DataContainer::MODE_PARENT,
+            'fields'                => ['title','alias','published'],
+            'header_fields'         => ['title','manufacturer','serialNumber1st','regModel1st','serialNumber2ndPri','regModel2ndPri','serialNumber2ndSec','regModel2ndSec'],
+            'flag'                  => DataContainer::SORT_ASC,
+            'panelLayout'           => 'filter;sort,search,limit'
         ],
-        'label'             => [
+        'label'                 => [
             'fields'                => ['title','midPreussurePre','inhalePressurePre','exhalePressurePre','midPressurePost','inhalePressurePost','exhalePressurePost'],
+            'showColumns'           => false,
             'format'                => '%s: Vorher MD %s bar EAW%s AAW %s - Nachher MD %s bar EAW %s AAW %s',
         ],
         'global_operations'     => [

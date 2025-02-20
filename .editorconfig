@@ -18,6 +18,7 @@ indent_size = 4
 insert_final_newline = false
 
 [*/contao/**.{css,js,php}*/public/**.{css,js}]
+
 indent_style = tab
 
 [*/contao/**.html5]
