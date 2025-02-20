@@ -43,22 +43,21 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
     ],
     'list'                  => [
         'sorting'               => [
-            'mode'                  => DataContainer::MODE_PARENT,
+            'mode'                  => DataContainer::MODE_SORTED_PARENT,
             'fields'                => ['title','alias','published'],
-            'header_fields'         => ['title'],//,'manufacturer','serialNumber1st','regModel1st','serialNumber2ndPri','regModel2ndPri','serialNumber2ndSec','regModel2ndSec'],
+            'header_fields'         => ['title','manufacturer'],//'serialNumber1st','regModel1st','serialNumber2ndPri','regModel2ndPri','serialNumber2ndSec','regModel2ndSec'],
             'flag'                  => DataContainer::SORT_ASC,
             'panelLayout'           => 'filter;sort,search,limit'
         ],
         'label'                 => [
             'fields'                => ['title','midPreussurePre','inhalePressurePre','exhalePressurePre','midPressurePost','inhalePressurePost','exhalePressurePost'],
-            'showColumns'           => false,
             'format'                => '%s: Vorher MD %s bar EAW%s AAW %s - Nachher MD %s bar EAW %s AAW %s',
         ],
         'global_operations'     => [
-            'all'               => [
-                'href'              => 'act=select',
-                'class'             => 'header_edit_all',
-                'attributes'        => 'onclick="Backend.getScrollOffset()" accesskey="e"'
+            'all'                   => [
+                'href'                  => 'act=select',
+                'class'                 => 'header_edit_all',
+                'attributes'            => 'onclick="Backend.getScrollOffset()" accesskey="e"'
             ]
         ],
         'operations'            => [
