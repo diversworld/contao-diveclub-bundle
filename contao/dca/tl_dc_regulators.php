@@ -183,7 +183,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulators']['addNotes'],
             'exclude'           => true,
             'eval'              => ['submitOnChange' => true, 'tl_class' => 'w50'],
-            'sql'       => ['type' => 'boolean', 'default' => false]
+            'sql'               => ['type' => 'boolean', 'default' => false]
         ],
         'notes'                 => [
             'inputType'         => 'textarea',
@@ -278,6 +278,8 @@ class tl_dc_regulators extends Backend
             $this->logger->error('Template file not found: ' . $templatePath);
             return [];
         }
+
+        //$options = include $templatePath;
 
         // Dateiinhalt lesen
         $content = file_get_contents($templatePath);

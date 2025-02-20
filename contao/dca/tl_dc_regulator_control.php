@@ -51,7 +51,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
         ],
         'label'                 => [
             'fields'                => ['title','midPreussurePre','inhalePressurePre','exhalePressurePre','midPressurePost','inhalePressurePost','exhalePressurePost'],
-            'format'                => '%s: Vorher MD %s bar EAW%s AAW %s - Nachher MD %s bar EAW %s AAW %s',
+            'format'                => '%s: Vorher MD %s bar EAW %s AAW %s - Nachher MD %s bar EAW %s AAW %s',
         ],
         'global_operations'     => [
             'all'                   => [
