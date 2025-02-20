@@ -24,34 +24,32 @@ use Psr\Log\LoggerInterface;
 use Contao\TemplateLoader;
 
 /**
- * Table tl_dc_tanks
+ * Table tl_dc_regulators
  */
 $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
     'config'            => [
-        'dataContainer'         => DC_Table::class,
-        'ctable'                => ['tl_dc_regulator_control'],
-        'enableVersioning'      => true,
-        'sql'                   => [
-            'keys'          => [
-                'id'            => 'primary',
-                'tstamp'        => 'index',
-                'alias'         => 'index',
+        'dataContainer'     => DC_Table::class,
+        'ctable'            => ['tl_dc_regulator_control'],
+        'enableVersioning'  => true,
+        'sql'               => [
+            'keys' => [
+                'id'        => 'primary',
+                'tstamp'    => 'index',
+                'alias'     => 'index',
                 'published,start,stop' => 'index'
             ]
         ],
     ],
     'list'              => [
-        'sorting'               => [
+        'sorting'           => [
             'mode'          => DataContainer::MODE_SORTABLE,
-            'fields'        => ['title','alias','manufacturer','regModel1st','regModel2ndPri','regModel2ndSec','published'],
+            'fields'        => ['title','alias','published'],
             'flag'          => DataContainer::SORT_ASC,
             'panelLayout'   => 'filter;sort,search,limit'
         ],
-        'label'                 => [
-            'fields'            => ['title','manufacturer','regModel1st','regModel2ndPri','regModel2ndSec'],
-            'showColumns'       => false,
-            'format'            => '%s %s %s %s %s',
-            'label_callback'    => ['tl_dc_regulators', 'customLabelCallback'],
+        'label'             => [
+            'fields' => ['title'],
+            'format' => '%s',
         ],
         'global_operations'     => [
             'all'               => [
