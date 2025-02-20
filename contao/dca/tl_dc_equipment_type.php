@@ -43,11 +43,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_type'] = [
     ],
     'list'              => [
         'sorting'           => [
-<<<<<<< HEAD
-            'mode'          => DataContainer::MODE_SORTABLE,
-=======
             'mode'          => DataContainer::MODE_SORTED,
->>>>>>> origin/main
             'fields'        => ['title','subType'],
             'flag'          => DataContainer::MODE_SORTED,
             'panelLayout'   => 'filter;search,limit'

@@ -22,6 +22,7 @@ use Contao\CoreBundle\Monolog\ContaoContext;
 use Diversworld\ContaoDiveclubBundle\DataContainer\DcTanks;
 use Psr\Log\LoggerInterface;
 use Contao\TemplateLoader;
+
 /**
  * Table tl_dc_regulator_control
  */
@@ -44,7 +45,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
         'sorting'               => [
             'mode'                  => DataContainer::MODE_PARENT,
             'fields'                => ['title','alias','published'],
-            'header_fields'         => ['title','manufacturer','serialNumber1st','regModel1st','serialNumber2ndPri','regModel2ndPri','serialNumber2ndSec','regModel2ndSec'],
+            'header_fields'         => ['title'],//,'manufacturer','serialNumber1st','regModel1st','serialNumber2ndPri','regModel2ndPri','serialNumber2ndSec','regModel2ndSec'],
             'flag'                  => DataContainer::SORT_ASC,
             'panelLayout'           => 'filter;sort,search,limit'
         ],
