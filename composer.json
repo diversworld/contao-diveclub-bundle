@@ -1,0 +1,52 @@
+{
+    "name": "diversworld/contao-diveclub-bundle",
+    "description": "Module für die Verwaltung Eines Tauchclubs",
+    "keywords": [
+        "contao",
+        "bundle",
+        "diveclub",
+        "manager"
+    ],
+    "type": "contao-bundle",
+    "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Eckhard Becker",
+            "email": "info@diversworld.eu",
+            "homepage": "https://github.com/diversworld",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/diversworld/contao-diveclub-bundle/issues",
+        "source": "https://github.com/diversworld/contao-diveclub-bundle"
+    },
+    "require": {
+        "php": "^8.1",
+        "contao/core-bundle": "^5.0",
+        "inspiredminds/contao-event-registration": "^2.1"
+    },
+    "require-dev": {
+        "contao/manager-plugin": "^2.12"
+    },
+    "autoload": {
+        "psr-4": {
+            "Diversworld\\ContaoDiveclubBundle\\": "src/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "contao-components/installer": true,
+            "contao/manager-plugin": true,
+            "contao-community-alliance/composer-plugin": true,
+            "php-http/discovery": false
+        }
+    },
+    "extra": {
+        "contao-manager-plugin": "Diversworld\\ContaoDiveclubBundle\\ContaoManager\\Plugin"
+    },
+    "scripts": {
+        "cs-fixer": "@php tools/ecs/vendor/bin/ecs check config/ contao/ src/ templates/ tests/ --config tools/ecs/config.php --fix --ansi",
+        "unit-tests": "@php tools/phpunit/vendor/bin/phpunit -c tools/phpunit/phpunit.xml.dist"
+    }
+}

@@ -1,0 +1,23 @@
+<?php $this->extend('block_unsearchable'); ?>
+<?php $this->block('content'); ?>
+<div class="tank-list">
+    <table>
+        <tr>
+            <th>Inventarnummer</th>
+            <th>Seriennummer</th>
+            <th>Volumen</th>
+            <th>Letzter TÜV</th>
+            <th>Nächster TÜV</th>
+        </tr>
+        <?php foreach ($this->tanks as $tank): ?>
+        <tr>
+            <td><?php echo htmlspecialchars($tank->title); ?></td>
+            <td><?php echo htmlspecialchars($tank->serialNumber); ?></td>
+            <td><?php echo htmlspecialchars($tank->size); ?>L</td>
+            <td><?php echo htmlspecialchars(date('m/Y', $tank->lastCheckDate)); ?></td>
+            <td><?php echo htmlspecialchars(date('m/Y', $tank->nextCheckDate)); ?></td>
+        </tr>
+        <?php endforeach; ?>
+    </table>
+</div>
+<?php $this->endblock(); ?>
