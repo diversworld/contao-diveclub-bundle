@@ -19,7 +19,6 @@ use Contao\DC_Table;
 use Contao\System;
 use Contao\Input;
 use Contao\CoreBundle\Monolog\ContaoContext;
-use Diversworld\ContaoDiveclubBundle\DataContainer\DcTanks;
 use Psr\Log\LoggerInterface;
 use Contao\TemplateLoader;
 
