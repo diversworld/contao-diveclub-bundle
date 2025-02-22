@@ -266,14 +266,12 @@ class tl_dc_regulators extends Backend
 
     private function getTemplateOptions($templateName)
     {
-        $this->logger = System::getContainer()->get('monolog.logger.contao.general');
         // Templatepfad über Contao ermitteln
         $templatePath = TemplateLoader::getPath($templateName, 'html5');
 
         // Überprüfen, ob die Datei existiert
         if (!$templatePath || !file_exists($templatePath)) {
-            $this->logger->error('Template file not found: ' . $templatePath);
-            return [];
+            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['templateNotFound'], $templatePath));
         }
 
         //$options = include $templatePath;
@@ -284,7 +282,7 @@ class tl_dc_regulators extends Backend
         $options = [];
         // Entferne PHP-Tags und wandle Daten in ein Array um
         $content = trim($content);
-        $content = trim($content, '<?php');
+        $content = trim($content, '<?=');
         $content = trim($content, '?>');
 
         eval('$options = ' . $content . ';');
