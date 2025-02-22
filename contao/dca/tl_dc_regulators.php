@@ -45,8 +45,10 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'panelLayout'       => 'filter;sort,search,limit'
         ],
         'label'             => [
-            'fields'            => ['title','serialNumber2ndPri','serialNumber2ndPri','serialNumber2ndSec'],
-            'format'            => '%s',
+            'fields'            => ['title','manufacturer','regModel1st','regModel2ndPri','regModel2ndSec'],
+            'format'            => '%s %s %s %s %s',
+            'showColumns'       => true,
+            'label_callback'    => ['tl_dc_regulators', 'customLabelCallback']
         ],
         'global_operations' => [
             'all'               => [
@@ -334,6 +336,8 @@ class tl_dc_regulators extends Backend
     {
         // Hersteller auslesen
         $manufacturer = $row['manufacturer'];
+        $manufacturers = $this->getManufacturers();
+
         $args[1] = $manufacturers[$row['manufacturer']] ?? '-'; // Hersteller-Name einsetzen
 
         // Modelle für die erste und zweite Stufe basierend auf dem Hersteller laden
