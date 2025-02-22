@@ -17,8 +17,6 @@ use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
-use Contao\Input;
-use Contao\CoreBundle\Monolog\ContaoContext;
 use Psr\Log\LoggerInterface;
 use Contao\TemplateLoader;
 
@@ -42,9 +40,9 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
     ],
     'list'                  => [
         'sorting'               => [
-            'mode'                  => DataContainer::MODE_PARENT,
+            'mode'                  => DataContainer::MODE_SORTED_PARENT,
             'fields'                => ['title','alias','published'],
-            'headerFields'         => ['title','manufacturer'],//'serialNumber1st','regModel1st','serialNumber2ndPri','regModel2ndPri','serialNumber2ndSec','regModel2ndSec'],
+            'headerFields'         => ['title','manufacturer','regModel1st','serialNumber1st','regModel2ndPri','serialNumber2ndPri','regModel2ndSec','serialNumber2ndSec'],
             'flag'                  => DataContainer::SORT_ASC,
             'panelLayout'           => 'filter;sort,search,limit'
         ],
@@ -111,7 +109,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             ],
             'sql'           => "varchar(255) BINARY NOT NULL default ''"
         ],
-        'midPreussurePre'       => [
+        'midPressurePre'        => [
             'inputType'             => 'text',
             'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['midPreussurePre'],
             'search'                => true,
@@ -138,7 +136,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'eval'                  => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25'],
             'sql'                   => "varchar(50) NOT NULL default ''"
         ],
-        'midPreussurePost'      => [
+        'midPressurePost'       => [
             'inputType'             => 'text',
             'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['midPreussurePost'],
             'search'                => true,
@@ -283,7 +281,7 @@ class tl_dc_regulator_control extends Backend
         $options = [];
         // Entferne PHP-Tags und wandle Daten in ein Array um
         $content = trim($content);
-        $content = trim($content, '<?=');
+        $content = trim($content, '<?php');
         $content = trim($content, '?>');
 
         eval('$options = ' . $content . ';');

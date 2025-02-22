@@ -20,12 +20,13 @@ use Diversworld\ContaoDiveclubBundle\Model\DcCheckArticlesModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCalendarEventsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorControlModel;
+
 /**
  * Backend modules
  */
 
 // Add child table tl_calendar_events_member to tl_calendar_events
-$GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_dc_tanks';
+//$GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_dc_tanks';
 
 $GLOBALS['BE_MOD']['diveclub'] = [
         'dc_equipment_collection' => [
