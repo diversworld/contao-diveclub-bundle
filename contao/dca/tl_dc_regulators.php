@@ -45,7 +45,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'panelLayout'       => 'filter;sort,search,limit'
         ],
         'label'             => [
-            'fields'            => ['title'],
+            'fields'            => ['title','serialNumber2ndPri','serialNumber2ndPri','serialNumber2ndSec'],
             'format'            => '%s',
         ],
         'global_operations' => [
@@ -85,7 +85,6 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
         'title'             => [
             'inputType'         => 'text',
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulators']['title'],
-            'exclude'           => true,
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,

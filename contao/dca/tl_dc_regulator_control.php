@@ -42,7 +42,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
         'sorting'               => [
             'mode'                  => DataContainer::MODE_PARENT,
             'fields'                => ['title','nextCheckDate','alias','published'],
-            'headerFields'          => ['title','manufacturer','regModel1st','serialNumber1st','regModel2ndPri','serialNumber2ndPri','regModel2ndSec','serialNumber2ndSec'],
+            'headerFields'          => ['id'],//,'manufacturer','regModel1st','serialNumber1st','regModel2ndPri','serialNumber2ndPri','regModel2ndSec','serialNumber2ndSec'],
             'flag'                  => DataContainer::SORT_ASC,
             'panelLayout'           => 'filter;sort,search,limit'
         ],
@@ -290,26 +290,5 @@ class tl_dc_regulator_control extends Backend
         }
 
         return $options;
-    }
-    public function getRegModels(DataContainer $dc): array
-    {
-        // Sicherstellen, dass ein aktiver Datensatz vorhanden ist
-        if (!$dc->activeRecord) {
-            return [];
-        }
-
-        // Ermittle den aktuellen Typ aus dem aktiven Datensatz
-        $currentType = $dc->activeRecord->title;
-        $this->logger->info('getSubTypes: Current type: ' . $currentType);
-
-        $subTypes = $this->getTemplateOptions('equipment_subTypes');
-
-        // Prüfen, ob für den aktuellen Typ Subtypen definiert wurden
-        if (!isset($subTypes[$currentType]) || !is_array($subTypes[$currentType])) {
-            // Keine passenden Subtypen gefunden -> leere Liste zurückgeben
-            return [];
-        }
-        // Nur die relevanten Subtypen für diesen Typ zurückgeben
-        return $subTypes[$currentType];
     }
 }
