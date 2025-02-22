@@ -17,9 +17,6 @@ use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
-use Contao\Input;
-use Contao\CoreBundle\Monolog\ContaoContext;
-use Diversworld\ContaoDiveclubBundle\DataContainer\DcTanks;
 use Psr\Log\LoggerInterface;
 use Contao\TemplateLoader;
 
@@ -43,7 +40,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
     'list'              => [
         'sorting'           => [
             'mode'          => DataContainer::MODE_SORTABLE,
-            'fields'        => ['title','alias','published'],
+            'fields'        => ['title','manufacturer','serialNumber1st','regModel1st','serialNumber2ndPri','regModel2ndPri','serialNumber2ndSec','regModel2ndSec','alias','published'],
             'flag'          => DataContainer::SORT_ASC,
             'panelLayout'   => 'filter;sort,search,limit'
         ],
@@ -85,22 +82,22 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
         'tstamp'                => [
             'sql'               => "int(10) unsigned NOT NULL default 0"
         ],
-        'title'                 => [
-            'inputType'         => 'text',
+        'title'             => [
+            'inputType'     => 'text',
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulators']['title'],
-            'exclude'           => true,
-            'search'            => true,
-            'filter'            => true,
-            'sorting'           => true,
-            'flag'              => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'eval'              => ['mandatory' => true, 'maxlength'=>255, 'tl_class' => 'w25'],
-            'sql'               => "varchar(255) NOT NULL default ''"
+            'exclude'       => true,
+            'search'        => true,
+            'filter'        => true,
+            'sorting'       => true,
+            'flag'          => DataContainer::SORT_INITIAL_LETTER_ASC,
+            'eval'          => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w33'],
+            'sql'           => "varchar(255) NOT NULL default ''"
         ],
         'alias'                 => [
             'search'            => true,
             'inputType'         => 'text',
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulators']['alias'],
-            'eval'              => ['rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w25'],
+            'eval'              => ['rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w335'],
             'save_callback' => [
                 ['tl_dc_regulators', 'generateAlias']
             ],
@@ -293,7 +290,7 @@ class tl_dc_regulators extends Backend
         eval('$options = ' . $content . ';');
 
         if (!is_array($options)) {
-            $this->logger->error('Failed to parse template content into an array: ' . $content);
+            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['templateContent'], $content));
             return [];
         }
 

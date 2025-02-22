@@ -23,3 +23,4 @@ declare(strict_types=1);
 //GLOBALS['TL_LANG']['ERR'][''] = '';
 $GLOBALS['TL_LANG']['ERR']['aliasNumeric'] = 'The alias "%s" must not consist only of numbers.';
 $GLOBALS['TL_LANG']['ERR']['aliasExists'] = 'The alias "%s" already exists.';
+$GLOBALS['TL_LANG']['ERR']['templateContent'] ='Failed to parse template content into an array: ';

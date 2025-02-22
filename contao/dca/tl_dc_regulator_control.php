@@ -17,8 +17,6 @@ use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
-use Contao\Input;
-use Contao\CoreBundle\Monolog\ContaoContext;
 use Psr\Log\LoggerInterface;
 use Contao\TemplateLoader;
 
@@ -44,7 +42,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
         'sorting'               => [
             'mode'                  => DataContainer::MODE_PARENT,
             'fields'                => ['title','alias','published'],
-            'header_fields'         => ['title','manufacturer'],//'serialNumber1st','regModel1st','serialNumber2ndPri','regModel2ndPri','serialNumber2ndSec','regModel2ndSec'],
+            'headerfields'         => ['title','alias','start','stop'],
             'flag'                  => DataContainer::SORT_ASC,
             'panelLayout'           => 'filter;sort,search,limit'
         ],
@@ -267,7 +265,6 @@ class tl_dc_regulator_control extends Backend
 
     private function getTemplateOptions($templateName)
     {
-        $this->logger = System::getContainer()->get('monolog.logger.contao.general');
         // Templatepfad über Contao ermitteln
         $templatePath = TemplateLoader::getPath($templateName, 'html5');
 
@@ -289,8 +286,7 @@ class tl_dc_regulator_control extends Backend
         eval('$options = ' . $content . ';');
 
         if (!is_array($options)) {
-            $this->logger->error('Failed to parse template content into an array: ' . $content);
-            return [];
+            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['templateContent'], $options));
         }
 
         return $options;
