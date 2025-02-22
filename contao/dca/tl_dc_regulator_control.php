@@ -295,33 +295,41 @@ class tl_dc_regulator_control extends Backend
 
     public function getHeaderFields(array $fields, DataContainer $dc): array
     {
+        $this->logger = System::getContainer()->get('monolog.logger.contao.general');
+        $this->logger->debug('getHeaderFields: fields=' . print_r($fields, true) . ', dc=' . print_r($dc, true) . '');
         // Sicherstellen, dass ein aktiver Datensatz vorhanden ist
         if ($dc->activeRecord) {
             // Hersteller ermitteln
             $manufacturer = $dc->activeRecord->manufacturer;
+            $this->logger->debug('getHeaderFields: manufacturer=' . $manufacturer . '');
 
             // Verfügbare Modelle für den Hersteller laden (ähnlich wie in getRegModels1st)
             $models = $this->getTemplateOptions('regulator_data');
             $modelOptions1st = $models[$manufacturer]['regModel1st'] ?? [];
+            $this->logger->debug('getHeaderFields: modelOptions1st=' . print_r($modelOptions1st, true) . '');
 
             // Modell 1. Stufe (Key in Label umwandeln)
             if ($dc->activeRecord->model1st) {
                 $fields['model1st'] = $modelOptions1st[$dc->activeRecord->model1st] ?? $dc->activeRecord->model1st;
+                $this->logger->debug('getHeaderFields: model1st=' . $fields['model1st'] . '');
             }
 
             // Modell 2. Stufe (primär)
             $modelOptions2ndPri = $models[$manufacturer]['regModel2ndPri'] ?? [];
             if ($dc->activeRecord->model2ndPri) {
                 $fields['model2ndPri'] = $modelOptions2ndPri[$dc->activeRecord->model2ndPri] ?? $dc->activeRecord->model2ndPri;
+                $this->logger->debug('getHeaderFields: model2ndPri=' . $fields['model2ndPri'] . '');
             }
 
             // Modell 2. Stufe (sekundär)
             $modelOptions2ndSec = $models[$manufacturer]['regModel2ndSec'] ?? [];
             if ($dc->activeRecord->model2ndSec) {
                 $fields['model2ndSec'] = $modelOptions2ndSec[$dc->activeRecord->model2ndSec] ?? $dc->activeRecord->model2ndSec;
+                $this->logger->debug('getHeaderFields: model2ndSec=' . $fields['model2ndSec'] . '');
             }
         }
 
+        $this->logger->debug('return: fields=' . print_r($fields, true) . ', dc=' . print_r($dc, true) . '');
         // Geänderte Header-Felder zurückgeben
         return $fields;
     }
