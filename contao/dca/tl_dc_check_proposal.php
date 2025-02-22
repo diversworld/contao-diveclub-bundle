@@ -17,10 +17,9 @@ use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
-use Diversworld\ContaoDiveclubBundle\Model\DcCheckProposalModel;
-use Symfony\Component\String\Slugger\SluggerInterface;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\CoreBundle\EventListener\Widget\HttpUrlListener;
+use Diversworld\ContaoDiveclubBundle\DataContainer\DcCheckProposal;
 
 /**
  * Table tl_dc_check_invoice
@@ -231,7 +230,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
 /**
  * Provide miscellaneous methods that are used by the data configuration array.
  *
- * @property DcTanks $Tanks
+ * @property DcCheckProposal $dcCheckProposal
  *
  * @internal
  */

@@ -25,3 +25,4 @@ $GLOBALS['TL_LANG']['MSC']['tanks'] = 'Tauchgeräte';
 $GLOBALS['TL_LANG']['ERR']['aliasNumeric'] = 'Der Alias "%s" darf nicht nur aus Zahlen bestehen.';
 $GLOBALS['TL_LANG']['ERR']['aliasExists'] = 'Der Alias "%s" existiert bereits.';
 
+$GLOBALS['TL_LANG']['ERR']['templateContent'] ='Failed to parse template content into an array: ';

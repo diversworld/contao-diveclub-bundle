@@ -14,18 +14,6 @@ declare(strict_types=1);
 
 namespace Diversworld\ContaoDiveclubBundle\DataContainer;
 
-use Contao\Calendar;
-use Contao\CalendarEventsModel;
-use Contao\Config;
-use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
-use Contao\CoreBundle\Monolog\ContaoContext;
-use Contao\Database;
-use Contao\DataContainer;
-use Contao\Date;
-use Contao\System;
-use Diversworld\ContaoDiveclubBundle\Model\TanksModel;
-use InspiredMinds\ContaoEventRegistration\EventListener\DataContainer\CalendarEvents\ConfigOnLoadCallbackListener;
-
 class CalendarEvents
 {
 
