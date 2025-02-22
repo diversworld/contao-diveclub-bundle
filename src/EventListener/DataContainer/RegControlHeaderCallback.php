@@ -95,7 +95,7 @@ class RegControlHeaderCallback
 
         $options = [];
         $content = trim($content);
-        $content = trim($content, '<?php');
+        $content = trim($content, '<?p=');
         $content = trim($content, '?>');
 
         eval('$options = ' . $content . ';');

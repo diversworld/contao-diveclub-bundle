@@ -281,7 +281,7 @@ class tl_dc_regulator_control extends Backend
         $options = [];
         // Entferne PHP-Tags und wandle Daten in ein Array um
         $content = trim($content);
-        $content = trim($content, '<?php');
+        $content = trim($content, '<?=');
         $content = trim($content, '?>');
 
         eval('$options = ' . $content . ';');
