@@ -22,55 +22,60 @@ class RegControlHeaderCallback
 
     public function __invoke(array $labels, DataContainer $dc): array
     {
-        // 1. Lade die Felder aus der Datenbank-Tabelle `tl_dc_regulator_control` für den aktuellen Datensatz
+        // 1. Hole die `pid` des aktuellen Datensatzes (Parent-ID)
+        $parentId = $dc->activeRecord ? $dc->activeRecord->pid : null;
+
+        if (!$parentId) {
+            $this->logger->error('No parent ID found for record in tl_dc_regulator_control.');
+            return []; // Keine Parent-ID, leeres Array zurückgeben
+        }
+
+        // 2. Lade die Parent-Daten aus `tl_dc_regulators`
         $record = $this->db->fetchAssociative(
             "SELECT title, manufacturer, serialNumber1st, regModel1st, serialNumber2ndPri, regModel2ndPri, serialNumber2ndSec, regModel2ndSec
              FROM tl_dc_regulators
              WHERE id = ?",
-            [$dc->pid]
+            [$dc->pid],
         );
 
-        $this->logger->debug('Fetched record: ' . print_r($record, true));
+        $this->logger->debug('Fetched parent record: ' . print_r($record, true));
 
-        // 2. Hole die Dropdown-Optionen aus dem Template `regulator_data.html5`
-        $templateOptions = $this->getTemplateOptions('regulator_data');
-
-        // 3. Löse die Indexwerte der `select`-Felder aus der Datenbank in die tatsächlichen Werte auf
-        if ($record && $templateOptions) {
-            $manufacturerId = $record['manufacturer'];
-
-            // Modelle der ersten Stufe zuordnen
-            $regModel1stOptions = $templateOptions[$manufacturerId]['regModel1st'] ?? [];
-            if (!empty($regModel1stOptions)) {
-                $record['regModel1st'] = $regModel1stOptions[$record['regModel1st']] ?? $record['regModel1st'];
-            }
-
-            // Modelle der zweiten Stufe (primär)
-            $regModel2ndOptionsPri = $templateOptions[$manufacturerId]['regModel2nd'] ?? [];
-            if (!empty($regModel2ndOptionsPri)) {
-                $record['regModel2ndPri'] = $regModel2ndOptionsPri[$record['regModel2ndPri']] ?? $record['regModel2ndPri'];
-            }
-
-            // Modelle der zweiten Stufe (sekundär)
-            $regModel2ndOptionsSec = $templateOptions[$manufacturerId]['regModel2nd'] ?? [];
-            if (!empty($regModel2ndOptionsSec)) {
-                $record['regModel2ndSec'] = $regModel2ndOptionsSec[$record['regModel2ndSec']] ?? $record['regModel2ndSec'];
-            }
+        if (!$record) {
+            $this->logger->warning('No data found in tl_dc_regulators for parent ID: ' . $parentId);
+            return []; // Keine Daten gefunden, leeres Array zurückgeben
         }
 
-        $this->logger->debug('Resolved record: ' . print_r($record, true));
+        // 3. Template-Daten laden und Modelle auflösen
+        $templateOptions = $this->getTemplateOptions('regulator_data');
+        $manufacturerId = $record['manufacturer'] ?? null;
 
-        // 4. Header-Felder in das Array `labels` einfügen
-        $labels['title'] = $record['title'] ?? '';
-        $labels['Manufacturer'] = $record['manufacturer'] ?? '';
-        $labels['First Stage Serial'] = $record['serialNumber1st'] ?? '';
-        $labels['First Stage Model'] = $record['regModel1st'] ?? '';
-        $labels['Second Stage Serial (Primary)'] = $record['serialNumber2ndPri'] ?? '';
-        $labels['Second Stage Model (Primary)'] = $record['regModel2ndPri'] ?? '';
-        $labels['Second Stage Serial (Secondary)'] = $record['serialNumber2ndSec'] ?? '';
-        $labels['Second Stage Model (Secondary)'] = $record['regModel2ndSec'] ?? '';
+        $this->logger->debug('Loaded template options: ' . print_r($templateOptions, true));
+        $this->logger->debug('Manufacturer ID: ' . $manufacturerId);
 
-        return $labels;
+        if ($manufacturerId && isset($templateOptions[$manufacturerId])) {
+            $templateData = $templateOptions[$manufacturerId];
+
+            // Modelle anhand der Indexwerte ersetzen
+            $record['regModel1st'] = $templateData[$manufacturerId][$record['regModel1st']] ?? $record['regModel1st'];
+            $record['regModel2ndPri'] = $templateData[$manufacturerId][$record['regModel2ndPri']] ?? $record['regModel2ndPri'];
+            $record['regModel2ndSec'] = $templateData[$manufacturerId][$record['regModel2ndSec']] ?? $record['regModel2ndSec'];
+        } else {
+            $this->logger->warning('Manufacturer ID not found or no template options available.');
+        }
+
+        $this->logger->debug('Resolved parent record: ' . print_r($record, true));
+
+        // 4. Fülle die Header-Felder
+        return array_filter([
+            'Inventarnummer' => $record['title'] ?? null,
+            'Hersteller' => $record['manufacturer'] ?? null,
+            'Seriennummer 1. Stufe' => $record['serialNumber1st'] ?? null,
+            'Modell 1. Stufe' => $record['regModel1st'] ?? null,
+            'Seriennummer 2. Stufe (primär)' => $record['serialNumber2ndPri'] ?? null,
+            'Modell 2. Stufe (primär)' => $record['regModel2ndPri'] ?? null,
+            'Seriennummer 2. Stufe (sekundär)' => $record['serialNumber2ndSec'] ?? null,
+            'Modell 2. Stufe (sekundär)' => $record['regModel2ndSec'] ?? null,
+        ]);
     }
 
     /**
@@ -78,15 +83,13 @@ class RegControlHeaderCallback
      */
     private function getTemplateOptions(string $templateName): array
     {
-        // Pfad des Templates holen
         $templatePath = TemplateLoader::getPath($templateName, 'html5');
 
         if (!$templatePath || !file_exists($templatePath)) {
-            $this->logger->error('Template not found: ' . $templatePath);
+            $this->logger->error('Template file not found: ' . $templatePath);
             return [];
         }
 
-        // Template-Datei lesen
         $content = file_get_contents($templatePath);
         $this->logger->debug('Loaded template content: ' . $content);
 
@@ -95,7 +98,6 @@ class RegControlHeaderCallback
         $content = trim($content, '<?php');
         $content = trim($content, '?>');
 
-        // Auswerten und sicherstellen, dass es sich um ein Array handelt
         eval('$options = ' . $content . ';');
 
         if (!is_array($options)) {

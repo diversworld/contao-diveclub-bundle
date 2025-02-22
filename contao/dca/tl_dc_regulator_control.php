@@ -17,7 +17,6 @@ use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\RegControlHeaderCallback;
 use Psr\Log\LoggerInterface;
 use Contao\TemplateLoader;
 
@@ -25,17 +24,17 @@ use Contao\TemplateLoader;
  * Table tl_dc_regulator_control
  */
 $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
-    'config'        => [
-        'dataContainer'     => DC_Table::class,
-        'ptable'            => 'tl_dc_regulators',
-        'enableVersioning'  => true,
-        'sql'               => [
-            'keys'          => [
-                'id'            => 'primary',
-                'pid'           => 'index',
-                'tstamp'        => 'index',
-                'alias'         => 'index',
-                'published,start,stop' => 'index'
+    'config'                => [
+        'dataContainer'         => DC_Table::class,
+        'ptable'                => 'tl_dc_regulators',
+        'enableVersioning'      => true,
+        'sql'                   => [
+            'keys'                  => [
+                'id'                    => 'primary',
+                'pid'                   => 'index',
+                'tstamp'                => 'index',
+                'alias'                 => 'index',
+                'published,start,stop'  => 'index'
             ]
         ],
     ],
@@ -43,10 +42,10 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
         'sorting'               => [
             'mode'                  => DataContainer::MODE_PARENT,
             'fields'                => ['title','alias','published'],
-            'headerFields'          => ['title','manufacturer','serialNumber1st','regModel1st','serialNumber2ndPri','regModel2ndPri','serialNumber2ndSec','regModel2ndSec'],
+            'headerFields'          => ['title', 'manufacturer', 'serialNumber1st', 'regModel1st', 'serialNumber2ndPri', 'regModel2ndPri', 'serialNumber2ndSec', 'regModel2ndSec'],
+            'header_callback'       => ['tl_dc_regulator_control', 'getHeaderFields'],
             'flag'                  => DataContainer::SORT_ASC,
             'panelLayout'           => 'filter;sort,search,limit',
-            'header_callback'       => ['tl_dc_regulator_control', RegControlHeaderCallback::class],
         ],
         'label'                 => [
             'fields'                => ['title','midPressurePre','inhalePressurePre','exhalePressurePre','midPressurePost','inhalePressurePost','exhalePressurePost'],
@@ -303,24 +302,15 @@ class tl_dc_regulator_control extends Backend
 
             // Verfügbare Modelle für den Hersteller laden (ähnlich wie in getRegModels1st)
             $models = $this->getTemplateOptions('regulator_data');
-            $modelOptions1st = $models[$manufacturer]['regModel1st'] ?? [];
 
             // Modell 1. Stufe (Key in Label umwandeln)
-            if ($dc->activeRecord->model1st) {
-                $fields['model1st'] = $modelOptions1st[$dc->activeRecord->model1st] ?? $dc->activeRecord->model1st;
-            }
+            $fields['model1st'] = $models[$manufacturer]['regModel1st'] ?? [];
 
             // Modell 2. Stufe (primär)
-            $modelOptions2ndPri = $models[$manufacturer]['regModel2ndPri'] ?? [];
-            if ($dc->activeRecord->model2ndPri) {
-                $fields['model2ndPri'] = $modelOptions2ndPri[$dc->activeRecord->model2ndPri] ?? $dc->activeRecord->model2ndPri;
-            }
+            $fields['model2ndPri'] = $models[$manufacturer]['model2ndPri'] ?? [];
 
             // Modell 2. Stufe (sekundär)
-            $modelOptions2ndSec = $models[$manufacturer]['regModel2ndSec'] ?? [];
-            if ($dc->activeRecord->model2ndSec) {
-                $fields['model2ndSec'] = $modelOptions2ndSec[$dc->activeRecord->model2ndSec] ?? $dc->activeRecord->model2ndSec;
-            }
+            $fields['model2ndSec'] = $models[$manufacturer]['regModel2ndSec'] ?? [];
         }
 
         // Geänderte Header-Felder zurückgeben
