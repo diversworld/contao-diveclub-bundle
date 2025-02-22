@@ -42,10 +42,10 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
         'sorting'               => [
             'mode'                  => DataContainer::MODE_PARENT,
             'fields'                => ['title','alias','published'],
-            'headerFields'         => ['title','manufacturer','serialNumber1st','regModel1st','serialNumber2ndPri','regModel2ndPri','serialNumber2ndSec','regModel2ndSec','alias','start','stop'],
+            'headerFields'          => ['title','manufacturer','serialNumber1st','regModel1st','serialNumber2ndPri','regModel2ndPri','serialNumber2ndSec','regModel2ndSec'],
             'flag'                  => DataContainer::SORT_ASC,
             'panelLayout'           => 'filter;sort,search,limit',
-            'header_callback' => ['tl_dc_regulator_control', 'getHeaderFields'],
+            'header_callback'       => ['tl_dc_regulator_control', 'getHeaderFields'],
         ],
         'label'                 => [
             'fields'                => ['title','midPressurePre','inhalePressurePre','exhalePressurePre','midPressurePost','inhalePressurePost','exhalePressurePost'],
