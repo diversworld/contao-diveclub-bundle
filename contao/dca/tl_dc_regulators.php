@@ -40,7 +40,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
     'list'              => [
         'sorting'           => [
             'mode'          => DataContainer::MODE_SORTABLE,
-            'fields'        => ['title','manufacturer','serialNumber1st','regModel1st','serialNumber2ndPri','regModel2ndPri','serialNumber2ndSec','regModel2ndSec','alias','published'],
+            'fields'        => ['title','alias','published'],
             'flag'          => DataContainer::SORT_ASC,
             'panelLayout'   => 'filter;sort,search,limit'
         ],
@@ -291,7 +291,6 @@ class tl_dc_regulators extends Backend
 
         if (!is_array($options)) {
             throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['templateContent'], $content));
-            return [];
         }
 
         return $options;

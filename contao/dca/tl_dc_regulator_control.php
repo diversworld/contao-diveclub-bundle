@@ -42,9 +42,10 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
         'sorting'               => [
             'mode'                  => DataContainer::MODE_PARENT,
             'fields'                => ['title','alias','published'],
-            'headerFields'         => ['title','alias','start','stop'],
+            'headerFields'         => ['title','manufacturer','serialNumber1st','regModel1st','serialNumber2ndPri','regModel2ndPri','serialNumber2ndSec','regModel2ndSec','alias','start','stop'],
             'flag'                  => DataContainer::SORT_ASC,
-            'panelLayout'           => 'filter;sort,search,limit'
+            'panelLayout'           => 'filter;sort,search,limit',
+            'header_callback' => ['tl_dc_regulator_control', 'getHeaderFields'],
         ],
         'label'                 => [
             'fields'                => ['title','midPressurePre','inhalePressurePre','exhalePressurePre','midPressurePost','inhalePressurePost','exhalePressurePost'],
@@ -291,25 +292,38 @@ class tl_dc_regulator_control extends Backend
 
         return $options;
     }
-    public function getRegModels(DataContainer $dc): array
+
+    public function getHeaderFields(array $fields, DataContainer $dc): array
     {
         // Sicherstellen, dass ein aktiver Datensatz vorhanden ist
-        if (!$dc->activeRecord) {
-            return [];
+        if ($dc->activeRecord) {
+            // Hersteller ermitteln
+            $manufacturer = $dc->activeRecord->manufacturer;
+
+            // Verfügbare Modelle für den Hersteller laden (ähnlich wie in getRegModels1st)
+            $models = $this->getTemplateOptions('regulator_data');
+            $modelOptions1st = $models[$manufacturer]['regModel1st'] ?? [];
+
+            // Modell 1. Stufe (Key in Label umwandeln)
+            if ($dc->activeRecord->model1st) {
+                $fields['model1st'] = $modelOptions1st[$dc->activeRecord->model1st] ?? $dc->activeRecord->model1st;
+            }
+
+            // Modell 2. Stufe (primär)
+            $modelOptions2ndPri = $models[$manufacturer]['regModel2ndPri'] ?? [];
+            if ($dc->activeRecord->model2ndPri) {
+                $fields['model2ndPri'] = $modelOptions2ndPri[$dc->activeRecord->model2ndPri] ?? $dc->activeRecord->model2ndPri;
+            }
+
+            // Modell 2. Stufe (sekundär)
+            $modelOptions2ndSec = $models[$manufacturer]['regModel2ndSec'] ?? [];
+            if ($dc->activeRecord->model2ndSec) {
+                $fields['model2ndSec'] = $modelOptions2ndSec[$dc->activeRecord->model2ndSec] ?? $dc->activeRecord->model2ndSec;
+            }
         }
 
-        // Ermittle den aktuellen Typ aus dem aktiven Datensatz
-        $currentType = $dc->activeRecord->title;
-        $this->logger->info('getSubTypes: Current type: ' . $currentType);
-
-        $subTypes = $this->getTemplateOptions('equipment_subTypes');
-
-        // Prüfen, ob für den aktuellen Typ Subtypen definiert wurden
-        if (!isset($subTypes[$currentType]) || !is_array($subTypes[$currentType])) {
-            // Keine passenden Subtypen gefunden -> leere Liste zurückgeben
-            return [];
-        }
-        // Nur die relevanten Subtypen für diesen Typ zurückgeben
-        return $subTypes[$currentType];
+        // Geänderte Header-Felder zurückgeben
+        return $fields;
     }
+
 }
