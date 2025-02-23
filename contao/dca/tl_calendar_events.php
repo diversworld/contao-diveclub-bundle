@@ -96,7 +96,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addVendorInfo'] = [
             return $options;
     },
     'eval'              => array('submitOnChange' => true, 'alwaysSave' => true,'mandatory'=> false, 'includeBlankOption'=> true, 'tl_class' => 'w33 clr'),
-    'sql'               => "int(10) unsigned NOT NULL default 0",
+    'sql'               => ['type' => 'boolean', 'default' => false]
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseFee'] = [
