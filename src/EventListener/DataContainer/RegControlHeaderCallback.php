@@ -67,8 +67,8 @@ class RegControlHeaderCallback
 
         // 4. Fülle die Header-Felder
         return array_filter([
-            'Inventarnummer' => $record['title'] ?? null,
-            'Hersteller' => $record['manufacturer'] ?? null,
+            $GLOBALS['TL_LANG']['tl_dc_regulators']['title'] => $record['title'] ?? null,
+            $GLOBALS['TL_LANG']['tl_dc_regulators']['manufacturer'] => $record['manufacturer'] ?? null,
             'Seriennummer 1. Stufe' => $record['serialNumber1st'] ?? null,
             'Modell 1. Stufe' => $record['regModel1st'] ?? null,
             'Seriennummer 2. Stufe (primär)' => $record['serialNumber2ndPri'] ?? null,

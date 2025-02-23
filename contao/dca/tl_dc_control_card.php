@@ -21,15 +21,15 @@ use Psr\Log\LoggerInterface;
 use Contao\TemplateLoader;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\RegControlHeaderCallback;
 /**
- * Table tl_dc_regulator_control
+ * Table tl_dc_control_card
  */
-$GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
+$GLOBALS['TL_DCA']['tl_dc_control_card'] = [
     'config'        => [
         'dataContainer'     => DC_Table::class,
         'ptable'            => 'tl_dc_regulators',
         'enableVersioning'  => true,
         'onload_callback' => [
-            ['tl_dc_regulator_control', 'debugParentData'],
+            ['tl_dc_control_card', 'debugParentData'],
         ],
 
         'sql'               => [
@@ -96,7 +96,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
         ],
         'title'                 => [
             'inputType'             => 'text',
-            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['actualCheckDate'],
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_control_card']['actualCheckDate'],
             'exclude'               => true,
             'search'                => true,
             'filter'                => true,
@@ -110,13 +110,13 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'inputType'             => 'text',
             'eval'                  => ['rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w50'],
             'save_callback'         => [
-                ['tl_dc_regulator_control', 'generateAlias']
+                ['tl_dc_control_card', 'generateAlias']
             ],
             'sql'           => "varchar(255) BINARY NOT NULL default ''"
         ],
         'midPressurePre'        => [
             'inputType'             => 'text',
-            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['midPreussurePre'],
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_control_card']['midPreussurePre'],
             'search'                => true,
             'filter'                => true,
             'sorting'               => true,
@@ -125,7 +125,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
         ],
         'inhalePressurePre'     => [
             'inputType'             => 'text',
-            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['inhalePressurePre'],
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_control_card']['inhalePressurePre'],
             'search'                => true,
             'filter'                => true,
             'sorting'               => true,
@@ -134,7 +134,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
         ],
         'exhalePressurePre'     => [
             'inputType'             => 'text',
-            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['exhalePressurePre'],
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_control_card']['exhalePressurePre'],
             'search'                => true,
             'filter'                => true,
             'sorting'               => true,
@@ -143,7 +143,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
         ],
         'midPressurePost'       => [
             'inputType'             => 'text',
-            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['midPreussurePost'],
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_control_card']['midPreussurePost'],
             'search'                => true,
             'filter'                => true,
             'sorting'               => true,
@@ -152,7 +152,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
         ],
         'inhalePressurePost'    => [
             'inputType'             => 'text',
-            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['inhalePressurePost'],
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_control_card']['inhalePressurePost'],
             'search'                => true,
             'filter'                => true,
             'sorting'               => true,
@@ -162,7 +162,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
         ],
         'exhalePressurePost'    => [
             'inputType'             => 'text',
-            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['exhalePressurePost'],
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_control_card']['exhalePressurePost'],
             'search'                => true,
             'filter'                => true,
             'sorting'               => true,
@@ -172,7 +172,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
         ],
         'nextCheckDate'         => [
             'inputType'             => 'text',
-            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['nextCheckDate'],
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_control_card']['nextCheckDate'],
             'sorting'               => true,
             'filter'                => true,
             'flag'                  => DataContainer::SORT_YEAR_DESC,
@@ -181,14 +181,14 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
         ],
         'addNotes'              => [
             'inputType'             => 'checkbox',
-            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['addNotes'],
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_control_card']['addNotes'],
             'exclude'               => true,
             'eval'                  => ['submitOnChange' => true, 'tl_class' => 'w50'],
             'sql'                   => ['type' => 'boolean', 'default' => false]
         ],
         'notes'                 => [
             'inputType'             => 'textarea',
-            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['notes'],
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_control_card']['notes'],
             'exclude'               => true,
             'search'                => false,
             'filter'                => false,
@@ -198,7 +198,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
         ],
         'published'             => [
             'inputType'             => 'checkbox',
-            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['published'],
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_control_card']['published'],
             'toggle'                => true,
             'filter'                => true,
             'flag'                  => DataContainer::SORT_INITIAL_LETTER_DESC,
@@ -207,20 +207,20 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
         ],
         'start'                 => [
             'inputType'             => 'text',
-            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['start'],
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_control_card']['start'],
             'eval'                  => ['rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 clr wizard'],
             'sql'                   => "varchar(10) NOT NULL default ''"
         ],
         'stop'                  => [
             'inputType'             => 'text',
-            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['stop'],
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_control_card']['stop'],
             'eval'                  => ['rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 wizard'],
             'sql'                   => "varchar(10) NOT NULL default ''"
         ]
     ]
 ];
 
-class tl_dc_regulator_control extends Backend
+class tl_dc_control_card extends Backend
 {
     public LoggerInterface $logger;
 
@@ -238,7 +238,7 @@ class tl_dc_regulator_control extends Backend
     {
         $aliasExists = static function (string $alias) use ($dc): bool {
             $result = Database::getInstance()
-                ->prepare("SELECT id FROM tl_dc_regulator_control WHERE alias=? AND id!=?")
+                ->prepare("SELECT id FROM tl_dc_control_card WHERE alias=? AND id!=?")
                 ->execute($alias, $dc->id);
             return $result->numRows > 0;
         };
