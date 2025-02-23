@@ -16,7 +16,7 @@ namespace Diversworld\ContaoDiveclubBundle\Model;
 
 use Contao\Model;
 
-class DcRegulatorControlModel extends Model
+class DcControlCardModel extends Model
 {
-    protected static $strTable = 'tl_dc_regulator_control';
+    protected static $strTable = 'tl_dc_control_card';
 }

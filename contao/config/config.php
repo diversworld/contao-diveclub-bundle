@@ -18,8 +18,8 @@ use Diversworld\ContaoDiveclubBundle\Model\DcCheckProposalModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCoursesModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckArticlesModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCalendarEventsModel;
-use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorsModel;
-use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorControlModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcControlCardModel;
 
 /**
  * Backend modules
@@ -33,7 +33,7 @@ $GLOBALS['BE_MOD']['diveclub'] = [
             'tables' => ['tl_dc_equipment_type', 'tl_dc_equipment'],
         ],
         'dc_regulator_collection' => [
-            'tables' => ['tl_dc_regulators','tl_dc_regulator_control'],
+            'tables' => ['tl_dc_regulator','tl_dc_control_card'],
         ],
         'dc_tanks_collection' => [
             'tables' => ['tl_dc_tanks','tl_dc_check_invoice'],
@@ -57,5 +57,5 @@ $GLOBALS['TL_MODELS']['tl_dc_check_articles']       = DcCheckArticlesModel::clas
 $GLOBALS['TL_MODELS']['tl_dc_eqipment_type']        = DcEquipmentTypeModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_equipment']            = DcEquipmentModel::class;
 $GLOBALS['TL_MODELS']['tl_calendar_events']         = DcCalendarEventsModel::class;
-$GLOBALS['TL_MODELS']['tl_dc_regulators']           = DcRegulatorsModel::class;
-$GLOBALS['TL_MODELS']['tl_dc_regulator_control']    = DcRegulatorControlModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_regulator']            = DcRegulatorModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_control_card']    = DcControlCardModel::class;

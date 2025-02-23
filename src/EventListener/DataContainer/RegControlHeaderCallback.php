@@ -8,7 +8,7 @@ use Doctrine\DBAL\Connection;
 use Contao\TemplateLoader;
 use Psr\Log\LoggerInterface;
 
-#[AsCallback(table: 'tl_dc_regulator_control', target: 'list.sorting.header')]
+#[AsCallback(table: 'tl_dc_control_card', target: 'list.sorting.header')]
 class RegControlHeaderCallback
 {
     private Connection $db;
@@ -26,14 +26,14 @@ class RegControlHeaderCallback
         $parentId = $dc->activeRecord ? $dc->activeRecord->pid : null;
 
         if (!$parentId) {
-            $this->logger->error('No parent ID found for record in tl_dc_regulator_control.');
+            $this->logger->error('No parent ID found for record in tl_dc_control_card.');
             return []; // Keine Parent-ID, leeres Array zurückgeben
         }
 
-        // 2. Lade die Parent-Daten aus `tl_dc_regulators`
+        // 2. Lade die Parent-Daten aus `tl_dc_regulator`
         $record = $this->db->fetchAssociative(
             "SELECT title, manufacturer, serialNumber1st, regModel1st, serialNumber2ndPri, regModel2ndPri, serialNumber2ndSec, regModel2ndSec
-             FROM tl_dc_regulators
+             FROM tl_dc_regulator
              WHERE id = ?",
             [$dc->pid],
         );
@@ -41,7 +41,7 @@ class RegControlHeaderCallback
         $this->logger->debug('Fetched parent record: ' . print_r($record, true));
 
         if (!$record) {
-            $this->logger->warning('No data found in tl_dc_regulators for parent ID: ' . $parentId);
+            $this->logger->warning('No data found in tl_dc_regulator for parent ID: ' . $parentId);
             return []; // Keine Daten gefunden, leeres Array zurückgeben
         }
 
@@ -67,8 +67,8 @@ class RegControlHeaderCallback
 
         // 4. Fülle die Header-Felder
         return array_filter([
-            $GLOBALS['TL_LANG']['tl_dc_regulators']['title'] => $record['title'] ?? null,
-            $GLOBALS['TL_LANG']['tl_dc_regulators']['manufacturer'] => $record['manufacturer'] ?? null,
+            $GLOBALS['TL_LANG']['tl_dc_regulator']['title'] => $record['title'] ?? null,
+            $GLOBALS['TL_LANG']['tl_dc_regulator']['manufacturer'] => $record['manufacturer'] ?? null,
             'Seriennummer 1. Stufe' => $record['serialNumber1st'] ?? null,
             'Modell 1. Stufe' => $record['regModel1st'] ?? null,
             'Seriennummer 2. Stufe (primär)' => $record['serialNumber2ndPri'] ?? null,

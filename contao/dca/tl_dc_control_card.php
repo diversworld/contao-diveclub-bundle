@@ -26,7 +26,7 @@ use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\RegControlHeade
 $GLOBALS['TL_DCA']['tl_dc_control_card'] = [
     'config'        => [
         'dataContainer'     => DC_Table::class,
-        'ptable'            => 'tl_dc_regulators',
+        'ptable'            => 'tl_dc_regulator',
         'enableVersioning'  => true,
         'onload_callback' => [
             ['tl_dc_control_card', 'debugParentData'],
@@ -87,7 +87,7 @@ $GLOBALS['TL_DCA']['tl_dc_control_card'] = [
             'sql'                   => "int(10) unsigned NOT NULL auto_increment"
         ],
         'pid'                   => [
-            'foreignKey'            => 'tl_dc_regulators.title',
+            'foreignKey'            => 'tl_dc_regulator.title',
             'relation'              => ['type' => 'belongsTo', 'load' => 'lazy'], // Typ anpassen, falls notwendig
             'sql'                   => "int(10) unsigned NOT NULL default 0",
         ],
@@ -302,7 +302,7 @@ class tl_dc_control_card extends Backend
         $this->logger = System::getContainer()->get('monolog.logger.contao.general');
         // Lade Parent-Datensatz
         $parent = Database::getInstance()
-            ->prepare("SELECT * FROM tl_dc_regulators WHERE id=?")
+            ->prepare("SELECT * FROM tl_dc_regulator WHERE id=?")
             ->execute($dc->id);
 
         if ($parent->numRows === 0) {

@@ -26,7 +26,7 @@ use Contao\TemplateLoader;
 $GLOBALS['TL_DCA']['tl_dc_regulator'] = [
     'config'            => [
         'dataContainer'     => DC_Table::class,
-        'ctable'            => ['tl_dc_regulator_control'],
+        'ctable'            => ['tl_dc_control_card'],
         'enableVersioning'  => true,
         'sql'               => [
             'keys'              => [
@@ -235,7 +235,7 @@ class tl_dc_regulator extends Backend
     {
         $aliasExists = static function (string $alias) use ($dc): bool {
             $result = Database::getInstance()
-                ->prepare("SELECT id FROM tl_dc_regulators WHERE alias=? AND id!=?")
+                ->prepare("SELECT id FROM tl_dc_regulator WHERE alias=? AND id!=?")
                 ->execute($alias, $dc->id);
             return $result->numRows > 0;
         };

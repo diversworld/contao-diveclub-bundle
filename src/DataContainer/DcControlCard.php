@@ -15,13 +15,8 @@ declare(strict_types=1);
 namespace Diversworld\ContaoDiveclubBundle\DataContainer;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\Monolog\ContaoContext;
-use Contao\Database;
-use Contao\DataContainer;
-use Contao\System;
-use Diversworld\ContaoDiveclubBundle\Model\CheckInvoiceModel;
 
-class DcRegulatorControl
+class DcControlCard
 {
     private ContaoFramework $framework;
 

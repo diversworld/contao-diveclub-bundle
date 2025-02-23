@@ -16,7 +16,7 @@ namespace Diversworld\ContaoDiveclubBundle\DataContainer;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
 
-class DcRegulators
+class DcRegulator
 {
     private ContaoFramework $framework;
 
