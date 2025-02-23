@@ -47,7 +47,7 @@ $GLOBALS['TL_DCA']['tl_dc_control_card'] = [
             'mode'                  => DataContainer::MODE_PARENT,
             'fields'                => ['title','nextCheckDate','alias','published'],
             'headerFields'          => ['title','manufacturer','regModel1st','serialNumber1st','regModel2ndPri','serialNumber2ndPri','regModel2ndSec','serialNumber2ndSec'],// Felder aus der Eltern-Tabelle
-            'header_callback'       => [RegControlHeaderCallback::class, '__invoke'],
+            //'header_callback'       => [RegControlHeaderCallback::class, '__invoke'],
             'flag'                  => DataContainer::SORT_ASC,
             'panelLayout'           => 'filter;sort,search,limit'
         ],
