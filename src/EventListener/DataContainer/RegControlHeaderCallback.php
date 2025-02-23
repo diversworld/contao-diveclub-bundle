@@ -24,8 +24,6 @@ class RegControlHeaderCallback
 
     public function __invoke(array $labels, DataContainer $dc): array
     {
-        $this->logger = System::getContainer()->get('monolog.logger.contao.general');
-
         // 1. Parent-ID laden
         $parentId = Input::get('id');
 
@@ -52,9 +50,6 @@ class RegControlHeaderCallback
         // 3. Templates laden
         $manufacturers = $this->getTemplateOptions('equipment_manufacturers'); // Hersteller
         $models = $this->getTemplateOptions('regulator_data'); // Regulator-Daten
-
-        $this->logger->debug('Loaded manufacturers: ' . print_r($manufacturers, true));
-        $this->logger->debug('Loaded models: ' . print_r($models, true));
 
         // 4. Hersteller auflösen
         $manufacturerId = (int)$record['manufacturer']; // Speichern der numerischen ID
