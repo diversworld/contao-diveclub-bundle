@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-/*
+/**
  * This file is part of ContaoDiveclubBundle.
  *
  * (c) Diversworld, Eckhard Becker 2025 <info@diversworld.eu>
@@ -11,27 +11,21 @@ declare(strict_types=1);
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/diversworld/contao-diveclub-bundle
  */
-
 use Contao\Backend;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
-use Psr\Log\LoggerInterface;
 use Contao\TemplateLoader;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\RegControlHeaderCallback;
+
 /**
- * Table tl_dc_control_card
+ * Table tl_dc_check_articles
  */
-$GLOBALS['TL_DCA']['tl_dc_control_card'] = [
+$GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
     'config'        => [
         'dataContainer'     => DC_Table::class,
-        'ptable'            => 'tl_dc_regulator',
+        'ptable'            => 'tl_dc_regulators',
         'enableVersioning'  => true,
-        'onload_callback' => [
-            ['tl_dc_control_card', 'debugParentData'],
-        ],
-
         'sql'               => [
             'keys'          => [
                 'id'            => 'primary',
@@ -42,81 +36,90 @@ $GLOBALS['TL_DCA']['tl_dc_control_card'] = [
             ]
         ],
     ],
-    'list'                  => [
-        'sorting'               => [
-            'mode'                  => DataContainer::MODE_PARENT,
-            'fields'                => ['title','nextCheckDate','alias','published'],
-            'headerFields'          => ['title','manufacturer','regModel1st','serialNumber1st','regModel2ndPri','serialNumber2ndPri','regModel2ndSec','serialNumber2ndSec'],// Felder aus der Eltern-Tabelle
-            //'header_callback'       => [RegControlHeaderCallback::class, '__invoke'],
-            'flag'                  => DataContainer::SORT_ASC,
-            'panelLayout'           => 'filter;sort,search,limit'
+    'list'          => [
+        'sorting'           => [
+            'mode'          => DataContainer::MODE_PARENT,
+            'fields'        => ['title','alias','published'],
+            'headerFields'  => ['title', 'regModel1st', 'regModel2ndPri', 'regModel2ndSec'],
+            'flag'          => DataContainer::SORT_ASC,
+            'panelLayout'   => 'filter;sort,search,limit',
         ],
-        'label'                 => [
-            'fields'                => ['title','midPressurePre','inhalePressurePre','exhalePressurePre','midPressurePost','inhalePressurePost','exhalePressurePost'],
-            'format'                => '%s: Vorher MD %s bar EAW %s AAW %s - Nachher MD %s bar EAW %s AAW %s',
+        'label'             => [
+            'fields'        => ['title','articlePriceNetto','articlePriceBrutto'],
+            'headerFields'  => ['title', 'manufacturer', 'proposalDate'],
+            'format'        => '%s - Netto: %s€ Brutto: %s€',
         ],
-        'global_operations'     => [
-            'all'                   => [
-                'href'                  => 'act=select',
-                'class'                 => 'header_edit_all',
-                'attributes'            => 'onclick="Backend.getScrollOffset()" accesskey="e"'
+        'global_operations' => [
+            'all'       => [
+                'href'      => 'act=select',
+                'class'     => 'header_edit_all',
+                'attributes'=> 'onclick="Backend.getScrollOffset()" accesskey="e"'
             ]
         ],
-        'operations'            => [
+        'operations'        => [
             'edit',
             'copy',
             'delete',
-            'toggle',
             'show',
-        ],
+            'toggle'
+        ]
     ],
-    'palettes'              => [
-        '__selector__'      => ['addNotes'],
-        'default'           => '{title_legend},title,alias;
-                                {pre_legend},midPreussurePre,inhalePressurePre,exhalePressurePre;
-                                {post_legend},midPreussurePost,inhalePressurePost,exhalePressurePost;
-                                {nextCheck_legend},nextCheckDate;
+    'palettes'      => [
+        '__selector__'      => ['addArticleInfo'],
+        'default'           => '{title_legend},title,actualCheckDate,alias;
+                                {details_legend},midPressurePre,inhalePressurePre,exhalePressurePre,midPressurePost,inhalePressurePost,exhalePressurePost,nextCheckDate;
                                 {notes_legend},addNotes;
                                 {publish_legend},published,start,stop;'
     ],
-    'subpalettes'           => [
+    'subpalettes'   => [
         'addNotes'          => 'notes',
     ],
-    'fields'                => [
-        'id'                    => [
-            'sql'                   => "int(10) unsigned NOT NULL auto_increment"
+    'fields'        => [
+        'id'                => [
+            'sql'           => "int(10) unsigned NOT NULL auto_increment"
         ],
-        'pid'                   => [
-            'foreignKey'            => 'tl_dc_regulator.title',
-            'relation'              => ['type' => 'belongsTo', 'load' => 'lazy'], // Typ anpassen, falls notwendig
-            'sql'                   => "int(10) unsigned NOT NULL default 0",
+        'pid'               => [
+            'foreignKey'        => 'tl_dc_check_proposal.title',
+            'sql'               => "int(10) unsigned NOT NULL default 0",
+            'relation'          => ['type' => 'belongsTo', 'load' => 'lazy'], // Typ anpassen, falls notwendig
         ],
-        'tstamp'                => [
-            'sql'                   => "int(10) unsigned NOT NULL default 0"
+        'tstamp'            => [
+            'sql'               => "int(10) unsigned NOT NULL default 0"
         ],
-        'title'                 => [
-            'inputType'             => 'text',
-            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_control_card']['actualCheckDate'],
-            'exclude'               => true,
-            'search'                => true,
-            'filter'                => true,
-            'sorting'               => true,
-            'flag'                  => DataContainer::SORT_YEAR_DESC,
-            'eval'                  => ['submitOnChange' => true, 'rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w33 wizard'],
-            'sql'                   => "varchar(10) NOT NULL default ''"
+        'title'             => [
+            'inputType'         => 'text',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['title'],
+            'exclude'           => true,
+            'search'            => true,
+            'filter'            => true,
+            'sorting'           => true,
+            'flag'              => DataContainer::SORT_INITIAL_LETTER_ASC,
+            'eval'              => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w33'],
+            'sql'               => "varchar(255) NOT NULL default ''",
         ],
-        'alias'                 => [
-            'search'                => true,
-            'inputType'             => 'text',
-            'eval'                  => ['rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w50'],
-            'save_callback'         => [
-                ['tl_dc_control_card', 'generateAlias']
+        'alias'             => [
+            'search'        => true,
+            'inputType'     => 'text',
+            'eval'          => ['rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w33'],
+            'save_callback' => [
+                ['tl_dc_regulator_control', 'generateAlias']
             ],
-            'sql'           => "varchar(255) BINARY NOT NULL default ''"
+            'sql'           => "varchar(255) BINARY NOT NULL default ''",
+        ],
+        'actualCheckDate'       => [
+            'inputType'             => 'text',
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['actualCheckDate'],
+            'exclude'               => true,
+            'sorting'               => true,
+            'filter'                => true,
+            'flag'                  => DataContainer::SORT_YEAR_DESC,
+            'eval'                  => ['submitOnChange' => true,'rgxp'=>'date', 'doNotCopy'=>false, 'datepicker'=>true, 'tl_class'=>'w33 wizard'],
+            'sql'                   => "varchar(10) NOT NULL default ''"
         ],
         'midPressurePre'        => [
             'inputType'             => 'text',
-            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_control_card']['midPreussurePre'],
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['midPreussurePre'],
+            'exclude'               => true,
             'search'                => true,
             'filter'                => true,
             'sorting'               => true,
@@ -125,7 +128,8 @@ $GLOBALS['TL_DCA']['tl_dc_control_card'] = [
         ],
         'inhalePressurePre'     => [
             'inputType'             => 'text',
-            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_control_card']['inhalePressurePre'],
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['inhalePressurePre'],
+            'exclude'               => true,
             'search'                => true,
             'filter'                => true,
             'sorting'               => true,
@@ -134,7 +138,8 @@ $GLOBALS['TL_DCA']['tl_dc_control_card'] = [
         ],
         'exhalePressurePre'     => [
             'inputType'             => 'text',
-            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_control_card']['exhalePressurePre'],
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['exhalePressurePre'],
+            'exclude'               => true,
             'search'                => true,
             'filter'                => true,
             'sorting'               => true,
@@ -143,7 +148,8 @@ $GLOBALS['TL_DCA']['tl_dc_control_card'] = [
         ],
         'midPressurePost'       => [
             'inputType'             => 'text',
-            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_control_card']['midPreussurePost'],
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['midPreussurePost'],
+            'exclude'               => true,
             'search'                => true,
             'filter'                => true,
             'sorting'               => true,
@@ -152,7 +158,8 @@ $GLOBALS['TL_DCA']['tl_dc_control_card'] = [
         ],
         'inhalePressurePost'    => [
             'inputType'             => 'text',
-            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_control_card']['inhalePressurePost'],
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['inhalePressurePost'],
+            'exclude'               => true,
             'search'                => true,
             'filter'                => true,
             'sorting'               => true,
@@ -162,7 +169,8 @@ $GLOBALS['TL_DCA']['tl_dc_control_card'] = [
         ],
         'exhalePressurePost'    => [
             'inputType'             => 'text',
-            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_control_card']['exhalePressurePost'],
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['exhalePressurePost'],
+            'exclude'               => true,
             'search'                => true,
             'filter'                => true,
             'sorting'               => true,
@@ -172,7 +180,8 @@ $GLOBALS['TL_DCA']['tl_dc_control_card'] = [
         ],
         'nextCheckDate'         => [
             'inputType'             => 'text',
-            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_control_card']['nextCheckDate'],
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['nextCheckDate'],
+            'exclude'               => true,
             'sorting'               => true,
             'filter'                => true,
             'flag'                  => DataContainer::SORT_YEAR_DESC,
@@ -186,44 +195,39 @@ $GLOBALS['TL_DCA']['tl_dc_control_card'] = [
             'eval'                  => ['submitOnChange' => true, 'tl_class' => 'w50'],
             'sql'                   => ['type' => 'boolean', 'default' => false]
         ],
-        'notes'                 => [
-            'inputType'             => 'textarea',
-            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_control_card']['notes'],
-            'exclude'               => true,
-            'search'                => false,
-            'filter'                => false,
-            'sorting'               => false,
-            'eval'                  => ['rte' => 'tinyMCE', 'tl_class' => 'clr'],
-            'sql'                   => 'text NULL'
+        'notes'      => [
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['articleNotes'],
+            'inputType'         => 'textarea',
+            'exclude'           => true,
+            'search'            => false,
+            'filter'            => false,
+            'sorting'           => false,
+            'eval'              => ['rte' => 'tinyMCE', 'tl_class'=>'w33'],
+            'sql'               => 'text NULL',
         ],
-        'published'             => [
-            'inputType'             => 'checkbox',
-            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_control_card']['published'],
-            'toggle'                => true,
-            'filter'                => true,
-            'flag'                  => DataContainer::SORT_INITIAL_LETTER_DESC,
-            'eval'                  => ['doNotCopy'=>true, 'tl_class' => 'w50'],
-            'sql'                   => ['type' => 'boolean', 'default' => false]
+        'published'         => [
+            'toggle'            => true,
+            'filter'            => true,
+            'flag'              => DataContainer::SORT_INITIAL_LETTER_DESC,
+            'inputType'         => 'checkbox',
+            'eval'              => ['doNotCopy'=>true, 'tl_class' => 'w50'],
+            'sql'               => ['type' => 'boolean', 'default' => false],
         ],
-        'start'                 => [
-            'inputType'             => 'text',
-            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_control_card']['start'],
-            'eval'                  => ['rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 clr wizard'],
-            'sql'                   => "varchar(10) NOT NULL default ''"
+        'start'             => [
+            'inputType'         => 'text',
+            'eval'              => ['rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 clr wizard'],
+            'sql'               => "varchar(10) NOT NULL default ''",
         ],
-        'stop'                  => [
-            'inputType'             => 'text',
-            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_control_card']['stop'],
-            'eval'                  => ['rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 wizard'],
-            'sql'                   => "varchar(10) NOT NULL default ''"
+        'stop'              => [
+            'inputType'         => 'text',
+            'eval'              => ['rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 wizard'],
+            'sql'               => "varchar(10) NOT NULL default ''",
         ]
     ]
 ];
 
-class tl_dc_control_card extends Backend
+class tl_dc_regulator_control extends Backend
 {
-    public LoggerInterface $logger;
-
     /**
      * Auto-generate the event alias if it has not been set yet
      *
@@ -238,7 +242,7 @@ class tl_dc_control_card extends Backend
     {
         $aliasExists = static function (string $alias) use ($dc): bool {
             $result = Database::getInstance()
-                ->prepare("SELECT id FROM tl_dc_control_card WHERE alias=? AND id!=?")
+                ->prepare("SELECT id FROM tl_dc_regulator_control WHERE alias=? AND id!=?")
                 ->execute($alias, $dc->id);
             return $result->numRows > 0;
         };
@@ -258,6 +262,7 @@ class tl_dc_control_card extends Backend
 
         return $varValue;
     }
+
     public function getManufacturers()
     {
         return $this->getTemplateOptions('equipment_manufacturers');
@@ -296,20 +301,4 @@ class tl_dc_control_card extends Backend
 
         return $options;
     }
-
-    public function debugParentData(DataContainer $dc): void
-    {
-        $this->logger = System::getContainer()->get('monolog.logger.contao.general');
-        // Lade Parent-Datensatz
-        $parent = Database::getInstance()
-            ->prepare("SELECT * FROM tl_dc_regulator WHERE id=?")
-            ->execute($dc->id);
-
-        if ($parent->numRows === 0) {
-            $this->logger->error('No parent record found for ID: ' . $dc->id);
-        } else {
-            $this->logger->info('Parent record found: ' . print_r($parent->row(), true));
-        }
-    }
-
 }
