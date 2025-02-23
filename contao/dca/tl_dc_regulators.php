@@ -47,8 +47,9 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'panelLayout'   => 'filter;sort,search,limit'
         ],
         'label'             => [
-            'fields' => ['title','vendorName','checkId'],
-            'format' => '%s %s %s',
+            'fields' => ['title','regModel1st','regModel2ndPri','regModel2ndSec'],
+            'format' => '%s - %s %s %s',
+            'label_callback' => ['tl_dc_regulators', 'customLabelCallback']
         ],
         'global_operations' => [
             'all' => [

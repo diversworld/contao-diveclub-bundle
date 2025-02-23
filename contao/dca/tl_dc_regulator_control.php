@@ -17,6 +17,7 @@ use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
 use Contao\TemplateLoader;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\RegControlHeaderCallback;
 
 /**
  * Table tl_dc_check_articles
@@ -27,33 +28,34 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
         'ptable'            => 'tl_dc_regulators',
         'enableVersioning'  => true,
         'sql'               => [
-            'keys'          => [
-                'id'            => 'primary',
-                'pid'           => 'index',
-                'tstamp'        => 'index',
-                'alias'         => 'index',
+            'keys'              => [
+                'id'                => 'primary',
+                'pid'               => 'index',
+                'tstamp'            => 'index',
+                'alias'             => 'index',
                 'published,start,stop' => 'index'
             ]
         ],
     ],
     'list'          => [
         'sorting'           => [
-            'mode'          => DataContainer::MODE_PARENT,
-            'fields'        => ['title','alias','published'],
-            'headerFields'  => ['title', 'regModel1st', 'regModel2ndPri', 'regModel2ndSec'],
-            'flag'          => DataContainer::SORT_ASC,
-            'panelLayout'   => 'filter;sort,search,limit',
+            'mode'              => DataContainer::MODE_PARENT,
+            'fields'            => ['title','alias','published'],
+            'headerFields'      => ['title', 'manufacturer', 'regModel1st', 'regModel2ndPri', 'regModel2ndSec'],
+            'header_callback'   => [RegControlHeaderCallback::class,'__invoke'],
+            'flag'              => DataContainer::SORT_ASC,
+            'panelLayout'       => 'filter;sort,search,limit',
         ],
         'label'             => [
-            'fields'        => ['title','articlePriceNetto','articlePriceBrutto'],
-            'headerFields'  => ['title', 'manufacturer', 'proposalDate'],
-            'format'        => '%s - Netto: %s€ Brutto: %s€',
+            'fields'            => ['title','midPressurePre', 'inhalePressurePre', 'exhalePressurePre', 'midPressurePost', 'inhalePressurePost', 'exhalePressurePost'],
+            'headerFields'      => ['title','regModel1st','regModel2ndPri','regModel2ndSec' ],
+            'format'            => '%s - Vorher MD %s bar EAW %s AAW %s - Nachher MD %s bar EAW %s AAW %s',
         ],
         'global_operations' => [
-            'all'       => [
-                'href'      => 'act=select',
-                'class'     => 'header_edit_all',
-                'attributes'=> 'onclick="Backend.getScrollOffset()" accesskey="e"'
+            'all'               => [
+                'href'              => 'act=select',
+                'class'             => 'header_edit_all',
+                'attributes'        => 'onclick="Backend.getScrollOffset()" accesskey="e"'
             ]
         ],
         'operations'        => [
@@ -76,7 +78,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
     ],
     'fields'        => [
         'id'                => [
-            'sql'           => "int(10) unsigned NOT NULL auto_increment"
+            'sql'               => "int(10) unsigned NOT NULL auto_increment"
         ],
         'pid'               => [
             'foreignKey'        => 'tl_dc_check_proposal.title',
@@ -106,7 +108,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             ],
             'sql'           => "varchar(255) BINARY NOT NULL default ''",
         ],
-        'actualCheckDate'       => [
+        'actualCheckDate'   => [
             'inputType'             => 'text',
             'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['actualCheckDate'],
             'exclude'               => true,
@@ -114,9 +116,10 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'filter'                => true,
             'flag'                  => DataContainer::SORT_YEAR_DESC,
             'eval'                  => ['submitOnChange' => true,'rgxp'=>'date', 'doNotCopy'=>false, 'datepicker'=>true, 'tl_class'=>'w33 wizard'],
+            'onsubmit_callback'     => ['tl_dc_regulator_control', 'setNextCheckDate'],
             'sql'                   => "varchar(10) NOT NULL default ''"
         ],
-        'midPressurePre'        => [
+        'midPressurePre'    => [
             'inputType'             => 'text',
             'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['midPreussurePre'],
             'exclude'               => true,
@@ -126,7 +129,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'eval'                  => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25 clr'],
             'sql'                   => "varchar(50) NOT NULL default ''"
         ],
-        'inhalePressurePre'     => [
+        'inhalePressurePre' => [
             'inputType'             => 'text',
             'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['inhalePressurePre'],
             'exclude'               => true,
@@ -136,7 +139,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'eval'                  => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25'],
             'sql'                   => "varchar(50) NOT NULL default ''"
         ],
-        'exhalePressurePre'     => [
+        'exhalePressurePre' => [
             'inputType'             => 'text',
             'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['exhalePressurePre'],
             'exclude'               => true,
@@ -146,7 +149,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'eval'                  => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25'],
             'sql'                   => "varchar(50) NOT NULL default ''"
         ],
-        'midPressurePost'       => [
+        'midPressurePost'   => [
             'inputType'             => 'text',
             'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['midPreussurePost'],
             'exclude'               => true,
@@ -156,7 +159,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'eval'                  => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25 clr'],
             'sql'                   => "varchar(50) NOT NULL default ''"
         ],
-        'inhalePressurePost'    => [
+        'inhalePressurePost'=> [
             'inputType'             => 'text',
             'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['inhalePressurePost'],
             'exclude'               => true,
@@ -167,7 +170,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'eval'                  => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25'],
             'sql'                   => "varchar(50) NOT NULL default ''"
         ],
-        'exhalePressurePost'    => [
+        'exhalePressurePost'=> [
             'inputType'             => 'text',
             'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['exhalePressurePost'],
             'exclude'               => true,
@@ -178,7 +181,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'eval'                  => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25'],
             'sql'                   => "varchar(50) NOT NULL default ''"
         ],
-        'nextCheckDate'         => [
+        'nextCheckDate'     => [
             'inputType'             => 'text',
             'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['nextCheckDate'],
             'exclude'               => true,
@@ -188,14 +191,14 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'eval'                  => ['submitOnChange' => true,'rgxp'=>'date', 'doNotCopy'=>false, 'datepicker'=>true, 'tl_class'=>'w33 wizard'],
             'sql'                   => "varchar(10) NOT NULL default ''"
         ],
-        'addNotes'              => [
+        'addNotes'          => [
             'inputType'             => 'checkbox',
             'label'                 => &$GLOBALS['TL_LANG']['tl_dc_control_card']['addNotes'],
             'exclude'               => true,
             'eval'                  => ['submitOnChange' => true, 'tl_class' => 'w50'],
             'sql'                   => ['type' => 'boolean', 'default' => false]
         ],
-        'notes'      => [
+        'notes'             => [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['articleNotes'],
             'inputType'         => 'textarea',
             'exclude'           => true,
@@ -263,42 +266,11 @@ class tl_dc_regulator_control extends Backend
         return $varValue;
     }
 
-    public function getManufacturers()
+    function setNextCheckDate(DataContainer $dc)
     {
-        return $this->getTemplateOptions('equipment_manufacturers');
-    }
-
-    public function getSizes()
-    {
-        return $this->getTemplateOptions('equipment_sizes');
-    }
-
-    private function getTemplateOptions($templateName)
-    {
-        // Templatepfad über Contao ermitteln
-        $templatePath = TemplateLoader::getPath($templateName, 'html5');
-
-        // Überprüfen, ob die Datei existiert
-        if (!$templatePath || !file_exists($templatePath)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['templateNotFound'], $templatePath));
-        }
-
-        // Dateiinhalt lesen
-        $content = file_get_contents($templatePath);
-
-        $options = [];
-        // Entferne PHP-Tags und wandle Daten in ein Array um
-        $content = trim($content);
-        $content = trim($content, '<?=');
-        $content = trim($content, '?>');
-
-        eval('$options = ' . $content . ';');
-
-        if (!is_array($options)) {
-            $this->logger->error('Failed to parse template content into an array: ' . $content);
-            return [];
-        }
-
-        return $options;
+        $actualCheckDate = $dc->activeRecord->actualCheckDate;
+        $nextCheckDate = date('Y-m-d', strtotime($actualCheckDate. ' + 1 year'));
+        $dc->activeRecord->nextCheckDate = $nextCheckDate;
+        $dc->activeRecord->save();
     }
 }
