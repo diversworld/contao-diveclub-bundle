@@ -166,7 +166,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
             'eval'              => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25 clr'],
             'sql'               => "varchar(50) NOT NULL default ''"
         ],
-        'buyDate'     => [
+        'buyDate'           => [
             'inputType'         => 'text',
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['buyDate'],
             'exclude'           => true,
