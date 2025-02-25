@@ -18,6 +18,7 @@ use Contao\DC_Table;
 use Contao\System;
 use Contao\TemplateLoader;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\RegControlHeaderCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\SetRegNextCheckDateCallback;
 
 /**
  * Table tl_dc_check_articles
@@ -68,8 +69,8 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
     ],
     'palettes'      => [
         '__selector__'      => ['addArticleInfo'],
-        'default'           => '{title_legend},title,actualCheckDate,alias;
-                                {details_legend},midPressurePre,inhalePressurePre,exhalePressurePre,midPressurePost,inhalePressurePost,exhalePressurePost,nextCheckDate;
+        'default'           => '{title_legend},title,alias;
+                                {details_legend},actualCheckDate,midPressurePre,inhalePressurePre,exhalePressurePre,midPressurePost,inhalePressurePost,exhalePressurePost,nextCheckDate;
                                 {notes_legend},addNotes;
                                 {publish_legend},published,start,stop;'
     ],
@@ -115,9 +116,9 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'sorting'               => true,
             'filter'                => true,
             'flag'                  => DataContainer::SORT_YEAR_DESC,
-            'eval'                  => ['submitOnChange' => true,'rgxp'=>'date', 'doNotCopy'=>false, 'datepicker'=>true, 'tl_class'=>'w33 wizard'],
-            'onsubmit_callback'     => ['tl_dc_regulator_control', 'setNextCheckDate'],
-            'sql'                   => "varchar(10) NOT NULL default ''"
+            'eval'                  => ['submitOnChange' => true, 'rgxp'=>'date', 'doNotCopy'=>false, 'datepicker'=>true, 'tl_class'=>'w33 wizard'],
+            'onsubmit_callback'     => [SetRegNextCheckDateCallback::class, '__invoke'],
+            'sql'                   => "bigint(20) NULL"
         ],
         'midPressurePre'    => [
             'inputType'             => 'text',
@@ -188,8 +189,8 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'sorting'               => true,
             'filter'                => true,
             'flag'                  => DataContainer::SORT_YEAR_DESC,
-            'eval'                  => ['submitOnChange' => true,'rgxp'=>'date', 'doNotCopy'=>false, 'datepicker'=>true, 'tl_class'=>'w33 wizard'],
-            'sql'                   => "varchar(10) NOT NULL default ''"
+            'eval'                  => ['submitOnChange' => true, 'rgxp'=>'date', 'doNotCopy'=>false, 'datepicker'=>true, 'tl_class'=>'w33 wizard'],
+            'sql'                   => "bigint(20) NULL"
         ],
         'addNotes'          => [
             'inputType'             => 'checkbox',
@@ -264,13 +265,5 @@ class tl_dc_regulator_control extends Backend
         }
 
         return $varValue;
-    }
-
-    function setNextCheckDate(DataContainer $dc)
-    {
-        $actualCheckDate = $dc->activeRecord->actualCheckDate;
-        $nextCheckDate = date('Y-m-d', strtotime($actualCheckDate. ' + 1 year'));
-        $dc->activeRecord->nextCheckDate = $nextCheckDate;
-        $dc->activeRecord->save();
     }
 }

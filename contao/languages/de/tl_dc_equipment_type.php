@@ -21,6 +21,7 @@ $GLOBALS['TL_LANG']['tl_dc_equipment_type']['publish_legend'] = 'Veröffentlichu
 
 // Labels
 $GLOBALS['TL_LANG']['tl_dc_equipment_type']['title'] = ['Typ', 'Wählen Sie einen Typ aus.'];
+$GLOBALS['TL_LANG']['tl_dc_equipment_type']['subType'] = ['Art', 'Wählen Sie eine Art aus.'];
 $GLOBALS['TL_LANG']['tl_dc_equipment_type']['addNotes'] = ['Bemerkungen', 'Fügen Sie zusätzliche Informationen hinzu.'];
 $GLOBALS['TL_LANG']['tl_dc_equipment_type']['notes'] = ['Notizen', 'Geben Sie Ihre Notizen ein.'];
 $GLOBALS['TL_LANG']['tl_dc_equipment_type']['published'] = ['Veröffentlicht', 'Markieren Sie das Element als veröffentlicht.'];

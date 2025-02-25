@@ -62,26 +62,18 @@ class RegControlHeaderCallback
 
         // 6. Sprachdatei laden und Mapping vorbereiten
         System::loadLanguageFile('tl_dc_regulators');
-        $this->logger->debug('Loaded language: ' . print_r($GLOBALS['TL_LANG']['tl_dc_regulators'], true));
 
         $mapping = [
-            is_string($GLOBALS['TL_LANG']['tl_dc_regulators']['title'] ?? null)
-                ? $GLOBALS['TL_LANG']['tl_dc_regulators']['title'] : 'Inventarnummer' => 'title',
-            is_string($GLOBALS['TL_LANG']['tl_dc_regulators']['manufacturer'] ?? null)
-                ? $GLOBALS['TL_LANG']['tl_dc_regulators']['manufacturer'] : 'Hersteller' => 'manufacturer',
-            is_string($GLOBALS['TL_LANG']['tl_dc_regulators']['regModel1st'] ?? null)
-                ? $GLOBALS['TL_LANG']['tl_dc_regulators']['regModel1st'] : 'Modell 1. Stufe' => 'regModel1st',
-            is_string($GLOBALS['TL_LANG']['tl_dc_regulators']['regModel2ndPri'] ?? null)
-                ? $GLOBALS['TL_LANG']['tl_dc_regulators']['regModel2ndPri'] : 'Modell 2. Stufe (primär)' => 'regModel2ndPri',
-            is_string($GLOBALS['TL_LANG']['tl_dc_regulators']['regModel2ndSec'] ?? null)
-                ? $GLOBALS['TL_LANG']['tl_dc_regulators']['regModel2ndSec'] : 'Modell 2. Stufe (sekundär)' => 'regModel2ndSec',
+            'Inventarnummer' => 'title',
+            'Hersteller' => 'manufacturer',
+            'Modell 1. Stufe' => 'regModel1st',
+            'Modell 2. Stufe (primär)' => 'regModel2ndPri',
+            'Modell 2. Stufe (sekundär)' => 'regModel2ndSec',
         ];
 
         foreach ($mapping as $labelKey => $recordField) {
-            $labels[$labelKey] = $record[$recordField] ?? 'Nicht verfügbar';
+            $labels[$GLOBALS['TL_LANG']['tl_dc_regulators'][$recordField][0] ?? $labelKey] = $record[$recordField] ?? 'Nicht verfügbar';
         }
-
-        $this->logger->debug('Mapped labels: ' . print_r($labels, true));
 
         return $labels;
     }

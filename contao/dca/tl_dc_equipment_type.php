@@ -218,7 +218,6 @@ class tl_dc_equipment_type extends Backend
 
         // Ermittle den aktuellen Typ aus dem aktiven Datensatz
         $currentType = $dc->activeRecord->title;
-        $this->logger->info('getSubTypes: Current type: ' . $currentType);
 
         $subTypes = $this->getTemplateOptions('equipment_subTypes');
 
@@ -234,7 +233,6 @@ class tl_dc_equipment_type extends Backend
 
     private function getTemplateOptions($templateName):array
     {
-        $this->logger = System::getContainer()->get('monolog.logger.contao.general');
         // Templatepfad über Contao ermitteln
         $templatePath = TemplateLoader::getPath($templateName, 'html5');
 
@@ -250,7 +248,7 @@ class tl_dc_equipment_type extends Backend
         $options = [];
         // Entferne PHP-Tags und wandle Daten in ein Array um
         $content = trim($content);
-        $content = trim($content, '<?php');
+        $content = trim($content, '<?=');
         $content = trim($content, '?>');
 
         eval('$options = ' . $content . ';');

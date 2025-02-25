@@ -20,6 +20,7 @@ use Contao\System;
 use Contao\Input;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Diversworld\ContaoDiveclubBundle\DataContainer\DcTanks;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentHeaderCallback;
 use Psr\Log\LoggerInterface;
 use Contao\TemplateLoader;
 
@@ -43,11 +44,12 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
     ],
     'list'          => [
         'sorting'           => [
-            'mode'          => DataContainer::MODE_PARENT,
-            'fields'        => ['title','alias','published'],
-            'headerFields'  => ['title', 'subType'],
-            'flag'          => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'panelLayout'   => 'filter;sort,search,limit'
+            'mode'              => DataContainer::MODE_PARENT,
+            'fields'            => ['title','alias','published'],
+            'headerFields'      => ['title', 'subType'],
+            'header_callback'   =>[EquipmentHeaderCallback::class, '__invoke'],
+            'flag'              => DataContainer::SORT_INITIAL_LETTER_ASC,
+            'panelLayout'       => 'filter;sort,search,limit'
         ],
         'label'             => [
             'fields'            => ['title','manufacturer','size'],
@@ -265,7 +267,7 @@ class tl_dc_equipment extends Backend
         $options = [];
         // Entferne PHP-Tags und wandle Daten in ein Array um
         $content = trim($content);
-        $content = trim($content, '<?php');
+        $content = trim($content, '<?=');
         $content = trim($content, '?>');
 
         eval('$options = ' . $content . ';');
@@ -287,7 +289,6 @@ class tl_dc_equipment extends Backend
 
         // Ermittle den aktuellen Typ aus dem aktiven Datensatz
         $currentType = $dc->activeRecord->title;
-        $this->logger->info('getSubTypes: Current type: ' . $currentType);
 
         $subTypes = $this->getTemplateOptions('equipment_subTypes');
 
