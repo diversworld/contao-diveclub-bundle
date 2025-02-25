@@ -27,11 +27,12 @@ $GLOBALS['TL_DCA']['tl_dc_equipment']['model']              = ['Modell', 'Was is
 $GLOBALS['TL_LANG']['tl_dc_equipment']['size']              = ['Größe', 'Wählen Sie eine Größe aus.'];
 $GLOBALS['TL_DCA']['tl_dc_equipment']['color']              = ['Farbe', 'Welche Farbe hat das Equipment?'];
 $GLOBALS['TL_LANG']['tl_dc_equipment']['addNotes']          = ['Zusätzliche Notizen', 'Fügen Sie optionale Notizen hinzu.'];
+$GLOBALS['TL_LANG']['tl_dc_equipment']['serialNumber']      = ['Seriennummer', 'Bitte geben Sie die Seriennummer an.'];
+$GLOBALS['TL_LANG']['tl_dc_equipment']['buyDate']           = ['Kaufdatum', 'Wählen Sie das Kaufdatum aus.'];
 $GLOBALS['TL_LANG']['tl_dc_equipment']['notes']             = ['Notizen', 'Geben Sie bitte die Notizen ein.'];
 $GLOBALS['TL_LANG']['tl_dc_equipment']['published']         = ['Veröffentlicht', 'Markieren Sie das Equipment als veröffentlicht.'];
 $GLOBALS['TL_LANG']['tl_dc_equipment']['start']             = ['Startdatum', 'Geben Sie ein Startdatum an.'];
 $GLOBALS['TL_LANG']['tl_dc_equipment']['stop']              = ['Enddatum', 'Geben Sie ein Enddatum an.'];
 
-$GLOBALS['TL_DCA']['tl_dc_equipment']['stageType']     = ['1' => 'Erste Stufe', '2' => 'Zweite Stufe'];
-
-$GLOBALS['TL_DCA']['tl_dc_equipment']['regType']       = ['1' => 'Primär', '2' => 'Sekundär'];
+$GLOBALS['TL_DCA']['tl_dc_equipment']['stageType']          = ['1' => 'Erste Stufe', '2' => 'Zweite Stufe'];
+$GLOBALS['TL_DCA']['tl_dc_equipment']['regType']            = ['1' => 'Primär', '2' => 'Sekundär'];

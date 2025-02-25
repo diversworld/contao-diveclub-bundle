@@ -74,7 +74,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
     'palettes'          => [
         '__selector__'      => ['addNotes'],
         'default'           => '{title_legend},title,alias;
-                                {details_legend},manufacturer,model,color,size;
+                                {details_legend},manufacturer,model,color,size,serialNumber,buyDate;
                                 {notes_legend},addNotes;
                                 {publish_legend},published,start,stop;'
     ],
@@ -116,16 +116,18 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
         'manufacturer'      => [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['manufacturer'],
             'inputType'         => 'select',
+            'exclude'           => true,
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
-            'options_callback'  => array('tl_dc_equipment', 'getManufacturers'),
-            'eval'              => array('mandatory' => true, 'tl_class' => 'w25 clr'),
+            'options_callback'  => ['tl_dc_equipment', 'getManufacturers'],
+            'eval'              => ['mandatory' => true, 'tl_class' => 'w25 clr'],
             'sql'               => "varchar(255) NOT NULL default ''",
         ],
         'model'             => [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['model'],
             'inputType'         => 'text',
+            'exclude'           => true,
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
@@ -135,6 +137,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
         'color'             => [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['color'],
             'inputType'         => 'text',
+            'exclude'           => true,
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
@@ -144,6 +147,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
         'size'              => [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['size'],
             'inputType'         => 'select',
+            'exclude'           => true,
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
@@ -153,12 +157,25 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
         ],
         'serialNumber'      => [
             'inputType'         => 'text',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['serialNumber'],
+            'exclude'           => true,
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
             'flag'              => DataContainer::SORT_INITIAL_LETTER_ASC,
             'eval'              => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25 clr'],
             'sql'               => "varchar(50) NOT NULL default ''"
+        ],
+        'buyDate'     => [
+            'inputType'         => 'text',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['buyDate'],
+            'exclude'           => true,
+            'search'            => true,
+            'sorting'           => true,
+            'filter'            => true,
+            'flag'              => DataContainer::SORT_YEAR_DESC,
+            'eval'              => ['submitOnChange' => true,'rgxp'=>'date', 'doNotCopy'=>false, 'datepicker'=>true, 'tl_class'=>'w33 wizard'],
+            'sql'               => "bigint(20) NULL"
         ],
         'addNotes'          => [
             'inputType'         => 'checkbox',
