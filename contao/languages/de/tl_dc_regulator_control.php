@@ -35,3 +35,5 @@ $GLOBALS['TL_LANG']['tl_dc_regulator_control']['notes']                 = ['Noti
 $GLOBALS['TL_LANG']['tl_dc_regulator_control']['published']             = ['Veröffentlicht', 'Markieren Sie das Equipment als veröffentlicht.'];
 $GLOBALS['TL_LANG']['tl_dc_regulator_control']['start']                 = ['Startdatum', 'Geben Sie ein Startdatum an.'];
 $GLOBALS['TL_LANG']['tl_dc_regulator_control']['stop']                  = ['Enddatum', 'Geben Sie ein Enddatum an.'];
+
+$GLOBALS['TL_LANG']['tl_dc_regulator_control']['label_format'] = 'Revision am: %s - Vorher MD %s bar EAW %s AAW %s - Nachher MD %s bar EAW %s AAW %s';

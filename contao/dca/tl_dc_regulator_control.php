@@ -50,7 +50,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
         'label'             => [
             'fields'            => ['title','midPressurePre', 'inhalePressurePre', 'exhalePressurePre', 'midPressurePost', 'inhalePressurePost', 'exhalePressurePost'],
             'headerFields'      => ['title','regModel1st','regModel2ndPri','regModel2ndSec' ],
-            'format'            => '%s - Vorher MD %s bar EAW %s AAW %s - Nachher MD %s bar EAW %s AAW %s',
+            'format'            => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['label_format'], // Dynamische Formatierung
         ],
         'global_operations' => [
             'all'               => [
