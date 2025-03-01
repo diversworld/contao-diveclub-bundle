@@ -3,4 +3,5 @@
 '2' => 'Medium',
 '3' => 'Large',
 '4' => 'Extra Large',
+'5' => 'Hugo',
 ]

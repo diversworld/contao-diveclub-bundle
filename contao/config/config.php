@@ -45,6 +45,9 @@ $GLOBALS['BE_MOD']['diveclub'] = [
         ],
         'dc_check_collection' => [
             'tables' => ['tl_dc_check_proposal','tl_dc_check_articles'],
+        ],
+        'dc_config_collection' => [
+            'tables' => ['tl_dc_config'],
         ]
 ];
 

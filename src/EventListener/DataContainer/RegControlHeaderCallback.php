@@ -48,8 +48,8 @@ class RegControlHeaderCallback
         }
 
         // 3. Templates laden
-        $manufacturers = $this->getTemplateOptions('equipment_manufacturers'); // Hersteller
-        $models = $this->getTemplateOptions('regulator_data'); // Regulator-Daten
+        $manufacturers = $this->getTemplateOptions('dc_equipment_manufacturers'); // Hersteller
+        $models = $this->getTemplateOptions('dc_regulator_data'); // Regulator-Daten
 
         // 4. Hersteller auflösen
         $manufacturerId = (int)$record['manufacturer']; // Speichern der numerischen ID
@@ -79,7 +79,7 @@ class RegControlHeaderCallback
     }
 
     /**
-     * Lädt die Dropdown-Werte (Optionen) aus einem Template wie `regulator_data.html5`.
+     * Lädt die Dropdown-Werte (Optionen) aus einem Template wie `dc_regulator_data.html5`.
      */
     private function getTemplateOptions(string $templateName): array
     {

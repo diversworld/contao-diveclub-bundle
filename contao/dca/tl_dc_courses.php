@@ -129,6 +129,7 @@ $GLOBALS['TL_DCA']['tl_dc_courses'] = [
         ],
         'addImage'      => [
             'inputType' => 'checkbox',
+            'label'     => &$GLOBALS['TL_LANG']['tl_dc_courses']['addImage'],
             'eval'      => ['submitOnChange'=>true],
             'sql'       => ['type' => 'boolean', 'default' => false],
         ],
@@ -198,6 +199,7 @@ $GLOBALS['TL_DCA']['tl_dc_courses'] = [
         ],
         'remarks'       => [
             'inputType'     => 'textarea',
+            'label'         => &$GLOBALS['TL_LANG']['tl_dc_courses']['remarks'],
             'exclude'       => true,
             'search'        => true,
             'filter'        => true,
@@ -206,6 +208,7 @@ $GLOBALS['TL_DCA']['tl_dc_courses'] = [
             'sql'           => 'text NULL'
         ],
         'published'     => [
+            'label'         => &$GLOBALS['TL_LANG']['tl_dc_courses']['published'],
             'toggle'        => true,
             'filter'        => true,
             'flag'          => DataContainer::SORT_INITIAL_LETTER_DESC,

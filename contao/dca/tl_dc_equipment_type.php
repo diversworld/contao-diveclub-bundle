@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 
 use Contao\Backend;
+use Contao\BackendTemplate;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
@@ -194,19 +195,9 @@ class tl_dc_equipment_type extends Backend
         return $varValue;
     }
 
-    public function getManufacturers():array
-    {
-        return $this->getTemplateOptions('equipment_manufacturers');
-    }
-
-    public function getSizes():array
-    {
-        return $this->getTemplateOptions('equipment_sizes');
-    }
-
     public function getTypes():array
     {
-        return $this->getTemplateOptions('equipment_types');
+        return $this->getTemplateOptions('dc_equipment_types');
     }
 
     public function getSubTypes(DataContainer $dc): array
@@ -219,7 +210,7 @@ class tl_dc_equipment_type extends Backend
         // Ermittle den aktuellen Typ aus dem aktiven Datensatz
         $currentType = $dc->activeRecord->title;
 
-        $subTypes = $this->getTemplateOptions('equipment_subTypes');
+        $subTypes = $this->getTemplateOptions('dc_equipment_subTypes');
 
         // Prüfen, ob für den aktuellen Typ Subtypen definiert wurden
         if (!isset($subTypes[$currentType]) || !is_array($subTypes[$currentType])) {
@@ -231,31 +222,50 @@ class tl_dc_equipment_type extends Backend
         return $subTypes[$currentType];
     }
 
-    private function getTemplateOptions($templateName):array
+    private function getTemplateOptions($templateName)
     {
-        // Templatepfad über Contao ermitteln
-        $templatePath = TemplateLoader::getPath($templateName, 'html5');
+        $this->logger = System::getContainer()->get('monolog.logger.contao.general');
+        // Zuerst nach dem Template im Root-Template-Verzeichnis suchen
+        $rootTemplatePath = System::getContainer()->getParameter('kernel.project_dir') . '/templates/diveclub/' . $templateName . '.html5';
+        $this->logger->debug('Root template path: ' . $rootTemplatePath);
 
-        // Überprüfen, ob die Datei existiert
-        if (!$templatePath || !file_exists($templatePath)) {
-            $this->logger->error('Template file not found: ' . $templatePath);
-            return [];
+        if (is_readable($rootTemplatePath)) {
+            $this->logger->debug('Template is readable.');
+            return $this->parseTemplateFile($rootTemplatePath);
+        } else {
+            $this->logger->error('Template not found or not readable: ' . $rootTemplatePath);
         }
 
-        // Dateiinhalt lesen
-        $content = file_get_contents($templatePath);
+        // Falls nicht im Root-Template-Verzeichnis, Prüfung im Modul-Verzeichnis
+        $moduleTemplatePath = TemplateLoader::getPath($templateName, 'html5');
 
-        $options = [];
-        // Entferne PHP-Tags und wandle Daten in ein Array um
+        if ($moduleTemplatePath && file_exists($moduleTemplatePath)) {
+            $this->logger->debug('Template found in module directory: ' . $moduleTemplatePath);
+
+            return $this->parseTemplateFile($moduleTemplatePath);
+        }
+
+        // Wenn keine Datei gefunden wurde, Fehlermeldung ausgeben
+        $this->logger->error('Template not found: ' . $templateName);
+        throw new Exception(sprintf('Template not found: %s', $templateName));
+    }
+
+    private function parseTemplateFile(string $filePath): array
+    {
+        // Dateiinhalt lesen
+        $content = file_get_contents($filePath);
+
+        // Entferne PHP-Tags und wandle Inhalt in ein Array um
         $content = trim($content);
         $content = trim($content, '<?=');
         $content = trim($content, '?>');
 
+        // Eval-Schutz gegen fehlerhafte Inhalte
+        $options = [];
         eval('$options = ' . $content . ';');
 
         if (!is_array($options)) {
-            $this->logger->error('Failed to parse template content into an array: ' . $content);
-            return [];
+            throw new Exception(sprintf('Invalid template content in file: %s', $filePath));
         }
 
         return $options;
@@ -264,7 +274,7 @@ class tl_dc_equipment_type extends Backend
     public function subTypeLabel(array $row, string $label, DataContainer $dc = null): string
     {
         // Lade die Subtypen aus der Template-Datei
-        $subTypes = $this->getTemplateOptions('equipment_subTypes');
+        $subTypes = $this->getTemplateOptions('dc_equipment_subTypes');
 
         // Ermittle den aktuellen Subtypen-Text basierend auf dem gespeicherten Typ und Subtyp
         $currentType = $row['title']; // Titel/Typ aus der Datenbankzeile

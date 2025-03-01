@@ -23,6 +23,7 @@ class EquipmentHeaderCallback
 
     public function __invoke(array $labels, DataContainer $dc): array
     {
+        $this->logger->info('Equipment Header Labels: ' . print_r($labels, true));
         // 1. Parent-ID laden
         $parentId = Input::get('id');
 
@@ -32,8 +33,8 @@ class EquipmentHeaderCallback
         }
 
         // 2. Subtypen aus Template laden
-        $equipmentType = $this->getTemplateOptions('equipment_types');
-        $subTypes = $this->getTemplateOptions('equipment_subTypes');
+        $equipmentType = $this->getTemplateOptions('dc_equipment_types');
+        $subTypes = $this->getTemplateOptions('dc_equipment_subTypes');
 
         // 3. Parent-Typ aus Tabelle laden
         $record = $this->db->fetchAssociative(
@@ -59,30 +60,23 @@ class EquipmentHeaderCallback
         $this->logger->info('Titel: '. $record['title']);
         $this->logger->info('Subtyp: '. $record['subType']);
 
-
         // 6. Sprachdatei laden und Mapping vorbereiten
         System::loadLanguageFile('tl_dc_regulators');
 
-        // 4. Lokalisierte Werte aus `$GLOBALS['TL_LANG']`
-        $title = $GLOBALS['TL_LANG']['tl_dc_equipment_type']['title'][$equipmentId] ?? 'Unbekannter Typ';
-        $subType = $GLOBALS['TL_LANG']['tl_dc_equipment_type']['subType'][$equipmentId][$modelId] ?? 'Unbekanntes Modell';
-
-/*        $mapping = [
-            is_string($GLOBALS['TL_LANG']['tl_dc_equipment']['title'] ?? null)
-                ? $GLOBALS['TL_LANG']['tl_dc_equipment']['title'] : 'Typ' => 'title',
-            is_string($GLOBALS['TL_LANG']['tl_dc_equipment']['subType'] ?? null)
-                ? $GLOBALS['TL_LANG']['tl_dc_equipment']['subType'] : 'Art' => 'subType',
+        $mapping = [
+            'Typ' => 'title',
+            'Art' => 'subType',
         ];
 
         foreach ($mapping as $labelKey => $recordField) {
-            $labels[$labelKey] = $record[$recordField] ?? 'Nicht verfügbar';
-        }*/
+            $labels[$GLOBALS['TL_LANG']['tl_dc_equipment'][$recordField][0] ?? $labelKey] = $record[$recordField] ?? 'Nicht verfügbar';
+        }
 
-        return array_values($labels); // Rückgabe als Array
+        return $labels; // Rückgabe als Array
     }
 
     /**
-    * Lädt die Dropdown-Werte (Optionen) aus einem Template wie `regulator_data.html5`.
+    * Lädt die Dropdown-Werte (Optionen) aus einem Template wie `dc_regulator_data.html5`.
     */
     private function getTemplateOptions(string $templateName): array
     {
@@ -111,15 +105,13 @@ class EquipmentHeaderCallback
         return $options;
     }
 
-    private function resolveModel(array $models, int $equipmentId, string $modelType, int $modelId): string
+    private function resolveModel(array $models, int $manufacturerId, string $modelType, int $modelId): string
     {
         // Prüfen, ob Hersteller und Modelltyp existieren
-        if (isset($models[$equipmentId][$modelId])) {
-            return $models[$equipmentId][$modelId];
+        if (isset($models[$manufacturerId][$modelType][$modelId])) {
+            return $models[$manufacturerId][$modelType][$modelId];
         }
 
-
         return 'Unbekanntes Modell'; // Fallback, falls nicht gefunden
-
     }
 }

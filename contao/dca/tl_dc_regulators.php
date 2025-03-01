@@ -302,6 +302,7 @@ class tl_dc_regulators extends Backend
 
         return $options;
     }
+
     public function getRegModels1st(DataContainer $dc): array
     {
         // Sicherstellen, dass ein aktiver Datensatz vorhanden ist
