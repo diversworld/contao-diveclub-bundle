@@ -312,7 +312,7 @@ class tl_dc_regulators extends Backend
 
         // Ermittle den aktuellen Typ aus dem aktiven Datensatz
         $manufacturer = $dc->activeRecord->manufacturer; // Aktueller Hersteller
-        $models = $this->getTemplateOptions('regulator_data');
+        $models = $this->getTemplateOptions('dc_regulator_data');
 
         // Prüfen, ob der Hersteller existiert und Modelle für die erste Stufe definiert sind
         if (!isset($models[$manufacturer]['regModel1st']) || !is_array($models[$manufacturer]['regModel1st'])) {
