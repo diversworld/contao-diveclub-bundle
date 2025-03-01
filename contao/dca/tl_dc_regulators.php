@@ -265,12 +265,12 @@ class tl_dc_regulators extends Backend
 
     public function getManufacturers()
     {
-        return $this->getTemplateOptions('equipment_manufacturers');
+        return $this->getTemplateOptions('dc_equipment_manufacturers');
     }
 
     public function getSizes()
     {
-        return $this->getTemplateOptions('equipment_sizes');
+        return $this->getTemplateOptions('dc_equipment_sizes');
     }
 
     private function getTemplateOptions($templateName)
