@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Diversworld\ContaoDiveclubBundle\EventListener\DataContainer;
 
-use Contao\CoreBundle\ServiceAnnotation\Callback;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\DataContainer;
 use Diversworld\ContaoDiveclubBundle\Service\TemplateService;
 
 
-#[AsCallback(table: 'tl_dc_equipment_type', target: 'list.label.label')]
+#[AsCallback(table: 'tl_dc_equipment_type', target: 'list.label.label_callback')]
 class DcEquipmentTypeLabelCallback
 {
     private TemplateService $templateService;
