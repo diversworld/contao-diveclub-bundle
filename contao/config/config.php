@@ -66,3 +66,8 @@ $GLOBALS['TL_MODELS']['tl_dc_regulator']            = DcRegulatorModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_control_card']         = DcControlCardModel::class;
 $GLOBALS['TL_MODELS']['tl_regulators']              = DcRegulatorsModel::class;
 $GLOBALS['TL_MODELS']['tl_regulators_control']      = DcRegulatorControlModel::class;
+
+/**
+ * Hooks
+ */
+$GLOBALS['TL_HOOKS']['getTemplate'][] = [Diversworld\ContaoDiveclubBundle\Service\TemplateService::class, 'getTemplateOptions'];

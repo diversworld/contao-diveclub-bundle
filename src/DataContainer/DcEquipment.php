@@ -20,14 +20,25 @@ use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\System;
+use Diversworld\ContaoDiveclubBundle\Service\TemplateService;
 
 class DcEquipment
 {
-    private ContaoFramework $framework;
+    private TemplateService $templateService;
 
-    public function __construct(ContaoFramework $framework)
+    public function __construct(TemplateService $templateService)
     {
-        $this->framework = $framework;
+        $this->templateService = $templateService;
+    }
+
+    public function getManufacturers(DataContainer $dc): array
+    {
+        return $this->templateService->getManufacturers();
+    }
+
+    public function getSizes(DataContainer $dc): array
+    {
+        return $this->templateService->getSizes();
     }
 
 }

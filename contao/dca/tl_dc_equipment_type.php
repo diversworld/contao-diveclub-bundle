@@ -13,17 +13,15 @@ declare(strict_types=1);
  */
 
 use Contao\Backend;
-use Contao\BackendTemplate;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
-use Contao\FrontendTemplate;
 use Contao\System;
-use Contao\Input;
-use Contao\CoreBundle\Monolog\ContaoContext;
-use Diversworld\ContaoDiveclubBundle\DataContainer\DcTanks;
+use Diversworld\ContaoDiveclubBundle\DataContainer\DcEquipmentType;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\DcEquipmentTypeLabelCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\DcEquipmentTypeSubTypeOptionsCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\DcEquipmentTypeTitleOptionsCallback;
 use Psr\Log\LoggerInterface;
-use Contao\TemplateLoader;
 
 /**
  * Table tl_dc_tanks
@@ -52,7 +50,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_type'] = [
         'label'         => [
             'label' => &$GLOBALS['TL_LANG']['MSC']['all'],
             'fields'        => ['title','subType'],
-            'label_callback' => ['tl_dc_equipment_type', 'subTypeLabel'], // Callback zum Anpassen
+            'label_callback' => [DcEquipmentTypeLabelCallback::class, 'getLabelCallback'],
         ],
         'global_operations' => [
             'all'       => [
@@ -93,7 +91,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_type'] = [
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
-            'options_callback'  => ['tl_dc_equipment_type', 'getTypes'],
+            'options_callback'  => [DcEquipmentTypeTitleOptionsCallback::class, 'getEquipmentTypes'],
             'eval'              => ['submitOnChange' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w33'],
             'sql'               => "varchar(255) NOT NULL default ''"
         ],
@@ -113,8 +111,8 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_type'] = [
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
-            'options_callback'  => ['tl_dc_equipment_type', 'getSubTypes'],
-            'eval'              => ['mandatory' => false, 'tl_class' => 'w33'],
+            'options_callback'  => [DcEquipmentTypeSubTypeOptionsCallback::class, 'getSubTypes'],
+            'eval'              => ['mandatory' => false, 'submitOnChange' => true, 'tl_class' => 'w33'],
             'sql'               => "varchar(255) NOT NULL default ''",
         ],
         'addNotes'      => [
@@ -193,103 +191,6 @@ class tl_dc_equipment_type extends Backend
         }
 
         return $varValue;
-    }
-
-    public function getTypes():array
-    {
-        return $this->getTemplateOptions('dc_equipment_types');
-    }
-
-    public function getSubTypes(DataContainer $dc): array
-    {
-        // Sicherstellen, dass ein aktiver Datensatz vorhanden ist
-        if (!$dc->activeRecord) {
-            return [];
-        }
-
-        // Ermittle den aktuellen Typ aus dem aktiven Datensatz
-        $currentType = $dc->activeRecord->title;
-
-        $subTypes = $this->getTemplateOptions('dc_equipment_subTypes');
-
-        // Prüfen, ob für den aktuellen Typ Subtypen definiert wurden
-        if (!isset($subTypes[$currentType]) || !is_array($subTypes[$currentType])) {
-            // Keine passenden Subtypen gefunden -> leere Liste zurückgeben
-            return [];
-        }
-
-        // Nur die relevanten Subtypen für diesen Typ zurückgeben
-        return $subTypes[$currentType];
-    }
-
-    private function getTemplateOptions($templateName)
-    {
-        $this->logger = System::getContainer()->get('monolog.logger.contao.general');
-        // Zuerst nach dem Template im Root-Template-Verzeichnis suchen
-        $rootTemplatePath = System::getContainer()->getParameter('kernel.project_dir') . '/templates/diveclub/' . $templateName . '.html5';
-        $this->logger->debug('Root template path: ' . $rootTemplatePath);
-
-        if (is_readable($rootTemplatePath)) {
-            $this->logger->debug('Template is readable.');
-            return $this->parseTemplateFile($rootTemplatePath);
-        } else {
-            $this->logger->error('Template not found or not readable: ' . $rootTemplatePath);
-        }
-
-        // Falls nicht im Root-Template-Verzeichnis, Prüfung im Modul-Verzeichnis
-        $moduleTemplatePath = TemplateLoader::getPath($templateName, 'html5');
-
-        if ($moduleTemplatePath && file_exists($moduleTemplatePath)) {
-            $this->logger->debug('Template found in module directory: ' . $moduleTemplatePath);
-
-            return $this->parseTemplateFile($moduleTemplatePath);
-        }
-
-        // Wenn keine Datei gefunden wurde, Fehlermeldung ausgeben
-        $this->logger->error('Template not found: ' . $templateName);
-        throw new Exception(sprintf('Template not found: %s', $templateName));
-    }
-
-    private function parseTemplateFile(string $filePath): array
-    {
-        // Dateiinhalt lesen
-        $content = file_get_contents($filePath);
-
-        // Entferne PHP-Tags und wandle Inhalt in ein Array um
-        $content = trim($content);
-        $content = trim($content, '<?=');
-        $content = trim($content, '?>');
-
-        // Eval-Schutz gegen fehlerhafte Inhalte
-        $options = [];
-        eval('$options = ' . $content . ';');
-
-        if (!is_array($options)) {
-            throw new Exception(sprintf('Invalid template content in file: %s', $filePath));
-        }
-
-        return $options;
-    }
-
-    public function subTypeLabel(array $row, string $label, DataContainer $dc = null): string
-    {
-        // Lade die Subtypen aus der Template-Datei
-        $subTypes = $this->getTemplateOptions('dc_equipment_subTypes');
-
-        // Ermittle den aktuellen Subtypen-Text basierend auf dem gespeicherten Typ und Subtyp
-        $currentType = $row['title']; // Titel/Typ aus der Datenbankzeile
-        $subTypeId = $row['subType']; // Subtype-ID aus der Datenbankzeile
-
-        // Standardwert, falls keine Zuordnung gefunden wird
-        $subTypeName = $subTypeId;
-
-        // Überprüfen, ob der Titel/Subtype im Array existiert
-        if (isset($subTypes[$currentType]) && isset($subTypes[$currentType][$subTypeId])) {
-            $subTypeName = $subTypes[$currentType][$subTypeId];
-        }
-
-        // Label als Kombination aus Titel und Subtype-Name zurückgeben
-        return sprintf('%s', $subTypeName);
     }
 
 }

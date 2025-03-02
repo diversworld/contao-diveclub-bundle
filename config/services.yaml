@@ -7,11 +7,33 @@ services:
                                 # fetching services directly from the container via $container->get() won't work.
                                 # The best practice is to be explicit about your dependencies anyway.
         bind:
-            #$projectDir: '%kernel.project_dir%'
+            $projectDir: '%kernel.project_dir%'
 
     Diversworld\ContaoDiveclubBundle\:
         resource: ../src/
         exclude: ../src/{DependencyInjection,Model,Session}
+
+    diversworld.template.service:
+        class: Diversworld\ContaoDiveclubBundle\Service\TemplateService
+        public: true
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+            $logger: '@monolog.logger.contao.general'
+
+    diversworld.equipment.type:
+        class: Diversworld\ContaoDiveclubBundle\DataContainer\DcEquipmentType
+        public: true
+        arguments:
+            $framework: '@contao.framework'
+            $templateService: '@diversworld.template.service'
+
+
+    diversworld.equipment:
+        class: Diversworld\ContaoDiveclubBundle\DataContainer\DcEquipment
+        public: true
+        arguments:
+            $framework: '@contao.framework'
+            $templateService: '@diversworld.template.service'
 
     # Add a session bag
     diversworld.contao_diveclub_bundle.session.factory:

@@ -330,7 +330,7 @@ class tl_dc_regulators extends Backend
         }
 
         $manufacturer = $dc->activeRecord->manufacturer; // Aktueller Hersteller
-        $models = $this->getTemplateOptions('regulator_data');
+        $models = $this->getTemplateOptions('dc_regulator_data');
 
         // Prüfen, ob der Hersteller existiert und Modelle für die zweite Stufe definiert sind
         if (!isset($models[$manufacturer]['regModel2nd']) || !is_array($models[$manufacturer]['regModel2nd'])) {
@@ -350,7 +350,7 @@ class tl_dc_regulators extends Backend
         $args[1] = $manufacturers[$row['manufacturer']] ?? '-'; // Hersteller-Name einsetzen
 
         // Modelle für die erste und zweite Stufe basierend auf dem Hersteller laden
-        $models = $this->getTemplateOptions('regulator_data');
+        $models = $this->getTemplateOptions('dc_regulator_data');
 
         // Namen der Modelle statt der Indexwerte benutzen
         if (isset($models[$manufacturer]['regModel1st'][$row['regModel1st']])) {
