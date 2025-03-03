@@ -22,6 +22,7 @@ use Diversworld\ContaoDiveclubBundle\Model\DcCheckArticlesModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCalendarEventsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcControlCardModel;
+use Diversworld\ContaoDiveclubBundle\Service\TemplateService;
 
 /**
  * Backend modules
@@ -35,7 +36,7 @@ $GLOBALS['BE_MOD']['diveclub'] = [
             'tables' => ['tl_dc_equipment_type', 'tl_dc_equipment'],
         ],
         'dc_regulators_collection' => [
-        'tables' => ['tl_dc_regulators','tl_dc_regulator_control'],
+            'tables' => ['tl_dc_regulators','tl_dc_regulator_control'],
         ],
         'dc_tanks_collection' => [
             'tables' => ['tl_dc_tanks','tl_dc_check_invoice'],
@@ -54,20 +55,20 @@ $GLOBALS['BE_MOD']['diveclub'] = [
 /**
  * Models
  */
-$GLOBALS['TL_MODELS']['tl_dc_courses']              = DcCoursesModel::class;
-$GLOBALS['TL_MODELS']['tl_dc_tanks']                = DcTanksModel::class;
-$GLOBALS['TL_MODELS']['tl_dc_check_invoice']        = DcCheckInvoiceModel::class;
-$GLOBALS['TL_MODELS']['tl_dc_check_proposal']       = DcCheckProposalModel::class;
-$GLOBALS['TL_MODELS']['tl_dc_check_articles']       = DcCheckArticlesModel::class;
-$GLOBALS['TL_MODELS']['tl_dc_eqipment_type']        = DcEquipmentTypeModel::class;
-$GLOBALS['TL_MODELS']['tl_dc_equipment']            = DcEquipmentModel::class;
-$GLOBALS['TL_MODELS']['tl_calendar_events']         = DcCalendarEventsModel::class;
-$GLOBALS['TL_MODELS']['tl_dc_regulator']            = DcRegulatorModel::class;
-$GLOBALS['TL_MODELS']['tl_dc_control_card']         = DcControlCardModel::class;
-$GLOBALS['TL_MODELS']['tl_regulators']              = DcRegulatorsModel::class;
-$GLOBALS['TL_MODELS']['tl_regulators_control']      = DcRegulatorControlModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_courses']          = DcCoursesModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_tanks']            = DcTanksModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_check_invoice']    = DcCheckInvoiceModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_check_proposal']   = DcCheckProposalModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_check_articles']   = DcCheckArticlesModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_eqipment_type']    = DcEquipmentTypeModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_equipment']        = DcEquipmentModel::class;
+$GLOBALS['TL_MODELS']['tl_calendar_events']     = DcCalendarEventsModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_regulator']        = DcRegulatorModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_control_card']     = DcControlCardModel::class;
+$GLOBALS['TL_MODELS']['tl_regulators']          = DcRegulatorsModel::class;
+$GLOBALS['TL_MODELS']['tl_regulators_control']  = DcRegulatorControlModel::class;
 
 /**
  * Hooks
  */
-$GLOBALS['TL_HOOKS']['getTemplate'][] = [Diversworld\ContaoDiveclubBundle\Service\TemplateService::class, 'getTemplateOptions'];
+$GLOBALS['TL_HOOKS']['getTemplate'][]           = [TemplateService::class, 'getTemplateOptions'];

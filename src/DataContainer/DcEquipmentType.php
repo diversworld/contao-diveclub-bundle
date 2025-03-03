@@ -24,9 +24,10 @@ use Diversworld\ContaoDiveclubBundle\Service\TemplateService;
 
 class DcEquipmentType
 {
+    private ContaoFramework $framework;
     private TemplateService $templateService;
 
-    public function __construct(TemplateService $templateService)
+    public function __construct(ContaoFramework $framework, TemplateService $templateService)
     {
         $this->templateService = $templateService;
     }
