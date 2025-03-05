@@ -30,6 +30,7 @@ class DcEquipment
     public function __construct(ContaoFramework $framework, TemplateService $templateService)
     {
         $this->templateService = $templateService;
+        $this->framework = $framework;
     }
 
     public function getManufacturers(DataContainer $dc): array
