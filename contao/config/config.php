@@ -33,7 +33,7 @@ use Diversworld\ContaoDiveclubBundle\Service\TemplateService;
 
 $GLOBALS['BE_MOD']['diveclub'] = [
         'dc_equipment_collection' => [
-            'tables' => ['tl_dc_equipment_type', 'tl_dc_equipment'],
+            'tables' => ['tl_dc_equipment_types', 'tl_dc_equipment_subtypes'],
         ],
         'dc_regulators_collection' => [
             'tables' => ['tl_dc_regulators','tl_dc_regulator_control'],

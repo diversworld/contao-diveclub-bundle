@@ -10,7 +10,7 @@ use Diversworld\ContaoDiveclubBundle\Service\TemplateService;
 
 
 #[AsCallback(table: 'tl_dc_equipment_type', target: 'list.label.label_callback')]
-class DcEquipmentTypeLabelCallback
+class EquipmentTypeLabelCallback
 {
     private TemplateService $templateService;
 

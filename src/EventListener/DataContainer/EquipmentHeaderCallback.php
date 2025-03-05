@@ -33,8 +33,8 @@ class EquipmentHeaderCallback
         }
 
         // 2. Subtypen aus Template laden
-        $equipmentType = $this->getTemplateOptions('dc_equipment_types');
-        $subTypes = $this->getTemplateOptions('dc_equipment_subTypes');
+        $equipmentType  = $this->getTemplateOptions('dc_equipment_types');
+        $subTypes       = $this->getTemplateOptions('dc_equipment_subTypes');
 
         // 3. Parent-Typ aus Tabelle laden
         $record = $this->db->fetchAssociative(
@@ -80,7 +80,8 @@ class EquipmentHeaderCallback
     */
     private function getTemplateOptions(string $templateName): array
     {
-        $templatePath = TemplateLoader::getPath($templateName, 'html5');
+        // Zuerst nach dem Template im Root-Template-Verzeichnis suchen
+        $templatePath = System::getContainer()->getParameter('kernel.project_dir') . '/templates/diveclub/' . $templateName . '.html5';
 
         if (!$templatePath || !file_exists($templatePath)) {
             $this->logger->error('Template file not found: ' . $templatePath);
@@ -93,7 +94,7 @@ class EquipmentHeaderCallback
         $options = [];
         $content = trim($content);
         $content = trim($content, '<?p=');
-                $content = trim($content, '?>');
+        $content = trim($content, '?>');
 
         eval('$options = ' . $content . ';');
 

@@ -16,13 +16,9 @@ declare(strict_types=1);
 namespace Diversworld\ContaoDiveclubBundle\DataContainer;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\Monolog\ContaoContext;
-use Contao\Database;
-use Contao\DataContainer;
-use Contao\System;
 use Diversworld\ContaoDiveclubBundle\Service\TemplateService;
 
-class DcEquipment
+class DcEquipmentSubTypes
 {
     private ContaoFramework $framework;
     private TemplateService $templateService;
@@ -32,15 +28,4 @@ class DcEquipment
         $this->templateService = $templateService;
         $this->framework = $framework;
     }
-
-    public function getManufacturers(DataContainer $dc): array
-    {
-        return $this->templateService->getManufacturers();
-    }
-
-    public function getSizes(DataContainer $dc): array
-    {
-        return $this->templateService->getSizes();
-    }
-
 }

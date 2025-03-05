@@ -1,5 +1,6 @@
 <?php
 
+use Contao\Controller;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\Backend;
@@ -131,7 +132,9 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
             'default'               => 'dc_equipment_manufacturers',
             'exclude'               => true,
             'inputType'             => 'select',
-            'options_callback'      => array('tl_dc_config', 'getDcTemplates'),
+            'options_callback' => static function () {
+                return Controller::getTemplateGroup('dc_');
+            },
             'eval'                  => array ('tl_class'=>'clr w33'),
             'sql'					=> "varchar(32) NOT NULL default ''"
         ],
@@ -140,7 +143,9 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
             'default'               => 'dc_equipment_sizes',
             'exclude'               => true,
             'inputType'             => 'select',
-            'options_callback'      => array('tl_dc_config', 'getDcTemplates'),
+            'options_callback' => static function () {
+                return Controller::getTemplateGroup('dc_');
+            },
             'eval'                  => array ('tl_class'=>'clr w33'),
             'sql'					=> "varchar(32) NOT NULL default ''"
         ],
@@ -149,7 +154,9 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
             'default'               => 'dc_equipment_types',
             'exclude'               => true,
             'inputType'             => 'select',
-            'options_callback'      => array('tl_dc_config', 'getDcTemplates'),
+            'options_callback' => static function () {
+                return Controller::getTemplateGroup('dc_');
+            },
             'eval'                  => array ('tl_class'=>'clr w33'),
             'sql'					=> "varchar(32) NOT NULL default ''"
         ],
@@ -158,7 +165,9 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
             'default'               => 'dc_equipment_subTypes',
             'exclude'               => true,
             'inputType'             => 'select',
-            'options_callback'      => array('tl_dc_config', 'getDcTemplates'),
+            'options_callback' => static function () {
+                return Controller::getTemplateGroup('dc_');
+            },
             'eval'                  => array ('tl_class'=>'clr w33'),
             'sql'					=> "varchar(32) NOT NULL default ''"
         ],
@@ -167,7 +176,9 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
             'default'               => 'dc_regulator_data',
             'exclude'               => true,
             'inputType'             => 'select',
-            'options_callback'      => ['tl_dc_config', 'getDcTemplates'],
+            'options_callback' => static function () {
+                return Controller::getTemplateGroup('dc_');
+            },
             'eval'                  => ['tl_class'=>'clr w33'],
             'sql'					=> "varchar(32) NOT NULL default ''"
         ]

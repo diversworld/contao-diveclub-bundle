@@ -10,7 +10,7 @@ use Diversworld\ContaoDiveclubBundle\Service\TemplateService;
 
 
 #[AsCallback(table: 'tl_dc_equipment', target: 'fields.manufacturer.options')]
-class DcEquipmentManufacturerOptionsCallback
+class EquipmentManufacturerOptionsCallback
 {
     private TemplateService $templateService;
 

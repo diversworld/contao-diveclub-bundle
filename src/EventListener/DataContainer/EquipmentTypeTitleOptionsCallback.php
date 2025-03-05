@@ -8,7 +8,7 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Diversworld\ContaoDiveclubBundle\Service\TemplateService;
 
 #[AsCallback(table: 'tl_dc_equipment_type', target: 'fields.title.options')]
-class DcEquipmentTypeTitleOptionsCallback
+class EquipmentTypeTitleOptionsCallback
 {
     private TemplateService $templateService;
 

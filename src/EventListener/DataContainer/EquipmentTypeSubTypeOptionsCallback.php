@@ -9,7 +9,7 @@ use Contao\DataContainer;
 use Diversworld\ContaoDiveclubBundle\Service\TemplateService;
 
 #[AsCallback(table: 'tl_dc_equipment_type', target: 'fields.subType.options')]
-class DcEquipmentTypeSubTypeOptionsCallback
+class EquipmentTypeSubTypeOptionsCallback
 {
     private TemplateService $templateService;
 

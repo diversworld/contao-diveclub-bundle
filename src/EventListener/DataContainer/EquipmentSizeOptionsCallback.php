@@ -10,7 +10,7 @@ use Diversworld\ContaoDiveclubBundle\Service\TemplateService;
 
 
 #[AsCallback(table: 'tl_dc_equipment', target: 'fields.size.options')]
-class DcEquipmentSizeOptionsCallback
+class EquipmentSizeOptionsCallback
 {
     private TemplateService $templateService;
 
