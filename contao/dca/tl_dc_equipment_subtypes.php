@@ -255,6 +255,11 @@ class tl_dc_equipment_subtypes extends Backend
         return $varValue;
     }
 
+    function getManufacturers()
+    {
+        return $this->getTemplateOptions('dc_equipment_manufacturers');
+    }
+
     public function getSizes()
     {
         return $this->getTemplateOptions('dc_equipment_sizes');
@@ -262,7 +267,6 @@ class tl_dc_equipment_subtypes extends Backend
 
     private function getTemplateOptions($templateName)
     {
-        $this->logger = System::getContainer()->get('monolog.logger.contao.general');
         // Zuerst nach dem Template im Root-Template-Verzeichnis suchen
         $rootTemplatePath = System::getContainer()->getParameter('kernel.project_dir') . '/templates/diveclub/' . $templateName . '.html5';
         $this->logger->debug('Root template path: ' . $rootTemplatePath);

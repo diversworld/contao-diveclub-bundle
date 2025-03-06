@@ -3,13 +3,17 @@
 declare(strict_types=1);
 
 use Contao\Backend;
+use Contao\Database;
 use Contao\DataContainer;
+use Contao\DC_Table;
+use Contao\System;
 use Contao\TemplateLoader;
 
 $GLOBALS['TL_DCA']['tl_dc_equipment_types'] = [
     // Konfiguration
     'config'            => [
-        'dataContainer'     => 'Table',
+        'dataContainer'     => DC_Table::class,
+        'ctable'            => ['tl_dc_equipment_subtypes'],
         'enableVersioning'  => true,
         'sql'               => [
             'keys' => [
@@ -20,9 +24,9 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_types'] = [
     // Listenansicht
     'list'              => [
         'sorting'           => [
-            'mode'          => 1,
+            'mode'          => DataContainer::MODE_SORTED,
             'fields'        => ['title'],
-            'flag'          => 1,
+            'flag'          => DataContainer::SORT_INITIAL_LETTER_ASC,
             'panelLayout'   => 'filter;search,limit',
         ],
         'label'             => [
@@ -41,6 +45,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_types'] = [
                 'href'  => 'act=edit',
                 'icon'  => 'edit.svg',
             ],
+            'children',
             'copy' => [
                 'href'  => 'act=copy',
                 'icon'  => 'copy.svg',
@@ -69,6 +74,16 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_types'] = [
         'id' => [
             'sql' => "int(10) unsigned NOT NULL auto_increment",
         ],
+        'tstamp'            => [
+            'sql'           => "int(10) unsigned NOT NULL default 0"
+        ],
+        'alias'             => [
+            'search'        => true,
+            'inputType'     => 'text',
+            'eval'          => ['rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w33'],
+            'save_callback' => [['tl_dc_regulators', 'generateAlias']],
+            'sql'           => "varchar(255) BINARY NOT NULL default ''"
+        ],
         'title' => [
             'inputType'         => 'select',
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_types']['title'],
@@ -95,7 +110,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_types'] = [
         ],
         'addNotes'          => [
             'inputType'         => 'checkbox',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulators']['addNotes'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_types']['addNotes'],
             'exclude'           => true,
             'eval'              => ['submitOnChange' => true, 'tl_class' => 'w50'],
             'sql'               => ['type' => 'boolean', 'default' => false]
@@ -132,6 +147,44 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_types'] = [
 
 class tl_dc_equipment_types extends Backend
 {
+    /**
+     * Auto-generate the event alias if it has not been set yet
+     *
+     * @param mixed $varValue
+     * @param DataContainer $dc
+     *
+     * @return mixed
+     *
+     * @throws Exception
+     */
+    public function generateAlias(mixed $varValue, DataContainer $dc): mixed
+    {
+        $aliasExists = static function (string $alias) use ($dc): bool {
+            $result = Database::getInstance()
+                ->prepare("SELECT id FROM tl_dc_equipment_types WHERE alias=? AND id!=?")
+                ->execute($alias, $dc->id);
+
+            return $result->numRows > 0;
+        };
+
+        // Generate the alias if there is none
+        if (!$varValue) {
+            $varValue = System::getContainer()->get('contao.slug')->generate(
+                $dc->activeRecord->title,
+                [],
+                $aliasExists
+            );
+        }
+        elseif (preg_match('/^[1-9]\d*$/', $varValue)) {
+            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
+        }
+        elseif ($aliasExists($varValue)) {
+            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
+        }
+
+        return $varValue;
+    }
+
     /**
      * Liefert die Equipment-Typen (Hauptauswahl, z.B. "Anzüge", "Atemregler")
      */

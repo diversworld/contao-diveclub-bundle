@@ -6,7 +6,6 @@ use Contao\DataContainer;
 use Contao\Input;
 use Contao\System;
 use Doctrine\DBAL\Connection;
-use Contao\TemplateLoader;
 use Psr\Log\LoggerInterface;
 
 #[AsCallback(table: 'tl_dc_equipment', target: 'list.sorting.header')]
@@ -39,7 +38,7 @@ class EquipmentHeaderCallback
         // 3. Parent-Typ aus Tabelle laden
         $record = $this->db->fetchAssociative(
             "SELECT title, subType
-         FROM tl_dc_equipment_type
+         FROM tl_dc_equipment_types
          WHERE id = ?",
             [$parentId]
         );
@@ -54,9 +53,9 @@ class EquipmentHeaderCallback
         $modelId = (int)$record['subType']; // ID des Subtyps
 
         $record['title'] = $equipmentType[$equipmentId];
-        $record['subType'] = $this->resolveModel($subTypes, $modelId, 'subType', (int)$record['subType']);
-        $this->logger->info('equipmentId: ' . $equipmentId);
-        $this->logger->info('equipmentType: ' . print_r($equipmentType, true));
+        //$record['subType'] = $this->resolveModel($subTypes, $modelId, 'subType', (int)$record['subType']);
+        $record['subType'] = $this->resolveSubType($subTypes, $equipmentId, $modelId);
+
         $this->logger->info('Titel: '. $record['title']);
         $this->logger->info('Subtyp: '. $record['subType']);
 
@@ -80,39 +79,31 @@ class EquipmentHeaderCallback
     */
     private function getTemplateOptions(string $templateName): array
     {
-        // Zuerst nach dem Template im Root-Template-Verzeichnis suchen
-        $templatePath = System::getContainer()->getParameter('kernel.project_dir') . '/templates/diveclub/' . $templateName . '.html5';
+        // Templatepfad über Contao ermitteln
+        $templatePath = System::getContainer()->getParameter('kernel.project_dir') . '/templates/diveclub/' . $templateName . '.html5'; //TemplateLoader::getPath($templateName, 'html5');
 
+        // Überprüfen, ob die Datei existiert
         if (!$templatePath || !file_exists($templatePath)) {
-            $this->logger->error('Template file not found: ' . $templatePath);
-            return [];
+            throw new \Exception(sprintf('Template "%s" not found or not readable', $templateName));
         }
 
-        $content = file_get_contents($templatePath);
-        $this->logger->debug('Loaded template content: ' . $content);
-
-        $options = [];
-        $content = trim($content);
-        $content = trim($content, '<?p=');
-        $content = trim($content, '?>');
-
-        eval('$options = ' . $content . ';');
-
+        // Templateinhalt auswerten
+        $options = include $templatePath;
         if (!is_array($options)) {
-            $this->logger->error('Invalid template content format.');
-            return [];
+            throw new \Exception(sprintf('Invalid template content in file: %s', $templatePath));
         }
 
         return $options;
     }
 
-    private function resolveModel(array $models, int $manufacturerId, string $modelType, int $modelId): string
+    private function resolveSubType(array $subTypes, int $equipmentId, int $modelId): string
     {
-        // Prüfen, ob Hersteller und Modelltyp existieren
-        if (isset($models[$manufacturerId][$modelType][$modelId])) {
-            return $models[$manufacturerId][$modelType][$modelId];
-        }
+        $this->logger->info('resolveModel: models ' . print_r($subTypes, true).' equipmentType '.print_r($equipmentId, true).' modelid '.print_r($modelId, true));
 
+        if (isset($subTypes[$equipmentId][$modelId]) )
+        {
+            return $subTypes[$equipmentId][$modelId];
+        }
         return 'Unbekanntes Modell'; // Fallback, falls nicht gefunden
     }
 }

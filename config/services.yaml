@@ -20,21 +20,6 @@ services:
             $projectDir: '%kernel.project_dir%'
             $logger: '@monolog.logger.contao.general'
 
-    #diversworld.equipment.types:
-    #    class: Diversworld\ContaoDiveclubBundle\DataContainer\DcEquipmentTypes
-    #    public: true
-    #    arguments:
-    #        $framework: '@contao.framework'
-    #        $templateService: '@diversworld.template.service'
-
-
-    #diversworld.equipment.subtypes:
-    #    class: Diversworld\ContaoDiveclubBundle\DataContainer\DcEquipmentSubTypes
-    #    public: true
-    #    arguments:
-    #        $framework: '@contao.framework'
-    #        $templateService: '@diversworld.template.service'
-
     # Add a session bag
     diversworld.contao_diveclub_bundle.session.factory:
         class: Diversworld\ContaoDiveclubBundle\Session\SessionFactory
