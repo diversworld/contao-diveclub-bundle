@@ -98,8 +98,6 @@ class EquipmentHeaderCallback
 
     private function resolveSubType(array $subTypes, int $equipmentId, int $modelId): string
     {
-        $this->logger->info('resolveModel: models ' . print_r($subTypes, true).' equipmentType '.print_r($equipmentId, true).' modelid '.print_r($modelId, true));
-
         if (isset($subTypes[$equipmentId][$modelId]) )
         {
             return $subTypes[$equipmentId][$modelId];

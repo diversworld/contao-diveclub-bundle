@@ -269,26 +269,19 @@ class tl_dc_equipment_subtypes extends Backend
     {
         // Zuerst nach dem Template im Root-Template-Verzeichnis suchen
         $rootTemplatePath = System::getContainer()->getParameter('kernel.project_dir') . '/templates/diveclub/' . $templateName . '.html5';
-        $this->logger->debug('Root template path: ' . $rootTemplatePath);
 
         if (is_readable($rootTemplatePath)) {
-            $this->logger->debug('Template is readable.');
             return $this->parseTemplateFile($rootTemplatePath);
-        } else {
-            $this->logger->error('Template not found or not readable: ' . $rootTemplatePath);
         }
 
         // Falls nicht im Root-Template-Verzeichnis, Prüfung im Modul-Verzeichnis
         $moduleTemplatePath = TemplateLoader::getPath($templateName, 'html5');
 
         if ($moduleTemplatePath && file_exists($moduleTemplatePath)) {
-            $this->logger->debug('Template found in module directory: ' . $moduleTemplatePath);
-
             return $this->parseTemplateFile($moduleTemplatePath);
         }
 
         // Wenn keine Datei gefunden wurde, Fehlermeldung ausgeben
-        $this->logger->error('Template not found: ' . $templateName);
         throw new Exception(sprintf('Template not found: %s', $templateName));
     }
 
