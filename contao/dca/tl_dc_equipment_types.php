@@ -98,18 +98,14 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_types'] = [
             'sorting'           => true,
             'options_callback'  => array('tl_dc_equipment_types', 'getTypes'),
             'eval'              => array('includeBlankOption' => true, 'submitOnChange' => true, 'mandatory' => true, 'tl_class' => 'w25 clr'),
-            'sql'               => "varchar(255) NOT NULL default ''",
+            'sql'               => "int(10) unsigned NOT NULL default 0",
         ],
         'subType' => [
             'inputType'         => 'select',
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_types']['subType'],
             'exclude'           => true,
             'options_callback'  => ['tl_dc_equipment_types', 'getSubTypes'],
-            'eval'              => [
-                'includeBlankOption' => true,
-                'mandatory'          => false,
-                'tl_class'           => 'w50',
-            ],
+            'eval'              => ['includeBlankOption' => true,'mandatory' => false,'tl_class' => 'w50',],
             'sql'               => "int(10) unsigned NOT NULL default 0",
         ],
         'addNotes'          => [
@@ -206,7 +202,7 @@ class tl_dc_equipment_types extends Backend
             return [];
         }
         $types = $this->getTemplateOptions('subTypesFile');
-        return $types[$dc->activeRecord->title] ?? [];
+        return $types[$dc->activeRecord->types] ?? [];
     }
 
     /**
