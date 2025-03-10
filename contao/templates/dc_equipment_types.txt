@@ -1,8 +1,7 @@
-<?php
-return [
+[
 '0' => 'Anzüge',
 '1' => 'Atemregler',
 '2' => 'ABC-Equipment',
 '3' => 'Sonstiges',
 '4' => 'Modulordner'
-];
+]

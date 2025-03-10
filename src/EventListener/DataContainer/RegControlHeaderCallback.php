@@ -79,7 +79,7 @@ class RegControlHeaderCallback
     }
 
     /**
-     * Lädt die Dropdown-Werte (Optionen) aus einem Template wie `dc_regulator_data.html5`.
+     * Lädt die Dropdown-Werte (Optionen) aus einem Template wie `dc_regulator_data.txt`.
      */
     private function getTemplateOptions(string $templateName): array
     {

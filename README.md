@@ -24,11 +24,11 @@ This bundle provides several modules that allow dive clubs to manage equipment d
   - Manage offers for TÜV inspections. In the child table, individual items in a TÜV inspection can be added; for example, item name, cylinder size, price in net and gross amounts. The other price (net or gross) is automatically calculated based on the entered value. In a future version, it is planned to enable bookings for club members. Members can register their cylinders and book an inspection.
 
 ### The Regulator Module
-The data for the manufacturers and models of the regulators are entered in template files, allowing flexible customization of the equipment used by a club.
-There is a template for regulators (`regulator_data`). In this template, data for manufacturers and the models of the first and second stages are stored.
+The data for the manufacturers and models of the regulators are entered in files, allowing flexible customization of the equipment used by a club.
+There is a file for regulators (`regulator_data`). In this file, data for manufacturers and the models of the first and second stages are stored.
 The template content defines the array that is read into the module. The array contains data per manufacturer for first and second stages:
 
-The manufacturers are defined in the template `equipment_manufacturer.html5` as follows:
+The manufacturers are defined in the template `equipment_manufacturer.txt` as follows:
 
 ```
 [
@@ -39,7 +39,7 @@ The manufacturers are defined in the template `equipment_manufacturer.html5` as 
 '5' => 'Cressi',
 ]
 ```
-The regulator models are defined in the template `regulator_data.html5`. The number corresponds to the manufacturer's index:
+The regulator models are defined in the file `regulator_data.txt`. The number corresponds to the manufacturer's index:
 ```
 [
 //Manufacturer 1

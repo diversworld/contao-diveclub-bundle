@@ -1,5 +1,4 @@
-<?php
-return [
+[
     '0' => [
         '0' => 'Anzüge shorties',
         '1' => 'Anzüge nass',
@@ -19,4 +18,4 @@ return [
         '2' => 'Schwimmbadflossen',
         '3' => 'Geräteflossen',
     ],
-];
+]
