@@ -43,23 +43,21 @@ class CopyFilesMigration extends AbstractMigration
 
     public function run(): MigrationResult
     {
-        $output = new ConsoleOutput(); // Nutze Symfony's ConsoleOutput
-
         $path = \sprintf(
             '%s/%s/bundles/diversworldcontaodiveclub/templates',
             self::getRootDir(),
             self::getWebDir(),
         );
 
-        $output->writeln('<info>Starte den Kopiervorgang...</info>');
+        echo '<info>Starte den Kopiervorgang...</info>';
 
         new Folder('files/diveclub');
 
-        $output->writeln('<comment>Ordner "files/diveclub" wurde erstellt.</comment>');
-        $output->writeln('<info>Path:'. $path . '</info>');
+        echo '<comment>Ordner "files/diveclub" wurde erstellt.</comment>';
+        echo '<info>Path:'. $path . '</info>';
 
         $this->getFiles($path);
-        $output->writeln('<info>Kopiervorgang abgeschlossen!</info>');
+        echo '<info>Kopiervorgang abgeschlossen!</info>';
 
         return $this->createResult(true);
     }
@@ -71,7 +69,6 @@ class CopyFilesMigration extends AbstractMigration
 
     public static function getWebDir(): string
     {
-        dump(StringUtil::stripRootDir(System::getContainer()->getParameter('contao.web_dir')));
         return StringUtil::stripRootDir(System::getContainer()->getParameter('contao.web_dir'));
     }
 
