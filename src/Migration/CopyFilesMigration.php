@@ -18,6 +18,8 @@ use Contao\File;
 use Contao\Folder;
 use Contao\StringUtil;
 use Contao\System;
+use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 class CopyFilesMigration extends AbstractMigration
@@ -41,15 +43,23 @@ class CopyFilesMigration extends AbstractMigration
 
     public function run(): MigrationResult
     {
+        $output = new ConsoleOutput(); // Nutze Symfony's ConsoleOutput
+
         $path = \sprintf(
-            '%s/%s/bundles/templates/diversworlddiveclub',
+            '%s/%s/bundles/diversworldcontaodiveclub/templates',
             self::getRootDir(),
             self::getWebDir(),
         );
 
+        $output->writeln('<info>Starte den Kopiervorgang...</info>');
+
         new Folder('files/diveclub');
 
+        $output->writeln('<comment>Ordner "files/diveclub" wurde erstellt.</comment>');
+        $output->writeln('<info>Path:'. $path . '</info>');
+
         $this->getFiles($path);
+        $output->writeln('<info>Kopiervorgang abgeschlossen!</info>');
 
         return $this->createResult(true);
     }
@@ -69,21 +79,16 @@ class CopyFilesMigration extends AbstractMigration
     {
         foreach (Folder::scan($path) as $dir) {
             if (!is_dir($path . '/' . $dir)) {
-                $pos = strpos($path, 'diversworlddiveclub');
-                dump($pos);
-                $filesFolder = 'files/diveclub' . str_replace('diversworlddiveclub', '', substr($path, $pos)) . '/' . $dir;
-                dump($filesFolder);
+                $pos = strpos($path, 'diversworldcontaodiveclub');
+                $filesFolder = 'files/diveclub' . str_replace('diversworldcontaodiveclub', '', substr($path, $pos)) . '/' . $dir;
                 if (!$this->fs->exists(self::getRootDir() . '/' . $filesFolder)) {
                     $objFile = new File(self::getWebDir() . '/bundles/' . substr($path, $pos) . '/' . $dir);
-                    dump($objFile);
                     $objFile->copyTo($filesFolder);
                 }
             } else {
                 $folder = $path . '/' . $dir;
-                $pos = strpos($path, 'diversworlddiveclub');
-                dump($pos);
-                $filesFolder = 'files/diveclub' . str_replace('diversworlddiveclub', '', substr($path, $pos)) . '/' . $dir;
-                dump($filesFolder);
+                $pos = strpos($path, 'diversworldcontaodiveclub');
+                $filesFolder = 'files/diveclub' . str_replace('diversworldcontaodiveclub', '', substr($path, $pos)) . '/' . $dir;
                 if (!$this->fs->exists($filesFolder)) {
                     new Folder($filesFolder);
                 }
