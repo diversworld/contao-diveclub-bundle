@@ -29,7 +29,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_types'] = [
     'list'              => [
         'sorting'           => [
             'mode'          => DataContainer::MODE_SORTED,
-            'fields'        => ['title'],
+            'fields'        => ['types', 'subType', 'title', 'published'],
             'flag'          => DataContainer::SORT_INITIAL_LETTER_ASC,
             'panelLayout'   => 'filter;search,limit',
         ],
@@ -85,7 +85,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_types'] = [
             'search'        => true,
             'filter'        => true,
             'sorting'       => true,
-            'flag'          => DataContainer::SORT_INITIAL_LETTER_ASC,
+            'flag'          => DataContainer::SORT_INITIAL_LETTERS_ASC,
             'eval'          => ['mandatory' => true, 'maxlength' => 25, 'tl_class' => 'w33'],
             'sql'           => "varchar(255) NOT NULL default ''"
         ],
@@ -286,8 +286,8 @@ class tl_dc_equipment_types extends Backend
         $types = $this->getTypes();
         $subTypes = $this->getTemplateOptions('subTypesFile');
 
-        $typeLabel = $types[$row['title']] ?? $row['title'];
-        $subTypeLabel = $subTypes[$row['title']][$row['subType']] ?? $row['subType'];
+        $typeLabel = $types[$row['types']] ?? $row['types'];
+        $subTypeLabel = $subTypes[$row['types']][$row['subType']] ?? $row['subType'];
 
         return sprintf('%s / %s', $typeLabel, $subTypeLabel);
     }
