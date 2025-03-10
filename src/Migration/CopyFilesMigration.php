@@ -42,7 +42,7 @@ class CopyFilesMigration extends AbstractMigration
     public function run(): MigrationResult
     {
         $path = \sprintf(
-            '%s/%s/bundles/diversworlddiveclub',
+            '%s/%s/bundles/templates/diversworlddiveclub',
             self::getRootDir(),
             self::getWebDir(),
         );
@@ -61,6 +61,7 @@ class CopyFilesMigration extends AbstractMigration
 
     public static function getWebDir(): string
     {
+        dump(StringUtil::stripRootDir(System::getContainer()->getParameter('contao.web_dir')));
         return StringUtil::stripRootDir(System::getContainer()->getParameter('contao.web_dir'));
     }
 
@@ -69,17 +70,20 @@ class CopyFilesMigration extends AbstractMigration
         foreach (Folder::scan($path) as $dir) {
             if (!is_dir($path . '/' . $dir)) {
                 $pos = strpos($path, 'diversworlddiveclub');
+                dump($pos);
                 $filesFolder = 'files/diveclub' . str_replace('diversworlddiveclub', '', substr($path, $pos)) . '/' . $dir;
-
+                dump($filesFolder);
                 if (!$this->fs->exists(self::getRootDir() . '/' . $filesFolder)) {
                     $objFile = new File(self::getWebDir() . '/bundles/' . substr($path, $pos) . '/' . $dir);
+                    dump($objFile);
                     $objFile->copyTo($filesFolder);
                 }
             } else {
                 $folder = $path . '/' . $dir;
                 $pos = strpos($path, 'diversworlddiveclub');
+                dump($pos);
                 $filesFolder = 'files/diveclub' . str_replace('diversworlddiveclub', '', substr($path, $pos)) . '/' . $dir;
-
+                dump($filesFolder);
                 if (!$this->fs->exists($filesFolder)) {
                     new Folder($filesFolder);
                 }
