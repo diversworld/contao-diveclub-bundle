@@ -123,7 +123,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_subtypes'] = [
             'sorting'           => true,
             'options_callback'  => ['tl_dc_equipment_subtypes', 'getManufacturers'],
             'eval'              => ['mandatory' => true, 'tl_class' => 'w25 clr'],
-            'sql'               => "varchar(255) NOT NULL default ''",
+            'sql'               => "int(10) unsigned NOT NULL default 0",
         ],
         'model'             => [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_subtypes']['model'],
@@ -154,7 +154,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_subtypes'] = [
             'sorting'           => true,
             'options_callback'  => ['tl_dc_equipment_subtypes', 'getSizes'],
             'eval'              => ['mandatory' => false, 'tl_class' => 'w25'],
-            'sql'               => "varchar(255) NOT NULL default ''",
+            'sql'               => "int(10) unsigned NOT NULL default 0",
         ],
         'serialNumber'      => [
             'inputType'         => 'text',
