@@ -34,7 +34,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_types'] = [
             'panelLayout'   => 'filter;search,limit',
         ],
         'label'             => [
-            'fields'        => ['title', 'subType'],
+            'fields'        => ['types', 'subType'],
             'label_callback'=> ['tl_dc_equipment_types', 'customLabelCallback'],
         ],
         'global_operations' => [
@@ -55,9 +55,10 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_types'] = [
     ],
     // Palettes-Konfiguration
     'palettes'          => [
-        'default' => '{title_legend},title,subType;
-                      {notes_legend},addNotes;
-                      {publish_legend},published,start,stop;',
+        'default'   => '{title_legend},title,alias;
+                        {types_legend},types,subType;
+                        {notes_legend},addNotes;
+                        {publish_legend},published,start,stop;',
     ],
     'subpalettes'       => [
         'addNotes'          => 'notes',
@@ -74,21 +75,30 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_types'] = [
             'search'        => true,
             'inputType'     => 'text',
             'eval'          => ['rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w33'],
-            'save_callback' => [['tl_dc_regulators', 'generateAlias']],
+            'save_callback' => [['tl_dc_equipment_types', 'generateAlias']],
             'sql'           => "varchar(255) BINARY NOT NULL default ''"
         ],
-        'title' => [
+        'title'             => [
+            'inputType'     => 'text',
+            'label'         => &$GLOBALS['TL_LANG']['tl_dc_regulators']['title'],
+            'exclude'       => true,
+            'search'        => true,
+            'filter'        => true,
+            'sorting'       => true,
+            'flag'          => DataContainer::SORT_INITIAL_LETTER_ASC,
+            'eval'          => ['mandatory' => true, 'maxlength' => 25, 'tl_class' => 'w33'],
+            'sql'           => "varchar(255) NOT NULL default ''"
+        ],
+        'types'      => [
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_types']['types'],
             'inputType'         => 'select',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_types']['title'],
             'exclude'           => true,
-            'options_callback'  => ['tl_dc_equipment_types', 'getTypes'],
-            'eval'              => [
-                'includeBlankOption' => true,
-                'submitOnChange'     => true,
-                'mandatory'          => true,
-                'tl_class'           => 'w50',
-            ],
-            'sql'               => "int(10) unsigned NOT NULL default 0",
+            'search'            => true,
+            'filter'            => true,
+            'sorting'           => true,
+            'options_callback'  => array('tl_dc_equipment_types', 'getTypes'),
+            'eval'              => array('includeBlankOption' => true, 'submitOnChange' => true, 'mandatory' => true, 'tl_class' => 'w25 clr'),
+            'sql'               => "varchar(255) NOT NULL default ''",
         ],
         'subType' => [
             'inputType'         => 'select',
