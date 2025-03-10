@@ -3,11 +3,15 @@
 declare(strict_types=1);
 
 use Contao\Backend;
+use Contao\Controller;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
+use Contao\FilesModel;
+use Contao\StringUtil;
 use Contao\System;
 use Contao\TemplateLoader;
+use Contao\ThemeModel;
 
 $GLOBALS['TL_DCA']['tl_dc_equipment_types'] = [
     // Konfiguration
@@ -41,23 +45,12 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_types'] = [
             ],
         ],
         'operations'        => [
-            'edit' => [
-                'href'  => 'act=edit',
-                'icon'  => 'edit.svg',
-            ],
+            'edit',
             'children',
-            'copy' => [
-                'href'  => 'act=copy',
-                'icon'  => 'copy.svg',
-            ],
-            'delete' => [
-                'href'  => 'act=delete',
-                'icon'  => 'delete.svg',
-            ],
-            'show' => [
-                'href'  => 'act=show',
-                'icon'  => 'show.svg',
-            ],
+            'copy',
+            'delete',
+            'show',
+            'toggle',
         ],
     ],
     // Palettes-Konfiguration
@@ -91,6 +84,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_types'] = [
             'options_callback'  => ['tl_dc_equipment_types', 'getTypes'],
             'eval'              => [
                 'includeBlankOption' => true,
+                'submitOnChange'     => true,
                 'mandatory'          => true,
                 'tl_class'           => 'w50',
             ],
@@ -190,7 +184,7 @@ class tl_dc_equipment_types extends Backend
      */
     public function getTypes(): array
     {
-        return $this->getTemplateOptions('dc_equipment_types');
+        return $this->getTemplateOptions('typesFile');//'dc_equipment_types');
     }
 
     /**
@@ -201,8 +195,7 @@ class tl_dc_equipment_types extends Backend
         if (!$dc->activeRecord || !$dc->activeRecord->title) {
             return [];
         }
-
-        $types = $this->getTemplateOptions('dc_equipment_subtypes');
+        $types = $this->getTemplateOptions('subTypesFile');
         return $types[$dc->activeRecord->title] ?? [];
     }
 
@@ -212,20 +205,71 @@ class tl_dc_equipment_types extends Backend
     private function getTemplateOptions(string $templateName): array
     {
         // Templatepfad über Contao ermitteln
-        $templatePath = TemplateLoader::getPath($templateName, 'html5');
+        $templatePath = $this->getTemplateFromConfig($templateName);
 
         // Überprüfen, ob die Datei existiert
         if (!$templatePath || !file_exists($templatePath)) {
             throw new \Exception(sprintf('Template "%s" not found or not readable', $templateName));
         }
 
-        // Templateinhalt auswerten
-        $options = include $templatePath;
+        $content = file_get_contents($templatePath);
+
+        $options = [];
+        // Entferne PHP-Tags und wandle Daten in ein Array um
+        $content = trim($content);
+        $content = trim($content, '<?=');
+        $content = trim($content, '?>');
+
+        eval('$options = ' . $content . ';');
+
         if (!is_array($options)) {
             throw new \Exception(sprintf('Invalid template content in file: %s', $templatePath));
         }
 
         return $options;
+    }
+
+    function getTemplateFromConfig($templateName): string
+    {
+        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
+        $configArray = [];
+
+        // Lade die erforderlichen Felder aus der Tabelle tl_dc_config
+        $result = Database::getInstance()->execute("
+            SELECT manufacturersFile, typesFile, subTypesFile, regulatorsFile
+            FROM tl_dc_config
+            LIMIT 1"
+        );
+
+        if ($result->numRows > 0) {
+            // Für jedes Feld die UUID verarbeiten
+            $files = [
+                'manufacturersFile' => $result->manufacturersFile,
+                'typesFile' => $result->typesFile,
+                'subTypesFile' => $result->subTypesFile,
+                'regulatorsFile' => $result->regulatorsFile,
+            ];
+
+            // UUIDs in Pfade umwandeln
+            foreach ($files as $key => $uuid) {
+                if (!empty($uuid)) {
+                    $convertedUuid = StringUtil::binToUuid($uuid);
+                    $fileModel = FilesModel::findByUuid($convertedUuid);
+
+                    if ($fileModel !== null && file_exists($rootDir . '/' . $fileModel->path)) {
+                        $configArray[$key] = $rootDir . '/' . $fileModel->path;
+                    } else {
+                        $configArray[$key] = null; // Datei nicht gefunden oder ungültige UUID
+                    }
+                } else {
+                    $configArray[$key] = null; // Leerer Wert in der DB
+                }
+            }
+        } else {
+            throw new \RuntimeException('Keine Einträge in der Tabelle tl_dc_config gefunden.');
+        }
+
+        return $configArray[$templateName];
     }
 
     /**
@@ -234,7 +278,7 @@ class tl_dc_equipment_types extends Backend
     public function customLabelCallback(array $row, string $label, DataContainer $dc, array $args = null): string
     {
         $types = $this->getTypes();
-        $subTypes = $this->getTemplateOptions('dc_equipment_subtypes');
+        $subTypes = $this->getTemplateOptions('subTypesFile');
 
         $typeLabel = $types[$row['title']] ?? $row['title'];
         $subTypeLabel = $subTypes[$row['title']][$row['subType']] ?? $row['subType'];

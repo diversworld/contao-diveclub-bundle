@@ -13,13 +13,17 @@ declare(strict_types=1);
  */
 
 use Contao\Backend;
+use Contao\Controller;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
+use Contao\FilesModel;
+use Contao\StringUtil;
 use Contao\System;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\CoreBundle\EventListener\Widget\HttpUrlListener;
 use Contao\TemplateLoader;
+use Contao\ThemeModel;
 use Diversworld\ContaoDiveclubBundle\DataContainer\DcCheckProposal;
 
 /**
@@ -265,18 +269,13 @@ class tl_dc_regulators extends Backend
 
     public function getManufacturers()
     {
-        return $this->getTemplateOptions('dc_equipment_manufacturers');
-    }
-
-    public function getSizes()
-    {
-        return $this->getTemplateOptions('dc_equipment_sizes');
+        return $this->getTemplateOptions('manufacturersFile');
     }
 
     private function getTemplateOptions($templateName)
     {
         // Templatepfad über Contao ermitteln
-        $templatePath = TemplateLoader::getPath($templateName, 'html5');
+        $templatePath = $this->getTemplateFromConfig($templateName);
 
         // Überprüfen, ob die Datei existiert
         if (!$templatePath || !file_exists($templatePath)) {
@@ -303,6 +302,49 @@ class tl_dc_regulators extends Backend
         return $options;
     }
 
+    function getTemplateFromConfig($templateName): string
+    {
+        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
+        $configArray = [];
+
+        // Lade die erforderlichen Felder aus der Tabelle tl_dc_config
+        $result = Database::getInstance()->execute("
+            SELECT manufacturersFile, typesFile, subTypesFile, regulatorsFile
+            FROM tl_dc_config
+            LIMIT 1"
+        );
+
+        if ($result->numRows > 0) {
+            // Für jedes Feld die UUID verarbeiten
+            $files = [
+                'manufacturersFile' => $result->manufacturersFile,
+                'typesFile' => $result->typesFile,
+                'subTypesFile' => $result->subTypesFile,
+                'regulatorsFile' => $result->regulatorsFile,
+            ];
+
+            // UUIDs in Pfade umwandeln
+            foreach ($files as $key => $uuid) {
+                if (!empty($uuid)) {
+                    $convertedUuid = StringUtil::binToUuid($uuid);
+                    $fileModel = FilesModel::findByUuid($convertedUuid);
+
+                    if ($fileModel !== null && file_exists($rootDir . '/' . $fileModel->path)) {
+                        $configArray[$key] = $rootDir . '/' . $fileModel->path;
+                    } else {
+                        $configArray[$key] = null; // Datei nicht gefunden oder ungültige UUID
+                    }
+                } else {
+                    $configArray[$key] = null; // Leerer Wert in der DB
+                }
+            }
+        } else {
+            throw new \RuntimeException('Keine Einträge in der Tabelle tl_dc_config gefunden.');
+        }
+
+        return $configArray[$templateName];
+    }
+
     public function getRegModels1st(DataContainer $dc): array
     {
         // Sicherstellen, dass ein aktiver Datensatz vorhanden ist
@@ -312,7 +354,7 @@ class tl_dc_regulators extends Backend
 
         // Ermittle den aktuellen Typ aus dem aktiven Datensatz
         $manufacturer = $dc->activeRecord->manufacturer; // Aktueller Hersteller
-        $models = $this->getTemplateOptions('dc_regulator_data');
+        $models = $this->getTemplateOptions('regulatorsFile');
 
         // Prüfen, ob der Hersteller existiert und Modelle für die erste Stufe definiert sind
         if (!isset($models[$manufacturer]['regModel1st']) || !is_array($models[$manufacturer]['regModel1st'])) {
@@ -330,7 +372,7 @@ class tl_dc_regulators extends Backend
         }
 
         $manufacturer = $dc->activeRecord->manufacturer; // Aktueller Hersteller
-        $models = $this->getTemplateOptions('dc_regulator_data');
+        $models = $this->getTemplateOptions('regulatorsFile');
 
         // Prüfen, ob der Hersteller existiert und Modelle für die zweite Stufe definiert sind
         if (!isset($models[$manufacturer]['regModel2nd']) || !is_array($models[$manufacturer]['regModel2nd'])) {
@@ -350,7 +392,7 @@ class tl_dc_regulators extends Backend
         $args[1] = $manufacturers[$row['manufacturer']] ?? '-'; // Hersteller-Name einsetzen
 
         // Modelle für die erste und zweite Stufe basierend auf dem Hersteller laden
-        $models = $this->getTemplateOptions('dc_regulator_data');
+        $models = $this->getTemplateOptions('regulatorsFile');
 
         // Namen der Modelle statt der Indexwerte benutzen
         if (isset($models[$manufacturer]['regModel1st'][$row['regModel1st']])) {

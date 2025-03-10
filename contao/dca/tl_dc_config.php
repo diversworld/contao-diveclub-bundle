@@ -50,7 +50,6 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
     'palettes'      => [
         '__selector__'      => ['addManufacturer', 'addRegulators', 'addEquipment', 'addSizes',],
         'default'           => '{title_legend},title,alias;
-                                {template_legend},templatePath;
                                 {manufacturer_legend},addManufacturer;
                                 {equipment_legend},addEquipment;
                                 {sizes_legend},addSizes;
@@ -58,11 +57,10 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
                                 {regulator_legend},addRegulators;'
     ],
     'subpalettes'   => [
-        'addManufacturer'   => 'manufacturer_template',
-        'addEquipment'      => 'types_template','equipment_template',
-        'addSizes'          => 'sizes_template',
-        'addTypes'          => 'types_template',
-        'addRegulators'     => 'regulator_template',
+        'addManufacturer'   => 'manufacturersFile',
+        'addEquipment'      => 'typesFile,subTypesFile',
+        'addSizes'          => 'sizesFile',
+        'addRegulators'     => 'regulatorsFile',
     ],
     'fields'        => [
         'id'                    => [
@@ -90,14 +88,6 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
                         ['tl_dc_config', 'generateAlias']
             ],
             'sql'                   => "varchar(255) BINARY NOT NULL default ''"
-        ],
-        'templatePath'          => [
-            'label'                 => &$GLOBALS['TL_LANG']['tl_template_config']['templatePath'],
-            'exclude'               => true,
-            'inputType'             => 'text',
-            'options_callback'      => array('tl_dc_config', 'getDcTemplates'),
-            'eval'                  => array ('tl_class'=>'clr w33'),
-            'sql'					=> "varchar(255) NOT NULL default ''"
         ],
         'addManufacturer'       => [
             'label'                 => &$GLOBALS['TL_LANG']['tl_dc_config']['addManufacturer'],
@@ -127,61 +117,36 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
             'eval'                  => ['submitOnChange' => true],
             'sql'                   => ['type' => 'boolean', 'default' => false]
         ],
-        'manufacturer_template' => [
-            'label'                 => &$GLOBALS['TL_LANG']['tl_template_config']['manufacturer_template'],
-            'default'               => 'dc_equipment_manufacturers',
-            'exclude'               => true,
-            'inputType'             => 'select',
-            'options_callback' => static function () {
-                return Controller::getTemplateGroup('dc_');
-            },
-            'eval'                  => array ('tl_class'=>'clr w33'),
-            'sql'					=> "varchar(32) NOT NULL default ''"
-        ],
-        'sizes_template'        => [
-            'label'                 => &$GLOBALS['TL_LANG']['tl_template_config']['sizes_template'],
-            'default'               => 'dc_equipment_sizes',
-            'exclude'               => true,
-            'inputType'             => 'select',
-            'options_callback' => static function () {
-                return Controller::getTemplateGroup('dc_');
-            },
-            'eval'                  => array ('tl_class'=>'clr w33'),
-            'sql'					=> "varchar(32) NOT NULL default ''"
-        ],
-        'types_template'        => [
-            'label'                 => &$GLOBALS['TL_LANG']['tl_module']['types_template'],
-            'default'               => 'dc_equipment_types',
-            'exclude'               => true,
-            'inputType'             => 'select',
-            'options_callback' => static function () {
-                return Controller::getTemplateGroup('dc_');
-            },
-            'eval'                  => array ('tl_class'=>'clr w33'),
-            'sql'					=> "varchar(32) NOT NULL default ''"
-        ],
-        'equipment_template'    => [
-            'label'                 => &$GLOBALS['TL_LANG']['tl_module']['equipment_template'],
-            'default'               => 'dc_equipment_subTypes',
-            'exclude'               => true,
-            'inputType'             => 'select',
-            'options_callback' => static function () {
-                return Controller::getTemplateGroup('dc_');
-            },
-            'eval'                  => array ('tl_class'=>'clr w33'),
-            'sql'					=> "varchar(32) NOT NULL default ''"
-        ],
-        'regulator_template'    => [
-            'label'                 => &$GLOBALS['TL_LANG']['tl_module']['regulator_template'],
-            'default'               => 'dc_regulator_data',
-            'exclude'               => true,
-            'inputType'             => 'select',
-            'options_callback' => static function () {
-                return Controller::getTemplateGroup('dc_');
-            },
-            'eval'                  => ['tl_class'=>'clr w33'],
-            'sql'					=> "varchar(32) NOT NULL default ''"
-        ]
+        'manufacturersFile' => array
+        (
+            'inputType'               => 'fileTree',
+            'eval'                    => array('fieldType'=>'radio', 'files' => true, 'tl_class'=>'33clr'),
+            'sql'                     => "binary(16) NULL"
+        ),
+        'sizesFile' => array
+        (
+            'inputType'               => 'fileTree',
+            'eval'                    => array('fieldType'=>'radio', 'files' => true, 'tl_class'=>'w33clr'),
+            'sql'                     => "binary(16) NULL"
+        ),
+        'typesFile' => array
+        (
+            'inputType'               => 'fileTree',
+            'eval'                    => array('fieldType'=>'radio', 'files' => true, 'tl_class'=>'w33clr'),
+            'sql'                     => "binary(16) NULL"
+        ),
+        'subTypesFile' => array
+        (
+            'inputType'               => 'fileTree',
+            'eval'                    => array('fieldType'=>'radio', 'files' => true, 'tl_class'=>'w33clr'),
+            'sql'                     => "binary(16) NULL"
+        ),
+        'regulatorsFile' => array
+        (
+            'inputType'               => 'fileTree',
+            'eval'                    => array('fieldType'=>'radio', 'files' => true, 'tl_class'=>'w33clr'),
+            'sql'                     => "binary(16) NULL"
+        ),
     ],
 ];
 
