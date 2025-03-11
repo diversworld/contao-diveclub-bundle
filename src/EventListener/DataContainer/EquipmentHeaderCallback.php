@@ -2,10 +2,14 @@
 namespace Diversworld\ContaoDiveclubBundle\EventListener\DataContainer;
 
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
+use Contao\Database;
 use Contao\DataContainer;
+use Contao\FilesModel;
 use Contao\Input;
+use Contao\StringUtil;
 use Contao\System;
 use Doctrine\DBAL\Connection;
+use Exception;
 use Psr\Log\LoggerInterface;
 
 #[AsCallback(table: 'tl_dc_equipment', target: 'list.sorting.header')]
@@ -32,8 +36,8 @@ class EquipmentHeaderCallback
         }
 
         // 2. Subtypen aus Template laden
-        $equipmentType  = $this->getTemplateOptions('dc_equipment_types');
-        $subTypes       = $this->getTemplateOptions('dc_equipment_subTypes');
+        $equipmentType  = $this->getTemplateOptions('typesFile');
+        $subTypes       = $this->getTemplateOptions('subTypesFile');
 
         // 3. Parent-Typ aus Tabelle laden
         $record = $this->db->fetchAssociative(
@@ -77,23 +81,67 @@ class EquipmentHeaderCallback
     /**
     * Lädt die Dropdown-Werte (Optionen) aus einem Template wie `dc_regulator_data.txt`.
     */
-    private function getTemplateOptions(string $templateName): array
+    private function getTemplateOptions($templateName)
     {
         // Templatepfad über Contao ermitteln
-        $templatePath = System::getContainer()->getParameter('kernel.project_dir') . '/templates/diveclub/' . $templateName . '.html5'; //TemplateLoader::getPath($templateName, 'html5');
+        $templatePath = $this->getTemplateFromConfig($templateName);
 
         // Überprüfen, ob die Datei existiert
         if (!$templatePath || !file_exists($templatePath)) {
-            throw new \Exception(sprintf('Template "%s" not found or not readable', $templateName));
+            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['templateNotFound'], $templatePath));
         }
 
-        // Templateinhalt auswerten
         $options = include $templatePath;
+
         if (!is_array($options)) {
-            throw new \Exception(sprintf('Invalid template content in file: %s', $templatePath));
+            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['templateContent'], $options));
         }
 
         return $options;
+    }
+
+    function getTemplateFromConfig($templateName): string
+    {
+        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
+        $configArray = [];
+
+        // Lade die erforderlichen Felder aus der Tabelle tl_dc_config
+        $result = Database::getInstance()->execute("
+            SELECT manufacturersFile, typesFile, subTypesFile, regulatorsFile, sizesFile
+            FROM tl_dc_config
+            LIMIT 1"
+        );
+
+        if ($result->numRows > 0) {
+            // Für jedes Feld die UUID verarbeiten
+            $files = [
+                'manufacturersFile' => $result->manufacturersFile,
+                'typesFile' => $result->typesFile,
+                'subTypesFile' => $result->subTypesFile,
+                'regulatorsFile' => $result->regulatorsFile,
+                'sizesFile'     => $result->sizesFile,
+            ];
+
+            // UUIDs in Pfade umwandeln
+            foreach ($files as $key => $uuid) {
+                if (!empty($uuid)) {
+                    $convertedUuid = StringUtil::binToUuid($uuid);
+                    $fileModel = FilesModel::findByUuid($convertedUuid);
+
+                    if ($fileModel !== null && file_exists($rootDir . '/' . $fileModel->path)) {
+                        $configArray[$key] = $rootDir . '/' . $fileModel->path;
+                    } else {
+                        $configArray[$key] = null; // Datei nicht gefunden oder ungültige UUID
+                    }
+                } else {
+                    $configArray[$key] = null; // Leerer Wert in der DB
+                }
+            }
+        } else {
+            throw new \RuntimeException('Keine Einträge in der Tabelle tl_dc_config gefunden.');
+        }
+
+        return $configArray[$templateName];
     }
 
     private function resolveSubType(array $subTypes, int $equipmentId, int $modelId): string
