@@ -282,21 +282,10 @@ class tl_dc_regulators extends Backend
             throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['templateNotFound'], $templatePath));
         }
 
-        //$options = include $templatePath;
-
-        // Dateiinhalt lesen
-        $content = file_get_contents($templatePath);
-
-        $options = [];
-        // Entferne PHP-Tags und wandle Daten in ein Array um
-        $content = trim($content);
-        $content = trim($content, '<?=');
-        $content = trim($content, '?>');
-
-        eval('$options = ' . $content . ';');
+        $options = include $templatePath;
 
         if (!is_array($options)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['templateContent'], $content));
+            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['templateContent'], $options));
         }
 
         return $options;

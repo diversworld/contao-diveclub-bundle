@@ -1,21 +1,22 @@
-[
-    '0' => [
-        '0' => 'Anzüge shorties',
-        '1' => 'Anzüge nass',
-        '2' => 'Anzüge halbtrocken ',
-        '3' => 'Anzüge trocken',
-    ],
+<?php
+return [
     '1' => [
-        '0' => 'Primäre Regler',
-        '1' => 'Sekundäre Regler',
-        '2' => 'Finimeter',
-        '3' => 'Kompasse',
-        '4' => 'Sonstiges'
+        '1' => 'Anzüge shorties',
+        '2' => 'Anzüge nass',
+        '3' => 'Anzüge halbtrocken ',
+        '4' => 'Anzüge trocken',
     ],
     '2' => [
-        '0' => 'Masken',
-        '1' => 'Schnorchel',
-        '2' => 'Schwimmbadflossen',
-        '3' => 'Geräteflossen',
+        '1' => 'Primäre Regler',
+        '2' => 'Sekundäre Regler',
+        '3' => 'Finimeter',
+        '4' => 'Kompasse',
+        '5' => 'Sonstiges'
     ],
-]
+    '3' => [
+        '1' => 'Masken',
+        '2' => 'Schnorchel',
+        '3' => 'Schwimmbadflossen',
+        '4' => 'Geräteflossen',
+    ],
+];

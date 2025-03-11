@@ -52,8 +52,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_subtypes'] = [
         ],
         'label'             => [
             'fields'            => ['title','manufacturer','model','size'],
-            'headerFields'      => ['title', 'subType','alias'],
-            'header_callback'   => [EquipmentHeaderCallback::class, '__invoke'],
+            'label_callback' 	=> ['tl_dc_equipment_subtypes', 'formatLabel'],
             'showColumns'       => false,
             'format'            => '%s %s %s %s',
         ],
@@ -277,21 +276,11 @@ class tl_dc_equipment_subtypes extends Backend
             throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['templateNotFound'], $templatePath));
         }
 
-        //$options = include $templatePath;
-
         // Dateiinhalt lesen
-        $content = file_get_contents($templatePath);
-
-        $options = [];
-        // Entferne PHP-Tags und wandle Daten in ein Array um
-        $content = trim($content);
-        $content = trim($content, '<?=');
-        $content = trim($content, '?>');
-
-        eval('$options = ' . $content . ';');
+        $options = include $templatePath;
 
         if (!is_array($options)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['templateContent'], $content));
+            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['templateContent'], $options));
         }
 
         return $options;
@@ -338,5 +327,19 @@ class tl_dc_equipment_subtypes extends Backend
         }
 
         return $configArray[$templateName];
+    }
+
+    public function formatLabel(array $row, string $label, DataContainer $dc): string
+    {
+        // Hersteller-Name abrufen
+        $manufacturers = $this->getManufacturers();
+        $manufacturerName = $manufacturers[$row['manufacturer']] ?? 'Unbekannt';
+
+        // Größen-Name abrufen
+        $sizes = $this->getSizes();
+        $sizeName = $sizes[$row['size']] ?? 'Unbekannt';
+
+        // Neues Label-Format mit Text-Werten
+        return sprintf('%s %s %s - %s', $manufacturerName, $row['model'], $sizeName, $row['title']);
     }
 }

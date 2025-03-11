@@ -218,15 +218,7 @@ class tl_dc_equipment_types extends Backend
             throw new \Exception(sprintf('Template "%s" not found or not readable', $templateName));
         }
 
-        $content = file_get_contents($templatePath);
-
-        $options = [];
-        // Entferne PHP-Tags und wandle Daten in ein Array um
-        $content = trim($content);
-        $content = trim($content, '<?=');
-        $content = trim($content, '?>');
-
-        eval('$options = ' . $content . ';');
+        $options = include $templatePath;
 
         if (!is_array($options)) {
             throw new \Exception(sprintf('Invalid template content in file: %s', $templatePath));

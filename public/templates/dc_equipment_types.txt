@@ -1,7 +1,7 @@
-[
-'0' => 'Anzüge',
-'1' => 'Atemregler',
-'2' => 'ABC-Equipment',
-'3' => 'Sonstiges',
-'4' => 'Modulordner'
-]
+<?php
+return [
+'1' => 'Anzüge',
+'2' => 'Atemregler',
+'3' => 'ABC-Equipment',
+'4' => 'Sonstiges',
+];
