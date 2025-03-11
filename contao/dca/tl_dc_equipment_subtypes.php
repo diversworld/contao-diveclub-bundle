@@ -293,7 +293,7 @@ class tl_dc_equipment_subtypes extends Backend
 
         // Lade die erforderlichen Felder aus der Tabelle tl_dc_config
         $result = Database::getInstance()->execute("
-            SELECT manufacturersFile, typesFile, subTypesFile, regulatorsFile
+            SELECT manufacturersFile, typesFile, subTypesFile, regulatorsFile, sizesFile
             FROM tl_dc_config
             LIMIT 1"
         );
@@ -305,6 +305,7 @@ class tl_dc_equipment_subtypes extends Backend
                 'typesFile' => $result->typesFile,
                 'subTypesFile' => $result->subTypesFile,
                 'regulatorsFile' => $result->regulatorsFile,
+                'sizesFile'     => $result->sizesFile,
             ];
 
             // UUIDs in Pfade umwandeln
