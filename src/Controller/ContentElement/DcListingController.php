@@ -21,7 +21,7 @@ use Contao\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-#[AsContentElement(category: 'dc_elements', template: 'ce_dc_liusting')]
+#[AsContentElement(category: 'dc_equipment', template: 'ce_dc_listing')]
 class DcListingController extends AbstractContentElementController
 {
     public const TYPE = 'dc_listing';

@@ -19,5 +19,5 @@ use Contao\Model;
 
 class DcEquipmentTypeModel extends Model
 {
-    protected static $strTable = 'tl_dc_equipment_type';
+    protected static $strTable = 'tl_dc_equipment_types';
 }

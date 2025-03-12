@@ -25,6 +25,8 @@ use Contao\CoreBundle\EventListener\Widget\HttpUrlListener;
 use Contao\TemplateLoader;
 use Contao\ThemeModel;
 use Diversworld\ContaoDiveclubBundle\DataContainer\DcCheckProposal;
+use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
+use Diversworld\ContaoDiveclubBundle\Service\TemplateService;
 
 /**
  * Table tl_dc_regulators

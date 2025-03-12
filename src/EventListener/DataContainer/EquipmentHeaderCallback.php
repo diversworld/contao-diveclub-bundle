@@ -38,36 +38,38 @@ class EquipmentHeaderCallback
         // 2. Subtypen aus Template laden
         $equipmentType  = $this->getTemplateOptions('typesFile');
         $subTypes       = $this->getTemplateOptions('subTypesFile');
-
+        dump($subTypes);
+        dump($equipmentType);
+        dump($parentId);
         // 3. Parent-Typ aus Tabelle laden
         $record = $this->db->fetchAssociative(
-            "SELECT title, subType
+            "SELECT types, subType
          FROM tl_dc_equipment_types
          WHERE id = ?",
             [$parentId]
         );
-
+dump($record);
         if (!$record) {
             $this->logger->error("Kein Datensatz für Parent-ID {$parentId} gefunden.");
             return ['Typ: unbekannt', 'Art: unbekannt'];
         }
 
         // 4. Typ und SubTyp auflösen
-        $equipmentId = (int)$record['title']; // ID des Typs
+        $equipmentId = (int)$record['types']; // ID des Typs
         $modelId = (int)$record['subType']; // ID des Subtyps
 
         $record['title'] = $equipmentType[$equipmentId];
         //$record['subType'] = $this->resolveModel($subTypes, $modelId, 'subType', (int)$record['subType']);
         $record['subType'] = $this->resolveSubType($subTypes, $equipmentId, $modelId);
 
-        $this->logger->info('Titel: '. $record['title']);
+        $this->logger->info('Typ: '. $record['types']);
         $this->logger->info('Subtyp: '. $record['subType']);
 
         // 6. Sprachdatei laden und Mapping vorbereiten
         System::loadLanguageFile('tl_dc_regulators');
 
         $mapping = [
-            'Typ' => 'title',
+            'Typ' => 'types',
             'Art' => 'subType',
         ];
 

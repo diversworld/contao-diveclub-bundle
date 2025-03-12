@@ -6,23 +6,24 @@ namespace Diversworld\ContaoDiveclubBundle\EventListener\DataContainer;
 
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\DataContainer;
+use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
 use Diversworld\ContaoDiveclubBundle\Service\TemplateService;
 
 
 #[AsCallback(table: 'tl_dc_equipment_type', target: 'list.label.label_callback')]
 class EquipmentTypeLabelCallback
 {
-    private TemplateService $templateService;
+    private DcaTemplateHelper $templateHelper;
 
-    public function __construct(TemplateService $templateService)
+    public function __construct(DcaTemplateHelper $templateHelper)
     {
-        $this->templateService = $templateService;
+        $this->templateHelper = $templateHelper;
     }
 
     public function __invoke(array $row, string $label, DataContainer $dc): string
     {
         // Lade die Subtypen aus der Template-Datei
-        $subTypes = $this->templateService->getTemplateOptions('dc_equipment_subTypes');
+        $subTypes = $this->templateHelper->getTemplateOptions('dc_equipment_subTypes');
 
         // Ermittle den aktuellen Subtypen-Text
         $currentType = $row['title']; // Titel aus der Datenbankzeile

@@ -26,4 +26,5 @@ $GLOBALS['TL_LANG']['MOD']['dc_config_collection']      = ['Configuration', 'Con
 
 $GLOBALS['TL_LANG']['FMD']['dc_modules']                = ['Dive Club Manager', 'Modules of the Dive Club Manager'];
 $GLOBALS['TL_LANG']['FMD']['dc_listing']                = ['Offer Details', 'Dive Club Manager'];
-$GLOBALS['TL_LANG']['FMD']['dc_tanks_listing']          = ['Diving Equipment', 'List of recorded diving equipment'];
+$GLOBALS['TL_LANG']['FMD']['dc_tanks_listing']          = ['Dive Tanks', 'List of recorded Dive Tanks'];
+$GLOBALS['TL_LANG']['FMD']['dc_equipment_listing']      = ['Diving Equipment', 'List of recorded diving equipment'];

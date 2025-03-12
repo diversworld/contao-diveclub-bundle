@@ -17,7 +17,7 @@ namespace Diversworld\ContaoDiveclubBundle\Model;
 
 use Contao\Model;
 
-class DcEquipmentModel extends Model
+class DcEquipmentSubTypeModel extends Model
 {
-    protected static $strTable = 'tl_dc_equipment';
+    protected static $strTable = 'tl_dc_equipment_subtypes';
 }

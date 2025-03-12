@@ -28,3 +28,4 @@ $GLOBALS['TL_LANG']['MOD']['dc_config_collection']      = ['Einstellungen', 'Ein
 $GLOBALS['TL_LANG']['FMD']['dc_modules']                = ['Tauchclubmanager', 'Module des Tauchclubmanagers'];
 $GLOBALS['TL_LANG']['FMD']['dc_listing']                = ['Angebotsdetails', 'Diveclub Manager'];
 $GLOBALS['TL_LANG']['FMD']['dc_tanks_listing']          = ['Tauchgeräte', 'Liste der erfassten Tauchgeräte'];
+$GLOBALS['TL_LANG']['FMD']['dc_equipment_listing']      = ['Ausrüstung', 'Liste der erfassten Ausrüstung'];

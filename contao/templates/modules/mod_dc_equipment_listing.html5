@@ -1,0 +1,45 @@
+<?php $this->extend('block_unsearchable'); ?>
+<?php $this->block('content'); ?>
+
+<div class="equipment-list">
+    <?php foreach ($this->data as $entry): ?>
+    <div>
+        <h2>
+            Typ: <?php echo htmlspecialchars($entry['types']['type']); ?> - <?php echo htmlspecialchars($entry['types']['subType']); ?>
+        </h2>
+    </div>
+
+    <?php if (!empty($entry['subTypes'])): ?>
+    <table>
+        <thead>
+        <tr>
+            <th>Hersteller</th>
+            <th>Modell</th>
+            <th>Farbe</th>
+            <th>Größe</th>
+            <th>Inventarnummer</th>
+            <th>Kaufdatum</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($entry['subTypes'] as $subType): ?>
+        <tr>
+            <td><?php echo htmlspecialchars($subType['manufacturer']); ?></td>
+            <td><?php echo htmlspecialchars($subType['model']); ?></td>
+            <td><?php echo htmlspecialchars($subType['color']); ?></td>
+            <td><?php echo htmlspecialchars($subType['size']); ?></td>
+            <td><?php echo htmlspecialchars($subType['title']); ?></td>
+            <td><?php echo htmlspecialchars(date('d.m.Y', (int) $subType['buyDate'])); ?></td>
+        </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+    <?php else: ?>
+    <p>Keine Subtypen für diesen Typ vorhanden.</p>
+    <?php endif; ?>
+
+    <hr>
+    <?php endforeach; ?>
+</div>
+
+<?php $this->endblock(); ?>
