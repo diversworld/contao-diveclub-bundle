@@ -21,9 +21,6 @@ use Diversworld\ContaoDiveclubBundle\Model\DcCheckProposalModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCoursesModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckArticlesModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCalendarEventsModel;
-use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorModel;
-use Diversworld\ContaoDiveclubBundle\Model\DcControlCardModel;
-use Diversworld\ContaoDiveclubBundle\Service\TemplateService;
 
 /**
  * Backend modules
