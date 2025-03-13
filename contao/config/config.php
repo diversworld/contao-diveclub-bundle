@@ -11,6 +11,7 @@
  */
 
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckInvoiceModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcConfigModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentTypeModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentSubTypeModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorControlModel;
@@ -60,13 +61,12 @@ $GLOBALS['TL_MODELS']['tl_dc_tanks']                = DcTanksModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_check_invoice']        = DcCheckInvoiceModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_check_proposal']       = DcCheckProposalModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_check_articles']       = DcCheckArticlesModel::class;
-$GLOBALS['TL_MODELS']['tl_dc_equipment_types']       = DcEquipmentSubTypeModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_equipment_types']      = DcEquipmentSubTypeModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_equipment_subtypes']   = DcEquipmentTypeModel::class;
 $GLOBALS['TL_MODELS']['tl_calendar_events']         = DcCalendarEventsModel::class;
-$GLOBALS['TL_MODELS']['tl_dc_regulator']            = DcRegulatorModel::class;
-$GLOBALS['TL_MODELS']['tl_dc_control_card']         = DcControlCardModel::class;
-$GLOBALS['TL_MODELS']['tl_regulators']              = DcRegulatorsModel::class;
-$GLOBALS['TL_MODELS']['tl_regulators_control']      = DcRegulatorControlModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_regulators']           = DcRegulatorsModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_regulator_control']    = DcRegulatorControlModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_config']               = DcConfigModel::class;
 
 /**
  * Hooks

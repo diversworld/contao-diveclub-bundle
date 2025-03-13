@@ -10,6 +10,7 @@ $GLOBALS['TL_LANG']['tl_dc_config']['sizes_legend'] = "Template mit Größen wä
 $GLOBALS['TL_LANG']['tl_dc_config']['types_legend'] = "Template mit Typen wählen";
 $GLOBALS['TL_LANG']['tl_dc_config']['regulator_legend'] = "Template mit Atemreglern wählen";
 $GLOBALS['TL_LANG']['tl_dc_config']['template_legend'] = "Templates Konfiguration";
+$GLOBALS['TL_LANG']['tl_dc_config']['publish_legend']    = 'Veröffentlichung';
 
 /**
  * Global operations
@@ -37,3 +38,6 @@ $GLOBALS['TL_LANG']['tl_dc_config']['sizesFile'] = ['Größen-Template', 'Eine n
 $GLOBALS['TL_LANG']['tl_dc_config']['typesFile'] = ['Ausrüstungs-Template', 'Eine neue Template-Konfiguration anlegen'];
 $GLOBALS['TL_LANG']['tl_dc_config']['subTypesFile'] = ['Typen-Template', 'Eine neue Template-Konfiguration anlegen'];
 $GLOBALS['TL_LANG']['tl_dc_config']['regulatorsFile'] = ['Atemregler-Template', 'Eine neue Template-Konfiguration anlegen'];
+$GLOBALS['TL_LANG']['tl_dc_config']['published']         = ['Veröffentlicht', 'Markieren Sie das Equipment als veröffentlicht.'];
+$GLOBALS['TL_LANG']['tl_dc_config']['start']             = ['Startdatum', 'Geben Sie ein Startdatum an.'];
+$GLOBALS['TL_LANG']['tl_dc_config']['stop']              = ['Enddatum', 'Geben Sie ein Enddatum an.'];

@@ -15,7 +15,7 @@ declare(strict_types=1);
 /**
  * Backend modules
  */
-$GLOBALS['TL_LANG']['MOD']['diveclub']                  = ['Dive Club Manager', 'Manage equipment, dive courses, etc.'];
+//$GLOBALS['TL_LANG']['MOD']['diveclub']                  = ['Diveclub Manager', 'Manage equipment, dive courses, etc.'];
 
 $GLOBALS['TL_LANG']['MOD']['dc_course_collection']      = ['Dive Courses', 'Manage dive courses'];
 $GLOBALS['TL_LANG']['MOD']['dc_regulator_collection']   = ['Regulators', 'Manage regulators'];

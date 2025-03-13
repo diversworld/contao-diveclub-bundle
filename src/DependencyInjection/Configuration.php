@@ -27,15 +27,13 @@ class Configuration implements ConfigurationInterface
 
         $treeBuilder->getRootNode()
             ->children()
-                ->arrayNode('foo')
-                    ->addDefaultsIfNotSet()
-                    ->children()
-                        ->scalarNode('bar')
-                            ->cannotBeEmpty()
-                            ->defaultValue('***')
-                        ->end()
-                    ->end()
-                ->end() // end foo
+                ->scalarNode('module_title')
+                    ->cannotBeEmpty() // Der Titel darf nicht leer sein
+                    ->defaultValue('Diveclub Manager') // Standardwert
+                ->end()
+                ->scalarNode('module_description')
+                    ->defaultValue('This is the Diveclub Manager.') // Optionale Beschreibung
+                ->end()
             ->end()
         ;
 

@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Diversworld\ContaoDiveclubBundle\DependencyInjection;
 
+use Diversworld\ContaoDiveclubBundle\ParameterBag\BackendParameterBag;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -49,6 +50,16 @@ class DiversworldContaoDiveclubExtension extends Extension
 
         $rootKey = $this->getAlias();
 
-        $container->setParameter($rootKey.'.foo.bar', $config['foo']['bar']);
+        $container->setParameter($rootKey.'.module_title', $config['module_title']);
+        $container->setParameter($rootKey.'.module_description', $config['module_description']);
+
+        // Werte aus Configuration nach $GLOBALS['TL_LANG'] für MOD übernehmen
+        $moduleTitle = $config['module_title'] ?? 'Diveclub Manager'; // Fallback
+        $moduleDescription = $config['module_description'] ?? 'Manage equipment, dive courses, etc.'; // Fallback
+
+        $GLOBALS['TL_LANG']['MOD']['diveclub'] = [
+            $moduleTitle,
+            $moduleDescription,
+        ];
     }
 }

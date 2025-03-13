@@ -18,8 +18,6 @@ use Contao\File;
 use Contao\Folder;
 use Contao\StringUtil;
 use Contao\System;
-use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 class CopyFilesMigration extends AbstractMigration
@@ -49,15 +47,9 @@ class CopyFilesMigration extends AbstractMigration
             self::getWebDir(),
         );
 
-        echo '<info>Starte den Kopiervorgang...</info>';
-
         new Folder('files/diveclub');
 
-        echo '<comment>Ordner "files/diveclub" wurde erstellt.</comment>';
-        echo '<info>Path:'. $path . '</info>';
-
         $this->getFiles($path);
-        echo '<info>Kopiervorgang abgeschlossen!</info>';
 
         return $this->createResult(true);
     }

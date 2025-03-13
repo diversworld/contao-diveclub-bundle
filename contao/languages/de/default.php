@@ -16,7 +16,6 @@ declare(strict_types=1);
  * Miscellaneous
  */
 //$GLOBALS['TL_LANG']['MSC'][''] = '';
-$GLOBALS['TL_LANG']['MSC']['tanks'] = 'Tauchgeräte';
 
 /**
  * Errors

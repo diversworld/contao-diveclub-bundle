@@ -54,7 +54,8 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
                                 {equipment_legend},addEquipment;
                                 {sizes_legend},addSizes;
                                 {types_legend},addTypes;
-                                {regulator_legend},addRegulators;'
+                                {regulator_legend},addRegulators;
+                                {publish_legend},published,start,stop;'
     ],
     'subpalettes'   => [
         'addManufacturer'   => 'manufacturersFile',
@@ -147,6 +148,24 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
             'eval'                    => array('fieldType'=>'radio', 'files' => true, 'tl_class'=>'w33clr'),
             'sql'                     => "binary(16) NULL"
         ),
+        'published'         => [
+            'toggle'            => true,
+            'filter'            => true,
+            'flag'              => DataContainer::SORT_INITIAL_LETTER_DESC,
+            'inputType'         => 'checkbox',
+            'eval'              => ['doNotCopy'=>true, 'tl_class' => 'w50'],
+            'sql'               => ['type' => 'boolean', 'default' => false]
+        ],
+        'start'             => [
+            'inputType'         => 'text',
+            'eval'              => ['rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 clr wizard'],
+            'sql'               => "varchar(10) NOT NULL default ''"
+        ],
+        'stop'              => [
+            'inputType'         => 'text',
+            'eval'              => ['rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 wizard'],
+            'sql'               => "varchar(10) NOT NULL default ''"
+        ]
     ],
 ];
 
