@@ -217,13 +217,12 @@ class tl_dc_equipment_types extends Backend
         if (!$templatePath || !file_exists($templatePath)) {
             throw new \Exception(sprintf('Template "%s" not found or not readable', $templateName));
         }
-        dump($templatePath);
+
         $options = [];
         //$content = file_get_contents($templatePath);
 
         $options = include $templatePath;
 
-        dump($options);
         if (!is_array($options)) {
             throw new \Exception(sprintf('Invalid template content in file: %s', $templatePath));
         }
@@ -285,8 +284,7 @@ class tl_dc_equipment_types extends Backend
 
         $typeLabel = $types[$row['types']] ?? $row['types'];
         $subTypeLabel = $subTypes[$row['types']][$row['subType']] ?? $row['subType'];
-        dump($subTypes);
-        dump($row);
+
         return sprintf('%s / %s', $typeLabel, $subTypeLabel);
     }
 }

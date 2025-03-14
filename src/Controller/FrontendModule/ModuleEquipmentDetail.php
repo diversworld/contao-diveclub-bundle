@@ -85,8 +85,7 @@ class ModuleEquipmentDetail extends AbstractFrontendModuleController
         $equipmentTypes = $this->helper->getEquipmentTypes();
         $types = DcEquipmentTypeModel::findAll(); // Alle Typ-Modelle laden
         $equipmentSubTypes = $this->helper->getTemplateOptions('subTypesFile'); // Hole SubType-Optionen
-        dump($equipmentTypes);
-        dump($equipmentSubTypes);
+
         $data = []; // Datenstruktur vorbereiten
 
         if ($types) {

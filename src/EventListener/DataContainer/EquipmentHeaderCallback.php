@@ -38,9 +38,7 @@ class EquipmentHeaderCallback
         // 2. Subtypen aus Template laden
         $equipmentType  = $this->getTemplateOptions('typesFile');
         $subTypes       = $this->getTemplateOptions('subTypesFile');
-        dump($subTypes);
-        dump($equipmentType);
-        dump($parentId);
+
         // 3. Parent-Typ aus Tabelle laden
         $record = $this->db->fetchAssociative(
             "SELECT types, subType
@@ -48,7 +46,7 @@ class EquipmentHeaderCallback
          WHERE id = ?",
             [$parentId]
         );
-dump($record);
+
         if (!$record) {
             $this->logger->error("Kein Datensatz für Parent-ID {$parentId} gefunden.");
             return ['Typ: unbekannt', 'Art: unbekannt'];

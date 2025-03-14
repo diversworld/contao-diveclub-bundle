@@ -30,8 +30,3 @@ services:
         calls:
             - [ setName, [ diversworld_contao_diveclub ] ]
 
-    diversworld.config.service:
-        class: Diversworld\ContaoDiveclubBundle\Service\ModuleConfigService
-        arguments:
-            $parameterBag: '@parameter_bag'
-
