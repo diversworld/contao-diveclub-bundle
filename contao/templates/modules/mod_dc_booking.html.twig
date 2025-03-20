@@ -1,0 +1,37 @@
+{% if typeSelection %}
+    <h2>Was möchten Sie reservieren?</h2>
+    <form method="get">
+        <select name="type">
+            {% for type in typeSelection %}
+                <option value="{{ type }}">{{ type }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Weiter</button>
+    </form>
+{% elseif equipmentTypeSelection %}
+    <h2>Bitte wählen Sie die Art des Equipments:</h2>
+    <form method="get">
+        <input type="hidden" name="type" value="Equipment">
+        <select name="equipmentType">
+            {% for equipment in equipmentTypeSelection %}
+                <option value="{{ equipment }}">{{ equipment }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Weiter</button>
+    </form>
+{% elseif availableAssets %}
+    <h2>Verfügbare Assets</h2>
+    <form method="post">
+        {% for asset in availableAssets %}
+            <label>
+                <input type="checkbox" name="selectedAssets[]" value="{{ asset.id }}">
+                {{ asset.name }}
+            </label>
+        {% endfor %}
+        <button type="submit" name="reserveAssets" value="1">Buchen</button>
+    </form>
+{% endif %}
+
+{% if success %}
+    <p>{{ success }}</p>
+{% endif %}

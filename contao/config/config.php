@@ -30,6 +30,9 @@ use Diversworld\ContaoDiveclubBundle\Model\DcCalendarEventsModel;
 //$GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_dc_tanks';
 
 $GLOBALS['BE_MOD']['diveclub'] = [
+        'dc_config_collection' => [
+            'tables' => ['tl_dc_config'],
+        ],
         'dc_equipment_collection' => [
             'tables' => ['tl_dc_equipment_types', 'tl_dc_equipment_subtypes'],
         ],
@@ -42,11 +45,11 @@ $GLOBALS['BE_MOD']['diveclub'] = [
         'dc_course_collection' => [
             'tables' => ['tl_dc_courses','tl_content'],
         ],
+        'dc_reservation_collection' => [
+            'tables' => ['tl_dc_reservation', 'tl_dc_reservation_items'],
+        ],
         'dc_check_collection' => [
             'tables' => ['tl_dc_check_proposal','tl_dc_check_articles'],
-        ],
-        'dc_config_collection' => [
-            'tables' => ['tl_dc_config'],
         ],
 ];
 

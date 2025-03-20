@@ -51,10 +51,10 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_subtypes'] = [
             'panelLayout'       => 'filter;sort,search,limit'
         ],
         'label'             => [
-            'fields'            => ['title','manufacturer','model','size'],
+            'fields'            => ['title','manufacturer','model','size','status'],
             'label_callback' 	=> ['tl_dc_equipment_subtypes', 'formatLabel'],
-            'showColumns'       => false,
-            'format'            => '%s %s %s %s',
+            'showColumns'       => true,
+            'format'            => '%s %s %s %s %s',
         ],
         'global_operations' => [
             'all'               => [
@@ -73,7 +73,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_subtypes'] = [
     ],
     'palettes'          => [
         '__selector__'      => ['addNotes'],
-        'default'           => '{title_legend},title,alias;
+        'default'           => '{title_legend},title,alias,status;
                                 {details_legend},manufacturer,model,color,size,serialNumber,buyDate;
                                 {notes_legend},addNotes;
                                 {publish_legend},published,start,stop;'
@@ -101,13 +101,13 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_subtypes'] = [
             'filter'            => true,
             'sorting'           => true,
             'flag'              => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'eval'              => ['mandatory' => true, 'maxlength'=>255, 'tl_class' => 'w50'],
+            'eval'              => ['mandatory' => true, 'maxlength'=>255, 'tl_class' => 'w33'],
             'sql'               => "varchar(255) NOT NULL default ''"
         ],
         'alias'             => [
             'search'            => true,
             'inputType'         => 'text',
-            'eval'              => ['rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w50'],
+            'eval'              => ['rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w33'],
             'save_callback' => [
                 ['tl_dc_equipment_subtypes', 'generateAlias']
             ],
@@ -176,6 +176,18 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_subtypes'] = [
             'flag'              => DataContainer::SORT_YEAR_DESC,
             'eval'              => ['submitOnChange' => true,'rgxp'=>'date', 'doNotCopy'=>false, 'datepicker'=>true, 'tl_class'=>'w25 wizard'],
             'sql'               => "bigint(20) NULL"
+        ],
+        'status'        => [
+            'inputType'         => 'select',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_subtypes']['status'],
+            'exclude'           => true,
+            'search'            => true,
+            'filter'            => true,
+            'sorting'           => true,
+            'options'           => &$GLOBALS['TL_LANG']['tl_dc_equipment_subtypes']['itemStatus'],
+            'reference'         => &$GLOBALS['TL_LANG']['tl_dc_equipment_subtypes']['itemStatus'],
+            'eval'              => ['includeBlankOption' => true, 'submitOnChange' => true, 'chosen'   => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
+            'sql'               => "varchar(255) NOT NULL default ''"
         ],
         'addNotes'          => [
             'inputType'         => 'checkbox',
@@ -341,6 +353,6 @@ class tl_dc_equipment_subtypes extends Backend
         $sizeName = $sizes[$row['size']] ?? 'Unbekannt';
 
         // Neues Label-Format mit Text-Werten
-        return sprintf('%s %s %s - %s', $manufacturerName, $row['model'], $sizeName, $row['title']);
+        return sprintf('%s %s %s - %s - %s', $manufacturerName, $row['model'], $sizeName, $row['title'], $GLOBALS['TL_LANG']['tl_dc_equipment_subtypes']['itemStatus'][$row['status']]);
     }
 }

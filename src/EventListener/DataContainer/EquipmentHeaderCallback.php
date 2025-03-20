@@ -67,12 +67,12 @@ class EquipmentHeaderCallback
         System::loadLanguageFile('tl_dc_regulators');
 
         $mapping = [
-            'Typ' => 'types',
+            'Typ' => 'title',
             'Art' => 'subType',
         ];
 
         foreach ($mapping as $labelKey => $recordField) {
-            $labels[$GLOBALS['TL_LANG']['tl_dc_equipment'][$recordField][0] ?? $labelKey] = $record[$recordField] ?? 'Nicht verfügbar';
+            $labels[$GLOBALS['TL_LANG']['tl_dc_equipment'][$recordField] ?? $labelKey] = $record[$recordField] ?? 'Nicht verfügbar';
         }
 
         return $labels; // Rückgabe als Array

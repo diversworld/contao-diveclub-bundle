@@ -54,6 +54,8 @@ $GLOBALS['TL_LANG']['tl_dc_tanks']['addNotes']      = ["Bemerkungen eingeben", "
 $GLOBALS['TL_LANG']['tl_dc_tanks']['published']     = ["Veröffentlichen", "Den Datensatz veröffentlichen."];
 $GLOBALS['TL_LANG']['tl_dc_tanks']['start']         = ["Anzeigen ab", "Ab wann soll der Datensatz angezeigt werden."];
 $GLOBALS['TL_LANG']['tl_dc_tanks']['stop']          = ["Anzeigen bis", "Bis wann soll der Datensatz angezeigt werden."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['status']    = ['Status','Status des Assets'];
+
 /**
  * References
  */
@@ -72,6 +74,19 @@ $GLOBALS['TL_LANG']['tl_dc_tanks']['sizes'] = [
                                                 '40' => '40 cft',
                                                 '80' => '80 cft'
 ];
+
+$GLOBALS['TL_LANG']['tl_dc_tanks']['itemStatus'] = [
+            'avaílable' => 'verfügbar',
+            'reserved'  => 'reserviert',
+            'borrowed'  => 'ausgeliehen',
+            'returned'  => 'zurückgegeben',
+            'cancelled' => 'storniert',
+            'overdue'   => 'überfällig',
+            'lost'      => 'verloren',
+            'damaged'   => 'defekt',
+            'missing'   => 'vermisst',
+];
+
 
 /**
  * Buttons

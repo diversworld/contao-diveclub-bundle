@@ -36,3 +36,17 @@ $GLOBALS['TL_LANG']['tl_dc_equipment_subtypes']['stop']              = ['Enddatu
 
 $GLOBALS['TL_LANG']['tl_dc_equipment_subtypes']['stageType']          = ['1' => 'Erste Stufe', '2' => 'Zweite Stufe'];
 $GLOBALS['TL_LANG']['tl_dc_equipment_subtypes']['regType']            = ['1' => 'Primär', '2' => 'Sekundär'];
+$GLOBALS['TL_LANG']['tl_dc_equipment_subtypes']['status']       = ['Status','Status des Assets'];
+
+// Reference
+$GLOBALS['TL_LANG']['tl_dc_equipment_subtypes']['itemStatus'] = [
+    'avaílable' => 'verfügbar',
+    'reserved'  => 'reserviert',
+    'borrowed'  => 'ausgeliehen',
+    'returned'  => 'zurückgegeben',
+    'cancelled' => 'storniert',
+    'overdue'   => 'überfällig',
+    'lost'      => 'verloren',
+    'damaged'   => 'defekt',
+    'missing'   => 'vermisst',
+];

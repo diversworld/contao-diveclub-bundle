@@ -24,7 +24,7 @@ use Contao\System;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 //#[AsCallback(table: 'tl_dc_tanks', target: 'edit.buttons', priority: 100)]
-class DcTanks
+class DcReservation
 {
     private ContaoFramework $framework;
 

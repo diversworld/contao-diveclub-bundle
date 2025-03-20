@@ -53,8 +53,9 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'panelLayout'   => 'filter;sort,search,limit'
         ],
         'label'             => [
-            'fields' => ['title','regModel1st','regModel2ndPri','regModel2ndSec'],
-            'format' => '%s - %s %s %s',
+            'fields'        => ['title','regModel1st','regModel2ndPri','regModel2ndSec','status'],
+            'showColumns'   => true,
+            'format'        => '%s - %s %s %s',
             'label_callback' => ['tl_dc_regulators', 'customLabelCallback']
         ],
         'global_operations' => [
@@ -75,7 +76,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
     ],
     'palettes'          => [
         '__selector__'      => ['addArticleInfo'],
-        'default'           => '{title_legend},title,alias;
+        'default'           => '{title_legend},title,alias,status;
                                 {1stStage_legend},manufacturer,serialNumber1st,regModel1st;
                                 {2ndstage_legend},serialNumber2ndPri,regModel2ndPri,serialNumber2ndSec,regModel2ndSec;
                                 {notes_legend},addNotes;
@@ -183,6 +184,18 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'sorting'           => true,
             'options_callback'  => ['tl_dc_regulators', 'getRegModels2nd'],
             'eval'              => ['includeBlankOption' => true,'submitOnChange' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w25'],
+            'sql'               => "varchar(255) NOT NULL default ''"
+        ],
+        'status'        => [
+            'inputType'         => 'select',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulators']['status'],
+            'exclude'           => true,
+            'search'            => true,
+            'filter'            => true,
+            'sorting'           => true,
+            'options'           => &$GLOBALS['TL_LANG']['tl_dc_regulators']['itemStatus'],//['auvailable','reserved', 'borrowed', 'returned', 'cancelled', 'overdue', 'lost', 'damaged', 'missing'],
+            'reference'         => &$GLOBALS['TL_LANG']['tl_dc_regulators']['itemStatus'],
+            'eval'              => ['includeBlankOption' => true, 'submitOnChange' => true, 'chosen'   => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql'               => "varchar(255) NOT NULL default ''"
         ],
         'addNotes'          => [

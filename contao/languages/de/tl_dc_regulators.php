@@ -37,3 +37,18 @@ $GLOBALS['TL_LANG']['tl_dc_regulators']['notes']             = ['Notizen', 'Gebe
 $GLOBALS['TL_LANG']['tl_dc_regulators']['published']         = ['Veröffentlicht', 'Markieren Sie das Equipment als veröffentlicht.'];
 $GLOBALS['TL_LANG']['tl_dc_regulators']['start']             = ['Startdatum', 'Geben Sie ein Startdatum an.'];
 $GLOBALS['TL_LANG']['tl_dc_regulators']['stop']              = ['Enddatum', 'Geben Sie ein Enddatum an.'];
+$GLOBALS['TL_LANG']['tl_dc_regulators']['status']       = ['Status','Status des Assets'];
+
+// References
+
+$GLOBALS['TL_LANG']['tl_dc_regulators']['itemStatus'] = [
+    'avaílable' => 'verfügbar',
+    'reserved'  => 'reserviert',
+    'borrowed'  => 'ausgeliehen',
+    'returned'  => 'zurückgegeben',
+    'cancelled' => 'storniert',
+    'overdue'   => 'überfällig',
+    'lost'      => 'verloren',
+    'damaged'   => 'defekt',
+    'missing'   => 'vermisst',
+];

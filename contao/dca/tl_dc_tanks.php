@@ -43,13 +43,13 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
     'list'              => [
         'sorting'           => [
             'mode'              => DataContainer::MODE_SORTABLE,
-            'fields'            => ['title','owner','manufacturer','size','lastCheckDate','nextCheckDate','o2clean'],
+            'fields'            => ['title','owner','manufacturer','size','lastCheckDate','nextCheckDate','o2clean','status'],
             'flag'              => DataContainer::SORT_ASC,
             'panelLayout'       => 'filter;sort,search,limit',
         ],
         'label'             => [
-            'fields'            => ['title','serialNumber','manufacturer','size','o2clean','lastCheckDate','nextCheckDate'],
-            'showColumns'       => false,
+            'fields'            => ['title','serialNumber','manufacturer','size','o2clean','lastCheckDate','nextCheckDate','status'],
+            'showColumns'       => true,
             'format'            => '%s',
             'label_callback'    => ['tl_dc_tanks', 'formatCheckDates'],
             'group_callback'    => ['tl_dc_tanks', 'formatGroupHeader'],
@@ -72,7 +72,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
     ],
     'palettes'          => [
         '__selector__'      => ['addNotes'],
-        'default'           => '{title_legend},title,alias;
+        'default'           => '{title_legend},title,alias,status;
                                 {details_legend},serialNumber,manufacturer,bazNumber,size,o2clean,owner,checkId,lastCheckDate,nextCheckDate;
                                 {notes_legend},addNotes;
                                 {publish_legend},published,start,stop;'
@@ -94,13 +94,13 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'filter'            => true,
             'sorting'           => true,
             'flag'              => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'eval'              => ['mandatory' => true, 'maxlength'=>255, 'tl_class' => 'w50'],
+            'eval'              => ['mandatory' => true, 'maxlength'=>255, 'tl_class' => 'w33'],
             'sql'               => "varchar(255) NOT NULL default ''"
         ],
         'alias'             => [
             'search'            => true,
             'inputType'         => 'text',
-            'eval'              => ['rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w50'],
+            'eval'              => ['rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w33'],
             'save_callback' => [
                         ['tl_dc_tanks', 'generateAlias']
             ],
@@ -197,6 +197,18 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
                 'tl_class'          => 'w33 clr'                                    // Layout-Klasse
             ],
             'sql'               => "int(10) unsigned NOT NULL default 0"            // Datenbankspalte
+        ],
+        'status'        => [
+            'inputType'         => 'select',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_tanks']['status'],
+            'exclude'           => true,
+            'search'            => true,
+            'filter'            => true,
+            'sorting'           => true,
+            'options'           => &$GLOBALS['TL_LANG']['tl_dc_tanks']['itemStatus'],
+            'reference'         => &$GLOBALS['TL_LANG']['tl_dc_tanks']['itemStatus'],
+            'eval'              => ['includeBlankOption' => true, 'submitOnChange' => true, 'chosen'   => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
+            'sql'               => "varchar(255) NOT NULL default ''"
         ],
         'addNotes'          => [
             'exclude'           => true,
