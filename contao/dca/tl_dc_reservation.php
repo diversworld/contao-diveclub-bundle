@@ -99,19 +99,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'eval'              => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w33'],
             'save_callback'     => [['tl_dc_reservation', 'generateAlias']],
             'sql'               => "varchar(255) BINARY NOT NULL default ''"
-        ],/*
-        'asset_type'        => [
-            'inputType'         => 'select',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_reservation']['asset_type'],
-            'exclude'           => true,
-            'search'            => true,
-            'filter'            => true,
-            'sorting'           => true,
-            'options'           => ['tl_dc_regulators', 'tl_dc_tanks', 'tl_dc_equipment_types'],
-            'reference'         => &$GLOBALS['TL_LANG']['tl_dc_reservation'],
-            'eval'              => ['includeBlankOption' => true, 'submitOnChange' => true, 'chosen'   => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
-            'sql'               => "varchar(255) NOT NULL default ''"
-        ],*/
+        ],
         'reservation_status'=> [
             'inputType'         => 'select',
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_reservation']['reservation_status'],
@@ -123,19 +111,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'reference'         => &$GLOBALS['TL_LANG']['tl_dc_reservation'],
             'eval'              => ['includeBlankOption' => true, 'submitOnChange' => true, 'chosen'   => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql'               => "varchar(255) NOT NULL default ''"
-        ],/*
-        'asset_id'          => [
-            'inputType'         => 'select',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_reservation']['asset_id'],
-            'exclude'           => true,
-            'filter'            => true,
-            'sorting'           => true,
-            'options'           => ['1' => '1', '2' => '2', '3' => '3', '4' => '4'],
-            'eval'              => ['includeBlankOption' => true, 'submitOnChange' => true, 'chosen'   => true, 'multiple' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
-            //'sql'               => "int(10) unsigned NOT NULL default 0",
-            'sql'       => "text NULL",
-            'options_callback'  => ['tl_dc_reservation', 'getAvailableAssets']
-        ],*/
+        ],
         'asset_quantity'    => [
             'inputType'         => 'text',
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_reservation']['asset_quantity'],

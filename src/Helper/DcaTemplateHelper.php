@@ -23,48 +23,66 @@ class DcaTemplateHelper
     {
         return $this->getTemplateOptions('typesFile');
     }
-    public function getSubTypes(DataContainer $dc): array
+    public function getSubTypes(?int $type = null, ?DataContainer $dc = null): array
     {
-        if (!$dc->activeRecord || !$dc->activeRecord->title) {
+        // Typ entweder aus Parameter ($type) oder DataContainer ($dc) ermitteln
+        if (!$type && $dc && $dc->activeRecord->types) {
+            dump($dc->activeRecord);
+            $type = $dc->activeRecord->types; // Typ aus DataContainer
+        }
+
+        // Wenn kein Typ verfügbar ist, leere Rückgabe
+        if (!$type) {
             return [];
         }
+
+        // Optionen laden
         $types = $this->getTemplateOptions('subTypesFile');
-        return $types[$dc->activeRecord->types] ?? [];
+
+        // Rückgabe der Subtypen für den ermittelten Typ
+        return $types[$type] ?? [];
     }
 
-    public function getRegModels1st(DataContainer $dc): array
+    public function getRegModels1st(?int $manufacturer = null, ?DataContainer $dc = null): array
     {
-        // Sicherstellen, dass ein aktiver Datensatz vorhanden ist
-        if (!$dc->activeRecord || !$dc->activeRecord->manufacturer) {
-            return [];
+        // Hersteller entweder aus Parameter oder DataContainer ermitteln
+        if (!$manufacturer && $dc && $dc->activeRecord && $dc->activeRecord->manufacturer) {
+            $manufacturer = $dc->activeRecord->manufacturer;
+            dump($manufacturer);
         }
 
-        // Ermittle den aktuellen Typ aus dem aktiven Datensatz
-        $manufacturer = $dc->activeRecord->manufacturer; // Aktueller Hersteller
-        $models = $this->getTemplateOptions('regulatorsFile');
+        if (!$manufacturer) {
+            return []; // Kein Hersteller verfügbar
+        }
 
-        // Prüfen, ob der Hersteller existiert und Modelle für die erste Stufe definiert sind
+        $models = $this->getTemplateOptions('regulatorsFile');
+        dump($models);
         if (!isset($models[$manufacturer]['regModel1st']) || !is_array($models[$manufacturer]['regModel1st'])) {
             return [];
         }
 
-        // Rückgabe der Modelle für die erste Stufe
         return $models[$manufacturer]['regModel1st'];
     }
 
-    public function getRegModels2nd(DataContainer $dc): array
+    public function getRegModels2nd(?int $manufacturer = null, ?DataContainer $dc = null): array
     {
-        if (!$dc->activeRecord || !$dc->activeRecord->manufacturer) {
-            return [];
+        // Hersteller entweder aus Parameter oder DataContainer ermitteln
+        if (!$manufacturer && $dc && $dc->activeRecord && $dc->activeRecord->manufacturer) {
+            $manufacturer = $dc->activeRecord->manufacturer;
         }
 
-        $manufacturer = $dc->activeRecord->manufacturer; // Aktueller Hersteller
+        if (!$manufacturer) {
+            return []; // Kein Hersteller verfügbar
+        }
+
         $models = $this->getTemplateOptions('regulatorsFile');
 
         // Prüfen, ob der Hersteller existiert und Modelle für die zweite Stufe definiert sind
         if (!isset($models[$manufacturer]['regModel2nd']) || !is_array($models[$manufacturer]['regModel2nd'])) {
             return [];
         }
+        dump('Helper: models');
+        dump($models);
 
         // Rückgabe der Modelle für die zweite Stufe
         return $models[$manufacturer]['regModel2nd'];

@@ -18,6 +18,7 @@ declare(strict_types=1);
 $GLOBALS['TL_LANG']['tl_dc_reservation_items']['title_legend']        = "Stammdaten";
 $GLOBALS['TL_LANG']['tl_dc_reservation_items']['details_legend']      = "Details zum Tauchgerät";
 $GLOBALS['TL_LANG']['tl_dc_reservation_items']['reservation_legend']  = "Reservierung";
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['notes_legend']        = "Bemerkungen";
 $GLOBALS['TL_LANG']['tl_dc_reservation_items']['publish_legend']      = "Veröffentlichen";
 
 /**
@@ -37,45 +38,45 @@ $GLOBALS['TL_LANG']['tl_dc_reservation_items']['toggle']      = "Datensatz mit I
 /**
  * Fields
  */
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['title']               = ["Inventarnummer", "Geben Sie die Inventarnummer ein"];
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['alias']               = ["Alias", "Flaschen-Alias"];
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['serialNumber']        = ["Seriennummer", "Geben Sie die Seriennummer ein."];
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['o2clean']             = ["O2 Clean", "Die Flasche ist für Sauerstoff und muss O2 clean sein."];
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['manufacturer']        = ["Hersteller", "Hersteller des Tauchgerätes."];
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['bazNumber']           = ["BAZ Nummer", "BAZ Nummer."];
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['checkId']     	    = ["TÜV Termin", "Termin der letzten TÜV Prüfung."];
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['owner']               = ["Eigentümer", "Eingentümer des Tauchgerätes."];
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['lastCheckDate']       = ["letzter TÜV", "Datum der letzten TÜV Prüfung."];
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['nextCheckDate']       = ["nächster TÜV", "Datum der nächsten TÜV Prüfung."];
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['pid']                 = ["nächster TÜV-Termin", "Wähle den nächsten TÜV-Termin aus.."];
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['size']                = ["Größe", "Bitte die Flaschengröße auswählen."];
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['member']              = ["Eigentümer", "Eigentümer der Flasche."];
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['addNotes']            = ["Bemerkungen eingeben", "Bemerkungen zum Tauchgerät erfassen."];
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['published']           = ["Veröffentlichen", "Den Datensatz veröffentlichen."];
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['start']               = ["Anzeigen ab", "Ab wann soll der Datensatz angezeigt werden."];
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['stop']                = ["Anzeigen bis", "Bis wann soll der Datensatz angezeigt werden."];
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['reservation_status']  = ['Status','Status der Reservierung'];
+
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['manufacturer']          = ["Hersteller", "Hersteller des Tauchgerätes."];
+
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['pid']                   = ["nächster TÜV-Termin", "Wähle den nächsten TÜV-Termin aus.."];
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['size']                  = ["Größe", "Bitte die Flaschengröße auswählen."];
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['member']                = ["Eigentümer", "Eigentümer der Flasche."];
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['reservation_status']    = ['Status','Status der Reservierung'];
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['item_type']             = ['Ressourcentypen', 'Bitte wähle den Ausrüstungstyp aus.'];
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['item_id']               = ['Ressourcenart', 'Bitte wähle die Art der Ausrüstungs aus.'];
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['reserved_at']           = ['Reserviert', 'Bitte geben Sie das Reservierungsdatum an.'];
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['created_at']            = ['Erstellt', 'Das Datum der Erstellung der Reservierung wird automatisch erstellt.'];
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['updated_at']            = ['Aktualisiert', 'Das Datum der Aktualisierung der Reservierung wird automatisch erstellt.'];
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['picked_up_at']          = ['Abgeholt', 'Bitte geben Sie das Datum der Abholung an.'];
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['returned_at']           = ['Zurückgegeben', 'Bitte geben Sie das Datu der Rückgabe an.'];
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['addNotes']              = ["Bemerkungen eingeben", "Bemerkungen zum Tauchgerät erfassen."];
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['published']             = ["Veröffentlichen", "Den Datensatz veröffentlichen."];
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['start']                 = ["Anzeigen ab", "Ab wann soll der Datensatz angezeigt werden."];
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['stop']                  = ["Anzeigen bis", "Bis wann soll der Datensatz angezeigt werden."];
 
 /**
  * References
  */
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['asset_type']              = 'Ressourcentyp';
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['tl_dc_tanks']             = 'Tauchgeräte';
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['tl_dc_regulators']        = 'Atemregler';
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['tl_dc_equipment_types']   = 'Ausrüstung';
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['tl_dc_equipment_subtypes']= 'Ausrüstungsart';
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes']             = [
+        'tl_dc_tanks'               => 'Tauchgeräte',
+        'tl_dc_regulators'          => 'Atemregler',
+        'tl_dc_equipment_types'     => 'Ausrüstung',
+    ];
 
 $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'] = [
-    'avaílable' => 'verfügbar',
-    'reserved'  => 'reserviert',
-    'borrowed'  => 'ausgeliehen',
-    'returned'  => 'zurückgegeben',
-    'cancelled' => 'storniert',
-    'overdue'   => 'überfällig',
-    'lost'      => 'verloren',
-    'damaged'   => 'defekt',
-    'missing'   => 'vermisst',
-];
+        'avaílable' => 'verfügbar',
+        'reserved'  => 'reserviert',
+        'borrowed'  => 'ausgeliehen',
+        'returned'  => 'zurückgegeben',
+        'cancelled' => 'storniert',
+        'overdue'   => 'überfällig',
+        'lost'      => 'verloren',
+        'damaged'   => 'defekt',
+        'missing'   => 'vermisst',
+    ];
 
 /**
  * Buttons

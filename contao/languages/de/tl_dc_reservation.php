@@ -56,10 +56,10 @@ $GLOBALS['TL_LANG']['tl_dc_reservation']['start']               = ["Anzeigen ab"
 $GLOBALS['TL_LANG']['tl_dc_reservation']['stop']                = ["Anzeigen bis", "Bis wann soll der Datensatz angezeigt werden."];
 $GLOBALS['TL_LANG']['tl_dc_reservation']['reservation_status']  = ['Status','Status der Reservierung'];
 
+
 /**
  * References
  */
-$GLOBALS['TL_LANG']['tl_dc_reservation']['asset_type']              = 'Ressourcentyp';
 $GLOBALS['TL_LANG']['tl_dc_reservation']['tl_dc_tanks']             = 'Tauchgeräte';
 $GLOBALS['TL_LANG']['tl_dc_reservation']['tl_dc_regulators']        = 'Atemregler';
 $GLOBALS['TL_LANG']['tl_dc_reservation']['tl_dc_equipment_types']   = 'Ausrüstung';
