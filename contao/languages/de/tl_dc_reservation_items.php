@@ -47,6 +47,8 @@ $GLOBALS['TL_LANG']['tl_dc_reservation_items']['member']                = ["Eige
 $GLOBALS['TL_LANG']['tl_dc_reservation_items']['reservation_status']    = ['Status','Status der Reservierung'];
 $GLOBALS['TL_LANG']['tl_dc_reservation_items']['item_type']             = ['Kategorie', 'Bitte wähle den Ausrüstungstyp aus.'];
 $GLOBALS['TL_LANG']['tl_dc_reservation_items']['item_id']               = ['Gewähltes Teil', 'Bitte wähle die Art der Ausrüstungs aus.'];
+
+
 $GLOBALS['TL_LANG']['tl_dc_reservation_items']['types']                 = ['Ausrüstung', 'Bitte wähle die Art der Ausrüstungs aus.'];
 $GLOBALS['TL_LANG']['tl_dc_reservation_items']['sub_type']              = ['Ausrüstungsteil', 'Bitte wähle die Art der Ausrüstungs aus.'];
 $GLOBALS['TL_LANG']['tl_dc_reservation_items']['reserved_at']           = ['Reserviert', 'Bitte geben Sie das Reservierungsdatum an.'];
@@ -60,6 +62,15 @@ $GLOBALS['TL_LANG']['tl_dc_reservation_items']['start']                 = ["Anze
 $GLOBALS['TL_LANG']['tl_dc_reservation_items']['stop']                  = ["Anzeigen bis", "Bis wann soll der Datensatz angezeigt werden."];
 
 /**
+ * Explanations
+ */
+$GLOBALS['TL_LANG']['XPL']['selected_asset'] = [
+    [
+        'Hinweis',
+        'Der Status des momentan ausgewählte Assets wird auf den <strong>hier gewählten Status </strong> geändert, wenn sie den Status ändern.'
+    ]
+];
+/**
  * References
  */
 $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes']             = [
@@ -69,11 +80,11 @@ $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes']             = [
     ];
 
 $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'] = [
-        'avaílable' => 'verfügbar',
+        'available' => 'verfügbar',
         'reserved'  => 'reserviert',
         'borrowed'  => 'ausgeliehen',
         'returned'  => 'zurückgegeben',
-        'cancelled' => 'storniert',
+        'canceled'  => 'storniert',
         'overdue'   => 'überfällig',
         'lost'      => 'verloren',
         'damaged'   => 'defekt',

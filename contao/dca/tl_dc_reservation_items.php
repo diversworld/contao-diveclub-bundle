@@ -17,8 +17,8 @@ use Contao\Backend;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
-use Contao\System;
 use Diversworld\ContaoDiveclubBundle\DataContainer\DcReservation;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ItemReservationCallbackListener;
 use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
 
 /**
@@ -29,6 +29,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
         'dataContainer' => DC_Table::class,
         'ptable' => 'tl_dc_reservation',
         'enableVersioning' => true,
+        'onsubmit_callback' => [ItemReservationCallbackListener::class, '__invoke'],
         'sql' => [
             'keys' => [
                 'id' => 'primary',
@@ -61,8 +62,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
             'edit',
             'copy',
             'delete',
-            'show',
-            'toggle'
+            'show'
         ]
     ],
     'palettes' => [
@@ -140,8 +140,18 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
             'exclude'           => true,
             'filter'            => true,
             'sorting'           => true,
+            'explanation'       => 'selected_asset',
             'options_callback'  => ['tl_dc_reservation_items', 'getAvailableAssets'],
-            'eval'              => ['includeBlankOption' => true, 'submitOnChange' => true, 'chosen'   => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
+            'load_callback'     => ['tl_dc_reservation_items', 'showSelectedAssetHint'],
+            'eval'              => [
+                'includeBlankOption'    => true,
+                'submitOnChange'        => true,
+                'chosen'                => true,
+                'mandatory'             => true,
+                'maxlength'             => 255,
+                'helpwizard'            => true,
+                'tl_class'              => 'w25'
+            ],
             'sql'               => "int(10) unsigned NOT NULL default 0",
         ],
         'reserved_at'       => [
@@ -238,16 +248,9 @@ class tl_dc_reservation_items extends Backend
         // Die ausgewählte Tabelle basierend auf asset_type ermitteln
         $tableName = $dc->activeRecord->item_type;
 
-
         // Prüfen, ob die Tabelle existiert (Sicherheitsvorkehrung)
         if (!in_array($tableName, ['tl_dc_tanks', 'tl_dc_regulators', 'tl_dc_equipment_types'], true)) {
             return [];
-        }
-        if($tableName == 'tl_dc_equipment_types')
-        {
-            $equipmentType = $helper->getEquipmentTypes();
-            dump($equipmentType);
-            //$subTypeOption = $helper->getSubTypes($equipmentType, $dc->id);
         }
 
         // Datenbank-Abfrage zur Ermittlung der verfügbaren Asset-IDs
@@ -256,38 +259,52 @@ class tl_dc_reservation_items extends Backend
         switch ($tableName) {
             case 'tl_dc_tanks':
                 $query = sprintf(
-                    "SELECT id, title, size FROM %s
-                   WHERE published = 1 AND status = 'available'
+                    "SELECT id, title, size, status FROM %s
+                   WHERE published = 1
                    ORDER BY title", $tableName
                 );
 
                 $result = $database->prepare($query)->execute();
                 $options = [];
                 while ($result->next()) {
-                    $options[$result->id] = $result->size."L - ".$result->title;
+                    $statusText = $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$result->status] ?? $result->status;
+                    $status = $result->status ? ' (' . $statusText . ')' : '';
+
+                    $options[$result->id] = $result->title . ' (' . $statusText . ')';
+
+                    $options[$result->id] = $result->size."L - ".$result->title. ' '.$status;
                 }
                 break;
             case 'tl_dc_regulators':
                 $query = sprintf(
-                    "SELECT id, title, manufacturer, regModel1st, regModel2ndPri, regModel2ndSec FROM %s
-                   WHERE published = 1 AND status = 'available'
-                   ORDER BY title", $tableName
+                    "SELECT id, title, manufacturer, regModel1st, regModel2ndPri, regModel2ndSec, status FROM tl_dc_regulators
+                   WHERE published = 1
+                   ORDER BY title"
                 );
 
                 $result = $database->prepare($query)->execute();
                 $options = [];
                 while ($result->next()) {
-                    $options[$result->id] = $result->manufacturer." - ".$result->regModel1St.' - '.$result->regModel2ndPri.' - '.$result->regModel2ndsec;
+                    $statusText = $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$result->status] ?? $result->status;
+                    $status = $result->status ? ' (' . $statusText . ')' : '';
+                    $options[$result->id] = $result->manufacturer." - ".$result->regModel1St.' - '.$result->regModel2ndPri.' - '.$result->regModel2ndsec. ' ' . $status;
                 }
                 break;
             case 'tl_dc_equipment_types':
-                $tableName = 'tl_dc_equipment_subtypes';
+                $types = (int) $dc->activeRecord->types;
+                $subType = (int) $dc->activeRecord->sub_type;
+                $query = sprintf("SELECT id, types, subType
+                                FROM tl_dc_equipment_types
+                                WHERE published = 1 AND types = %s AND subType = %s LIMIT 1", $types, $subType
+                );
+                $result = $database->prepare($query)->execute();
 
-                $pid = (int) $dc->activeRecord->sub_type;
+                $pid = $result->id;
+
                 $query = sprintf(
-                    "SELECT id, title, manufacturer, model, size FROM %s
-                   WHERE pid = %s AND published = 1 AND status = 'available'
-                   ORDER BY title", $tableName, $pid
+                    "SELECT id, title, manufacturer, model, size, status FROM  tl_dc_equipment_subtypes
+                   WHERE pid = %s AND published = 1
+                   ORDER BY title", $pid
                 );
 
                 $result = $database->prepare($query)->execute();
@@ -296,13 +313,35 @@ class tl_dc_reservation_items extends Backend
                 while ($result->next()) {
                     $manufacturerName = $helper->getManufacturers()[$result->manufacturer] ?? 'Unbekannter Hersteller';
                     $size = $helper->getSizes()[$result->size] ?? 'Unbek. Größe';
-                    $options[$result->id] = $manufacturerName.' - '.$result->model.' - '.$size;
+                    $statusText = $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$result->status] ?? $result->status;
+                    $status = $result->status ? ' (' . $statusText . ')' : '';
+                    $options[$result->id] = $manufacturerName.' - '.$result->model.' - '.$size. ' ' . $status;
                 }
                 break;
         }
-
-        dump($options);
         return $options;
+    }
+
+    public function showSelectedAssetHint($value, DataContainer $dc)
+    {
+        if (!$dc->activeRecord->item_id) {
+            return $value;
+        }
+
+        $database = Database::getInstance();
+        $item = $database->prepare("SELECT title, status FROM tl_dc_equipment_subtypes WHERE id = ?")
+            ->execute($dc->activeRecord->item_id);
+
+        if ($item->numRows > 0) {
+            $status = $item->status === 'reserved' ? ' (Reserviert)' : ' (Verfügbar)';
+            $_SESSION['TL_INFO'][] = sprintf(
+                'Aktuell ausgewähltes Asset: <strong>%s</strong>%s',
+                $item->title,
+                $status
+            );
+        }
+
+        return $value;
     }
 
     public function getEquipmentTypes(DataContainer $dc): array
@@ -320,8 +359,8 @@ class tl_dc_reservation_items extends Backend
         {
             return[];
         }
-
         $options = $helper->getSubTypes((int) $dc->activeRecord->types, $dc);
+
         return $options;
     }
     public function setCeratedAt(string $value, DataContainer $dc): int
@@ -353,12 +392,12 @@ class tl_dc_reservation_items extends Backend
         $helper = new DcaTemplateHelper(); // Instanz der Helper-Klasse
 
         // Überprüfen, ob created_at und updated_at gültige Werte enthalten
-        $created = !empty($row['created_at']) && strtotime($row['created_at']) !== false
-            ? date($GLOBALS['TL_CONFIG']['datimFormat'], strtotime($row['created_at'])) // Fallback, falls nicht gesetzt))
+        $created = !empty($row['created_at']) && date($row['created_at']) !== false
+            ? date($GLOBALS['TL_CONFIG']['datimFormat'], (int) $row['created_at']) // Fallback, falls nicht gesetzt))
             : 'Unbekannt';
 
-        $updated = !empty($row['updated_at']) && strtotime($row['updated_at']) !== false
-            ? date($GLOBALS['TL_CONFIG']['datimFormat'], strtotime($row['updated_at']))
+        $updated = !empty($row['updated_at']) && date($row['updated_at']) !== false
+            ? date($GLOBALS['TL_CONFIG']['datimFormat'], (int) $row['updated_at'])
             : 'Unbekannt';
 
         $args[3] = $created;
@@ -417,7 +456,8 @@ class tl_dc_reservation_items extends Backend
                 } else {
                     $manufacturerName = $helper->getManufacturers()[$result->manufacturer] ?? 'Unbekannter Hersteller';
                     //$model = $helper->getSubTypes();
-                    $args[1] = $manufacturerName . ', ' . $result->model . ' (' . $result->size . ')';
+                    $size = $helper->getSizes();
+                    $args[1] = $manufacturerName . ', ' . $result->model . ' (' . $size[$result->size] . ')';
                 }
                 break;
 
@@ -426,6 +466,8 @@ class tl_dc_reservation_items extends Backend
                 break;
         }
 
+        $args[3] = $created;
+        $args[4] = $updated;
         return $args;
     }
 

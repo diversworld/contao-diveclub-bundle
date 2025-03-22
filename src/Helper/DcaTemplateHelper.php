@@ -27,7 +27,6 @@ class DcaTemplateHelper
     {
         // Typ entweder aus Parameter ($type) oder DataContainer ($dc) ermitteln
         if (!$type && $dc && $dc->activeRecord->types) {
-            dump($dc->activeRecord);
             $type = $dc->activeRecord->types; // Typ aus DataContainer
         }
 
@@ -48,7 +47,6 @@ class DcaTemplateHelper
         // Hersteller entweder aus Parameter oder DataContainer ermitteln
         if (!$manufacturer && $dc && $dc->activeRecord && $dc->activeRecord->manufacturer) {
             $manufacturer = $dc->activeRecord->manufacturer;
-            dump($manufacturer);
         }
 
         if (!$manufacturer) {
@@ -56,7 +54,6 @@ class DcaTemplateHelper
         }
 
         $models = $this->getTemplateOptions('regulatorsFile');
-        dump($models);
         if (!isset($models[$manufacturer]['regModel1st']) || !is_array($models[$manufacturer]['regModel1st'])) {
             return [];
         }
@@ -81,8 +78,6 @@ class DcaTemplateHelper
         if (!isset($models[$manufacturer]['regModel2nd']) || !is_array($models[$manufacturer]['regModel2nd'])) {
             return [];
         }
-        dump('Helper: models');
-        dump($models);
 
         // Rückgabe der Modelle für die zweite Stufe
         return $models[$manufacturer]['regModel2nd'];
