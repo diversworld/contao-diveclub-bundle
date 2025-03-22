@@ -77,15 +77,34 @@ The regulator models are defined in the file `regulator_data.txt`. The number co
 In the Dive Courses module, the data for a dive course can be entered. _(Development is ongoing and will be further enhanced in upcoming releases.)_
 
 ### The TÜV Inspection Module
-In the TÜV Inspection module, offers from inspection companies can be managed. An offer can be assigned to an event. In the calendar, you'll need to specify that the calendar's events may include TÜV appointments. Once this flag is set in the calendar, a TÜV offer can be assigned to an event.
+In the TÜV Inspection module, offers from inspection companies can be managed. An offer can be assigned to an event. In the calendar, you'll need to specify that the calendar's events may include TÜV appointments.
+Once this flag is set in the calendar, a TÜV offer can be assigned to an event.
 If an offer is assigned to an event, the corresponding offer will automatically be associated with the linked event, and vice versa.
 There is a frontend module that allows the data of the offer to be displayed on the frontend. To do this, the frontend module **Offer Details** must be included as a module on a page with the event reader.
 
 ### The Diving Equipment Module
-In the Diving Equipment module, the dive cylinders owned by the club can be recorded. In the child table of the diving equipment, individual inspection dates can be logged. This makes it easier to track which cylinders need to be inspected and which still have a valid inspection.
+In the Diving Equipment module, the dive cylinders owned by the club can be recorded. In the child table of the diving equipment, individual inspection dates can be logged.
+This makes it easier to track which cylinders need to be inspected and which still have a valid inspection.
 There is a frontend module that allows the data of the diving equipment to be displayed on the frontend. To do this, the frontend module **Diving Equipment List** must be added to a page.
 In a future version, it is planned to enable bookings of a dive cylinder for a TÜV inspection directly via this overview.
 
+## The Equipment reservation Module
+With the registration module, members of the diving clubs have the opportunity to reserve and borrow club equipment.
+Members can reserve equipment in the frontend, and once it is picked up, the reservation is processed by the admin responsible for issuing the equipment.
+Each piece of equipment is assigned a status, making it possible to track whether an item is available or borrowed.
+The following statuses can be assigned:
+
+`available`
+`reserved`
+`borrowed`
+`returned`
+`canceled`
+`overdue`
+`lost`
+`damaged`
+`missing`
+
+This allows the equipment manager to easily keep track of which equipment is available and which is not.
 ## Future Plans
 - Members will be able to record their own equipment.
 - Members will be able to book TÜV inspections for their equipment.
