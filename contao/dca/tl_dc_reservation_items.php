@@ -89,7 +89,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
             'sql'               => "int(10) unsigned NOT NULL default 0",
             'relation'          => ['type' => 'belongsTo', 'load' => 'lazy'],
         ],
-        'item_type'        => [
+        'item_type'         => [
             'inputType'         => 'select',
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_reservation_items']['item_type'],
             'exclude'           => true,
@@ -101,7 +101,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
             'eval'              => ['includeBlankOption' => true, 'submitOnChange' => true, 'chosen' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql'               => "varchar(255) NOT NULL default ''"
         ],
-        'types' => [
+        'types'             => [
             'inputType'    => 'select',
             'label'        => &$GLOBALS['TL_LANG']['tl_dc_reservation_items']['types'], // Sprachvariable
             'exclude'      => true,
@@ -111,7 +111,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
             'eval'         => ['mandatory' => false, 'submitOnChange' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w25'],
             'sql'          => "varchar(255) NOT NULL default ''",
         ],
-        'sub_type' => [
+        'sub_type'          => [
             'inputType'    => 'select',
             'label'        => &$GLOBALS['TL_LANG']['tl_dc_reservation_items']['sub_type'], // Sprachvariable
             'exclude'      => true,
@@ -121,7 +121,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
             'eval'         => ['mandatory' => false, 'submitOnChange' => true,'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w25'],
             'sql'          => "varchar(255) NOT NULL default ''",
         ],
-        'reservation_status'        => [
+        'reservation_status'=> [
             'inputType'         => 'select',
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_reservation_items']['reservation_status'],
             'default'           => 'reserved',
@@ -134,7 +134,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
             'eval'              => ['includeBlankOption' => true, 'submitOnChange' => true, 'chosen'   => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql'               => "varchar(255) NOT NULL default ''"
         ],
-        'item_id'          => [
+        'item_id'           => [
             'inputType'         => 'select',
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_reservation_items']['asset_id'],
             'exclude'           => true,
@@ -163,16 +163,16 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
         'picked_up_at'      => [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_reservation_items']['picked_up_at'],
             'inputType'         => 'text',
-            'eval'              => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
+            'eval'              => ['rgxp' => 'datim', 'submitOnChange' => true, 'datepicker' => true, 'tl_class' => 'w33 wizard'],
             'sql'               => "varchar(10) NOT NULL default ''"
         ],
         'returned_at'       => [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_reservation_items']['returned_at'],
             'inputType'         => 'text',
-            'eval'              => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
+            'eval'              => ['rgxp' => 'datim', 'submitOnChange' => true, 'datepicker' => true, 'tl_class' => 'w33 wizard'],
             'sql'               => "varchar(10) NOT NULL default ''"
         ],
-        'created_at'       => [
+        'created_at'        => [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_reservation_items']['created_at'],
             'inputType'         => 'text',
             'save_callback'     => [
@@ -181,7 +181,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
             'eval'              => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
             'sql'               => "varchar(10) NOT NULL default ''"
         ],
-        'updated_at'       => [
+        'updated_at'        => [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_reservation_items']['updated_at'],
             'inputType'         => 'text',
             'save_callback'     => [
