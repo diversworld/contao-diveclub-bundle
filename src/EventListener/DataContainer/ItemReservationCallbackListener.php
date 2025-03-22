@@ -30,6 +30,7 @@ class ItemReservationCallbackListener
         $pickedUpAt = $dc->activeRecord->picked_up_at;
         $returnedAt = $dc->activeRecord->returned_at;
         $reservationStatus = $dc->activeRecord->reservation_status;
+        $status = $dc->activeRecord->reservation_status;
         $itemType = $dc->activeRecord->item_type;           // Z. B. `tl_dc_tanks`, `tl_dc_regulators`, `tl_dc_equipment_types`
         $assetId = (int) $dc->activeRecord->item_id;        // Das ausgewählte Asset
 
@@ -37,15 +38,6 @@ class ItemReservationCallbackListener
             $status = 'available';
         } else {
             $status = $dc->activeRecord->reservation_status;    // Neuer Status (z. B. aus Ihrer Reservierungslogik)
-        }
-
-        // Logik zur Festlegung des Status
-        $status = $dc->activeRecord->reservation_status;
-        if (!empty($pickedUpAt) && empty($returnedAt && $status == 'borrowed')) {
-            $status = 'borrowed'; // Nur picked_up_at gefüllt
-        } elseif (!empty($pickedUpAt) && !empty($returnedAt)) {
-            $status = 'available'; // Beide Felder gefüllt
-            $reservation_status = 'returned';
         }
 
         if (!$itemType || !$assetId) {
@@ -89,6 +81,15 @@ class ItemReservationCallbackListener
             return; // Keine weitere Verarbeitung erforderlich
         }
 
+        // 2. Standard-Logik für Borrowed/Available
+        $status = $reservationStatus;
+        if (!empty($pickedUpAt) && empty($returnedAt)) {
+            $status = 'borrowed';
+        } elseif (!empty($pickedUpAt) && !empty($returnedAt)) {
+            $status = 'available';
+            $reservationStatus = 'returned';
+        }
+
         // Status des entsprechenden Assets in der richtigen Tabelle aktualisieren
             $this->db->update(
                 $itemType,                  // Tabelle aus item_type
@@ -97,7 +98,7 @@ class ItemReservationCallbackListener
             );
         $this->db->update(
             'tl_dc_reservation_items',
-            ['reservation_status' => $reservation_status],
+            ['reservation_status' => $reservationStatus],
             ['id' => $dc->id]
         );
     }
