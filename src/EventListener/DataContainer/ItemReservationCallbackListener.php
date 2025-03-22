@@ -25,7 +25,6 @@ class ItemReservationCallbackListener
         if (!$dc->id) {
             return;
         }
-dump($dc->activeRecord);
         // Die gewählte Tabelle aus item_type bestimmen
         $itemType = $dc->activeRecord->item_type;           // Z. B. `tl_dc_tanks`, `tl_dc_regulators`, `tl_dc_equipment_types`
 
@@ -36,8 +35,6 @@ dump($dc->activeRecord);
             $status = $dc->activeRecord->reservation_status;    // Neuer Status (z. B. aus Ihrer Reservierungslogik)
         }
 
-
-dump($status.' - '. $assetId);
         if (!$itemType || !$assetId) {
             return;
         }
@@ -45,7 +42,7 @@ dump($status.' - '. $assetId);
         if($itemType == 'tl_dc_equipment_types'){
            $itemType = 'tl_dc_equipment_subtypes';
         }
-dump($itemType);
+
         // Prüfen, ob es sich um eine unterstützte Tabelle handelt
         $allowedTables = [
             'tl_dc_tanks',
