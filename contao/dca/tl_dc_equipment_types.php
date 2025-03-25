@@ -79,17 +79,18 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_types'] = [
             'sql'           => "varchar(255) BINARY NOT NULL default ''"
         ],
         'title'             => [
-            'inputType'     => 'text',
-            'label'         => &$GLOBALS['TL_LANG']['tl_dc_equipment_types']['title'],
-            'exclude'       => true,
-            'search'        => true,
-            'filter'        => true,
-            'sorting'       => true,
-            'flag'          => DataContainer::SORT_INITIAL_LETTERS_ASC,
-            'eval'          => ['mandatory' => true, 'maxlength' => 25, 'tl_class' => 'w33'],
-            'sql'           => "varchar(255) NOT NULL default ''"
-        ],
-        'types'      => [
+            'inputType'         => 'select',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_types']['title'],
+            'exclude'           => true,
+            'search'            => true,
+            'filter'            => true,
+            'sorting'           => true,
+            'options_callback'  => array('tl_dc_equipment_types', 'getTypes'),
+            'flag'              => DataContainer::SORT_INITIAL_LETTERS_ASC,
+            'eval'              => array('includeBlankOption' => true, 'submitOnChange' => true, 'mandatory' => true, 'tl_class' => 'w25 clr'),
+            'sql'               => "int(10) unsigned NOT NULL default 0",
+        ],/*
+        'types'             => [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_types']['types'],
             'inputType'         => 'select',
             'exclude'           => true,
@@ -99,7 +100,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_types'] = [
             'options_callback'  => array('tl_dc_equipment_types', 'getTypes'),
             'eval'              => array('includeBlankOption' => true, 'submitOnChange' => true, 'mandatory' => true, 'tl_class' => 'w25 clr'),
             'sql'               => "int(10) unsigned NOT NULL default 0",
-        ],
+        ],*/
         'subType' => [
             'inputType'         => 'select',
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_types']['subType'],
@@ -202,7 +203,7 @@ class tl_dc_equipment_types extends Backend
             return [];
         }
         $types = $this->getTemplateOptions('subTypesFile');
-        return $types[$dc->activeRecord->types] ?? [];
+        return $types[$dc->activeRecord->title] ?? [];
     }
 
     /**

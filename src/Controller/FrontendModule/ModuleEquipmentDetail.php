@@ -110,7 +110,7 @@ class ModuleEquipmentDetail extends AbstractFrontendModuleController
                     'types' => [
                         'id' => $type->id,
                         'title' => $type->title,
-                        'type' => $equipmentTypes[$type->types],
+                        'type' => $equipmentTypes[$type->title],
                         'subType' => $equipmentSubTypes[$type->types][$type->subType],
                     ],
                     'subTypes' => $subTypes,

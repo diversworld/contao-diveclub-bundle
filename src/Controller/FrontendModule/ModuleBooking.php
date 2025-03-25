@@ -19,6 +19,7 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\ModuleModel;
 use Contao\PageModel;
+use Contao\System;
 use Contao\Template;
 use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
 use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentSubTypeModel;
@@ -81,7 +82,6 @@ class ModuleBooking extends AbstractFrontendModuleController
     {
         $sizes = $this->helper->getSizes();
         $manufacturers = $this->helper->getManufacturers();
-        $equipmentTypes = $this->helper->getEquipmentTypes();
         $types = DcEquipmentTypeModel::findAll(); // Alle Typ-Modelle laden
         $equipmentSubTypes = $this->helper->getTemplateOptions('subTypesFile'); // Hole SubType-Optione
 
@@ -123,7 +123,6 @@ class ModuleBooking extends AbstractFrontendModuleController
                     'types' => [
                         'id' => $type->id,
                         'title' => $type->title,
-                        'type' => $equipmentTypes[$type->types],
                         'subType' => $equipmentSubTypes[$type->types][$type->subType],
                     ],
                     'subTypes' => $subTypes,
@@ -137,17 +136,18 @@ class ModuleBooking extends AbstractFrontendModuleController
         $template->types = $types;
         $template->subTypes = $equipmentSubTypes;
 
+        System::loadLanguageFile('tl_dc_reservation_items');
+
         // Kategorien-Auswahl (Dropdown)
         $categories = [
-            'tl_dc_tanks' => 'tl_dc_tanks',
-            'tl_dc_regulators' => 'tl_dc_regulators',
-            'tl_dc_equipment_types' => 'tl_dc_equipment_types',
+            'tl_dc_tanks' => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes']['tl_dc_tanks'],// ?? 'Tanks', // Fallback zu "Tanks"
+            'tl_dc_regulators' => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes']['tl_dc_regulators'],// ?? 'Atemregler', // Fallback zu "Regulatoren"
+            'tl_dc_equipment_types' => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes']['tl_dc_equipment_types']// ?? 'Equipment Typen' // Fallback
         ];
         $template->categories = $categories;
 
         // Kategorie und Subtyp auswählen
         $category = $request->get('category');
-        $subType = $request->get('subType');
 
         $template->selectedCategory = $category;
         $template->data = $data;
@@ -156,21 +156,76 @@ class ModuleBooking extends AbstractFrontendModuleController
         if ('tl_dc_equipment_types' === $category) {
             $subTypes = $this->helper->getSubTypes(); // Hilfsmethode für die Subtypen
             $template->subTypes = $subTypes;
-            $template->selectedSubType = $subType;
         }
 
         // Verfügbare Assets laden
         if ($category) {
-            $assets = $this->getAvailableAssets($category, $subType ?? null);
-            $template->assets = $assets;
+            $assets = $this->getAvailableAssets($category);
         }
+
+        // Verfügbare Assets laden
+        // Fetch mappings from the Helpers
+        $manufacturers = $this->helper->getManufacturers();
+        $sizes = $this->helper->getSizes();
+        $equipmentTypes = $this->helper->getEquipmentTypes();
+        // Fetch the pid-to-title mapping from the `tl_dc_equipment_types` table directly
+        $equipmentTypesMapping = $this->getEquipmentTypeTitles(); // Custom method, explained below
+
+        // Apply mappings to assets
+        foreach ($assets as $asset) {
+            // Resolve the pid (equipment type) to its title using the fetched mapping
+            $asset['pid'] = $equipmentTypes[$equipmentTypesMapping[$asset['pid']]] ?? $asset['pid'];
+
+            // Other mappings
+            $asset['manufacturer'] = $manufacturers[$asset['manufacturer']] ?? $asset['manufacturer'];
+            $asset['size'] = $sizes[$asset['size']] ?? $asset['size'];
+
+            // Format 'buyDate'
+            $asset['buyDate'] = $asset['buyDate'] ? date('d.m.Y', (int) $asset['buyDate']) : 'N/A';
+
+            $updatedAssets[] = $asset; // Append the transformed asset to the updated list
+        }
+
+        $assets = $updatedAssets; // Reassign back to the original variable if needed
+
+        // Assign to the template
+        $template->assets = $assets;
+
+        // Optional: Group by 'pid' (e.g., Equipment Type)
+        $groupedAssets = [];
+        foreach ($assets as $asset) {
+            $groupedAssets[$asset['pid']][] = $asset;
+        }
+
+        $template->groupedAssets = $groupedAssets;
 
         // Frontend-Template zurückgeben
         return $template->getResponse();
 
     }
 
-    private function getAvailableAssets(string $category, ?string $subType = null): array
+    /**
+     * Get the mapping of `pid` to `title` in the `tl_dc_equipment_types` table.
+     */
+    private function getEquipmentTypeTitles(): array
+    {
+        $connection = $this->container->get('database_connection');
+
+        // Fetch the `pid` and `title` from the equipment types table
+        $results = $connection->fetchAllAssociative(
+            'SELECT id AS pid, title FROM tl_dc_equipment_types'
+        );
+
+        // Transform the results into a pid-to-title mapping
+        $mapping = [];
+        foreach ($results as $row) {
+            $mapping[$row['pid']] = $row['title'];
+        }
+
+        return $mapping;
+    }
+
+    private function getAvailableAssets(string $category): array
     {
         // Datenbankverbindung abrufen
         $connection = $this->container->get('database_connection');
@@ -186,14 +241,9 @@ class ModuleBooking extends AbstractFrontendModuleController
                 $params = [];
                 break;
             case 'tl_dc_equipment_types':
-                $query = "SELECT status, manufacturer, model, color, size, serialNumber, buyDate FROM tl_dc_equipment_subtypes WHERE status = 'available'";
+                $query = "SELECT pid, status, manufacturer, model, color, size, serialNumber, buyDate FROM tl_dc_equipment_subtypes WHERE status = 'available' ORDER BY pid";
                 $params = [];
 
-                // Optional: Filter für Subtypen hinzufügen
-                if ($subType) {
-                    $query .= " AND subtypes = ?";
-                    $params[] = $subType;
-                }
                 break;
             default:
                 return [];

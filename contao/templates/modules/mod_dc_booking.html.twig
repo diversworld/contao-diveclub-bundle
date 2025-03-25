@@ -20,60 +20,47 @@
                 {% endfor %}
             </select>
         </div>
-
-        {# Subtypen nur anzeigen, wenn Kategorie `tl_dc_equipment_types` ausgewählt #}
-        {% if selectedCategory == 'tl_dc_equipment_types' %}
-            <div class="form-group">
-                <label for="subType">Subtyp auswählen:</label>
-                <select name="subType" id="subType" class="form-control" onchange="document.getElementById('categorySelectionForm').submit();">
-                    <option value="">-- wählen --</option>
-                    {% for subType in subTypes %}
-                        <option value="{{ subType.id }}" {% if subType.id == selectedSubType %}selected{% endif %}>
-                            {{ subType.name }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-        {% endif %}
     </form>
 </div>
-{# Verfügbare Assets anzeigen #}
+
 <div class="reservation-assets">
     <h2>Verfügbare Ausrüstungsgegenstände</h2>
 
-    {% if assets is not empty %}
-        <table class="table table-striped">
-            <thead>
+    {% if groupedAssets is not empty %}
+        {% for subType, assets in groupedAssets %}
+            <h3>{{ subType }}</h3> {# Überschrift für den Subtype #}
+            <table class="table table-striped">
+                <thead>
                 <tr>
-                {% if selectedCategory == 'tl_dc_equipment_types' %}
-                    <th>Status</th>
-                    <th>Hersteller</th>
-                    <th>Modell</th>
-                    <th>Farbe</th>
-                    <th>Größe</th>
-                    <th>Seriennummer</th>
-                    <th>Kaufdatum</th>
-                {% elseif selectedCategory == 'tl_dc_tanks' %}
-                    <th>Seriennummer</th>
-                    <th>Hersteller</th>
-                    <th>Prüfzertifikat</th>
-                    <th>Größe</th>
-                    <th>O2-rein</th>
-                    <th>Besitzer</th>
-                    <th>Letzte Kontrolle</th>
-                    <th>Nächste Kontrolle</th>
-                {% elseif selectedCategory == 'tl_dc_regulators' %}
-                    <th>Hersteller</th>
-                    <th>SN 1. Stufe</th>
-                    <th>Modell 1. Stufe</th>
-                    <th>SN 2. Stufe (Primär)</th>
-                    <th>Modell 2. Stufe (Primär)</th>
-                    <th>SN 2. Stufe (Sekundär)</th>
-                    <th>Modell 2. Stufe (Sekundär)</th>
-                {% endif %}
-            </tr>
-            </thead>
-            <tbody>
+                    {% if selectedCategory == 'tl_dc_equipment_types' %}
+                        <th>Status</th>
+                        <th>Hersteller</th>
+                        <th>Modell</th>
+                        <th>Farbe</th>
+                        <th>Größe</th>
+                        <th>Seriennummer</th>
+                        <th>Kaufdatum</th>
+                    {% elseif selectedCategory == 'tl_dc_tanks' %}
+                        <th>Seriennummer</th>
+                        <th>Hersteller</th>
+                        <th>Prüfzertifikat</th>
+                        <th>Größe</th>
+                        <th>O2-rein</th>
+                        <th>Besitzer</th>
+                        <th>Letzte Kontrolle</th>
+                        <th>Nächste Kontrolle</th>
+                    {% elseif selectedCategory == 'tl_dc_regulators' %}
+                        <th>Hersteller</th>
+                        <th>SN 1. Stufe</th>
+                        <th>Modell 1. Stufe</th>
+                        <th>SN 2. Stufe (Primär)</th>
+                        <th>Modell 2. Stufe (Primär)</th>
+                        <th>SN 2. Stufe (Sekundär)</th>
+                        <th>Modell 2. Stufe (Sekundär)</th>
+                    {% endif %}
+                </tr>
+                </thead>
+                <tbody>
                 {% for asset in assets %}
                     <tr>
                         {% if selectedCategory == 'tl_dc_equipment_types' %}
@@ -89,7 +76,7 @@
                             <td>{{ asset.manufacturer }}</td>
                             <td>{{ asset.bazNumber }}</td>
                             <td>{{ asset.size }}</td>
-                            <td>{{ asset.o2clean ? 'Ja' : 'Nein' }}</td>
+                            <td>{{ asset.o2clean }}</td>
                             <td>{{ asset.owner }}</td>
                             <td>{{ asset.lastCheckDate }}</td>
                             <td>{{ asset.nextCheckDate }}</td>
@@ -104,9 +91,11 @@
                         {% endif %}
                     </tr>
                 {% endfor %}
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        {% endfor %}
     {% else %}
-        <p>Keine Daten verfügbar für die ausgewählte Kategorie.</p>
+        <p>Keine Ausrüstung verfügbar.</p>
     {% endif %}
 </div>
+

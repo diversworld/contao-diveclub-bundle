@@ -40,7 +40,7 @@ $GLOBALS['TL_LANG']['tl_dc_equipment_subtypes']['status']       = ['Status','Sta
 
 // Reference
 $GLOBALS['TL_LANG']['tl_dc_equipment_subtypes']['itemStatus'] = [
-    'avaílable' => 'verfügbar',
+    'available' => 'verfügbar',
     'reserved'  => 'reserviert',
     'borrowed'  => 'ausgeliehen',
     'returned'  => 'zurückgegeben',

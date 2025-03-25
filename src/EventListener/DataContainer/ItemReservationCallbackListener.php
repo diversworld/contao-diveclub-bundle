@@ -30,11 +30,10 @@ class ItemReservationCallbackListener
         $pickedUpAt = $dc->activeRecord->picked_up_at;
         $returnedAt = $dc->activeRecord->returned_at;
         $reservationStatus = $dc->activeRecord->reservation_status;
-        $status = $dc->activeRecord->reservation_status;
         $itemType = $dc->activeRecord->item_type;           // Z. B. `tl_dc_tanks`, `tl_dc_regulators`, `tl_dc_equipment_types`
         $assetId = (int) $dc->activeRecord->item_id;        // Das ausgewählte Asset
 
-        if($dc->activeRecord->reservation_status == 'returned' || $dc->activeRecord->reservation_status == 'canceled' ){
+        if($dc->activeRecord->reservation_status == 'returned' || $dc->activeRecord->reservation_status == 'cancelled' ){
             $status = 'available';
         } else {
             $status = $dc->activeRecord->reservation_status;    // Neuer Status (z. B. aus Ihrer Reservierungslogik)
@@ -45,7 +44,7 @@ class ItemReservationCallbackListener
         }
 
         if($itemType == 'tl_dc_equipment_types'){
-           $itemType = 'tl_dc_equipment_subtypes';
+            $itemType = 'tl_dc_equipment_subtypes';
         }
 
         // Prüfen, ob es sich um eine unterstützte Tabelle handelt
@@ -62,7 +61,7 @@ class ItemReservationCallbackListener
         }
 
         // 1. Überprüfen, ob der Status einer der speziellen Werte ist
-        $specialStatuses = ['canceled', 'overdue', 'lost', 'damaged', 'missing'];
+        $specialStatuses = ['overdue', 'lost', 'damaged', 'missing'];
 
         if (in_array($reservationStatus, $specialStatuses, true)) {
             // Status direkt in Asset-Tabelle und Reservierungs-Tabelle setzen
@@ -82,7 +81,7 @@ class ItemReservationCallbackListener
         }
 
         // 2. Standard-Logik für Borrowed/Available
-        $status = $reservationStatus;
+        //$status = $reservationStatus;
         if (!empty($pickedUpAt) && empty($returnedAt)) {
             $status = 'borrowed';
         } elseif (!empty($pickedUpAt) && !empty($returnedAt)) {
@@ -91,11 +90,11 @@ class ItemReservationCallbackListener
         }
 
         // Status des entsprechenden Assets in der richtigen Tabelle aktualisieren
-            $this->db->update(
-                $itemType,                  // Tabelle aus item_type
-                ['status' => $status],      // Zu setzende Spalten
-                ['id'  => $assetId]        // Bedingung (ID des Assets)
-            );
+        $this->db->update(
+            $itemType,                  // Tabelle aus item_type
+            ['status' => $status],      // Zu setzende Spalten
+            ['id'  => $assetId]        // Bedingung (ID des Assets)
+        );
         $this->db->update(
             'tl_dc_reservation_items',
             ['reservation_status' => $reservationStatus],

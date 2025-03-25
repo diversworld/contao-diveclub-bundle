@@ -26,7 +26,7 @@ class DcaTemplateHelper
     public function getSubTypes(?int $type = null, ?DataContainer $dc = null): array
     {
         // Typ entweder aus Parameter ($type) oder DataContainer ($dc) ermitteln
-        if (!$type && $dc && $dc->activeRecord->types) {
+        if (!$type && $dc && $dc->activeRecord->title) {
             $type = $dc->activeRecord->types; // Typ aus DataContainer
         }
 
