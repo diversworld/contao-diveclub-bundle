@@ -80,7 +80,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_types'] = [
         ],
         'title'             => [
             'inputType'     => 'text',
-            'label'         => &$GLOBALS['TL_LANG']['tl_dc_regulators']['title'],
+            'label'         => &$GLOBALS['TL_LANG']['tl_dc_equipment_types']['title'],
             'exclude'       => true,
             'search'        => true,
             'filter'        => true,

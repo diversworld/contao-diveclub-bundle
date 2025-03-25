@@ -19,6 +19,7 @@ use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
 use Diversworld\ContaoDiveclubBundle\DataContainer\DcReservation;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationTitleCallback;
 
 /**
  * Table tl_dc_reservation
@@ -89,8 +90,9 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
+            'save_callback'     => [[ReservationTitleCallback::class, '__invoke']],
             'flag'              => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'eval'              => ['mandatory' => true, 'maxlength' => 25, 'tl_class' => 'w33'],
+            'eval'              => ['mandatory' => false, 'maxlength' => 25, 'tl_class' => 'w33'],
             'sql'               => "varchar(255) NOT NULL default ''"
         ],
         'alias'             => [
@@ -154,7 +156,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'filter'            => true,
             'sorting'           => true,
             'foreignKey'        => 'tl_member.CONCAT(firstname, " ", lastname)',
-            'eval'              => array('includeBlankOption' => true, 'tl_class' => 'w25'),
+            'eval'              => array('submitOnChange' => true, 'includeBlankOption' => true, 'tl_class' => 'w25'),
             'sql'               => "varchar(255) NOT NULL default ''",
             'relation'          => array('type' => 'hasOne', 'load' => 'lazy')
         ],
@@ -240,76 +242,39 @@ class tl_dc_reservation extends Backend
         return $varValue;
     }
 
-    private function getAssetOptions(string $tableName): array
+    public function updateTitleOnMemberIdChange(DataContainer $dc): void
     {
-        $database = Database::getInstance();
-        $result = $database->execute("SELECT id, title FROM $tableName WHERE published = 1");
-
-        $options = [];
-        while ($result->next()) {
-            $options[$result->id] = $result->title;
+        dump($c->activeRecord);
+        if (!$dc->activeRecord) {
+            return;
         }
 
-        return $options;
+        $memberId = (int) $dc->activeRecord->member_id;
+
+        // Falls keine member_id vorhanden ist, nichts tun
+        if ($memberId === 0) {
+            return;
+        }
+
+        // Führende Nullen hinzufügen, um die member_id dreistellig zu machen
+        $formattedMemberId = str_pad((string)$memberId, 3, '0', STR_PAD_LEFT);
+        dump($formattedMemberId);
+        // Datum im Format jjjjmmtt
+        $currentDate = date('Ymd');
+        dump($currentDate);
+        // Neues Title-Format
+        $newTitle = $currentDate . $formattedMemberId;
+        dump($newTitle);
+        Database::getInstance()->update(
+            'tl_dc_reservation', // Reservierungs-Tabelle
+            ['title' => $newTitle],
+            ['id' => $dc->id]
+        );
+
+        // Message im Backend setzen (optional)
+        System::getContainer()->get('session')->getFlashBag()->set(
+            'contao.BE.warning',
+            sprintf('Title field updated to: %s', $newTitle)
+        );
     }
-
-    public function getAvailableAssets(DataContainer $dc): array
-    {
-        // Sicherstellen, dass $dc->activeRecord existiert und asset_type gesetzt ist
-        if (null === $dc || null === $dc->activeRecord || empty($dc->activeRecord->asset_type)) {
-            return []; // Keine Optionen verfügbar
-        }
-
-        // Die ausgewählte Tabelle basierend auf asset_type ermitteln
-        $tableName = $dc->activeRecord->asset_type;
-
-        // Prüfen, ob die Tabelle existiert (Sicherheitsvorkehrung)
-        if (!in_array($tableName, ['tl_dc_tanks', 'tl_dc_regulators', 'tl_dc_equipment_types'], true)) {
-            return [];
-        }
-
-        // Datenbank-Abfrage zur Ermittlung der verfügbaren Asset-IDs
-        $database = Database::getInstance();
-
-        switch ($tableName) {
-            case 'tl_dc_tanks':
-                $query = sprintf(
-                    "SELECT id, title, size FROM %s
-                   WHERE published = 1 AND status = 'available'
-                   ORDER BY title", $tableName
-                );
-                dump($query);
-                $result = $database->prepare($query)->execute();
-                break;
-            case 'tl_dc_regulators':
-                $query = sprintf(
-                    "SELECT id, title, manufacturer, regModel1st, regModel2ndPri, regModel2ndSec FROM %s
-                   WHERE published = 1 AND status = 'available'
-                   ORDER BY title", $tableName
-                );
-                dump($query);
-                $result = $database->prepare($query)->execute();
-                break;
-            case 'tl_dc_equipment_types':
-                $tableName = 'tl_dc_equipment_subtypes';
-                $query = sprintf(
-                    "SELECT id, title, manufacturer, model, size FROM %s
-                   WHERE published = 1 AND status = 'available'
-                   ORDER BY title", $tableName
-                );
-                dump($query);
-                $result = $database->prepare($query)->execute();
-                break;
-        }
-
-        dump($result);
-        // Optionen für das Dropdown erstellen
-        $options = [];
-        while ($result->next()) {
-            $options[$result->id] = $result->title;
-        }
-
-        return $options;
-    }
-
 }
