@@ -301,11 +301,16 @@ class tl_dc_reservation_items extends Backend
 
                 $types = (int) $dc->activeRecord->types;
                 $subType = (int) $dc->activeRecord->sub_type;
+
                 $query = sprintf("SELECT id, types, subType
                                 FROM tl_dc_equipment_types
                                 WHERE published = 1 AND types = %s AND subType = %s LIMIT 1", $types, $subType
                 );
+
                 $result = $database->prepare($query)->execute();
+                if (!$result->numRows) {
+                    return ['Keine Daten in dieser Kategorie verfügbar'];
+                }
 
                 $pid = $result->id;
 
