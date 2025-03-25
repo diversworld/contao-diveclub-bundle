@@ -49,7 +49,10 @@ class ReservationTitleCallback
 
         $this->db->update(
             'tl_dc_reservation', // Reservierungs-Tabelle
-            ['title' => $newTitle],
+            [
+                'title' => $newTitle,
+                'alias' => 'id-'.$newTitle
+            ],
             ['id' => $dc->id]
         );
 

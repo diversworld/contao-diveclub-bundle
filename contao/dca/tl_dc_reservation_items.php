@@ -295,6 +295,7 @@ class tl_dc_reservation_items extends Backend
                 }
                 break;
             case 'tl_dc_equipment_types':
+                dump($dc->activeRecord);
                 $types = (int) $dc->activeRecord->types;
                 $subType = (int) $dc->activeRecord->sub_type;
                 $query = sprintf("SELECT id, types, subType
@@ -302,7 +303,8 @@ class tl_dc_reservation_items extends Backend
                                 WHERE published = 1 AND types = %s AND subType = %s LIMIT 1", $types, $subType
                 );
                 $result = $database->prepare($query)->execute();
-
+                dump($query);
+                dump($result);
                 $pid = $result->id;
 
                 $query = sprintf(
@@ -310,8 +312,9 @@ class tl_dc_reservation_items extends Backend
                    WHERE pid = %s AND published = 1
                    ORDER BY title", $pid
                 );
-
+                dump($query);
                 $result = $database->prepare($query)->execute();
+                dump($result);
                 // Optionen für das Dropdown erstellen
                 $options = [];
                 while ($result->next()) {
@@ -321,6 +324,7 @@ class tl_dc_reservation_items extends Backend
                     $status = $result->status ? ' (' . $statusText . ')' : '';
                     $options[$result->id] = $manufacturerName.' - '.$result->model.' - '.$size. ' ' . $status;
                 }
+                dump($options);
                 break;
         }
         return $options;
