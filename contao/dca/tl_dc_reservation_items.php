@@ -296,6 +296,10 @@ class tl_dc_reservation_items extends Backend
                 break;
             case 'tl_dc_equipment_types':
                 dump($dc->activeRecord);
+                if (empty($dc->activeRecord->types) || empty($dc->activeRecord->sub_type)) {
+                    return []; // Keine Optionen anzeigen, wenn Werte fehlen
+                }
+
                 $types = (int) $dc->activeRecord->types;
                 $subType = (int) $dc->activeRecord->sub_type;
                 $query = sprintf("SELECT id, types, subType
