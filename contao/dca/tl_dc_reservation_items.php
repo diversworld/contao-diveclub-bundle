@@ -412,7 +412,7 @@ class tl_dc_reservation_items extends Backend
         // Prüfen, ob "item_type" und "item_id" gesetzt sind
         if (!$row['item_type'] || !$row['item_id']) {
             $args[1] = 'Unbekannt'; // Ersatzwert, falls Daten nicht gesetzt sind
-            return $args;
+            return vsprintf('%s, %s - Status: %s - Erstellt: %s - Geändert: %s', $args);
         }
 
         // Tabelle bestimmen basierend auf item_type
