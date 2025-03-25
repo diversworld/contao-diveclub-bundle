@@ -37,7 +37,7 @@ $GLOBALS['TL_LANG']['tl_dc_reservation']['toggle']      = "Datensatz mit ID: %s 
 /**
  * Fields
  */
-$GLOBALS['TL_LANG']['tl_dc_reservation']['title']               = ["Inventarnummer", "Geben Sie die Inventarnummer ein"];
+$GLOBALS['TL_LANG']['tl_dc_reservation']['title']               = ["Reservierung", "Vorgangsnummer der Reservierung"];
 $GLOBALS['TL_LANG']['tl_dc_reservation']['alias']               = ["Alias", "Flaschen-Alias"];
 $GLOBALS['TL_LANG']['tl_dc_reservation']['serialNumber']        = ["Seriennummer", "Geben Sie die Seriennummer ein."];
 $GLOBALS['TL_LANG']['tl_dc_reservation']['o2clean']             = ["O2 Clean", "Die Flasche ist für Sauerstoff und muss O2 clean sein."];
@@ -55,6 +55,10 @@ $GLOBALS['TL_LANG']['tl_dc_reservation']['published']           = ["Veröffentli
 $GLOBALS['TL_LANG']['tl_dc_reservation']['start']               = ["Anzeigen ab", "Ab wann soll der Datensatz angezeigt werden."];
 $GLOBALS['TL_LANG']['tl_dc_reservation']['stop']                = ["Anzeigen bis", "Bis wann soll der Datensatz angezeigt werden."];
 $GLOBALS['TL_LANG']['tl_dc_reservation']['reservation_status']  = ['Status','Status der Reservierung'];
+$GLOBALS['TL_LANG']['tl_dc_reservation']['member_id']           = ['Mitglied','Name des Vereinsmitglieds'];
+$GLOBALS['TL_LANG']['tl_dc_reservation']['reserved_at']         = ['Reserviert am','Datum der Reservierung'];
+$GLOBALS['TL_LANG']['tl_dc_reservation']['picked_up_at']        = ['Abgeholt am','Datum der Abholung'];
+$GLOBALS['TL_LANG']['tl_dc_reservation']['returned_at']         = ['Zurückgegeben am','Datum der Rückgabe'];
 
 
 /**

@@ -24,7 +24,6 @@ use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
 use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentSubTypeModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentTypeModel;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Result;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;

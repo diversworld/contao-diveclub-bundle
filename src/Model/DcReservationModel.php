@@ -16,7 +16,7 @@ namespace Diversworld\ContaoDiveclubBundle\Model;
 
 use Contao\Model;
 
-class DcReservation extends Model
+class DcReservationModel extends Model
 {
     protected static $strTable = 'tl_dc_reservation';
 }

@@ -214,7 +214,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'exclude'           => true,
             'inputType'         => 'checkbox',
             'eval'              => ['submitOnChange' => true, 'tl_class' => 'w50'],
-            'sql'       => ['type' => 'boolean', 'default' => false]
+            'sql'               => ['type' => 'boolean', 'default' => false]
         ],
         'notes'             => [
             'inputType'         => 'textarea',

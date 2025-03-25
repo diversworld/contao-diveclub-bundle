@@ -84,17 +84,15 @@ class DcListingController extends AbstractFrontendModuleController
 
         /** @var Result $eventStmt */
         $event = DcCalendarEventsModel::findByAlias($eventAlias);
-dump($event);
-dump($event->id);
+
         $proposal = DcCheckProposalModel::findBy('checkId', $event->id);
-dump($proposal);
-dump($proposal->id);
+
         if( $proposal !== false){
             $articles = DcCheckArticlesModel::findBy('pid', $proposal->id);
         } else {
             $articles = [];
         }
-Dump($articles);
+
         // Prüfen, ob ein Event gefunden wurde
         if ($event !== false) {
             // Daten vorbereiten und ans Template übergeben

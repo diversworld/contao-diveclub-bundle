@@ -1,6 +1,5 @@
 <?php
 
-
 declare(strict_types=1);
 
 /*
@@ -15,9 +14,17 @@ declare(strict_types=1);
 
 namespace Diversworld\ContaoDiveclubBundle\DataContainer;
 
+use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Monolog\ContaoContext;
+use Contao\Database;
+use Contao\DataContainer;
+use Contao\Input;
+use Contao\System;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
-class DcEquipmentTypes
+//#[AsCallback(table: 'tl_dc_tanks', target: 'edit.buttons', priority: 100)]
+class DcReservationItems
 {
     private ContaoFramework $framework;
 

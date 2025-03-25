@@ -1,0 +1,56 @@
+<form method="get">
+    <h3>Buchung von Equipment</h3>
+
+    <!-- Benutzerinformationen -->
+    {% if currentUser %}
+    <p>Eingeloggt als: <strong>{{ currentUser.username }}</strong></p>
+    {% endif %}
+
+    <!-- Kategorien-Auswahl -->
+    <label for="category">Kategorie:</label>
+    <select name="category" id="category" onchange="this.form.submit()">
+        <option value="">Bitte wählen...</option>
+        {% for key, value in categories %}
+        <option value="{{ key }}" {{ selectedCategory == key ? 'selected' : '' }}>
+        {{ value }}
+        </option>
+        {% endfor %}
+    </select>
+
+    <!-- Subtypen bei Auswahl von Equipment -->
+    {% if selectedCategory == 'tl_dc_equipment_types' and subTypes is defined %}
+    <label for="subType">Subtyp:</label>
+    <select name="subType" id="subType" onchange="this.form.submit()">
+        <option value="">Bitte wählen...</option>
+        {% for subType in subTypes %}
+        <option value="{{ subType.id }}" {{ selectedSubType == subType.id ? 'selected' : '' }}>
+        {{ subType.name }}
+        </option>
+        {% endfor %}
+    </select>
+    {% endif %}
+
+    <!-- Verfügbare Assets -->
+    {% if assets is defined and assets|length > 0 %}
+    <h4>Verfügbare Assets:</h4>
+    <ul>
+        {% for asset in assets %}
+        <li>
+            <strong>{{ asset.name }}</strong>
+            {% if asset.description %}
+            <br>{{ asset.description }}
+            {% endif %}
+            <br>Typ: {{ asset.types }}
+            <br>Status: <span class="status">{{ asset.status }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>Keine verfügbaren Assets gefunden.</p>
+    {% endif %}
+
+    <!-- Reservierungs-Button -->
+    {% if assets is defined and assets|length > 0 %}
+    <button type="submit" name="reserve" value="1">Reservieren</button>
+    {% endif %}
+</form>

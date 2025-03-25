@@ -9,13 +9,14 @@
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/diversworld/contao-diveclub-bundle
  */
-
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckInvoiceModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcConfigModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentTypeModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentSubTypeModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorControlModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorsModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcReservationItemsModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcReservationModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcTanksModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckProposalModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCoursesModel;
@@ -30,9 +31,7 @@ use Diversworld\ContaoDiveclubBundle\Model\DcCalendarEventsModel;
 //$GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_dc_tanks';
 
 $GLOBALS['BE_MOD']['diveclub'] = [
-        'dc_config_collection' => [
-            'tables' => ['tl_dc_config'],
-        ],
+
         'dc_equipment_collection' => [
             'tables' => ['tl_dc_equipment_types', 'tl_dc_equipment_subtypes'],
         ],
@@ -51,6 +50,9 @@ $GLOBALS['BE_MOD']['diveclub'] = [
         'dc_check_collection' => [
             'tables' => ['tl_dc_check_proposal','tl_dc_check_articles'],
         ],
+        'dc_config_collection' => [
+            'tables' => ['tl_dc_config'],
+        ],
 ];
 
 /**
@@ -67,6 +69,13 @@ $GLOBALS['TL_MODELS']['tl_calendar_events']         = DcCalendarEventsModel::cla
 $GLOBALS['TL_MODELS']['tl_dc_regulators']           = DcRegulatorsModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_regulator_control']    = DcRegulatorControlModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_config']               = DcConfigModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_reservation']          = DcReservationModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_reservation_items']    = DcReservationItemsModel::class;
+
+/**
+ * Frontend Modules
+ */
+
 
 /**
  * Hooks

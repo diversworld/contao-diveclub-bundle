@@ -16,16 +16,12 @@ declare(strict_types=1);
 namespace Diversworld\ContaoDiveclubBundle\DataContainer;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Diversworld\ContaoDiveclubBundle\Service\TemplateService;
-
 class DcEquipmentSubTypes
 {
     private ContaoFramework $framework;
-    private TemplateService $templateService;
 
-    public function __construct(ContaoFramework $framework, TemplateService $templateService)
+    public function __construct(ContaoFramework $framework)
     {
-        $this->templateService = $templateService;
         $this->framework = $framework;
     }
 }

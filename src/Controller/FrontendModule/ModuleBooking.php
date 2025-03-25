@@ -21,6 +21,8 @@ use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\Template;
 use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
+use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentSubTypeModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentTypeModel;
 use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -77,62 +79,127 @@ class ModuleBooking extends AbstractFrontendModuleController
 
     protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
     {
-        $database = $this->container->get('database_connection');
-        $security = $this->container->get('security.helper');
-        $user = $security->getUser();
+        $sizes = $this->helper->getSizes();
+        $manufacturers = $this->helper->getManufacturers();
+        $equipmentTypes = $this->helper->getEquipmentTypes();
+        $types = DcEquipmentTypeModel::findAll(); // Alle Typ-Modelle laden
+        $equipmentSubTypes = $this->helper->getTemplateOptions('subTypesFile'); // Hole SubType-Optione
 
-        // 1. Auswahl der Kategorie
-        $category = $request->query->get('category'); // 'tank', 'regulator', 'equipment'
-        $type = $request->query->get('equipmentType'); // z.B. 'BCD'
+        $data = []; // Datenstruktur vorbereiten
 
-        if (!$category) {
-            $template->categories = ['Tank', 'Regulator', 'Equipment'];
-        } elseif ($category === 'equipment' && !$type) {
-            // Equipment-Typen laden
-            $equipmentTypes = $database->fetchAllAssociative("SELECT id, title FROM tl_dc_equipment_types");
-            $template->equipmentTypes = $equipmentTypes;
-        } else {
-            // 2. Anzeige verfügbarer Ressourcen
-            $query = $database->createQueryBuilder()
-                ->select('*')
-                ->from("tl_dc_{$category}") // Dynamische Tabellenauswahl
-                ->where('id NOT IN (SELECT asset_id FROM tl_dc_reservation WHERE asset_type = :category)')
-                ->setParameter('category', $category);
+        // Aktuell eingeloggter Benutzer
+        $user = $this->container->get('security.helper')->getUser();
 
-            if ($type) {
-                $query->andWhere('equipment_type = :type')->setParameter('type', $type);
+        $template->typeSelection = []; // Standardwert, falls keine Typen vorhanden sind
+        if (null !== $types) {
+            foreach ($types as $type) {
+                $template->typeSelection[] = [
+                    'id' => $type->id,
+                    'name' => $type->name,
+                ];
             }
-
-            $template->assets = $query->execute()->fetchAllAssociative();
         }
 
-        // 3. Reservierung speichern
-        if ($request->isMethod('POST') && $request->request->get('reserve')) {
-            $selectedAssets = $request->request->get('selectedAssets');
+        if ($types) {
+            foreach ($types as $type) {
+                // Subtypen abrufen, die diesem Typ zugeordnet sind
+                $subTypesCollection = DcEquipmentSubTypeModel::findBy('pid', $type->id);
+                $subTypes = [];
 
-            foreach ($selectedAssets as $assetId) {
-                $database->insert('tl_dc_reservation', [
-                    'asset_type' => $category,
-                    'asset_id' => $assetId,
-                    'user_id' => $user->id,
-                    'reserved_at' => (new \DateTime())->format('Y-m-d H:i:s'),
-                ]);
+                if ($subTypesCollection) {
+                    foreach ($subTypesCollection as $subType) {
+                        $subTypes[] = [
+                            'manufacturer'  => $manufacturers[$subType->manufacturer] ?? $subType->manufacturer,
+                            'model'         => $subType->model,
+                            'color'         => $subType->color,
+                            'size'          => $sizes[$subType->size] ?? $subType->size,
+                            'title'         => $subType->title,
+                            'buyDate'       => $subType->buyDate ? date('d.m.Y', (int) $subType->buyDate) : 'N/A',
+                        ];
+                    }
+                }
+                // Haupttyp mit zugehörigen Subtypen speichern
+                $data[] = [
+                    'types' => [
+                        'id' => $type->id,
+                        'title' => $type->title,
+                        'type' => $equipmentTypes[$type->types],
+                        'subType' => $equipmentSubTypes[$type->types][$type->subType],
+                    ],
+                    'subTypes' => $subTypes,
+                ];
             }
-
-            $template->success = 'Reservierung erfolgreich durchgeführt!';
         }
 
+        $template->currentUser = $user;
+        $template->sizes = $sizes;
+        $template->manufacturers = $manufacturers;
+        $template->types = $types;
+        $template->subTypes = $equipmentSubTypes;
+
+        // Kategorien-Auswahl (Dropdown)
+        $categories = [
+            'tl_dc_tanks' => 'tl_dc_tanks',
+            'tl_dc_regulators' => 'tl_dc_regulators',
+            'tl_dc_equipment_types' => 'tl_dc_equipment_types',
+        ];
+        $template->categories = $categories;
+
+        // Kategorie und Subtyp auswählen
+        $category = $request->get('category');
+        $subType = $request->get('subType');
+
+        $template->selectedCategory = $category;
+        $template->data = $data;
+
+        // Für `tl_dc_equipment_types`: Dynamische Subtypen laden
+        if ('tl_dc_equipment_types' === $category) {
+            $subTypes = $this->helper->getSubTypes(); // Hilfsmethode für die Subtypen
+            $template->subTypes = $subTypes;
+            $template->selectedSubType = $subType;
+        }
+
+        // Verfügbare Assets laden
+        if ($category) {
+            $assets = $this->getAvailableAssets($category, $subType ?? null);
+            $template->assets = $assets;
+        }
+
+        // Frontend-Template zurückgeben
         return $template->getResponse();
+
     }
 
-    public function updateReservationStatus(int $reservationId, string $status): void
+    private function getAvailableAssets(string $category, ?string $subType = null): array
     {
-        $database = $this->container->get('database_connection');
+        // Datenbankverbindung abrufen
+        $connection = $this->container->get('database_connection');
 
-        if ($status === 'picked_up') {
-            $database->update('tl_dc_reservation', ['picked_up_at' => (new \DateTime())->format('Y-m-d H:i:s')], ['id' => $reservationId]);
-        } elseif ($status === 'returned') {
-            $database->update('tl_dc_reservation', ['returned_at' => (new \DateTime())->format('Y-m-d H:i:s')], ['id' => $reservationId]);
+        // Unterschiedliche Queries für verschiedene Kategorien
+        switch ($category) {
+            case 'tl_dc_tanks':
+                $query = "SELECT serialNumber, manufacturer, bazNumber, size, o2clean, owner, checkId, lastCheckDate, nextCheckDate FROM tl_dc_tanks WHERE status = 'available'";
+                $params = [];
+                break;
+            case 'tl_dc_regulators':
+                $query = "SELECT manufacturer, serialNumber1st, regModel1st, serialNumber2ndPri, regModel2ndPri, serialNumber2ndSec, regModel2ndSec FROM tl_dc_regulators WHERE status = 'available'";
+                $params = [];
+                break;
+            case 'tl_dc_equipment_types':
+                $query = "SELECT status, manufacturer, model, color, size, serialNumber, buyDate FROM tl_dc_equipment_subtypes WHERE status = 'available'";
+                $params = [];
+
+                // Optional: Filter für Subtypen hinzufügen
+                if ($subType) {
+                    $query .= " AND subtypes = ?";
+                    $params[] = $subType;
+                }
+                break;
+            default:
+                return [];
         }
+
+        // Ergebnisse abrufen und zurückgeben
+        return $connection->fetchAllAssociative($query, $params);
     }
 }

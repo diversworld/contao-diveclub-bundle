@@ -1,37 +1,112 @@
-{% if typeSelection %}
-    <h2>Was möchten Sie reservieren?</h2>
-    <form method="get">
-        <select name="type">
-            {% for type in typeSelection %}
-                <option value="{{ type }}">{{ type }}</option>
-            {% endfor %}
-        </select>
-        <button type="submit">Weiter</button>
-    </form>
-{% elseif equipmentTypeSelection %}
-    <h2>Bitte wählen Sie die Art des Equipments:</h2>
-    <form method="get">
-        <input type="hidden" name="type" value="Equipment">
-        <select name="equipmentType">
-            {% for equipment in equipmentTypeSelection %}
-                <option value="{{ equipment }}">{{ equipment }}</option>
-            {% endfor %}
-        </select>
-        <button type="submit">Weiter</button>
-    </form>
-{% elseif availableAssets %}
-    <h2>Verfügbare Assets</h2>
-    <form method="post">
-        {% for asset in availableAssets %}
-            <label>
-                <input type="checkbox" name="selectedAssets[]" value="{{ asset.id }}">
-                {{ asset.name }}
-            </label>
-        {% endfor %}
-        <button type="submit" name="reserveAssets" value="1">Buchen</button>
-    </form>
-{% endif %}
+{% set assets = assets ?? [] %} {# Standardwert setzen, falls assets nicht existiert #}
 
-{% if success %}
-    <p>{{ success }}</p>
-{% endif %}
+<div class="reservation-form">
+    {# Benutzerauswahl (aktueller Benutzer) #}
+    <div class="form-group">
+        <label for="currentUser">Angemeldeter Benutzer:</label>
+        <p>{{ currentUser.username }}</p>
+    </div>
+
+    {# Kategorienauswahl Formular #}
+    <form method="get" id="categorySelectionForm" action="">
+        <div class="form-group">
+            <label for="category">Kategorie auswählen:</label>
+            <select name="category" id="category" class="form-control" onchange="document.getElementById('categorySelectionForm').submit();">
+                <option value="">-- wählen --</option>
+                {% for key, label in categories %}
+                    <option value="{{ key }}" {% if key == selectedCategory %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        {# Subtypen nur anzeigen, wenn Kategorie `tl_dc_equipment_types` ausgewählt #}
+        {% if selectedCategory == 'tl_dc_equipment_types' %}
+            <div class="form-group">
+                <label for="subType">Subtyp auswählen:</label>
+                <select name="subType" id="subType" class="form-control" onchange="document.getElementById('categorySelectionForm').submit();">
+                    <option value="">-- wählen --</option>
+                    {% for subType in subTypes %}
+                        <option value="{{ subType.id }}" {% if subType.id == selectedSubType %}selected{% endif %}>
+                            {{ subType.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        {% endif %}
+    </form>
+</div>
+{# Verfügbare Assets anzeigen #}
+<div class="reservation-assets">
+    <h2>Verfügbare Ausrüstungsgegenstände</h2>
+
+    {% if assets is not empty %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                {% if selectedCategory == 'tl_dc_equipment_types' %}
+                    <th>Status</th>
+                    <th>Hersteller</th>
+                    <th>Modell</th>
+                    <th>Farbe</th>
+                    <th>Größe</th>
+                    <th>Seriennummer</th>
+                    <th>Kaufdatum</th>
+                {% elseif selectedCategory == 'tl_dc_tanks' %}
+                    <th>Seriennummer</th>
+                    <th>Hersteller</th>
+                    <th>Prüfzertifikat</th>
+                    <th>Größe</th>
+                    <th>O2-rein</th>
+                    <th>Besitzer</th>
+                    <th>Letzte Kontrolle</th>
+                    <th>Nächste Kontrolle</th>
+                {% elseif selectedCategory == 'tl_dc_regulators' %}
+                    <th>Hersteller</th>
+                    <th>SN 1. Stufe</th>
+                    <th>Modell 1. Stufe</th>
+                    <th>SN 2. Stufe (Primär)</th>
+                    <th>Modell 2. Stufe (Primär)</th>
+                    <th>SN 2. Stufe (Sekundär)</th>
+                    <th>Modell 2. Stufe (Sekundär)</th>
+                {% endif %}
+            </tr>
+            </thead>
+            <tbody>
+                {% for asset in assets %}
+                    <tr>
+                        {% if selectedCategory == 'tl_dc_equipment_types' %}
+                            <td>{{ asset.status }}</td>
+                            <td>{{ asset.manufacturer }}</td>
+                            <td>{{ asset.model }}</td>
+                            <td>{{ asset.color }}</td>
+                            <td>{{ asset.size }}</td>
+                            <td>{{ asset.serialNumber }}</td>
+                            <td>{{ asset.buyDate }}</td>
+                        {% elseif selectedCategory == 'tl_dc_tanks' %}
+                            <td>{{ asset.serialNumber }}</td>
+                            <td>{{ asset.manufacturer }}</td>
+                            <td>{{ asset.bazNumber }}</td>
+                            <td>{{ asset.size }}</td>
+                            <td>{{ asset.o2clean ? 'Ja' : 'Nein' }}</td>
+                            <td>{{ asset.owner }}</td>
+                            <td>{{ asset.lastCheckDate }}</td>
+                            <td>{{ asset.nextCheckDate }}</td>
+                        {% elseif selectedCategory == 'tl_dc_regulators' %}
+                            <td>{{ asset.manufacturer }}</td>
+                            <td>{{ asset.serialNumber1st }}</td>
+                            <td>{{ asset.regModel1st }}</td>
+                            <td>{{ asset.serialNumber2ndPri }}</td>
+                            <td>{{ asset.regModel2ndPri }}</td>
+                            <td>{{ asset.serialNumber2ndSec }}</td>
+                            <td>{{ asset.regModel2ndSec }}</td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Keine Daten verfügbar für die ausgewählte Kategorie.</p>
+    {% endif %}
+</div>

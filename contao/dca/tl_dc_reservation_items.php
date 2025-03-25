@@ -38,51 +38,52 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
             ]
         ],
     ],
-    'list' => [
-        'sorting' => [
-            'mode' => DataContainer::MODE_SORTABLE,
-            'fields' => ['item_type', 'item_id', 'reservation_status','created_at','updated_at'],
-            'flag' => DataContainer::SORT_ASC,
-            'panelLayout' => 'filter;sort,search,limit'
+    'list'                  => [
+        'sorting'               => [
+            'mode'              => DataContainer::MODE_PARENT,
+            'fields'            => ['item_type', 'item_id', 'reservation_status','created_at','updated_at'],
+            'headerFields'      => ['title', 'member_id'],
+            'flag'              => DataContainer::SORT_ASC,
+            'panelLayout'       => 'filter;sort,search,limit'
         ],
-        'label' => [
-            'fields' => ['item_type', 'item_id', 'reservation_status','created_at','updated_at'],
-            'showColumns' => true,
-            'format' => '%s',//%s - Status: %s - Erstellt: %s - Geändert: %s',
-            'label_callback' => ['tl_dc_reservation_items', 'setLabel'],
+        'label'             => [
+            'fields'            => ['item_type', 'item_id', 'reservation_status','created_at','updated_at'],
+            'showColumns'       => true,
+            'format'            => '%s, %s - Status: %s - Erstellt: %s - Geändert: %s',
+            'label_callback'    => ['tl_dc_reservation_items', 'setLabel'],
         ],
         'global_operations' => [
-            'all' => [
-                'href' => 'act=select',
-                'class' => 'header_edit_all',
-                'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"'
+            'all'               => [
+                'href'          => 'act=select',
+                'class'         => 'header_edit_all',
+                'attributes'    => 'onclick="Backend.getScrollOffset()" accesskey="e"'
             ]
         ],
-        'operations' => [
+        'operations'        => [
             'edit',
             'copy',
             'delete',
             'show'
         ]
     ],
-    'palettes' => [
-        '__selector__'  => ['item_type','addNotes'], // "item_type" als selektierbares Feld definieren
-        'default'       => '{title_legend},item_type,item_id;
-                            {details_legend},reservation_status;
-                            {reservation_legend},reserved_at,picked_up_at,returned_at,created_at,updated_at;
-                            {notes_legend},addNotes;
-                            {publish_legend},published,start,stop;',
+    'palettes'              => [
+        '__selector__'          => ['item_type','addNotes'], // "item_type" als selektierbares Feld definieren
+        'default'               => '{title_legend},item_type,item_id;
+                                    {details_legend},reservation_status;
+                                    {reservation_legend},reserved_at,picked_up_at,returned_at,created_at,updated_at;
+                                    {notes_legend},addNotes;
+                                    {publish_legend},published,start,stop;',
     ],
-    'subpalettes'       => [
-        'addNotes'          => 'notes',
+    'subpalettes'           => [
+        'addNotes'              => 'notes',
         'item_type_tl_dc_equipment_types' => 'types,sub_type', // Subpalette für "tl_dc_equipment_types"
     ],
-    'fields'            => [
-        'id'                => [
-            'sql'               => "int(10) unsigned NOT NULL auto_increment"
+    'fields'                => [
+        'id'                    => [
+            'sql'                   => "int(10) unsigned NOT NULL auto_increment"
         ],
-        'tstamp'            => [
-            'sql'               => "int(10) unsigned NOT NULL default 0"
+        'tstamp'                => [
+            'sql'                   => "int(10) unsigned NOT NULL default 0"
         ],
         'pid'               => [
             'foreignKey'        => 'tl_dc_reservation.title',
@@ -102,24 +103,24 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
             'sql'               => "varchar(255) NOT NULL default ''"
         ],
         'types'             => [
-            'inputType'    => 'select',
-            'label'        => &$GLOBALS['TL_LANG']['tl_dc_reservation_items']['types'], // Sprachvariable
-            'exclude'      => true,
-            'filter'       => true,
-            'sorting'      => true,
-            'options_callback' => ['tl_dc_reservation_items', 'getEquipmentTypes'], // Callback-Funktion für dynamische Optionen
-            'eval'         => ['mandatory' => false, 'submitOnChange' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w25'],
-            'sql'          => "varchar(255) NOT NULL default ''",
+            'inputType'         => 'select',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_reservation_items']['types'], // Sprachvariable
+            'exclude'           => true,
+            'filter'            => true,
+            'sorting'           => true,
+            'options_callback'  => ['tl_dc_reservation_items', 'getEquipmentTypes'], // Callback-Funktion für dynamische Optionen
+            'eval'              => ['mandatory' => false, 'submitOnChange' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w25'],
+            'sql'               => "varchar(255) NOT NULL default ''",
         ],
         'sub_type'          => [
-            'inputType'    => 'select',
-            'label'        => &$GLOBALS['TL_LANG']['tl_dc_reservation_items']['sub_type'], // Sprachvariable
-            'exclude'      => true,
-            'filter'       => true,
-            'sorting'      => true,
-            'options_callback' => ['tl_dc_reservation_items', 'getEquipmentSubTypes'], // Callback-Funktion für dynamische Optionen
-            'eval'         => ['mandatory' => false, 'submitOnChange' => true,'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w25'],
-            'sql'          => "varchar(255) NOT NULL default ''",
+            'inputType'         => 'select',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_reservation_items']['sub_type'], // Sprachvariable
+            'exclude'           => true,
+            'filter'            => true,
+            'sorting'           => true,
+            'options_callback'  => ['tl_dc_reservation_items', 'getEquipmentSubTypes'], // Callback-Funktion für dynamische Optionen
+            'eval'              => ['mandatory' => false, 'submitOnChange' => true,'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w25'],
+            'sql'               => "varchar(255) NOT NULL default ''",
         ],
         'reservation_status'=> [
             'inputType'         => 'select',
@@ -271,7 +272,6 @@ class tl_dc_reservation_items extends Backend
                     $status = $result->status ? ' (' . $statusText . ')' : '';
 
                     $options[$result->id] = $result->title . ' (' . $statusText . ')';
-
                     $options[$result->id] = $result->size."L - ".$result->title. ' '.$status;
                 }
                 break;
@@ -285,9 +285,13 @@ class tl_dc_reservation_items extends Backend
                 $result = $database->prepare($query)->execute();
                 $options = [];
                 while ($result->next()) {
+                    $manufacturerName = $helper->getManufacturers()[$result->manufacturer] ?? 'Unbekannter Hersteller';
+                    $regModel1st = $helper->getRegModels1st((int) $result->manufacturer)[$result->regModel1st] ?? 'Unbekanntes Modell';
+                    $regModel2ndPri = $helper->getRegModels2nd((int) $result->manufacturer)[$result->regModel2ndPri] ?? 'Unbekanntes Modell';
+                    $regModel2ndSec = $helper->getRegModels2nd((int) $result->manufacturer)[$result->regModel2ndSec] ?? 'Unbekanntes Modell';
                     $statusText = $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$result->status] ?? $result->status;
                     $status = $result->status ? ' (' . $statusText . ')' : '';
-                    $options[$result->id] = $result->manufacturer." - ".$result->regModel1St.' - '.$result->regModel2ndPri.' - '.$result->regModel2ndsec. ' ' . $status;
+                    $options[$result->id] = $manufacturerName." - ".$regModel1st.' - '.$regModel2ndPri.' - '.$regModel2ndSec. ' ' . $status;
                 }
                 break;
             case 'tl_dc_equipment_types':
@@ -386,8 +390,10 @@ class tl_dc_reservation_items extends Backend
         return $actualTimeStamp;
     }
 
-    public function setLabel(array $row, string $label, DataContainer $dc, array $args): array
+    public function setLabel(array $row, string $label, DataContainer $dc): string
     {
+        $args = [$GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes'][$row['item_type']] ?? 'Unbekannt', $row['item_id'] ?? 'Unbekannt', $row['reservation_status'] ?? 'Unbekannt', 'Unbekannt'];
+
         $database = Database::getInstance();
         $helper = new DcaTemplateHelper(); // Instanz der Helper-Klasse
 
@@ -468,7 +474,9 @@ class tl_dc_reservation_items extends Backend
 
         $args[3] = $created;
         $args[4] = $updated;
-        return $args;
+
+        return vsprintf('%s, %s - Status: %s - Erstellt: %s - Geändert: %s', $args);
+
     }
 
 }
