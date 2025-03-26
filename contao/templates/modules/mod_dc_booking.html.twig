@@ -26,76 +26,93 @@
 <div class="reservation-assets">
     <h2>Verfügbare Ausrüstungsgegenstände</h2>
 
-    {% if groupedAssets is not empty %}
-        {% for subType, assets in groupedAssets %}
-            <h3>{{ subType }}</h3> {# Überschrift für den Subtype #}
-            <table class="table table-striped">
-                <thead>
-                <tr>
-                    {% if selectedCategory == 'tl_dc_equipment_types' %}
+    {% if selectedCategory == 'tl_dc_equipment_types' %}
+        {# Kategorie equipment_types benötigt groupedAssets #}
+        {% if groupedAssets is not empty %}
+            {% for subType, assets in groupedAssets %}
+                <h3>{{ subType }}</h3> {# Überschrift für den Subtype #}
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Inventarnummer</th>
                         <th>Status</th>
                         <th>Hersteller</th>
                         <th>Modell</th>
                         <th>Farbe</th>
                         <th>Größe</th>
-                        <th>Seriennummer</th>
-                        <th>Kaufdatum</th>
-                    {% elseif selectedCategory == 'tl_dc_tanks' %}
-                        <th>Seriennummer</th>
-                        <th>Hersteller</th>
-                        <th>Prüfzertifikat</th>
+                        <th>Status</th>
+                        <th>Reservieren</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for asset in assets %}
+                        <tr>
+                            <td>{{ asset.title|default('Keine Daten') }}</td>
+                            <td>{{ asset.status|default('Keine Daten') }}</td>
+                            <td>{{ asset.manufacturer|default('Keine Daten') }}</td>
+                            <td>{{ asset.model|default('Keine Daten') }}</td>
+                            <td>{{ asset.color|default('Keine Daten') }}</td>
+                            <td>{{ asset.size|default('Keine Daten') }}</td>
+                            <td>{{ asset.status|default('Keine Daten') }}</td>
+                            <td>{% if asset.status == 'available' %}<button>reservieren</button>{% endif %}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% endfor %}
+        {% else %}
+            <p>Keine Ausrüstung verfügbar.</p>
+        {% endif %}
+
+    {% else %}
+        {# Alle anderen Kategorien arbeiten direkt mit assets #}
+        {% if assets is not empty %}
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    {% if selectedCategory == 'tl_dc_tanks' %}
+                        <th>Inventarnummer</th>
                         <th>Größe</th>
-                        <th>O2-rein</th>
-                        <th>Besitzer</th>
-                        <th>Letzte Kontrolle</th>
-                        <th>Nächste Kontrolle</th>
+                        <th>Status</th>
+                        <th>Reservieren</th>
                     {% elseif selectedCategory == 'tl_dc_regulators' %}
+                        <th>Inventarnummer</th>
                         <th>Hersteller</th>
                         <th>SN 1. Stufe</th>
                         <th>Modell 1. Stufe</th>
-                        <th>SN 2. Stufe (Primär)</th>
                         <th>Modell 2. Stufe (Primär)</th>
-                        <th>SN 2. Stufe (Sekundär)</th>
                         <th>Modell 2. Stufe (Sekundär)</th>
+                        <th>Status</th>
+                        <th>Reservieren</th>
                     {% endif %}
                 </tr>
                 </thead>
                 <tbody>
                 {% for asset in assets %}
                     <tr>
-                        {% if selectedCategory == 'tl_dc_equipment_types' %}
-                            <td>{{ asset.status }}</td>
-                            <td>{{ asset.manufacturer }}</td>
-                            <td>{{ asset.model }}</td>
-                            <td>{{ asset.color }}</td>
-                            <td>{{ asset.size }}</td>
-                            <td>{{ asset.serialNumber }}</td>
-                            <td>{{ asset.buyDate }}</td>
-                        {% elseif selectedCategory == 'tl_dc_tanks' %}
-                            <td>{{ asset.serialNumber }}</td>
-                            <td>{{ asset.manufacturer }}</td>
-                            <td>{{ asset.bazNumber }}</td>
-                            <td>{{ asset.size }}</td>
-                            <td>{{ asset.o2clean }}</td>
-                            <td>{{ asset.owner }}</td>
-                            <td>{{ asset.lastCheckDate }}</td>
-                            <td>{{ asset.nextCheckDate }}</td>
+                        {% if selectedCategory == 'tl_dc_tanks' %}
+                            <td>{{ asset.title|default('Keine Daten') }}</td>
+                            <td>{{ asset.size|default('Keine Daten') }}</td>
+                            <td>{{ asset.status|default('Keine Daten') }}</td>
+                            <td>{% if asset.status == 'available' %}<button>reservieren</button>{% endif %}</td>
                         {% elseif selectedCategory == 'tl_dc_regulators' %}
-                            <td>{{ asset.manufacturer }}</td>
-                            <td>{{ asset.serialNumber1st }}</td>
-                            <td>{{ asset.regModel1st }}</td>
-                            <td>{{ asset.serialNumber2ndPri }}</td>
-                            <td>{{ asset.regModel2ndPri }}</td>
-                            <td>{{ asset.serialNumber2ndSec }}</td>
-                            <td>{{ asset.regModel2ndSec }}</td>
+                            <td>{{ asset.title|default('Keine Daten') }}</td>
+                            <td>{{ asset.manufacturer|default('Keine Daten') }}</td>
+                            <td>{{ asset.serialNumber1st|default('Keine Daten') }}</td>
+                            <td>{{ asset.regModel1st|default('Keine Daten') }}</td>
+                            <td>{{ asset.regModel2ndPri|default('Keine Daten') }}</td>
+                            <td>{{ asset.regModel2ndSec|default('Keine Daten') }}</td>
+                            <td>{{ asset.status|default('Keine Daten') }}</td>
+                            <td>{% if asset.status == 'available' %}<button>reservieren</button>{% endif %}</td>
                         {% endif %}
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
-        {% endfor %}
-    {% else %}
-        <p>Keine Ausrüstung verfügbar.</p>
+        {% else %}
+            <p>Keine Ausrüstung verfügbar.</p>
+        {% endif %}
     {% endif %}
 </div>
+
 

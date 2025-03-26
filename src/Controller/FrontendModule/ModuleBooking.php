@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace Diversworld\ContaoDiveclubBundle\Controller\FrontendModule;
 
+use Contao\Config;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
@@ -85,12 +86,16 @@ class ModuleBooking extends AbstractFrontendModuleController
         $types = DcEquipmentTypeModel::findAll(); // Alle Typ-Modelle laden
         $equipmentSubTypes = $this->helper->getTemplateOptions('subTypesFile'); // Hole SubType-Optione
 
+        // Datum global abrufen
+        $dateFormat = Config::get('dateFormat');
+
         $data = []; // Datenstruktur vorbereiten
 
         // Aktuell eingeloggter Benutzer
         $user = $this->container->get('security.helper')->getUser();
 
         $template->typeSelection = []; // Standardwert, falls keine Typen vorhanden sind
+
         if (null !== $types) {
             foreach ($types as $type) {
                 $template->typeSelection[] = [
@@ -148,7 +153,6 @@ class ModuleBooking extends AbstractFrontendModuleController
 
         // Kategorie und Subtyp auswählen
         $category = $request->get('category');
-
         $template->selectedCategory = $category;
         $template->data = $data;
 
@@ -159,11 +163,6 @@ class ModuleBooking extends AbstractFrontendModuleController
         }
 
         // Verfügbare Assets laden
-        if ($category) {
-            $assets = $this->getAvailableAssets($category);
-        }
-
-        // Verfügbare Assets laden
         // Fetch mappings from the Helpers
         $manufacturers = $this->helper->getManufacturers();
         $sizes = $this->helper->getSizes();
@@ -171,37 +170,106 @@ class ModuleBooking extends AbstractFrontendModuleController
         // Fetch the pid-to-title mapping from the `tl_dc_equipment_types` table directly
         $equipmentTypesMapping = $this->getEquipmentTypeTitles(); // Custom method, explained below
 
-        // Apply mappings to assets
-        foreach ($assets as $asset) {
-            // Resolve the pid (equipment type) to its title using the fetched mapping
-            $asset['pid'] = $equipmentTypes[$equipmentTypesMapping[$asset['pid']]] ?? $asset['pid'];
+        $assets = []; // Standard-Wert setzen
 
-            // Other mappings
-            $asset['manufacturer'] = $manufacturers[$asset['manufacturer']] ?? $asset['manufacturer'];
-            $asset['size'] = $sizes[$asset['size']] ?? $asset['size'];
-
-            // Format 'buyDate'
-            $asset['buyDate'] = $asset['buyDate'] ? date('d.m.Y', (int) $asset['buyDate']) : 'N/A';
-
-            $updatedAssets[] = $asset; // Append the transformed asset to the updated list
+        if ($category) {
+            $assets = $this->getAvailableAssets($category);
         }
 
-        $assets = $updatedAssets; // Reassign back to the original variable if needed
+        // Anwenden der Transformationen
+        $updatedAssets = [];
 
-        // Assign to the template
+        switch ($category) {
+            case 'tl_dc_tanks':
+                // Verarbeitung für Tanks
+                foreach ($assets as $asset) {
+                    $updatedAssets[] = [
+                        'title' => $asset['title'] ?? 'N/A', // Standardwert, falls 'title' fehlt
+                        'manufacturer' => $manufacturers[$asset['manufacturer']] ?? $asset['manufacturer'],
+                        'size' => $asset['size']."L" ?? 'N/A',
+                        'o2clean' => $asset['o2clean'] ?? 'N/A',
+                        'owner' => $asset['owner'] ?? 'Unknown',
+                        'lastCheckDate' => $asset['lastCheckDate']
+                            ? date($dateFormat, (int) $asset['lastCheckDate'])
+                            : 'N/A',
+                        'nextCheckDate' => $asset['nextCheckDate']
+                            ? date($dateFormat, (int) $asset['nextCheckDate'])
+                            : 'N/A',
+                        'status' => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$asset['status']] ?? 'Unknown',
+                    ];
+                }
+                break;
+
+            case 'tl_dc_regulators':
+                // Verarbeitung für Regulators
+                foreach ($assets as $asset) {
+                    $regModel1st = $this->helper->getRegModels1st((int) $asset['manufacturer']);
+                    $regModel2nd = $this->helper->getRegModels2nd((int) $asset['manufacturer']);
+
+                    $updatedAssets[] = [
+                        'title' => $asset['title'] ?? 'N/A', // Standardwert setzen
+                        'manufacturer' => $manufacturers[$asset['manufacturer']] ?? $asset['manufacturer'],
+                        'serialNumber1st' => $asset['serialNumber1st'] ?? 'Unknown',
+                        'regModel1st' => $regModel1st[$asset['regModel1st']] ?? 'Unknown',
+                        'serialNumber2ndPri' => $asset['serialNumber2ndPri'] ?? 'Unknown',
+                        'regModel2ndPri' => $regModel2nd[$asset['regModel2ndPri']] ?? 'Unknown',
+                        'serialNumber2ndSec' => $asset['serialNumber2ndSec'] ?? 'Unknown',
+                        'regModel2ndSec' => $regModel2nd[$asset['regModel2ndSec']] ?? 'Unknown',
+                        'status' => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$asset['status']] ?? 'Unknown',
+                    ];
+                }
+                break;
+
+            case 'tl_dc_equipment_types':
+                // Verarbeitung für Equipment Types
+                foreach ($assets as $asset) {
+                    $updatedAssets[] = [
+                        'pid' => $equipmentTypes[$equipmentTypesMapping[$asset['pid']]] ?? $asset['pid'],
+                        'title' => $asset['title'] ?? 'N/A', // Mapping für Titel
+                        'manufacturer' => $manufacturers[$asset['manufacturer']] ?? $asset['manufacturer'],
+                        'size' => $sizes[$asset['size']] ?? $asset['size'],
+                        'buyDate' => $asset['buyDate']
+                            ? date($dateFormat, (int) $asset['buyDate'])
+                            : 'N/A',
+                        'model' => $asset['model'] ?? 'N/A',
+                        'color' => $asset['color'] ?? 'N/A',
+                        'serialNumber' => $asset['serialNumber'] ?? 'N/A',
+                        'status' => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$asset['status']] ?? 'Unknown',
+                    ];
+                }
+                break;
+
+            default:
+                // Fallback: Falls keine Kategorie zutrifft, keine Verarbeitung
+                foreach ($assets as $asset) {
+                    $updatedAssets[] = [
+                        'title' => $asset['title'] ?? 'N/A',
+                        'manufacturer' => $asset['manufacturer'] ?? 'N/A',
+                        'size' => $asset['size'] ?? 'N/A',
+                    ];
+                }
+                break;
+        }
+
+        // Zuweisung der transformierten Assets
+        $assets = $updatedAssets;
+
+        // Optional: Gruppieren nach `pid` nur für Equipment Types
+        if ('tl_dc_equipment_types' === $category) {
+            $groupedAssets = [];
+            foreach ($assets as $asset) {
+                $groupedAssets[$asset['pid']][] = $asset;
+            }
+            $template->groupedAssets = $groupedAssets;
+        } else {
+            $template->groupedAssets = $assets; // Keine Gruppierung für andere Kategorien
+        }
+
+        // Weitergabe an Twig
         $template->assets = $assets;
-
-        // Optional: Group by 'pid' (e.g., Equipment Type)
-        $groupedAssets = [];
-        foreach ($assets as $asset) {
-            $groupedAssets[$asset['pid']][] = $asset;
-        }
-
-        $template->groupedAssets = $groupedAssets;
 
         // Frontend-Template zurückgeben
         return $template->getResponse();
-
     }
 
     /**
@@ -233,15 +301,15 @@ class ModuleBooking extends AbstractFrontendModuleController
         // Unterschiedliche Queries für verschiedene Kategorien
         switch ($category) {
             case 'tl_dc_tanks':
-                $query = "SELECT serialNumber, manufacturer, bazNumber, size, o2clean, owner, checkId, lastCheckDate, nextCheckDate FROM tl_dc_tanks WHERE status = 'available'";
+                $query = "SELECT title, serialNumber, manufacturer, bazNumber, size, o2clean, owner, checkId, lastCheckDate, nextCheckDate, status FROM tl_dc_tanks WHERE status = 'available'";
                 $params = [];
                 break;
             case 'tl_dc_regulators':
-                $query = "SELECT manufacturer, serialNumber1st, regModel1st, serialNumber2ndPri, regModel2ndPri, serialNumber2ndSec, regModel2ndSec FROM tl_dc_regulators WHERE status = 'available'";
+                $query = "SELECT title, manufacturer, serialNumber1st, regModel1st, serialNumber2ndPri, regModel2ndPri, serialNumber2ndSec, regModel2ndSec, status FROM tl_dc_regulators WHERE status = 'available'";
                 $params = [];
                 break;
             case 'tl_dc_equipment_types':
-                $query = "SELECT pid, status, manufacturer, model, color, size, serialNumber, buyDate FROM tl_dc_equipment_subtypes WHERE status = 'available' ORDER BY pid";
+                $query = "SELECT pid, title, status, manufacturer, model, color, size, serialNumber, buyDate, status FROM tl_dc_equipment_subtypes WHERE status = 'available' ORDER BY pid";
                 $params = [];
 
                 break;

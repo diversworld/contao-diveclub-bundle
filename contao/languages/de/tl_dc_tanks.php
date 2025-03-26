@@ -76,7 +76,7 @@ $GLOBALS['TL_LANG']['tl_dc_tanks']['sizes'] = [
 ];
 
 $GLOBALS['TL_LANG']['tl_dc_tanks']['itemStatus'] = [
-            'avaílable' => 'verfügbar',
+            'available' => 'verfügbar',
             'reserved'  => 'reserviert',
             'borrowed'  => 'ausgeliehen',
             'returned'  => 'zurückgegeben',

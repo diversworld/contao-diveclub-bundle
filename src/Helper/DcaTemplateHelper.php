@@ -47,6 +47,7 @@ class DcaTemplateHelper
         // Hersteller entweder aus Parameter oder DataContainer ermitteln
         if (!$manufacturer && $dc && $dc->activeRecord && $dc->activeRecord->manufacturer) {
             $manufacturer = $dc->activeRecord->manufacturer;
+            dump('shit');
         }
 
         if (!$manufacturer) {
@@ -54,10 +55,11 @@ class DcaTemplateHelper
         }
 
         $models = $this->getTemplateOptions('regulatorsFile');
+        dump($models);
         if (!isset($models[$manufacturer]['regModel1st']) || !is_array($models[$manufacturer]['regModel1st'])) {
             return [];
         }
-
+        dump($models[$manufacturer]['regModel1st']);
         return $models[$manufacturer]['regModel1st'];
     }
 
