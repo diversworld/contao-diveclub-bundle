@@ -47,7 +47,6 @@ class DcaTemplateHelper
         // Hersteller entweder aus Parameter oder DataContainer ermitteln
         if (!$manufacturer && $dc && $dc->activeRecord && $dc->activeRecord->manufacturer) {
             $manufacturer = $dc->activeRecord->manufacturer;
-            dump('shit');
         }
 
         if (!$manufacturer) {
@@ -55,11 +54,10 @@ class DcaTemplateHelper
         }
 
         $models = $this->getTemplateOptions('regulatorsFile');
-        dump($models);
+
         if (!isset($models[$manufacturer]['regModel1st']) || !is_array($models[$manufacturer]['regModel1st'])) {
             return [];
         }
-        dump($models[$manufacturer]['regModel1st']);
         return $models[$manufacturer]['regModel1st'];
     }
 
@@ -88,7 +86,7 @@ class DcaTemplateHelper
     /**
      * Gibt die Optionen für eine Vorlage zurück.
      */
-    public function getTemplateOptions($templateName)
+    public function getTemplateOptions($templateName): array
     {
         // Templatepfad über Contao ermitteln
         $templatePath = $this->getTemplateFromConfig($templateName);
@@ -148,6 +146,19 @@ class DcaTemplateHelper
             throw new \RuntimeException('Keine Einträge in der Tabelle tl_dc_config gefunden.');
         }
 
-        return $configArray[$templateName];
+        switch ($templateName) {
+            case 'dc_regulator_data':
+                return $configArray['regulatorsFile'];
+            case 'dc_equipment_subTypes':
+                return $configArray['subTypesFile'];
+            case 'dc_equipment_types':
+                return $configArray['typesFile'];
+            case 'dc_equipment_sizes':
+                return $configArray['sizesFile'];
+            case 'dc_equipment_manufacturers':
+                return $configArray['manufacturersFile'];
+            default:
+                return $configArray[$templateName];
+        }
     }
 }

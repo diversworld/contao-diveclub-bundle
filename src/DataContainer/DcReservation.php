@@ -27,9 +27,12 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 class DcReservation
 {
     private ContaoFramework $framework;
+    private Database $db;
 
-    public function __construct(ContaoFramework $framework)
+    public function __construct(ContaoFramework $framework, Database $database)
+
     {
         $this->framework = $framework;
+        $this->db = $database;
     }
 }

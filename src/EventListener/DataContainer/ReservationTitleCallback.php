@@ -26,7 +26,6 @@ class ReservationTitleCallback
 
     public function __invoke($value, DataContainer $dc): string
     {
-        dump($dc->activeRecord);
         if (!$dc->activeRecord) {
             return '-';
         }

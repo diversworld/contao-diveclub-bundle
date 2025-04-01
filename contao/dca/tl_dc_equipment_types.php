@@ -3,15 +3,13 @@
 declare(strict_types=1);
 
 use Contao\Backend;
-use Contao\Controller;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\FilesModel;
 use Contao\StringUtil;
 use Contao\System;
-use Contao\TemplateLoader;
-use Contao\ThemeModel;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentTypeLabelCallback;
 
 $GLOBALS['TL_DCA']['tl_dc_equipment_types'] = [
     // Konfiguration
@@ -29,13 +27,14 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_types'] = [
     'list'              => [
         'sorting'           => [
             'mode'          => DataContainer::MODE_SORTED,
-            'fields'        => ['types', 'subType', 'title', 'published'],
+            'fields'        => ['title', 'subType', 'published'],
             'flag'          => DataContainer::SORT_INITIAL_LETTER_ASC,
             'panelLayout'   => 'filter;search,limit',
         ],
         'label'             => [
-            'fields'        => ['types', 'subType'],
-            'label_callback'=> ['tl_dc_equipment_types', 'customLabelCallback'],
+            'fields'        => ['title', 'subType'],
+            'label_callback'=> [EquipmentTypeLabelCallback::class, '__invoke'],
+            'showColumns'   => false,
         ],
         'global_operations' => [
             'all' => [
@@ -56,7 +55,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_types'] = [
     // Palettes-Konfiguration
     'palettes'          => [
         'default'   => '{title_legend},title,alias;
-                        {types_legend},types,subType;
+                        {types_legend},subType;
                         {notes_legend},addNotes;
                         {publish_legend},published,start,stop;',
     ],
@@ -89,18 +88,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_types'] = [
             'flag'              => DataContainer::SORT_INITIAL_LETTERS_ASC,
             'eval'              => array('includeBlankOption' => true, 'submitOnChange' => true, 'mandatory' => true, 'tl_class' => 'w25 clr'),
             'sql'               => "int(10) unsigned NOT NULL default 0",
-        ],/*
-        'types'             => [
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_types']['types'],
-            'inputType'         => 'select',
-            'exclude'           => true,
-            'search'            => true,
-            'filter'            => true,
-            'sorting'           => true,
-            'options_callback'  => array('tl_dc_equipment_types', 'getTypes'),
-            'eval'              => array('includeBlankOption' => true, 'submitOnChange' => true, 'mandatory' => true, 'tl_class' => 'w25 clr'),
-            'sql'               => "int(10) unsigned NOT NULL default 0",
-        ],*/
+        ],
         'subType' => [
             'inputType'         => 'select',
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_types']['subType'],
@@ -273,19 +261,5 @@ class tl_dc_equipment_types extends Backend
         }
 
         return $configArray[$templateName];
-    }
-
-    /**
-     * Erzeugt ein Label für die Ausgabe in der Listenansicht
-     */
-    public function customLabelCallback(array $row, string $label, DataContainer $dc, array $args = null): string
-    {
-        $types = $this->getTypes();
-        $subTypes = $this->getTemplateOptions('subTypesFile');
-
-        $typeLabel = $types[$row['types']] ?? $row['types'];
-        $subTypeLabel = $subTypes[$row['types']][$row['subType']] ?? $row['subType'];
-
-        return sprintf('%s / %s', $typeLabel, $subTypeLabel);
     }
 }

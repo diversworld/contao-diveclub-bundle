@@ -1,18 +1,18 @@
 {% set assets = assets ?? [] %} {# Standardwert setzen, falls assets nicht existiert #}
 
 <div class="reservation-form">
-    {# Benutzerauswahl (aktueller Benutzer) #}
-    <div class="form-group">
-        <label for="currentUser">Angemeldeter Benutzer:</label>
-        <p>{{ currentUser.username }}</p>
-    </div>
-
-    {# Kategorienauswahl Formular #}
-    <form method="get" id="categorySelectionForm" action="">
+    <h2>Reservierungssystem</h2>
+    <form method="get" id="categorySelectionForm" action="{{ action }}">
+        <input type="hidden" name="FORM_SUBMIT" value="reservation_submit" />
+        {# Anzeige des aktuellen Benutzers #}
+        <div class="form-group">
+            <label for="currentUser">Angemeldeter Benutzer:</label>
+            <p>{{ currentUser.userFullName| default('Gast') }}</p>
+        </div>
         <div class="form-group">
             <label for="category">Kategorie auswählen:</label>
-            <select name="category" id="category" class="form-control" onchange="document.getElementById('categorySelectionForm').submit();">
-                <option value="">-- wählen --</option>
+            <select name="category" id="category" class="form-control" onchange="this.form.submit();">
+                <option value="">-- Bitte auswählen --</option>
                 {% for key, label in categories %}
                     <option value="{{ key }}" {% if key == selectedCategory %}selected{% endif %}>
                         {{ label }}
@@ -21,98 +21,121 @@
             </select>
         </div>
     </form>
-</div>
+    <form method="POST" id="categorySelectionForm" action="{{ action }}">
+        <input type="hidden" name="FORM_SUBMIT" value="reservationItems_submit" />
+        <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
+        <input type="hidden" name="userId" value="{{ currentUser.userId }}">
+        <div class="form-group">
+            <p>Bitte wähle die gewünschten Ausrüstungsteile aus der Liste. Mit dem Absenden des Formulars, werden die gewählten Teile für Dich reserviert.</p>
+            <button type="submit" class="btn btn-primary">Ausgewählte Reservieren</button>
+        </div>
+        <div class="reservation-assets">
+            <h2>Verfügbare Ausrüstungsgegenstände</h2>
+            {% if selectedCategory == 'tl_dc_equipment_types' %}
+                {# Kategorie equipment_types benötigt groupedAssets #}
+                {% if groupedAssets is not empty %}
+                    {% for subType, assets in groupedAssets %}
+                        <h3>{{ subType }}</h3> {# Überschrift für den Subtype #}
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th>Inventarnummer</th>
+                                <th>Status</th>
+                                <th>Hersteller</th>
+                                <th>Modell</th>
+                                <th>Farbe</th>
+                                <th>Größe</th>
+                                <th>Status</th>
+                                <th>Reservieren</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for asset in assets %}
+                                <tr>
 
-<div class="reservation-assets">
-    <h2>Verfügbare Ausrüstungsgegenstände</h2>
-
-    {% if selectedCategory == 'tl_dc_equipment_types' %}
-        {# Kategorie equipment_types benötigt groupedAssets #}
-        {% if groupedAssets is not empty %}
-            {% for subType, assets in groupedAssets %}
-                <h3>{{ subType }}</h3> {# Überschrift für den Subtype #}
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>Inventarnummer</th>
-                        <th>Status</th>
-                        <th>Hersteller</th>
-                        <th>Modell</th>
-                        <th>Farbe</th>
-                        <th>Größe</th>
-                        <th>Status</th>
-                        <th>Reservieren</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for asset in assets %}
-                        <tr>
-                            <td>{{ asset.title|default('Keine Daten') }}</td>
-                            <td>{{ asset.status|default('Keine Daten') }}</td>
-                            <td>{{ asset.manufacturer|default('Keine Daten') }}</td>
-                            <td>{{ asset.model|default('Keine Daten') }}</td>
-                            <td>{{ asset.color|default('Keine Daten') }}</td>
-                            <td>{{ asset.size|default('Keine Daten') }}</td>
-                            <td>{{ asset.status|default('Keine Daten') }}</td>
-                            <td>{% if asset.status == 'available' %}<button>reservieren</button>{% endif %}</td>
-                        </tr>
+                                    <td>{{ asset.title|default('Keine Daten') }}</td>
+                                    <td>{{ asset.status|default('Keine Daten') }}</td>
+                                    <td>{{ asset.manufacturer|default('Keine Daten') }}</td>
+                                    <td>{{ asset.model|default('Keine Daten') }}</td>
+                                    <td>{{ asset.color|default('Keine Daten') }}</td>
+                                    <td>{{ asset.size|default('Keine Daten') }}</td>
+                                    <td>{{ asset.status|default('Keine Daten') }}</td>
+                                    <td style="width: 40px;">
+                                        <div class="widget widget-checkbox">
+                                            {{ reservationCheckboxes[asset.id]|raw }}
+                                        </div>
+                                        <input type="hidden" name="pid" value="{{ asset.pid }}">
+                                        <input type="hidden" name="type_id" value="{{ asset.typeId }}">
+                                        <input type="hidden" name="category" value="{{ asset.category }}">
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
                     {% endfor %}
-                    </tbody>
-                </table>
-            {% endfor %}
-        {% else %}
-            <p>Keine Ausrüstung verfügbar.</p>
-        {% endif %}
+                {% else %}
+                    <p>Keine Ausrüstung verfügbar.</p>
+                {% endif %}
+            {% else %}
+                {# Alle anderen Kategorien arbeiten direkt mit assets #}
+                {% if assets is not empty %}
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            {% if selectedCategory == 'tl_dc_tanks' %}
+                                <th>Inventarnummer</th>
+                                <th>Größe</th>
+                                <th>Status</th>
+                                <th>Reservieren</th>
+                            {% elseif selectedCategory == 'tl_dc_regulators' %}
+                                <th>Inventarnummer</th>
+                                <th>Hersteller</th>
+                                <th>SN 1. Stufe</th>
+                                <th>Modell 1. Stufe</th>
+                                <th>Modell 2. Stufe (Primär)</th>
+                                <th>Modell 2. Stufe (Sekundär)</th>
+                                <th>Status</th>
+                                <th>Reservieren</th>
+                            {% endif %}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for asset in assets %}
+                            <tr>
+                                {% if selectedCategory == 'tl_dc_tanks' %}
+                                    <td>{{ asset.title|default('Keine Daten') }}</td>
+                                    <td>{{ asset.size|default('Keine Daten') }}</td>
+                                    <td>{{ asset.status|default('Keine Daten') }}</td>
+                                    <td style="width: 40px;">
+                                        <div class="widget widget-checkbox">
+                                            {{ reservationCheckboxes[asset.id]|raw }}
+                                        </div>
+                                        <input type="hidden" name="category" value="{{ asset.category }}">
+                                    </td>
+                                {% elseif selectedCategory == 'tl_dc_regulators' %}
+                                    <td>{{ asset.title|default('Keine Daten') }}</td>
+                                    <td>{{ asset.manufacturer|default('Keine Daten') }}</td>
+                                    <td>{{ asset.serialNumber1st|default('Keine Daten') }}</td>
+                                    <td>{{ asset.regModel1st|default('Keine Daten') }}</td>
+                                    <td>{{ asset.regModel2ndPri|default('Keine Daten') }}</td>
+                                    <td>{{ asset.regModel2ndSec|default('Keine Daten') }}</td>
+                                    <td>{{ asset.status|default('Keine Daten') }}</td>
+                                    <td style="width: 40px;">
+                                        <div class="widget widget-checkbox">
+                                            {{ reservationCheckboxes[asset.id]|raw }}
+                                            <input type="hidden" name="category" value="{{ asset.category }}">
+                                        </div>
 
-    {% else %}
-        {# Alle anderen Kategorien arbeiten direkt mit assets #}
-        {% if assets is not empty %}
-            <table class="table table-striped">
-                <thead>
-                <tr>
-                    {% if selectedCategory == 'tl_dc_tanks' %}
-                        <th>Inventarnummer</th>
-                        <th>Größe</th>
-                        <th>Status</th>
-                        <th>Reservieren</th>
-                    {% elseif selectedCategory == 'tl_dc_regulators' %}
-                        <th>Inventarnummer</th>
-                        <th>Hersteller</th>
-                        <th>SN 1. Stufe</th>
-                        <th>Modell 1. Stufe</th>
-                        <th>Modell 2. Stufe (Primär)</th>
-                        <th>Modell 2. Stufe (Sekundär)</th>
-                        <th>Status</th>
-                        <th>Reservieren</th>
-                    {% endif %}
-                </tr>
-                </thead>
-                <tbody>
-                {% for asset in assets %}
-                    <tr>
-                        {% if selectedCategory == 'tl_dc_tanks' %}
-                            <td>{{ asset.title|default('Keine Daten') }}</td>
-                            <td>{{ asset.size|default('Keine Daten') }}</td>
-                            <td>{{ asset.status|default('Keine Daten') }}</td>
-                            <td>{% if asset.status == 'available' %}<button>reservieren</button>{% endif %}</td>
-                        {% elseif selectedCategory == 'tl_dc_regulators' %}
-                            <td>{{ asset.title|default('Keine Daten') }}</td>
-                            <td>{{ asset.manufacturer|default('Keine Daten') }}</td>
-                            <td>{{ asset.serialNumber1st|default('Keine Daten') }}</td>
-                            <td>{{ asset.regModel1st|default('Keine Daten') }}</td>
-                            <td>{{ asset.regModel2ndPri|default('Keine Daten') }}</td>
-                            <td>{{ asset.regModel2ndSec|default('Keine Daten') }}</td>
-                            <td>{{ asset.status|default('Keine Daten') }}</td>
-                            <td>{% if asset.status == 'available' %}<button>reservieren</button>{% endif %}</td>
-                        {% endif %}
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p>Keine Ausrüstung verfügbar.</p>
-        {% endif %}
-    {% endif %}
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>Keine Ausrüstung verfügbar.</p>
+                {% endif %}
+            {% endif %}
+        </div>
+    </form>
 </div>
-
-

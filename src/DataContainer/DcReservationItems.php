@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Diversworld\ContaoDiveclubBundle\DataContainer;
 
+use AllowDynamicProperties;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
@@ -24,7 +25,7 @@ use Contao\System;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 //#[AsCallback(table: 'tl_dc_tanks', target: 'edit.buttons', priority: 100)]
-class DcReservationItems
+#[AllowDynamicProperties] class DcReservationItems
 {
     private ContaoFramework $framework;
 

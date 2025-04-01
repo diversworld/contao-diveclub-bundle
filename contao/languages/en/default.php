@@ -25,3 +25,5 @@ $GLOBALS['TL_LANG']['ERR']['aliasNumeric'] = 'The alias "%s" must not consist on
 $GLOBALS['TL_LANG']['ERR']['aliasExists'] = 'The alias "%s" already exists.';
 $GLOBALS['TL_LANG']['ERR']['templateContent'] ='Failed to parse template content into an array';
 $GLOBALS['TL_LANG']['ERR']['templateNotFound'] ='Template file not found';
+
+$GLOBALS['TL_LANG']['MSC']['reservationCheckbox']     = 'reserve';
