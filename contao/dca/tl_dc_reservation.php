@@ -244,7 +244,6 @@ class tl_dc_reservation extends Backend
 
     public function updateTitleOnMemberIdChange(DataContainer $dc): void
     {
-        dump($c->activeRecord);
         if (!$dc->activeRecord) {
             return;
         }
@@ -258,13 +257,12 @@ class tl_dc_reservation extends Backend
 
         // Führende Nullen hinzufügen, um die member_id dreistellig zu machen
         $formattedMemberId = str_pad((string)$memberId, 3, '0', STR_PAD_LEFT);
-        dump($formattedMemberId);
         // Datum im Format jjjjmmtt
         $currentDate = date('Ymd');
-        dump($currentDate);
+
         // Neues Title-Format
         $newTitle = $currentDate . $formattedMemberId;
-        dump($newTitle);
+
         Database::getInstance()->update(
             'tl_dc_reservation', // Reservierungs-Tabelle
             ['title' => $newTitle],

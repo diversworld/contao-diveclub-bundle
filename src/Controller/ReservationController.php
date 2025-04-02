@@ -25,9 +25,6 @@ class ReservationController extends AbstractController
         }
 
         // Reservierung speichern (z. B. in der Datenbank)
-        // ...
-        dump($request->request->all());
-
         return new Response(sprintf('Asset %s wurde erfolgreich reserviert!', $assetId), 200);
     }
 }

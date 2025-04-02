@@ -55,9 +55,7 @@ class EquipmentHeaderCallback
         // 4. Typ und SubTyp auflösen
         $equipmentId = (int)$record['types']; // ID des Typs
         $modelId = (int)$record['subType']; // ID des Subtyps
-dump($equipmentId);
-dump($modelId);
-dump($record);
+
         $record['title'] = $equipmentType[$equipmentId];
         //$record['subType'] = $this->resolveModel($subTypes, $modelId, 'subType', (int)$record['subType']);
         $record['subType'] = $this->resolveSubType($subTypes, $equipmentId, $modelId);
@@ -69,12 +67,11 @@ dump($record);
             'Typ' => 'title',
             'Art' => 'subType',
         ];
-        dump($mapping);
 
         foreach ($mapping as $labelKey => $recordField) {
             $labels[$GLOBALS['TL_LANG']['tl_dc_equipment'][$recordField] ?? $labelKey] = $record[$recordField] ?? 'Nicht verfügbar';
         }
-dump($labels);
+
         return $labels; // Rückgabe als Array
     }
 

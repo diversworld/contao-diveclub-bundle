@@ -21,7 +21,6 @@ class SetRegNextCheckDateCallback
 
     public function __invoke($value, DataContainer $dc)
     {
-        dump($dc->activeRecord);
         //$this->logger = System::getContainer()->get('monolog.logger.contao.general');
         $this->logger->info('__invoke: Actual Check Date: ' . $value);
         $actualCheckDate = $value;

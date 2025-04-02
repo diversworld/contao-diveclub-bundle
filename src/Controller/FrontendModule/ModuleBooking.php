@@ -109,7 +109,6 @@ class ModuleBooking extends AbstractFrontendModuleController
         // Prüfen, ob ein POST-Request vorliegt
         if ($request->isMethod('POST') && $request->request->get('FORM_SUBMIT') === 'reservationItems_submit')
         {
-            dump($request->request->all());
             // Alle Formulardaten abrufen und Assets filtern
             $selectedAssets = $request->request->all('selectedAssets');
             $selectedAssets = array_filter($selectedAssets, fn($value) => !empty($value));
@@ -120,20 +119,23 @@ class ModuleBooking extends AbstractFrontendModuleController
 
             // Benutzer-ID und Kategorie abrufen
             $userId = (int)$request->request->get('userId');
-
             $itemCategory = $request->request->get('category');
             $assetType = $request->request->get('assetType') ?? null;
 
-            // Prüfen, ob Parent-Datensatz (tl_dc_reservation) bereits existiert
-            $reservation = DcReservationModel::findOneBy(['member_id=?'], [$userId]);
+            // Generiere Titel anhand der userId
+            $reservationTitle = $this->generateReservationTitle($userId);
+
+            // Prüfen, ob eine bestehende Reservierung mit demselben Titel vorhanden ist
+            $reservation = DcReservationModel::findOneBy(['title=?'], [$reservationTitle]);
+
 
             if (null === $reservation) {
                 // Nur speichern, wenn der Parent-Datensatz noch nicht existiert
 
                 // Neues Eltern-Datensatz (Reservation) erstellen
                 $reservation = new DcReservationModel();
-                $reservation->title = $this->generateReservationTitle($userId); // Titel generieren
-                $reservation->alias = 'id-' . $this->generateReservationTitle($userId); // Titel generieren
+                $reservation->title = $reservationTitle;            // Titel generieren
+                $reservation->alias = 'id-' . $reservationTitle;    // alias generieren
                 $reservation->tstamp = time();
                 $reservation->member_id = $userId;
                 $reservation->asset_type = $assetType;
@@ -168,9 +170,11 @@ class ModuleBooking extends AbstractFrontendModuleController
                     $reservationItem = new DcReservationItemsModel(); // Hinweis: DcReservationItemsModel anpassen, falls Modell nicht existiert
                     $reservationItem->pid = $reservationId; // Parent-ID setzen
                     $reservationItem->tstamp = time();
-                    $reservationItem->asset_id = (int)$assetId; // ID des ausgewählten Assets
+                    $reservationItem->item_id = (int)$assetId; // ID des ausgewählten Assets
                     $reservationItem->item_type = $itemCategory;
                     $reservationItem->reserved_at = time();
+                    $reservationItem->created_at = time();
+                    $reservationItem->updated_at = time();
                     $reservationItem->reservation_status = 'reserved';
                     $reservationItem->published = 1;
 
@@ -183,7 +187,7 @@ class ModuleBooking extends AbstractFrontendModuleController
                             WHERE id = ?
                         ');
                         $result = $query->executeQuery([(int) $assetId])->fetchAssociative();
-
+dump($result);
                         if ($result) {
                             // Typ und Subtyp in den Kinddatensatz eintragen
                             $reservationItem->types = $result['title'];
@@ -231,8 +235,6 @@ class ModuleBooking extends AbstractFrontendModuleController
                 }
             }
 
-            dump('Reservierung gespeichert mit ID: ' . $reservationId);
-            dump('Reservierte Assets:', $selectedAssets);
             // Optional: Weiterleitung oder Erfolgsmeldung
             if (null !== ($redirectPage = PageModel::findById($model->jumpTo))) {
                 throw new RedirectResponseException($redirectPage->getAbsoluteUrl());
@@ -377,7 +379,6 @@ class ModuleBooking extends AbstractFrontendModuleController
 
             case 'tl_dc_equipment_types':
                 $assets = $this->getAvailableAssets($category);
-                dump($assets);
 
                 // Verarbeitung für Equipment Types
                 foreach ($assets as $asset) {
@@ -420,8 +421,6 @@ class ModuleBooking extends AbstractFrontendModuleController
         if ('tl_dc_equipment_types' === $category) {
             $groupedAssets = [];
             foreach ($assets as $asset) {
-                $groupedAssets[$asset['type']][] = $asset;
-                dump($groupedAssets);
             }
             $template->groupedAssets = $groupedAssets;
         } else {

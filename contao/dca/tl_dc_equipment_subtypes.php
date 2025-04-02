@@ -351,7 +351,7 @@ class tl_dc_equipment_subtypes extends Backend
         // Größen-Name abrufen
         $sizes = $this->getSizes();
         $sizeName = $sizes[$row['size']] ?? 'Unbekannt';
-dump($row['status']);
+
         // Neues Label-Format mit Text-Werten
         return sprintf('%s %s %s - %s - %s', $manufacturerName, $row['model'], $sizeName, $row['title'], $GLOBALS['TL_LANG']['tl_dc_equipment_subtypes']['itemStatus'][$row['status']]);
     }
