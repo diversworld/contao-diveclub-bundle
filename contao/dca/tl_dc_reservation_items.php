@@ -49,7 +49,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
         'label'             => [
             'fields'            => ['item_type', 'item_id', 'reservation_status','created_at','updated_at'],
             'showColumns'       => true,
-            'format'            => '%s, %s - Status: %s - Erstellt: %s - Geändert: %s',
+            'format'            => '%s, %s - %s - %s - %s',
             'label_callback'    => ['tl_dc_reservation_items', 'setLabel'],
         ],
         'global_operations' => [
@@ -402,91 +402,89 @@ class tl_dc_reservation_items extends Backend
 
     public function setLabel(array $row, string $label, DataContainer $dc): string
     {
-        $args = [$GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes'][$row['item_type']] ?? 'Unbekannt', $row['item_id'] ?? 'Unbekannt', $row['reservation_status'] ?? 'Unbekannt', 'Unbekannt'];
-
         $database = Database::getInstance();
-        $helper = new DcaTemplateHelper(); // Instanz der Helper-Klasse
+        $helper = new DcaTemplateHelper();
 
-        // Überprüfen, ob created_at und updated_at gültige Werte enthalten
-        $created = !empty($row['created_at']) && date($row['created_at']) !== false
-            ? date($GLOBALS['TL_CONFIG']['datimFormat'], (int) $row['created_at']) // Fallback, falls nicht gesetzt))
-            : 'Unbekannt';
+        // Fallback-Werte definieren
+        $typeLabel = $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes'][$row['item_type']] ?? 'Unbekannter Typ';
+        $itemDetails = 'Unbekannt';
+        $createdAt = !empty($row['created_at']) ? date($GLOBALS['TL_CONFIG']['datimFormat'], (int) $row['created_at']) : 'Unbekannt';
+        $updatedAt = !empty($row['updated_at']) ? date($GLOBALS['TL_CONFIG']['datimFormat'], (int) $row['updated_at']) : 'Unbekannt';
 
-        $updated = !empty($row['updated_at']) && date($row['updated_at']) !== false
-            ? date($GLOBALS['TL_CONFIG']['datimFormat'], (int) $row['updated_at'])
-            : 'Unbekannt';
-
-        $args[3] = $created;
-        $args[4] = $updated;
-
-        // Prüfen, ob "item_type" und "item_id" gesetzt sind
-        if (!$row['item_type'] || !$row['item_id']) {
-            $args[1] = 'Unbekannt'; // Ersatzwert, falls Daten nicht gesetzt sind
-            return vsprintf('%s, %s - Status: %s - Erstellt: %s - Geändert: %s', $args);
-        }
-
-        // Tabelle bestimmen basierend auf item_type
+        // Daten basierend auf dem Typ laden
         switch ($row['item_type']) {
-            case 'tl_dc_tanks':
+            case 'tl_dc_tanks': // Tanks
                 $result = $database
                     ->prepare("SELECT title, size FROM tl_dc_tanks WHERE id = ?")
                     ->execute($row['item_id']);
-                // Fall: Kein Ergebnis gefunden
-                if (!$result->numRows) {
-                    $args[1] = 'Nicht gefunden';
+
+                if ($result->numRows) {
+                    $itemDetails = sprintf(
+                        'Größe: %sL, Inventarnummer: %s',
+                        $result->size,
+                        $result->title
+                    );
                 } else {
-                    // Bezeichnung zusammenbauen
-                    $args[1] = 'Größe: ' . $result->size . 'L - Inverntarnummer: ' . $result->title;
+                    $itemDetails = 'Tank nicht gefunden';
                 }
                 break;
 
-            case 'tl_dc_regulators':
+            case 'tl_dc_regulators': // Regulatoren
                 $result = $database
                     ->prepare("SELECT title, manufacturer, regModel1st, regModel2ndPri, regModel2ndSec FROM tl_dc_regulators WHERE id = ?")
                     ->execute($row['item_id']);
-                if (!$result->numRows) {
-                    $args[1] = 'Nicht gefunden';
-                } else {
-                    $manufacturerName = $helper->getManufacturers()[$result->manufacturer] ?? 'Unbekannter Hersteller';
-                    $regModel1st = $helper->getRegModels1st((int) $result->manufacturer, $dc)[$result->regModel1st] ?? 'Unbek. 1. Stufe';
-                    $regModel2ndPri = $helper->getRegModels2nd((int) $result->manufacturer, $dc)[$result->regModel2ndPri] ?? 'Unbek. 2. Stufe (Primär)';
-                    $regModel2ndSec = $helper->getRegModels2nd((int) $result->manufacturer, $dc)[$result->regModel2ndSec] ?? 'Unbek. 2. Stufe (Sekundär)';
 
-                    // Ausgabe formatieren
-                    $args[1] = implode(', ', [
-                        'Hersteller: ' . $manufacturerName,
-                        'Inventarnummer: ' . $result->title,
-                        '1. Stufe: ' . $regModel1st,
-                        '2. Stufe (Primär): ' . $regModel2ndPri,
-                        '2. Stufe (Sekundär): ' . $regModel2ndSec
-                    ]);
+                if ($result->numRows) {
+                    $manufacturerName = $helper->getManufacturers()[$result->manufacturer] ?? 'Unbekannter Hersteller';
+                    $regModel1st = $helper->getRegModels1st((int) $result->manufacturer)[$result->regModel1st] ?? 'Unbek. 1. Stufe';
+                    $regModel2ndPri = $helper->getRegModels2nd((int) $result->manufacturer)[$result->regModel2ndPri] ?? 'Unbek. 2. Stufe (Primär)';
+                    $regModel2ndSec = $helper->getRegModels2nd((int) $result->manufacturer)[$result->regModel2ndSec] ?? 'Unbek. 2. Stufe (Sekundär)';
+
+                    $itemDetails = sprintf(
+                        'Hersteller: %s, 1. Stufe: %s, 2. Stufe (Primär): %s, 2. Stufe (Sekundär): %s',
+                        $manufacturerName,
+                        $regModel1st,
+                        $regModel2ndPri,
+                        $regModel2ndSec
+                    );
+                } else {
+                    $itemDetails = 'Regulator nicht gefunden';
                 }
                 break;
 
-            case 'tl_dc_equipment_types':
+            case 'tl_dc_equipment_types': // Equipment-Typen
                 $result = $database
                     ->prepare("SELECT title, manufacturer, model, size FROM tl_dc_equipment_subtypes WHERE id = ?")
                     ->execute($row['item_id']);
-                if (!$result->numRows) {
-                    $args[1] = 'Nicht gefunden';
-                } else {
+
+                if ($result->numRows) {
                     $manufacturerName = $helper->getManufacturers()[$result->manufacturer] ?? 'Unbekannter Hersteller';
-                    //$model = $helper->getSubTypes();
-                    $size = $helper->getSizes();
-                    $args[1] = $manufacturerName . ', ' . $result->model . ' (' . $size[$result->size] . ')';
+                    $size = $helper->getSizes()[$result->size] ?? $result->size;
+
+                    $itemDetails = sprintf(
+                        '%s, Modell %s, Größe %s',
+                        $manufacturerName,
+                        $result->model,
+                        $size
+                    );
+                } else {
+                    $itemDetails = 'Equipment-Typ nicht gefunden';
                 }
                 break;
 
             default:
-                $args[1] = 'Unbekannter Typ';
+                $itemDetails = 'Unbekannter Typ';
                 break;
         }
 
-        $args[3] = $created;
-        $args[4] = $updated;
-
-        return vsprintf('%s, %s - Status: %s - Erstellt: %s - Geändert: %s', $args);
-
+        // Darstellung des Labels zusammenstellen
+        return sprintf(
+            '%s: %s | Status: %s | Erstellt: %s | Geändert: %s',
+            $typeLabel,
+            $itemDetails,
+            $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$row['reservation_status']] ?? 'Unbekannt',
+            $createdAt,
+            $updatedAt
+        );
     }
-
 }
