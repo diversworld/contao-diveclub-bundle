@@ -41,7 +41,7 @@ class EquipmentHeaderCallback
 
         // 3. Parent-Typ aus Tabelle laden
         $record = $this->db->fetchAssociative(
-            "SELECT types, subType
+            "SELECT title, subType
          FROM tl_dc_equipment_types
          WHERE id = ?",
             [$parentId]
@@ -53,7 +53,7 @@ class EquipmentHeaderCallback
         }
 
         // 4. Typ und SubTyp auflösen
-        $equipmentId = (int)$record['types']; // ID des Typs
+        $equipmentId = (int)$record['title']; // ID des Typs
         $modelId = (int)$record['subType']; // ID des Subtyps
 
         $record['title'] = $equipmentType[$equipmentId];

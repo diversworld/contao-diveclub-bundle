@@ -55,6 +55,7 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
                                 {sizes_legend},addSizes;
                                 {types_legend},addTypes;
                                 {regulator_legend},addRegulators;
+                                {reservation_legend},reservationMessage;
                                 {publish_legend},published,start,stop;'
     ],
     'subpalettes'   => [
@@ -118,53 +119,59 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
             'eval'                  => ['submitOnChange' => true],
             'sql'                   => ['type' => 'boolean', 'default' => false]
         ],
-        'manufacturersFile' => array
+        'manufacturersFile'     => array
         (
-            'inputType'               => 'fileTree',
-            'eval'                    => array('fieldType'=>'radio', 'files' => true, 'tl_class'=>'33clr'),
-            'sql'                     => "binary(16) NULL"
+            'inputType'             => 'fileTree',
+            'eval'                  => array('fieldType'=>'radio', 'files' => true, 'tl_class'=>'33clr'),
+            'sql'                   => "binary(16) NULL"
         ),
-        'sizesFile' => array
+        'sizesFile'             => array
         (
-            'inputType'               => 'fileTree',
-            'eval'                    => array('fieldType'=>'radio', 'files' => true, 'tl_class'=>'w33clr'),
-            'sql'                     => "binary(16) NULL"
+            'inputType'             => 'fileTree',
+            'eval'                  => array('fieldType'=>'radio', 'files' => true, 'tl_class'=>'w33clr'),
+            'sql'                   => "binary(16) NULL"
         ),
-        'typesFile' => array
+        'typesFile'             => array
         (
-            'inputType'               => 'fileTree',
-            'eval'                    => array('fieldType'=>'radio', 'files' => true, 'tl_class'=>'w33clr'),
-            'sql'                     => "binary(16) NULL"
+            'inputType'             => 'fileTree',
+            'eval'                  => array('fieldType'=>'radio', 'files' => true, 'tl_class'=>'w33clr'),
+            'sql'                   => "binary(16) NULL"
         ),
-        'subTypesFile' => array
+        'subTypesFile'          => array
         (
-            'inputType'               => 'fileTree',
-            'eval'                    => array('fieldType'=>'radio', 'files' => true, 'tl_class'=>'w33clr'),
-            'sql'                     => "binary(16) NULL"
+            'inputType'             => 'fileTree',
+            'eval'                  => array('fieldType'=>'radio', 'files' => true, 'tl_class'=>'w33clr'),
+            'sql'                   => "binary(16) NULL"
         ),
-        'regulatorsFile' => array
+        'regulatorsFile'        => array
         (
-            'inputType'               => 'fileTree',
-            'eval'                    => array('fieldType'=>'radio', 'files' => true, 'tl_class'=>'w33clr'),
-            'sql'                     => "binary(16) NULL"
+            'inputType'             => 'fileTree',
+            'eval'                  => array('fieldType'=>'radio', 'files' => true, 'tl_class'=>'w33clr'),
+            'sql'                   => "binary(16) NULL"
         ),
-        'published'         => [
-            'toggle'            => true,
-            'filter'            => true,
-            'flag'              => DataContainer::SORT_INITIAL_LETTER_DESC,
-            'inputType'         => 'checkbox',
-            'eval'              => ['doNotCopy'=>true, 'tl_class' => 'w50'],
-            'sql'               => ['type' => 'boolean', 'default' => false]
+        'reservationMessage'    => [
+            'label'                     => &$GLOBALS['TL_LANG']['tl_dc_config']['reservationMessage'],
+            'inputType'                 => 'textarea',
+            'eval'                      => ['mandatory' => false, 'tl_class' => 'clr'],
+            'sql'                       => "text NULL"
         ],
-        'start'             => [
-            'inputType'         => 'text',
-            'eval'              => ['rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 clr wizard'],
-            'sql'               => "varchar(10) NOT NULL default ''"
+        'published'             => [
+            'toggle'                => true,
+            'filter'                => true,
+            'flag'                  => DataContainer::SORT_INITIAL_LETTER_DESC,
+            'inputType'             => 'checkbox',
+            'eval'                  => ['doNotCopy'=>true, 'tl_class' => 'w50'],
+            'sql'                   => ['type' => 'boolean', 'default' => false]
         ],
-        'stop'              => [
-            'inputType'         => 'text',
-            'eval'              => ['rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 wizard'],
-            'sql'               => "varchar(10) NOT NULL default ''"
+        'start'                 => [
+            'inputType'             => 'text',
+            'eval'                  => ['rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 clr wizard'],
+            'sql'                   => "varchar(10) NOT NULL default ''"
+        ],
+        'stop'                  => [
+            'inputType'             => 'text',
+            'eval'                  => ['rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 wizard'],
+            'sql'                   => "varchar(10) NOT NULL default ''"
         ]
     ],
 ];

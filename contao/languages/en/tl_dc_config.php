@@ -9,6 +9,7 @@ $GLOBALS['TL_LANG']['tl_dc_config']['equipment_legend'] = "Template mit Equipmen
 $GLOBALS['TL_LANG']['tl_dc_config']['sizes_legend'] = "Template mit Größen wählen";
 $GLOBALS['TL_LANG']['tl_dc_config']['types_legend'] = "Template mit Typen wählen";
 $GLOBALS['TL_LANG']['tl_dc_config']['template_legend'] = "Template configuration";
+$GLOBALS['TL_LANG']['tl_dc_config']['reservation_legend'] = 'Reservation';
 
 /**
  * Global operations
@@ -36,3 +37,4 @@ $GLOBALS['TL_LANG']['tl_dc_config']['sizesFile'] = ['Größen-Template', 'Eine n
 $GLOBALS['TL_LANG']['tl_dc_config']['typesFile'] = ['Ausrüstungs-Template', 'Eine neue Template-Konfiguration anlegen'];
 $GLOBALS['TL_LANG']['tl_dc_config']['subTypesFile'] = ['Typen-Template', 'Eine neue Template-Konfiguration anlegen'];
 $GLOBALS['TL_LANG']['tl_dc_config']['regulatorsFile'] = ['Regulator-Template', 'Eine neue Template-Konfiguration anlegen'];
+$GLOBALS['TL_LANG']['tl_dc_config']['reservationMessage'] = ['Mitteilung Reservierung', 'Text, der bei einer Reservierung von Ausrüstung angezeigt wird'];

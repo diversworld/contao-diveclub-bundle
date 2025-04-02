@@ -20,6 +20,7 @@ use Contao\CoreBundle\Exception\RedirectResponseException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\FormCheckbox;
+use Contao\Message;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\System;
@@ -45,12 +46,10 @@ class ModuleBooking extends AbstractFrontendModuleController
     protected ?PageModel $page;
 
     private DcaTemplateHelper $helper;
-    private RequestStack $requestStack; // Dependency Injection für RequestStack
     private Connection $db;
-    public function __construct(DcaTemplateHelper $helper, RequestStack $requestStack, Connection $db)
+    public function __construct(DcaTemplateHelper $helper, Connection $db)
     {
         $this->helper = $helper;
-        $this->requestStack = $requestStack;
         $this->db = $db;
     }
 
@@ -94,6 +93,7 @@ class ModuleBooking extends AbstractFrontendModuleController
         $template->form = [
             'messages' => 'Hier könnte Ihre Nachricht stehen.',
         ];
+        $template->messages = '';
 
         $sizes = $this->helper->getSizes();
         $manufacturers = $this->helper->getManufacturers();
@@ -117,10 +117,55 @@ class ModuleBooking extends AbstractFrontendModuleController
                 throw new \RuntimeException('Bitte mindestens ein Asset auswählen.');
             }
 
+            // Alle reservierten Gegenstände in einem Array sammeln
+            $reservedItems = [];
+
+            foreach ($selectedAssets as $assetId) {
+                $itemCategory = $request->request->get('category'); // Hole die Kategorie aus dem POST-Request
+                if (!$itemCategory) {
+                    throw new \RuntimeException('Die Kategorie des Gegenstands ist nicht definiert.');
+                }
+
+                // Asset-Details aus der entsprechenden Kategorie abrufen
+                $itemDetails = $this->getAssetDetails($itemCategory, (int) $assetId);
+
+                if ($itemDetails) {
+                    $reservedItems[] = $itemDetails; // Zur Liste hinzufügen
+                } else {
+                    // Wenn kein Asset gefunden wurde, Notiz hinzufügen
+                    $reservedItems[] = "Asset-ID {$assetId}: Details nicht verfügbar.";
+                }
+            }
+
+            // Erfolgreich reservierte Gegenstände in eine Nachricht schreiben
+            if (!empty($reservedItems)) {
+                $result = $this->db->fetchAssociative('SELECT reservationMessage FROM tl_dc_config LIMIT 1');
+
+                $defaultMessage = $result['reservationMessage'] ?? 'Die folgenden Gegenstände wurden erfolgreich reserviert:<br>';
+
+                // Nachricht aus `tl_dc_config` verwenden und Platzhalter ersetzen
+                $reservedMessage = sprintf(
+                    $defaultMessage,
+                    '<ul><li>' . implode('</li><li>', $reservedItems) . '</li></ul>'
+                );
+
+                // Contao-Message verwenden, um die Benachrichtigung anzuzeigen
+                Message::addConfirmation(htmlspecialchars_decode($reservedMessage));
+                // Contao-Meldungen generieren und ans Template übergeben
+                $template->messages = Message::generate(); // Contao verarbeitet es mit den Nachrichten
+
+            }
+
+            // Optional: Weiterleitung nach erfolgreicher Reservierung
+            if (null !== ($redirectPage = PageModel::findById($model->jumpTo))) {
+                throw new RedirectResponseException($redirectPage->getAbsoluteUrl());
+            }
+
             // Benutzer-ID und Kategorie abrufen
             $userId = (int)$request->request->get('userId');
             $itemCategory = $request->request->get('category');
             $assetType = $request->request->get('assetType') ?? null;
+            $pid = (int) ($request->request->get('pid') ?? 0);
 
             // Generiere Titel anhand der userId
             $reservationTitle = $this->generateReservationTitle($userId);
@@ -163,6 +208,7 @@ class ModuleBooking extends AbstractFrontendModuleController
                     $reservationId,
                     (int)$assetId,
                 ]);
+
                 if (null === $existingItem) {
                     $reservationItem = new DcReservationItemsModel(); // Hinweis: DcReservationItemsModel anpassen, falls Modell nicht existiert
                     $reservationItem->pid = $reservationId; // Parent-ID setzen
@@ -179,11 +225,11 @@ class ModuleBooking extends AbstractFrontendModuleController
                     if ($itemCategory === 'tl_dc_equipment_types') {
                         // Typ und Subtyp aus der Tabelle `tl_dc_equipment_types` abrufen
                         $query = $this->db->prepare('
-                            SELECT title, subType, types
+                            SELECT title, subType
                             FROM tl_dc_equipment_types
                             WHERE id = ?
                         ');
-                        $result = $query->executeQuery([(int) $assetId])->fetchAssociative();
+                        $result = $query->executeQuery([(int) $pid])->fetchAssociative();
 
                         if ($result) {
                             // Typ und Subtyp in den Kinddatensatz eintragen
@@ -275,12 +321,15 @@ class ModuleBooking extends AbstractFrontendModuleController
                         ];
                     }
                 }
+
                 // Haupttyp mit zugehörigen Subtypen speichern
                 $data[] = [
                     'types' => [
                         'id' => $type->id,
                         'title' => $type->title,
-                        'subType' => $equipmentSubTypes[$type->types][$type->subType],
+                        'subType' => isset($equipmentSubTypes[$type->types][$type->subType])
+                            ? $equipmentSubTypes[$type->types][$type->subType]
+                            : 'Unknown SubType', // Fallback, wenn der Key nicht existiert
                     ],
                     'subTypes' => $subTypes,
                 ];
@@ -503,6 +552,80 @@ class ModuleBooking extends AbstractFrontendModuleController
 
         // Ergebnisse abrufen und zurückgeben
         return $connection->fetchAllAssociative($query, $params);
+    }
+
+    private function getAssetDetails(string $category, int $assetId): ?string
+    {
+        $query = '';
+        $params = [$assetId];
+
+        switch ($category) {
+            case 'tl_dc_tanks':
+                $query = 'SELECT title, size FROM tl_dc_tanks WHERE id = ?';
+                break;
+            case 'tl_dc_regulators':
+                $query = 'SELECT title, manufacturer, regModel1st, regModel2ndPri, regModel2ndSec FROM tl_dc_regulators WHERE id = ?';
+                break;
+            case 'tl_dc_equipment_types':
+                $query = 'SELECT title, model, size, color FROM tl_dc_equipment_subtypes WHERE id = ?';
+                break;
+            default:
+                return null;
+        }
+
+        $result = $this->db->fetchAssociative($query, $params);
+
+        if ($result) {
+            $helper = new DcaTemplateHelper();
+            // Unterschiedliche Rückgabe je nach Kategorie formatieren
+            switch ($category) {
+                case 'tl_dc_tanks':
+                    // Größe durch Helper-Methode auflösen
+                    $sizeMapping = $helper->getSizes();
+                    $sizeText = $sizeMapping[$result['size']] ?? 'Unbekannte Größe';
+                    return sprintf(
+                        'Tank: %s (Größe: %s)',
+                        $result['title'] ?? 'Unbekannt',
+                        $sizeText
+                    );
+
+                case 'tl_dc_regulators':
+                    // Hersteller und Modelle durch Helper-Methode auflösen
+                    $manufacturerMapping = $helper->getManufacturers();
+                    $manufacturerText = $manufacturerMapping[$result['manufacturer']] ?? 'Unbekannter Hersteller';
+
+                    $regModel1stMapping = $helper->getRegModels1st((int) $result['manufacturer']);
+                    $regModel1stText = $regModel1stMapping[$result['regModel1st']] ?? 'N/A';
+
+                    $regModel2ndMapping = $helper->getRegModels2nd((int) $result['manufacturer']);
+                    $regModel2ndPriText = $regModel2ndMapping[$result['regModel2ndPri']] ?? 'N/A';
+                    $regModel2ndSecText = $regModel2ndMapping[$result['regModel2ndSec']] ?? 'N/A';
+
+                    return sprintf(
+                        'Regulator: %s (Hersteller: %s, 1st Stage: %s, 2nd Stage (Pri): %s, 2nd Stage (Sec): %s)',
+                        $result['title'] ?? 'Unbekannt',
+                        $manufacturerText,
+                        $regModel1stText,
+                        $regModel2ndPriText,
+                        $regModel2ndSecText
+                    );
+
+                case 'tl_dc_equipment_types':
+                    // Subtypen und weitere Felder durch Helper-Methode auflösen
+                    $sizeMapping = $helper->getSizes();
+                    $sizeText = $sizeMapping[$result['size']] ?? 'Unbekannte Größe';
+
+                    return sprintf(
+                        'Ausrüstung: %s (Modell: %s, Größe: %s, Farbe: %s)',
+                        $result['title'] ?? 'Unbekannt',
+                        $result['model'] ?? 'Kein Modell angegeben',
+                        $sizeText,
+                        $result['color'] ?? 'Keine Farbe angegeben'
+                    );
+            }
+        }
+
+        return null;
     }
 
     protected function generateReservationCheckboxes(array $assets): array

@@ -29,6 +29,13 @@
             <p>Bitte wähle die gewünschten Ausrüstungsteile aus der Liste. Mit dem Absenden des Formulars, werden die gewählten Teile für Dich reserviert.</p>
             <button type="submit" class="btn btn-primary">Ausgewählte Reservieren</button>
         </div>
+        <div class="form-group">
+        {% if messages|trim is not empty %}
+            <div class="alert-container">
+                {{ messages|raw }}
+            </div>
+        {% endif %}
+        </div>
         <div class="reservation-assets">
             <h2>Verfügbare Ausrüstungsgegenstände</h2>
             {% if selectedCategory == 'tl_dc_equipment_types' %}

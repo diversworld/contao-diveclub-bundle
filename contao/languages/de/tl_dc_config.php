@@ -11,6 +11,7 @@ $GLOBALS['TL_LANG']['tl_dc_config']['types_legend'] = "Template mit Typen wähle
 $GLOBALS['TL_LANG']['tl_dc_config']['regulator_legend'] = "Template mit Atemreglern wählen";
 $GLOBALS['TL_LANG']['tl_dc_config']['template_legend'] = "Templates Konfiguration";
 $GLOBALS['TL_LANG']['tl_dc_config']['publish_legend']    = 'Veröffentlichung';
+$GLOBALS['TL_LANG']['tl_dc_config']['reservation_legend'] = 'Reservierung';
 
 /**
  * Global operations
@@ -41,3 +42,5 @@ $GLOBALS['TL_LANG']['tl_dc_config']['regulatorsFile'] = ['Atemregler-Template', 
 $GLOBALS['TL_LANG']['tl_dc_config']['published']         = ['Veröffentlicht', 'Markieren Sie das Equipment als veröffentlicht.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['start']             = ['Startdatum', 'Geben Sie ein Startdatum an.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['stop']              = ['Enddatum', 'Geben Sie ein Enddatum an.'];
+$GLOBALS['TL_LANG']['tl_dc_config']['reservationMessage'] = ['Reservation Message', 'Text displayed when reserving equipment'];
+
