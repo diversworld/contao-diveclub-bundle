@@ -46,8 +46,8 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'panelLayout' => 'filter;sort,search,limit'
         ],
         'label' => [
-            'fields' => ['title', 'member_id', 'asset_type', 'asset_id'],
-            'format' => '%s - %s %s %s',
+            'fields' => ['title', 'member_id', 'asset_type', 'asset_id', 'reservation_status'],
+            'format' => '%s - %s %s %s - %s',
         ],
         'global_operations' => [
             'all' => [

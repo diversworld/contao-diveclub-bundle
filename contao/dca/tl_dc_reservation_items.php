@@ -42,7 +42,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
         'sorting'               => [
             'mode'              => DataContainer::MODE_PARENT,
             'fields'            => ['item_type', 'item_id', 'reservation_status','created_at','updated_at'],
-            'headerFields'      => ['title', 'member_id'],
+            'headerFields'      => ['title', 'member_id', 'reservation_status','created_at','updated_at'],
             'flag'              => DataContainer::SORT_ASC,
             'panelLayout'       => 'filter;sort,search,limit'
         ],
@@ -97,7 +97,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
-            'options'           => &$GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes'],//['tl_dc_regulators', 'tl_dc_tanks', 'tl_dc_equipment_types'],
+            'options'           => &$GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes'],
             'reference'         => &$GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes'],
             'eval'              => ['includeBlankOption' => true, 'submitOnChange' => true, 'chosen' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql'               => "varchar(255) NOT NULL default ''"

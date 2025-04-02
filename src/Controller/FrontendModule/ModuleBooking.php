@@ -150,9 +150,6 @@ class ModuleBooking extends AbstractFrontendModuleController
             // ID des gespeicherten Eltern-Datensatzes abrufen
             $reservationId = $reservation->id;
 
-            // Datenbankverbindung abrufen (für Asset-Update)
-            $connection = $this->container->get('database_connection');
-
             if (!$reservationId) {
                 throw new \RuntimeException('Die Reservierung konnte nicht gespeichert werden.');
             }
@@ -187,7 +184,7 @@ class ModuleBooking extends AbstractFrontendModuleController
                             WHERE id = ?
                         ');
                         $result = $query->executeQuery([(int) $assetId])->fetchAssociative();
-dump($result);
+
                         if ($result) {
                             // Typ und Subtyp in den Kinddatensatz eintragen
                             $reservationItem->types = $result['title'];
@@ -421,6 +418,10 @@ dump($result);
         if ('tl_dc_equipment_types' === $category) {
             $groupedAssets = [];
             foreach ($assets as $asset) {
+                //$groupedAssets[$asset['pid']][] = $asset;
+                // Gruppierung nach Namen des Typs statt ID
+                $groupName = $asset['type'] ?? 'Unbekannter Typ'; // Typ-Bezeichnung verwenden
+                $groupedAssets[$groupName][] = $asset;
             }
             $template->groupedAssets = $groupedAssets;
         } else {
