@@ -706,10 +706,6 @@ class ModuleBooking extends AbstractFrontendModuleController
             $informationText
         );
 
-        //$informationText = str_replace('#memberName#', $memberName, $informationText);
-        //$informationText = str_replace('#reservationNumber#', $memberName, $informationText);
-        //$informationText = str_replace('#assetsHtml#', $assetsHtml, $informationText);
-
         // Erstellen der E-Mail
         $email = new Email();
 
