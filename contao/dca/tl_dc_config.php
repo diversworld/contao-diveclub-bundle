@@ -55,7 +55,7 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
                                 {sizes_legend},addSizes;
                                 {types_legend},addTypes;
                                 {regulator_legend},addRegulators;
-                                {reservation_legend},reservationMessage,reservationInfo;
+                                {reservation_legend},reservationMessage,reservationInfo,reservationInfoText;
                                 {publish_legend},published,start,stop;'
     ],
     'subpalettes'   => [
@@ -158,6 +158,13 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
             'eval'                  => ['rgxp' => 'emails', 'mandatory' => false, 'maxlength'=>255, 'tl_class' => 'w33 clr'],
             'sql'                   => "varchar(255) NOT NULL default ''"
         ],
+        'reservationInfoText'    => [
+            'inputType'             => 'textarea',
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_config']['reservationInfoText'],
+            'exclude'               => true,
+            'eval'                  => ['mandatory' => false, 'tl_class' => 'clr'],
+            'sql'                   => "text NULL"
+        ],
         'reservationMessage'    => [
             'inputType'             => 'textarea',
             'label'                 => &$GLOBALS['TL_LANG']['tl_dc_config']['reservationMessage'],
@@ -212,66 +219,5 @@ class tl_dc_config extends Backend
         }
 
         return $varValue;
-    }
-
-    /**
-     * Return all event templates as array
-     * @param object
-     * @return array
-     */
-    public function getDcTemplates(): array
-    {
-//        $this->logger = System::getContainer()->get('monolog.logger.contao.general');
-//        $this->logger->info('getDcTemplates: '. print_r($this->getTemplateGroup('dc_')));
-        return $this->getTemplateGroup('dc_');
-    }
-
-    /**
-     * Return all event templates as array
-     * @param object
-     * @return array
-     */
-    public function getManufacturerTemplates()
-    {
-        return $this->getTemplateGroup('dc_equipment_manufacturers');
-    }
-
-    /**
-     * Return all event templates as array
-     * @param object
-     * @return array
-     */
-    public function getEquipmentTemplates()
-    {
-        return $this->getTemplateGroup('dc_equipment_');
-    }
-
-    /**
-     * Return all event templates as array
-     * @param object
-     * @return array
-     */
-    public function getSizesTemplates()
-    {
-        return $this->getTemplateGroup('dc_equipment_sizes_');
-    }
-    /**
-     * Return all event templates as array
-     * @param object
-     * @return array
-     */
-    public function getRegTemplates()
-    {
-        return $this->getTemplateGroup('dc_regulator_');
-    }
-
-    /**
-     * Return all event templates as array
-     * @param object
-     * @return array
-     */
-    public function getTypesTemplates()
-    {
-        return $this->getTemplateGroup('dc_equipment_types');
     }
 }

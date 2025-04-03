@@ -685,9 +685,11 @@ class ModuleBooking extends AbstractFrontendModuleController
         $configAdapter = $this->framework->getAdapter(Config::class);
 
         // E-Mail-Adresse aus der Tabelle `tl_dc_config` abrufen
-        $result = $this->db->fetchAssociative('SELECT reservationInfo FROM tl_dc_config LIMIT 1');
+        $result = $this->db->fetchAssociative('SELECT reservationInfo, reservationInfoText FROM tl_dc_config LIMIT 1');
         $recipientEmail = $result['reservationInfo'] ?? null;
+        $informationText = html_entity_decode($result['reservationInfoText'] , ENT_QUOTES, 'UTF-8') ?? '<p>Hallo,</p><p>es wurde eine neue Reservierung erstellt.</p>';
 
+        dump($informationText);
         if (empty($recipientEmail)) {
             throw new \RuntimeException('Keine Empfänger-E-Mail-Adresse in der Konfiguration gefunden.');
         }
@@ -699,18 +701,23 @@ class ModuleBooking extends AbstractFrontendModuleController
         }
         $assetsHtml .= '</ul>';
 
+        $informationText = str_replace(
+            ['#memberName#', '#reservationNumber#', '#assetsHtml#'],
+            [$memberName, $reservationNumber, $assetsHtml],
+            $informationText
+        );
+
+        //$informationText = str_replace('#memberName#', $memberName, $informationText);
+        //$informationText = str_replace('#reservationNumber#', $memberName, $informationText);
+        //$informationText = str_replace('#assetsHtml#', $assetsHtml, $informationText);
+
         // Erstellen der E-Mail
         $email = new Email();
 
         $email->from    = $GLOBALS['TL_ADMIN_EMAIL'] ?? $configAdapter->get('adminEmail') ?? 'reservierung@diversworld.eu';
         $email->subject = 'Neue Reservierung: ' . $reservationNumber;
-        $email->html    = "<p>Sehr geehrte Damen und Herren,</p>
-                            <p>es wurde eine neue Reservierung von " . $memberName . " erstellt.</p>
-                            <p><strong>Reservierungsnummer:</strong> ".$reservationNumber."</p>
-                            <p><strong>Reservierte Gegenstände:</strong></p>
-                            ".$assetsHtml."
-                            <p>Mit freundlichen Grüßen,<br>Diveclub-Team</p>";
-
+        $email->html = $informationText;
+ dump($email);
         // Versenden der E-Mail
         $emailSuccess = $email->sendTo($recipientEmail); // Empfänger
 
