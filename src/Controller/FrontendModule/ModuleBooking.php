@@ -19,6 +19,7 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Exception\RedirectResponseException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Routing\ScopeMatcher;
+use Contao\Email;
 use Contao\FormCheckbox;
 use Contao\Message;
 use Contao\ModuleModel;
@@ -32,7 +33,6 @@ use Diversworld\ContaoDiveclubBundle\Model\DcReservationItemsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcReservationModel;
 use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -46,8 +46,10 @@ class ModuleBooking extends AbstractFrontendModuleController
     protected ?PageModel $page;
 
     private DcaTemplateHelper $helper;
+
     private Connection $db;
-    public function __construct(DcaTemplateHelper $helper, Connection $db)
+    public function __construct(DcaTemplateHelper $helper, Connection $db, private readonly ContaoFramework $framework,
+    )
     {
         $this->helper = $helper;
         $this->db = $db;
@@ -151,6 +153,19 @@ class ModuleBooking extends AbstractFrontendModuleController
 
                 // Contao-Message verwenden, um die Benachrichtigung anzuzeigen
                 Message::addConfirmation(htmlspecialchars_decode($reservedMessage));
+
+                // Reservierungsnummer generieren
+                $reservationNumber = $this->generateReservationTitle((int)$request->request->get('userId'));
+                $reservationId = (int) ($request->request->get('pid') ?? 0);
+
+
+                // Name des Mitglieds holen
+                $member = $this->container->get('security.helper')->getUser();
+                $memberName = $member->firstname . ' ' . $member->lastname;
+
+                // E-Mail senden
+                $this->sendReservationEmail($reservationId, $reservationNumber, $memberName, $reservedItems);
+
                 // Contao-Meldungen generieren und ans Template übergeben
                 $template->messages = Message::generate(); // Contao verarbeitet es mit den Nachrichten
 
@@ -581,8 +596,8 @@ class ModuleBooking extends AbstractFrontendModuleController
             switch ($category) {
                 case 'tl_dc_tanks':
                     // Größe durch Helper-Methode auflösen
-                    $sizeMapping = $helper->getSizes();
-                    $sizeText = $sizeMapping[$result['size']] ?? 'Unbekannte Größe';
+                    //$sizeMapping = $helper->getSizes();
+                    $sizeText = $result['size'].'L' ?? 'Unbekannte Größe';
                     return sprintf(
                         'Tank: %s (Größe: %s)',
                         $result['title'] ?? 'Unbekannt',
@@ -663,5 +678,44 @@ class ModuleBooking extends AbstractFrontendModuleController
         // Datum hinzufügen
         $currentDate = date('Ymd');
         return $currentDate . $formattedMemberId;
+    }
+
+    function sendReservationEmail(int $reservationId, string $reservationNumber, string $memberName, array $reservedItems): void
+    {
+        $configAdapter = $this->framework->getAdapter(Config::class);
+
+        // E-Mail-Adresse aus der Tabelle `tl_dc_config` abrufen
+        $result = $this->db->fetchAssociative('SELECT reservationInfo FROM tl_dc_config LIMIT 1');
+        $recipientEmail = $result['reservationInfo'] ?? null;
+
+        if (empty($recipientEmail)) {
+            throw new \RuntimeException('Keine Empfänger-E-Mail-Adresse in der Konfiguration gefunden.');
+        }
+
+        // Liste der reservierten Assets als HTML formatieren
+        $assetsHtml = '<ul>';
+        foreach ($reservedItems as $item) {
+            $assetsHtml .= '<li>' . htmlspecialchars($item) . '</li>';
+        }
+        $assetsHtml .= '</ul>';
+
+        // Erstellen der E-Mail
+        $email = new Email();
+
+        $email->from    = $GLOBALS['TL_ADMIN_EMAIL'] ?? $configAdapter->get('adminEmail') ?? 'reservierung@diversworld.eu';
+        $email->subject = 'Neue Reservierung: ' . $reservationNumber;
+        $email->html    = "<p>Sehr geehrte Damen und Herren,</p>
+                            <p>es wurde eine neue Reservierung von " . $memberName . " erstellt.</p>
+                            <p><strong>Reservierungsnummer:</strong> ".$reservationNumber."</p>
+                            <p><strong>Reservierte Gegenstände:</strong></p>
+                            ".$assetsHtml."
+                            <p>Mit freundlichen Grüßen,<br>Diveclub-Team</p>";
+
+        // Versenden der E-Mail
+        $emailSuccess = $email->sendTo($recipientEmail); // Empfänger
+
+        if (!$emailSuccess) {
+            throw new \Exception('Something went wrong while trying to send the reservation Mail.');
+        }
     }
 }

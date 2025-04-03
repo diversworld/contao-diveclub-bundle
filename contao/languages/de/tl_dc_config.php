@@ -42,5 +42,5 @@ $GLOBALS['TL_LANG']['tl_dc_config']['regulatorsFile'] = ['Atemregler-Template', 
 $GLOBALS['TL_LANG']['tl_dc_config']['published']         = ['Veröffentlicht', 'Markieren Sie das Equipment als veröffentlicht.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['start']             = ['Startdatum', 'Geben Sie ein Startdatum an.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['stop']              = ['Enddatum', 'Geben Sie ein Enddatum an.'];
-$GLOBALS['TL_LANG']['tl_dc_config']['reservationMessage'] = ['Reservation Message', 'Text displayed when reserving equipment'];
-
+$GLOBALS['TL_LANG']['tl_dc_config']['reservationMessage'] = ['Mitteilung Reservierung', 'Text, der bei einer Reservierung von Ausrüstung angezeigt wird.'];
+$GLOBALS['TL_LANG']['tl_dc_config']['reservationInfo'] = ['Info-Mail-Adresse', 'Geben Sie die E-Mail-Adresse an, die über neue Reservierungen informiert werden soll.'];

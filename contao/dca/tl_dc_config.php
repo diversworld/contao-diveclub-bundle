@@ -55,7 +55,7 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
                                 {sizes_legend},addSizes;
                                 {types_legend},addTypes;
                                 {regulator_legend},addRegulators;
-                                {reservation_legend},reservationMessage;
+                                {reservation_legend},reservationMessage,reservationInfo;
                                 {publish_legend},published,start,stop;'
     ],
     'subpalettes'   => [
@@ -149,17 +149,27 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
             'eval'                  => array('fieldType'=>'radio', 'files' => true, 'tl_class'=>'w33clr'),
             'sql'                   => "binary(16) NULL"
         ),
+        'reservationInfo'  => [
+            'inputType'             => 'text',
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_config']['reservationInfo'],
+            'exclude'               => true,
+            'search'                => true,
+            'sorting'               => true,
+            'eval'                  => ['rgxp' => 'emails', 'mandatory' => false, 'maxlength'=>255, 'tl_class' => 'w33 clr'],
+            'sql'                   => "varchar(255) NOT NULL default ''"
+        ],
         'reservationMessage'    => [
-            'label'                     => &$GLOBALS['TL_LANG']['tl_dc_config']['reservationMessage'],
-            'inputType'                 => 'textarea',
-            'eval'                      => ['mandatory' => false, 'tl_class' => 'clr'],
-            'sql'                       => "text NULL"
+            'inputType'             => 'textarea',
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_config']['reservationMessage'],
+            'exclude'               => true,
+            'eval'                  => ['mandatory' => false, 'tl_class' => 'clr'],
+            'sql'                   => "text NULL"
         ],
         'published'             => [
+            'inputType'             => 'checkbox',
             'toggle'                => true,
             'filter'                => true,
             'flag'                  => DataContainer::SORT_INITIAL_LETTER_DESC,
-            'inputType'             => 'checkbox',
             'eval'                  => ['doNotCopy'=>true, 'tl_class' => 'w50'],
             'sql'                   => ['type' => 'boolean', 'default' => false]
         ],
