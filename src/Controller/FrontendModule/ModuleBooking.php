@@ -689,7 +689,6 @@ class ModuleBooking extends AbstractFrontendModuleController
         $recipientEmail = $result['reservationInfo'] ?? null;
         $informationText = html_entity_decode($result['reservationInfoText'] , ENT_QUOTES, 'UTF-8') ?? '<p>Hallo,</p><p>es wurde eine neue Reservierung erstellt.</p>';
 
-        dump($informationText);
         if (empty($recipientEmail)) {
             throw new \RuntimeException('Keine Empfänger-E-Mail-Adresse in der Konfiguration gefunden.');
         }
@@ -717,7 +716,7 @@ class ModuleBooking extends AbstractFrontendModuleController
         $email->from    = $GLOBALS['TL_ADMIN_EMAIL'] ?? $configAdapter->get('adminEmail') ?? 'reservierung@diversworld.eu';
         $email->subject = 'Neue Reservierung: ' . $reservationNumber;
         $email->html = $informationText;
- dump($email);
+
         // Versenden der E-Mail
         $emailSuccess = $email->sendTo($recipientEmail); // Empfänger
 
