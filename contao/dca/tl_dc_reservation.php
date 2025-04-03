@@ -69,7 +69,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
         '__selector__'      => ['addArticleInfo'],
         'default'           => '{title_legend},title,alias;
                                 {details_legend},asset_type,asset_id,member_id;
-                                {reservation_legend},reserved_at,picked_up_at,returned_at;
+                                {reservation_legend},reserved_at,picked_up_at,returned_at,reservation_status;
                                 {notes_legend},addNotes;
                                 {publish_legend},published,start,stop;'
     ],
