@@ -37,23 +37,24 @@ $GLOBALS['TL_LANG']['tl_dc_tanks']['toggle']    = "Publish record with ID: %s";
 /**
  * Fields
  */
-$GLOBALS['TL_LANG']['tl_dc_tanks']['title']         = ["Inventory Number", "Enter the inventory number"];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['alias']         = ["Alias", "Dive tank alias"];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['serialNumber']  = ["Serial Number", "Enter the serial number."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['o2clean']       = ["O2 Clean", "The tank is for oxygen and must be O2 clean."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['manufacturer']  = ["Manufacturer", "Manufacturer of the dive tank."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['bazNumber']     = ["BAZ Number", "BAZ Number."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['checkId']     	= ["Safety Check", "Event of the last Safety-Check."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['owner']     	= ["Owner", "Owner of the Asset."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['lastCheckDate'] = ["Last Inspection", "Date of the last inspection."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['nextCheckDate'] = ["Next Inspection", "Date of the next inspection."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['pid']           = ["Next Inspection Date", "Select the next inspection date."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['size']          = ["Size", "Please select the tank size."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['member']        = ["Owner", "Owner of the dive tank."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['addNotes']      = ["Enter Notes", "Record notes about the dive tank."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['published']     = ["Publish", "Publish the record."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['start']         = ["Show from", "From when should the record be displayed."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['stop']          = ["Show until", "Until when should the record be displayed."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['title']             = ["Inventory Number", "Enter the inventory number"];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['alias']             = ["Alias", "Dive tank alias"];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['serialNumber']      = ["Serial Number", "Enter the serial number."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['o2clean']           = ["O2 Clean", "The tank is for oxygen and must be O2 clean."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['manufacturer']      = ["Manufacturer", "Manufacturer of the dive tank."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['bazNumber']         = ["BAZ Number", "BAZ Number."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['checkId']     	    = ["Safety Check", "Event of the last Safety-Check."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['owner']     	    = ["Owner", "Owner of the Asset."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['lastCheckDate']     = ["Last Inspection", "Date of the last inspection."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['nextCheckDate']     = ["Next Inspection", "Date of the next inspection."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['pid']               = ["Next Inspection Date", "Select the next inspection date."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['rentalFee']         = ['Price', 'Fee for the item.'];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['size']              = ["Size", "Please select the tank size."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['member']            = ["Owner", "Owner of the dive tank."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['addNotes']          = ["Enter Notes", "Record notes about the dive tank."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['published']         = ["Publish", "Publish the record."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['start']             = ["Show from", "From when should the record be displayed."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['stop']              = ["Show until", "Until when should the record be displayed."];
 
 /**
  * References

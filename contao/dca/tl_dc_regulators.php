@@ -13,20 +13,13 @@ declare(strict_types=1);
  */
 
 use Contao\Backend;
-use Contao\Controller;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\FilesModel;
 use Contao\StringUtil;
 use Contao\System;
-use Contao\CoreBundle\Monolog\ContaoContext;
-use Contao\CoreBundle\EventListener\Widget\HttpUrlListener;
-use Contao\TemplateLoader;
-use Contao\ThemeModel;
 use Diversworld\ContaoDiveclubBundle\DataContainer\DcCheckProposal;
-use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
-use Diversworld\ContaoDiveclubBundle\Service\TemplateService;
 
 /**
  * Table tl_dc_regulators
@@ -48,7 +41,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
     'list'              => [
         'sorting'           => [
             'mode'          => DataContainer::MODE_SORTABLE,
-            'fields'        => ['title','alias','published'],
+            'fields'        => ['title','alias','regModel1st','regModel2ndPri','regModel2ndSec','published'],
             'flag'          => DataContainer::SORT_ASC,
             'panelLayout'   => 'filter;sort,search,limit'
         ],
@@ -77,7 +70,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
     'palettes'          => [
         '__selector__'      => ['addArticleInfo'],
         'default'           => '{title_legend},title,alias,status;
-                                {1stStage_legend},manufacturer,serialNumber1st,regModel1st;
+                                {1stStage_legend},manufacturer,serialNumber1st,regModel1st,rentalFee;
                                 {2ndstage_legend},serialNumber2ndPri,regModel2ndPri,serialNumber2ndSec,regModel2ndSec;
                                 {notes_legend},addNotes;
                                 {publish_legend},published,start,stop;'
@@ -197,6 +190,18 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'reference'         => &$GLOBALS['TL_LANG']['tl_dc_regulators']['itemStatus'],
             'eval'              => ['includeBlankOption' => true, 'submitOnChange' => true, 'chosen'   => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql'               => "varchar(255) NOT NULL default ''"
+        ],
+        'rentalFee'             => [
+            'inputType'         => 'text',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_types']['rentalFee'],
+            'exclude'           => true,
+            'search'            => false,
+            'filter'            => true,
+            'sorting'           => false,
+            'load_callback'     => [['tl_dc_regulators', 'formatPrice']],
+            'save_callback'     => [['tl_dc_regulators', 'convertPrice']],
+            'eval'              => ['rgxp'=>'digit', 'mandatory'=>false, 'tl_class' => 'w25'], // Beachten Sie "rgxp" für Währungsangaben
+            'sql'               => "DECIMAL(10,2) NOT NULL default 0.00"
         ],
         'addNotes'          => [
             'inputType'         => 'checkbox',
@@ -419,5 +424,30 @@ class tl_dc_regulators extends Backend
         }
 
         return $args;
+    }
+
+    /**
+     * Formatiert den Preis für die Anzeige im Backend
+     */
+    public function formatPrice($value): string
+    {
+        return number_format((float)$value, 2, '.', ',') . ' €'; // z. B. "123.45 €"
+    }
+
+    /**
+     * Konvertiert den eingegebenen Preis zurück ins DB-Format
+     */
+    public function convertPrice($value): float
+    {
+        // Logik für leere Eingabe
+        if (empty($value)) {
+            return 0.00;
+        }
+
+        // Entferne eventuell angefügte Währungszeichen und whitespace
+        $value = str_replace(['€', ' '], '', $value);
+
+        // Stelle sicher, dass es ein gültiger Dezimalwert ist
+        return round((float)$value, 2);
     }
 }

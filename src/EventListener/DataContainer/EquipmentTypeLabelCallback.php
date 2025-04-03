@@ -20,6 +20,8 @@ class EquipmentTypeLabelCallback
 
     public function __invoke(array $row, string $label, DataContainer $dc): string
     {
+        $args[2] = number_format((float) $row['rentalFee'], 2, ',', '.') . ' €'; // z. B. "1.234,56 €"
+
         // Lade die Subtypen aus der Template-Datei
         $types = $this->templateHelper->getTemplateOptions('dc_equipment_types');
         $subTypes = $this->templateHelper->getTemplateOptions('dc_equipment_subTypes');
@@ -31,6 +33,6 @@ class EquipmentTypeLabelCallback
             $subTypeName = $subTypes[$row['title']][$row['subType']];
         }
 
-        return sprintf('%s: %s', $typeName, $subTypeName);
+        return sprintf('%s: %s - %s', $typeName, $subTypeName, $args[2]);
     }
 }

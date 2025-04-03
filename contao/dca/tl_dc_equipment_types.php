@@ -27,12 +27,12 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_types'] = [
     'list'              => [
         'sorting'           => [
             'mode'          => DataContainer::MODE_SORTED,
-            'fields'        => ['title', 'subType', 'published'],
+            'fields'        => ['title', 'subType', 'rentalFee', 'published'],
             'flag'          => DataContainer::SORT_INITIAL_LETTER_ASC,
             'panelLayout'   => 'filter;search,limit',
         ],
         'label'             => [
-            'fields'        => ['title', 'subType'],
+            'fields'        => ['title', 'subType', 'rentalFee'],
             'label_callback'=> [EquipmentTypeLabelCallback::class, '__invoke'],
             'showColumns'   => false,
         ],
@@ -54,8 +54,8 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_types'] = [
     ],
     // Palettes-Konfiguration
     'palettes'          => [
-        'default'   => '{title_legend},title,alias;
-                        {types_legend},subType;
+        'default'   => '{title_legend},title,subType,alias;
+                        {types_legend},rentalFee;
                         {notes_legend},addNotes;
                         {publish_legend},published,start,stop;',
     ],
@@ -73,7 +73,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_types'] = [
         'alias'             => [
             'search'        => true,
             'inputType'     => 'text',
-            'eval'          => ['rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w33'],
+            'eval'          => ['rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w25'],
             'save_callback' => [['tl_dc_equipment_types', 'generateAlias']],
             'sql'           => "varchar(255) BINARY NOT NULL default ''"
         ],
@@ -94,8 +94,20 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_types'] = [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_types']['subType'],
             'exclude'           => true,
             'options_callback'  => ['tl_dc_equipment_types', 'getSubTypes'],
-            'eval'              => ['includeBlankOption' => true,'mandatory' => false,'tl_class' => 'w50',],
+            'eval'              => ['includeBlankOption' => true,'mandatory' => false,'tl_class' => 'w25',],
             'sql'               => "int(10) unsigned NOT NULL default 0",
+        ],
+        'rentalFee'             => [
+            'inputType'         => 'text',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_types']['price'],
+            'exclude'           => true,
+            'search'            => false,
+            'filter'            => true,
+            'sorting'           => false,
+            'load_callback'     => [['tl_dc_equipment_types', 'formatPrice']],
+            'save_callback'     => [['tl_dc_equipment_types', 'convertPrice']],
+            'eval'              => ['rgxp'=>'digit', 'mandatory'=>false, 'tl_class' => 'w25'], // Beachten Sie "rgxp" für Währungsangaben
+            'sql'               => "DECIMAL(10,2) NOT NULL default 0.00"
         ],
         'addNotes'          => [
             'inputType'         => 'checkbox',
@@ -261,5 +273,30 @@ class tl_dc_equipment_types extends Backend
         }
 
         return $configArray[$templateName];
+    }
+
+    /**
+     * Formatiert den Preis für die Anzeige im Backend
+     */
+    public function formatPrice($value): string
+    {
+        return number_format((float)$value, 2, '.', ',') . ' €'; // z. B. "123.45 €"
+    }
+
+    /**
+     * Konvertiert den eingegebenen Preis zurück ins DB-Format
+     */
+    public function convertPrice($value): float
+    {
+        // Logik für leere Eingabe
+        if (empty($value)) {
+            return 0.00;
+        }
+
+        // Entferne eventuell angefügte Währungszeichen und whitespace
+        $value = str_replace(['€', ' '], '', $value);
+
+        // Stelle sicher, dass es ein gültiger Dezimalwert ist
+        return round((float)$value, 2);
     }
 }

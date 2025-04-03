@@ -31,6 +31,7 @@ $GLOBALS['TL_LANG']['tl_dc_regulators']['regModel1st']       = ['Model 1st Stage
 $GLOBALS['TL_LANG']['tl_dc_regulators']['serialNumber2ndPri']= ['Serial Number 2nd Stage (Primary)', 'Please enter the serial number of the primary second stage.'];
 $GLOBALS['TL_LANG']['tl_dc_regulators']['regModel2ndPri']    = ['Model 2nd Stage (Primary)', 'Please enter the model of the primary second stage.'];
 $GLOBALS['TL_LANG']['tl_dc_regulators']['serialNumber2ndSec']= ['Serial Number 2nd Stage (secondary)', 'Please enter the serial number of the secondary second stage.'];
+$GLOBALS['TL_LANG']['tl_dc_regulators']['rentalFee']        = ['Price', 'Fee for the item.'];
 $GLOBALS['TL_LANG']['tl_dc_regulators']['regModel2ndSec']    = ['Model 2nd Stage (secondary)', 'Please enter the model of the secondary second stage.'];
 $GLOBALS['TL_LANG']['tl_dc_regulators']['addNotes']          = ['Additional Notes', 'Add optional notes.'];
 $GLOBALS['TL_LANG']['tl_dc_regulators']['notes']             = ['Notes', 'Please enter the notes.'];

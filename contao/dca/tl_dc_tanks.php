@@ -72,7 +72,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
     ],
     'palettes'          => [
         '__selector__'      => ['addNotes'],
-        'default'           => '{title_legend},title,alias,status;
+        'default'           => '{title_legend},title,alias,status,rentalFee;
                                 {details_legend},serialNumber,manufacturer,bazNumber,size,o2clean,owner,checkId,lastCheckDate,nextCheckDate;
                                 {notes_legend},addNotes;
                                 {publish_legend},published,start,stop;'
@@ -89,18 +89,20 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
         ],
         'title'             => [
             'inputType'         => 'text',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_tanks']['title'],
             'exclude'           => true,
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
             'flag'              => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'eval'              => ['mandatory' => true, 'maxlength'=>255, 'tl_class' => 'w33'],
+            'eval'              => ['mandatory' => true, 'maxlength'=>255, 'tl_class' => 'w25'],
             'sql'               => "varchar(255) NOT NULL default ''"
         ],
         'alias'             => [
-            'search'            => true,
             'inputType'         => 'text',
-            'eval'              => ['rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w33'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_tanks']['alias'],
+            'search'            => true,
+            'eval'              => ['rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w25'],
             'save_callback' => [
                         ['tl_dc_tanks', 'generateAlias']
             ],
@@ -108,6 +110,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
         ],
         'serialNumber'      => [
             'inputType'         => 'text',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_tanks']['serialNumber'],
             'exclude'           => true,
             'search'            => true,
             'filter'            => true,
@@ -118,6 +121,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
         ],
         'manufacturer'      => [
             'inputType'         => 'text',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_tanks']['manufacturer'],
             'exclude'           => true,
             'search'            => false,
             'filter'            => true,
@@ -128,6 +132,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
         ],
         'bazNumber'         => [
             'inputType'         => 'text',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_tanks']['bazNumber'],
             'exclude'           => true,
             'search'            => false,
             'filter'            => true,
@@ -138,6 +143,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
         ],
         'size'              => [
             'inputType'         => 'select',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_tanks']['size'],
             'exclude'           => true,
             'search'            => true,
             'filter'            => true,
@@ -148,14 +154,16 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'sql'               => "varchar(20) NOT NULL default ''",
         ],
         'o2clean'           => [
+            'inputType'         => 'checkbox',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_tanks']['o2clean'],
             'exclude'           => true,
             'filter'            => true,
-            'inputType'         => 'checkbox',
             'eval'              => ['submitOnChange' => true, 'tl_class' => 'w50'],
             'sql'               => ['type' => 'boolean', 'default' => false]
         ],
         'checkId'           => [
             'inputType'         => 'select',                        // Typ ist "select"
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_tanks']['checkId'],
             'foreignKey'        => 'tl_calendar_events.title',      // Zeigt den Titel des Events als Auswahl
             'relation'          => ['type' => 'hasOne', 'load' => 'lazy'], // Relationstyp
             'options_callback'  => ['tl_dc_tanks', 'getCalendarOptions'],  // Option Callback
@@ -172,6 +180,8 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
         ],
         'lastCheckDate'     => [
             'inputType'         => 'text',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_tanks']['lastCheckDate'],
+            'exclude'           => true,
             'sorting'           => true,
             'filter'            => true,
             'flag'              => DataContainer::SORT_YEAR_DESC,
@@ -180,15 +190,30 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
         ],
         'nextCheckDate'     => [
             'inputType'         => 'text',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_tanks']['nextCheckDate'],
+            'exclude'           => true,
             'sorting'           => true,
             'filter'            => true,
             'flag'              => DataContainer::SORT_YEAR_DESC,
             'eval'              => ['submitOnChange' => true,'rgxp'=>'date', 'doNotCopy'=>false, 'datepicker'=>true, 'tl_class'=>'w33 wizard'],
             'sql'               => "bigint(20) NULL"
         ],
+        'rentalFee'             => [
+            'inputType'         => 'text',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_types']['rentalFee'],
+            'exclude'           => true,
+            'search'            => false,
+            'filter'            => true,
+            'sorting'           => true,
+            'load_callback'     => [['tl_dc_tanks', 'formatPrice']],
+            'save_callback'     => [['tl_dc_tanks', 'convertPrice']],
+            'eval'              => [ 'mandatory'=>false, 'tl_class' => 'w25'], // Beachten Sie "rgxp" für Währungsangaben
+            'sql'               => "DECIMAL(10,2) NOT NULL default 0.00"
+        ],
         'owner'             => [
             'inputType'         => 'select',                                        // Typ ist "select"
             'foreignKey'        => 'tl_member.CONCAT(firstname, " ", lastname)',    // Zeigt Vor- und Nachnamen als Titel
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_tanks']['owner'],
             'relation'          => ['type' => 'belongsTo', 'load' => 'lazy'],       // Relationstyp
             'eval'              => [
                 'includeBlankOption'=> true,                                        // Option "Bitte wählen" hinzufügen
@@ -211,13 +236,15 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'sql'               => "varchar(255) NOT NULL default ''"
         ],
         'addNotes'          => [
-            'exclude'           => true,
             'inputType'         => 'checkbox',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_tanks']['addNotes'],
+            'exclude'           => true,
             'eval'              => ['submitOnChange' => true, 'tl_class' => 'w50'],
             'sql'               => ['type' => 'boolean', 'default' => false]
         ],
         'notes'             => [
             'inputType'         => 'textarea',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_tanks']['notes'],
             'exclude'           => true,
             'search'            => false,
             'filter'            => false,
@@ -226,10 +253,10 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'sql'               => 'text NULL'
         ],
         'published'         => [
+            'inputType'         => 'checkbox',
+            'flag'              => DataContainer::SORT_INITIAL_LETTER_DESC,
             'toggle'            => true,
             'filter'            => true,
-            'flag'              => DataContainer::SORT_INITIAL_LETTER_DESC,
-            'inputType'         => 'checkbox',
             'eval'              => ['doNotCopy'=>true, 'tl_class' => 'w50'],
             'sql'               => ['type' => 'boolean', 'default' => false]
         ],
@@ -472,5 +499,30 @@ class tl_dc_tanks extends Backend
         if (Input::get('do') == 'calendar' && ($eventId = Input::get('event_id')) !== null) {
             $GLOBALS['TL_DCA']['tl_dc_tanks']['list']['sorting']['filter'] = [['pid=?', $eventId]];
         }
+    }
+
+    /**
+     * Formatiert den Preis für die Anzeige im Backend
+     */
+    public function formatPrice($value): string
+    {
+        return number_format((float)$value, 2, '.', ',') . ' €'; // z. B. "123.45 €"
+    }
+
+    /**
+     * Konvertiert den eingegebenen Preis zurück ins DB-Format
+     */
+    public function convertPrice($value): float
+    {
+        // Logik für leere Eingabe
+        if (empty($value)) {
+            return 0.00;
+        }
+
+        // Entferne eventuell angefügte Währungszeichen und whitespace
+        $value = str_replace(['€', ' '], '', $value);
+
+        // Stelle sicher, dass es ein gültiger Dezimalwert ist
+        return round((float)$value, 2);
     }
 }
