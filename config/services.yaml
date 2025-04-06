@@ -26,6 +26,7 @@ services:
     diversworld.contao_diveclub_bundle.session.attribute.array_attribute_bag:
         class: Diversworld\ContaoDiveclubBundle\Session\Attribute\ArrayAttributeBag
         arguments:
+            - '_diversworld_reservation_temp' # Attributname (KEY)
             - _diversworld_contao_diveclub_attributes
         calls:
             - [ setName, [ diversworld_contao_diveclub ] ]

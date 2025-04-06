@@ -30,7 +30,6 @@ class SessionFactory implements SessionFactoryInterface
     {
         $session = $this->inner->createSession();
         $session->registerBag($this->sessionBag);
-
         return $session;
     }
 }

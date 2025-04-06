@@ -46,8 +46,8 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'panelLayout' => 'filter;sort,search,limit'
         ],
         'label' => [
-            'fields' => ['title', 'member_id', 'asset_type', 'asset_id', 'reservation_status'],
-            'format' => '%s - %s %s %s - %s',
+            'fields' => ['title','member_id','asset_type','asset_id','reservation_status','rentalFee'],
+            'format' => '%s - %s %s %s - %s %s',
         ],
         'global_operations' => [
             'all' => [
@@ -69,7 +69,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
         '__selector__'      => ['addArticleInfo'],
         'default'           => '{title_legend},title,alias;
                                 {details_legend},asset_type,asset_id,member_id;
-                                {reservation_legend},reserved_at,picked_up_at,returned_at,reservation_status;
+                                {reservation_legend},reserved_at,picked_up_at,returned_at,reservation_status,rentalFee;
                                 {notes_legend},addNotes;
                                 {publish_legend},published,start,stop;'
     ],
@@ -159,6 +159,18 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'eval'              => array('submitOnChange' => true, 'includeBlankOption' => true, 'tl_class' => 'w25'),
             'sql'               => "varchar(255) NOT NULL default ''",
             'relation'          => array('type' => 'hasOne', 'load' => 'lazy')
+        ],
+        'rentalFee'             => [
+            'inputType'         => 'text',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_types']['rentalFee'],
+            'exclude'           => true,
+            'search'            => false,
+            'filter'            => true,
+            'sorting'           => false,
+            'load_callback'     => [['tl_dc_regulators', 'formatPrice']],
+            'save_callback'     => [['tl_dc_regulators', 'convertPrice']],
+            'eval'              => ['rgxp'=>'digit', 'mandatory'=>false, 'tl_class' => 'w25'], // Beachten Sie "rgxp" für Währungsangaben
+            'sql'               => "DECIMAL(10,2) NOT NULL default 0.00"
         ],
         'addNotes'          => [
             'inputType'         => 'checkbox',

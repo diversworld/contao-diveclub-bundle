@@ -205,7 +205,6 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'search'            => false,
             'filter'            => true,
             'sorting'           => true,
-            'load_callback'     => [['tl_dc_tanks', 'formatPrice']],
             'save_callback'     => [['tl_dc_tanks', 'convertPrice']],
             'eval'              => [ 'mandatory'=>false, 'tl_class' => 'w25'], // Beachten Sie "rgxp" für Währungsangaben
             'sql'               => "DECIMAL(10,2) NOT NULL default 0.00"

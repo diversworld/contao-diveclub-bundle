@@ -46,9 +46,9 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'panelLayout'   => 'filter;sort,search,limit'
         ],
         'label'             => [
-            'fields'        => ['title','regModel1st','regModel2ndPri','regModel2ndSec','status'],
+            'fields'        => ['title','manufacturer','regModel1st','regModel2ndPri','regModel2ndSec','status'],
             'showColumns'   => true,
-            'format'        => '%s - %s %s %s',
+            'format'        => '%s - %s - %s %s %s',
             'label_callback' => ['tl_dc_regulators', 'customLabelCallback']
         ],
         'global_operations' => [
@@ -69,8 +69,8 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
     ],
     'palettes'          => [
         '__selector__'      => ['addArticleInfo'],
-        'default'           => '{title_legend},title,alias,status;
-                                {1stStage_legend},manufacturer,serialNumber1st,regModel1st,rentalFee;
+        'default'           => '{title_legend},title,alias,status,rentalFee;
+                                {1stStage_legend},manufacturer,serialNumber1st,regModel1st;
                                 {2ndstage_legend},serialNumber2ndPri,regModel2ndPri,serialNumber2ndSec,regModel2ndSec;
                                 {notes_legend},addNotes;
                                 {publish_legend},published,start,stop;'
@@ -93,13 +93,13 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'filter'        => true,
             'sorting'       => true,
             'flag'          => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'eval'          => ['mandatory' => true, 'maxlength' => 25, 'tl_class' => 'w33'],
+            'eval'          => ['mandatory' => true, 'maxlength' => 25, 'tl_class' => 'w25'],
             'sql'           => "varchar(255) NOT NULL default ''"
         ],
         'alias'             => [
             'search'        => true,
             'inputType'     => 'text',
-            'eval'          => ['rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w33'],
+            'eval'          => ['rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w25'],
             'save_callback' => [['tl_dc_regulators', 'generateAlias']],
             'sql'           => "varchar(255) BINARY NOT NULL default ''"
         ],
@@ -198,7 +198,6 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'search'            => false,
             'filter'            => true,
             'sorting'           => false,
-            'load_callback'     => [['tl_dc_regulators', 'formatPrice']],
             'save_callback'     => [['tl_dc_regulators', 'convertPrice']],
             'eval'              => ['rgxp'=>'digit', 'mandatory'=>false, 'tl_class' => 'w25'], // Beachten Sie "rgxp" für Währungsangaben
             'sql'               => "DECIMAL(10,2) NOT NULL default 0.00"

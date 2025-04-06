@@ -16,7 +16,6 @@ namespace Diversworld\ContaoDiveclubBundle\Controller\FrontendModule;
 use Contao\Config;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
-use Contao\CoreBundle\Exception\RedirectResponseException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\Email;
@@ -27,12 +26,12 @@ use Contao\PageModel;
 use Contao\System;
 use Contao\Template;
 use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
-use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentSubTypeModel;
-use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentTypeModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcReservationItemsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcReservationModel;
+use Diversworld\ContaoDiveclubBundle\Session\Attribute\ArrayAttributeBag;
 use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -46,13 +45,15 @@ class ModuleBooking extends AbstractFrontendModuleController
     protected ?PageModel $page;
 
     private DcaTemplateHelper $helper;
+    private RequestStack $requestStack;
 
     private Connection $db;
-    public function __construct(DcaTemplateHelper $helper, Connection $db, private readonly ContaoFramework $framework,
-    )
+    public function __construct(DcaTemplateHelper $helper, Connection $db, ContaoFramework $framework, RequestStack $requestStack)
     {
         $this->helper = $helper;
         $this->db = $db;
+        $this->framework = $framework;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -91,309 +92,407 @@ class ModuleBooking extends AbstractFrontendModuleController
 
     protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
     {
-        // Übergabe der Default-Werte an das Template
-        $template->form = [
-            'messages' => 'Hier könnte Ihre Nachricht stehen.',
+        // Sprachdateien laden
+        System::loadLanguageFile('tl_dc_reservation_items');
+
+        // Session und Hilfsparameter
+        $session = $this->requestStack->getSession();
+        $bag = $session->getBag(ArrayAttributeBag::ATTRIBUTE_NAME);
+        $sessionData = $bag->get('reservation_items', []); // Alle Daten in der Session
+
+        // Kategorie aus dem Request abrufen
+        $category = $request->get('category');
+        $template->selectedCategory = $category;
+
+        // Benutzerinformationen abrufen
+        $hasFrontendUser = System::getContainer()->get('contao.security.token_checker')->hasFrontendUser();
+        $userId = null;
+        $userFullName = 'Gast';
+
+        if ($hasFrontendUser) {
+            $user = $this->getUser();
+            $userId = $user->id;
+            $userFullName = trim($user->firstname . ' ' . $user->lastname);
+        }
+
+        // Benutzerinformation ans Template übergeben
+        $template->currentUser = [
+            'userId'       => $userId,
+            'userFullName' => $userFullName ?: 'Gast',
         ];
-        $template->messages = '';
 
-        $sizes = $this->helper->getSizes();
-        $manufacturers = $this->helper->getManufacturers();
-        $types = DcEquipmentTypeModel::findAll(); // Alle Typ-Modelle laden
-        $equipmentSubTypes = $this->helper->getTemplateOptions('subTypesFile'); // Hole SubType-Optione
+        if ($category ) {
+            // Verfügbare Assets abrufen
+            $updatedAssets = $this->updateAssets($category);
 
-        if ($request->isMethod(Request::METHOD_POST)) {
-            if (null !== ($redirectPage = PageModel::findById($model->jumpTo))) {
-                throw new RedirectResponseException($redirectPage->getAbsoluteUrl());
+            // Session-Daten mit geladenen Assets kombinieren
+            $updatedAssets = $this->combineAssetsWithSession($category, $updatedAssets);
+
+            // Zuweisung der transformierten Assets
+            $assets = $updatedAssets;
+
+            // Optional: Gruppieren nach `pid` nur für Equipment Types
+            if ('tl_dc_equipment_types' === $category) {
+                $groupedAssets = [];
+                foreach ($assets as $asset) {
+                    //$groupedAssets[$asset['pid']][] = $asset;
+                    // Gruppierung nach Namen des Typs statt ID
+                    $groupName = $asset['type'] ?? 'Unbekannter Typ'; // Typ-Bezeichnung verwenden
+                    $groupedAssets[$groupName][] = $asset;
+                }
+                $template->groupedAssets = $groupedAssets;
+            } else {
+                $template->assets = $assets; // Keine Gruppierung für andere Kategorien
+            }
+
+            // Checkboxen für verfügbare Assets generieren
+            $reservationCheckboxes = $this->generateReservationCheckboxes($updatedAssets);
+            $template->reservationCheckboxes = $reservationCheckboxes;
+        }
+
+        // POST-Anfrage: Verarbeitungen
+        if ($request->isMethod('POST')) {
+            $formType = $request->request->get('FORM_SUBMIT');
+
+            // A - Speichern in der Session
+            if ('reservationItems_submit' === $formType) {
+                try {
+                    // Neue Reservierungen in der Session speichern
+                    $this->saveDataToSession($request->request->all());
+
+                    // Session-Daten neu laden
+                    $sessionData = $bag->get('reservation_items', []);
+
+                    // Nachricht, dass die Speicherung funktioniert hat
+                    Message::addConfirmation('Die Reservierungsdaten wurden erfolgreich in der Session gespeichert.');
+
+                    // Reservierte Items aus der Session laden
+                    $storedAssets = [];
+                    foreach ($sessionData as $entry) {
+                        if (!empty($entry['selectedAssets'])) {
+                            foreach ($entry['selectedAssets'] as $assetId) {
+                                $assetDetails = $this->getAssetDetails($entry['category'], (int) $assetId);
+                                if ($assetDetails) {
+                                    $storedAssets[] = $assetDetails;
+                                }
+                            }
+                        }
+                    }
+
+                    // Erfolgsmeldung für gespeicherte Items
+                    if (!empty($storedAssets)) {
+                        $message = 'Die folgenden Reservierungen wurden in der Session gespeichert:<br><ul>';
+                        foreach ($storedAssets as $item) {
+                            $message .= '<li>' . htmlspecialchars($item) . '</li>';
+                        }
+                        $message .= '</ul>';
+                        Message::addConfirmation($message);
+                    }
+
+                    $template->messages = Message::generate();
+                } catch (\Exception $e) {
+                    // Fehlermeldung bei Problemen mit der Session-Speicherung
+                    System::getContainer()->get('monolog.logger.contao.general')->error($e->getMessage());
+                    Message::addError('Es gab ein Problem beim Speichern der Reservierungsdaten in der Session.');
+                    $template->messages = Message::generate();
+                }
+            }
+
+            // B - Speichern in die Datenbank
+            if ('reservationSubmit' === $formType) {
+                try {
+                    // Reservierungsdaten in die Datenbank speichern
+                    $saveMessage = $this->saveDataToDb();
+
+                    // Erfolgreich-Meldung anzeigen
+                    Message::addConfirmation(htmlspecialchars($saveMessage));
+
+                    // Reservierungen aus der Datenbank ausgeben
+                    $reservedItems = [];
+                    foreach ($sessionData as $entry) {
+                        if (!empty($entry['selectedAssets'])) {
+                            foreach ($entry['selectedAssets'] as $assetId) {
+                                $assetDetails = $this->getAssetDetails($entry['category'], (int) $assetId);
+                                if ($assetDetails) {
+                                    $reservedItems[] = $assetDetails;
+                                }
+                            }
+                        }
+                    }
+
+                    if (!empty($reservedItems)) {
+                        $emailMessage = 'Die Reservierung wurde erfolgreich durchgeführt und eine Bestätigungsmail versendet.<br>Reservierte Gegenstände:<ul>';
+                        foreach ($reservedItems as $item) {
+                            $emailMessage .= '<li>' . htmlspecialchars($item) . '</li>';
+                        }
+                        $emailMessage .= '</ul>';
+                        Message::addConfirmation($emailMessage);
+                    }
+
+                    // Mail senden
+                    $this->sendReservationEmail((int) $userId, 'SP-01', $userFullName, $reservedItems);
+
+                    // Nachrichten generieren
+                    $template->messages = Message::generate();
+
+                    // Session zurücksetzen (optional, um doppelte Speicherung zu verhindern)
+                    $bag->set('reservation_items', []);
+                } catch (\Exception $e) {
+                    // Fehler bei der Datenbank-Speicherung
+                    System::getContainer()->get('monolog.logger.contao.general')->error($e->getMessage());
+                    Message::addError('Es gab ein Problem beim Speichern der Reservierungen in der Datenbank.');
+                    $template->messages = Message::generate();
+                }
             }
         }
 
-        // Prüfen, ob ein POST-Request vorliegt
-        if ($request->isMethod('POST') && $request->request->get('FORM_SUBMIT') === 'reservationItems_submit')
-        {
-            // Alle Formulardaten abrufen und Assets filtern
-            $selectedAssets = $request->request->all('selectedAssets');
-            $selectedAssets = array_filter($selectedAssets, fn($value) => !empty($value));
+        // Kategorien-Auswahl (Dropdown)
+        $categories = [
+            'tl_dc_tanks'           => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes']['tl_dc_tanks'],
+            'tl_dc_regulators'      => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes']['tl_dc_regulators'],
+            'tl_dc_equipment_types' => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes']['tl_dc_equipment_types'],
+        ];
+
+        $template->categories = $categories;
+        // Weitergabe an Twig
+        $template->action = $request->getUri();
+
+        return $template->getResponse();
+    }
+
+    /**
+     * Speichert die Daten in der Session.
+     */
+    private function saveDataToSession(array $data): void
+    {
+        dump($data);
+        $session = $this->requestStack->getSession();
+        $bag = $session->getBag(ArrayAttributeBag::ATTRIBUTE_NAME);
+        $sessionData = $bag->get('reservation_items', []);
+
+        // Extrahiert Daten aus der Anfrage
+        $userId = $data['userId'] ?? null;
+        $category = $data['category'] ?? null;
+        $selectedAssets = $data['selectedAssets'] ?? [];
+        $pid = $data['pid'] ?? null;
+
+        // Daten validieren
+        if (!$userId || !$category || empty($selectedAssets)) {
+            throw new \RuntimeException('Ungültige Daten: Es fehlt der Benutzer, Kategorie oder ausgewählte Assets.');
+        }
+
+        $entryExists = false;
+        foreach ($sessionData as &$entry) {
+            // Aktualisieren, falls die Kategorie und der Benutzer identisch sind
+            if ($entry['userId'] === $userId && $entry['category'] === $category) {
+                $entry['selectedAssets'] = array_unique(array_merge($entry['selectedAssets'] ?? [], $selectedAssets));
+                if ($category === 'tl_dc_equipment_types') {
+                    $entry['pid'] = $pid;
+                }
+                $entryExists = true;
+                break;
+            }
+        }
+
+        if (!$entryExists) {
+            // Neuen Eintrag hinzufügen, falls keine Übereinstimmung gefunden wurde
+            $sessionData[] = [
+                'userId' => $userId,
+                'category' => $category,
+                'selectedAssets' => $selectedAssets,
+                'pid' => $pid,
+            ];
+        }
+dump($sessionData);
+        // Daten in der Session speichern
+        $bag->set('reservation_items', $sessionData);
+        Message::addConfirmation('Daten wurden erfolgreich in der Session gespeichert.');
+    }
+
+    /**
+     * Save Data to Database
+     */
+    /**
+     * Speichert die Session-Daten in die Datenbank.
+     */
+    function saveDataToDb(): string
+    {
+        $session = $this->requestStack->getSession();
+        $bag = $session->getBag(ArrayAttributeBag::ATTRIBUTE_NAME);
+        $sessionData = $bag->get('reservation_items', []); // Alle gespeicherten Reservierungsdaten abrufen
+
+        if (empty($sessionData)) {
+            throw new \RuntimeException('Es sind keine Reservierungsdaten in der Session gespeichert.');
+        }
+
+        foreach ($sessionData as $entry) {
+            $userId = $entry['userId'] ?? null;
+            $category = $entry['category'] ?? null;
+            $selectedAssets = $entry['selectedAssets'] ?? [];
+            $pid = $entry['pid'] ?? null;
 
             if (empty($selectedAssets)) {
-                throw new \RuntimeException('Bitte mindestens ein Asset auswählen.');
+                continue; // Überspringen, wenn keine Assets ausgewählt sind
             }
 
-            // Alle reservierten Gegenstände in einem Array sammeln
-            $reservedItems = [];
-
-            foreach ($selectedAssets as $assetId) {
-                $itemCategory = $request->request->get('category'); // Hole die Kategorie aus dem POST-Request
-                if (!$itemCategory) {
-                    throw new \RuntimeException('Die Kategorie des Gegenstands ist nicht definiert.');
-                }
-
-                // Asset-Details aus der entsprechenden Kategorie abrufen
-                $itemDetails = $this->getAssetDetails($itemCategory, (int) $assetId);
-
-                if ($itemDetails) {
-                    $reservedItems[] = $itemDetails; // Zur Liste hinzufügen
-                } else {
-                    // Wenn kein Asset gefunden wurde, Notiz hinzufügen
-                    $reservedItems[] = "Asset-ID {$assetId}: Details nicht verfügbar.";
-                }
+            if (!$userId || !$category) {
+                throw new \RuntimeException('Ungültige Session-Daten: Benutzer oder Kategorie fehlt.');
             }
 
-            // Erfolgreich reservierte Gegenstände in eine Nachricht schreiben
-            if (!empty($reservedItems)) {
-                $result = $this->db->fetchAssociative('SELECT reservationMessage FROM tl_dc_config LIMIT 1');
+            // Reservierungstitel generieren
+            $reservationTitle = $this->generateReservationTitle((int) $userId);
 
-                $defaultMessage = $result['reservationMessage'] ?? 'Die folgenden Gegenstände wurden erfolgreich reserviert:<br>';
-
-                // Nachricht aus `tl_dc_config` verwenden und Platzhalter ersetzen
-                $reservedMessage = sprintf(
-                    $defaultMessage,
-                    '<ul><li>' . implode('</li><li>', $reservedItems) . '</li></ul>'
-                );
-
-                // Contao-Message verwenden, um die Benachrichtigung anzuzeigen
-                Message::addConfirmation(htmlspecialchars_decode($reservedMessage));
-
-                // Reservierungsnummer generieren
-                $reservationNumber = $this->generateReservationTitle((int)$request->request->get('userId'));
-                $reservationId = (int) ($request->request->get('pid') ?? 0);
-
-
-                // Name des Mitglieds holen
-                $member = $this->container->get('security.helper')->getUser();
-                $memberName = $member->firstname . ' ' . $member->lastname;
-
-                // E-Mail senden
-                $this->sendReservationEmail($reservationId, $reservationNumber, $memberName, $reservedItems);
-
-                // Contao-Meldungen generieren und ans Template übergeben
-                $template->messages = Message::generate(); // Contao verarbeitet es mit den Nachrichten
-
-            }
-
-            // Optional: Weiterleitung nach erfolgreicher Reservierung
-            if (null !== ($redirectPage = PageModel::findById($model->jumpTo))) {
-                throw new RedirectResponseException($redirectPage->getAbsoluteUrl());
-            }
-
-            // Benutzer-ID und Kategorie abrufen
-            $userId = (int)$request->request->get('userId');
-            $itemCategory = $request->request->get('category');
-            $assetType = $request->request->get('assetType') ?? null;
-            $pid = (int) ($request->request->get('pid') ?? 0);
-
-            // Generiere Titel anhand der userId
-            $reservationTitle = $this->generateReservationTitle($userId);
-
-            // Prüfen, ob eine bestehende Reservierung mit demselben Titel vorhanden ist
+            // Prüfen, ob eine Reservierung existiert
             $reservation = DcReservationModel::findOneBy(['title=?'], [$reservationTitle]);
-
-
             if (null === $reservation) {
-                // Nur speichern, wenn der Parent-Datensatz noch nicht existiert
-
-                // Neues Eltern-Datensatz (Reservation) erstellen
+                // Neue Reservierung erstellen
                 $reservation = new DcReservationModel();
-                $reservation->title = $reservationTitle;            // Titel generieren
-                $reservation->alias = 'id-' . $reservationTitle;    // alias generieren
+                $reservation->title = $reservationTitle;
+                $reservation->alias = 'id-' . $reservationTitle;
                 $reservation->tstamp = time();
                 $reservation->member_id = $userId;
-                $reservation->asset_type = $assetType;
+                $reservation->asset_type = $category;
                 $reservation->reserved_at = time();
                 $reservation->reservation_status = 'reserved';
                 $reservation->published = 1;
-
-                // Eltern-Datensatz in der Datenbank speichern
                 $reservation->save();
             }
 
-            // ID des gespeicherten Eltern-Datensatzes abrufen
             $reservationId = $reservation->id;
 
-            if (!$reservationId) {
-                throw new \RuntimeException('Die Reservierung konnte nicht gespeichert werden.');
-            }
-
-            // Kind-Datensätze (Reservation Items) anlegen
             foreach ($selectedAssets as $assetId) {
-                // Überprüfen, ob Kind-Datensatz bereits existiert
                 $existingItem = DcReservationItemsModel::findOneBy([
-                    'pid=? AND id=?',
+                    'pid=? AND item_id=?',
                 ], [
                     $reservationId,
-                    (int)$assetId,
+                    $assetId,
                 ]);
 
                 if (null === $existingItem) {
-                    $reservationItem = new DcReservationItemsModel(); // Hinweis: DcReservationItemsModel anpassen, falls Modell nicht existiert
-                    $reservationItem->pid = $reservationId; // Parent-ID setzen
+                    // Neue Reservierung für dieses Asset erstellen
+                    $reservationItem = new DcReservationItemsModel();
+                    $reservationItem->pid = $reservationId;
                     $reservationItem->tstamp = time();
-                    $reservationItem->item_id = (int)$assetId; // ID des ausgewählten Assets
-                    $reservationItem->item_type = $itemCategory;
+                    $reservationItem->item_id = (int) $assetId;
+                    $reservationItem->item_type = $category;
                     $reservationItem->reserved_at = time();
                     $reservationItem->created_at = time();
                     $reservationItem->updated_at = time();
                     $reservationItem->reservation_status = 'reserved';
                     $reservationItem->published = 1;
 
-                    // Spezielle Behandlung für "tl_dc_equipment_types"
-                    if ($itemCategory === 'tl_dc_equipment_types') {
-                        // Typ und Subtyp aus der Tabelle `tl_dc_equipment_types` abrufen
-                        $query = $this->db->prepare('
-                            SELECT title, subType
-                            FROM tl_dc_equipment_types
-                            WHERE id = ?
-                        ');
-                        $result = $query->executeQuery([(int) $pid])->fetchAssociative();
+                    if ('tl_dc_equipment_types' === $category) {
+                        $query = $this->db->prepare('SELECT title, subType FROM tl_dc_equipment_types WHERE id = ?');
+                        $result = $query->executeQuery([$pid])->fetchAssociative();
 
                         if ($result) {
-                            // Typ und Subtyp in den Kinddatensatz eintragen
                             $reservationItem->types = $result['title'];
                             $reservationItem->sub_type = $result['subType'];
-                        } else {
-                            // Fehler werfen, wenn kein Parent-Datensatz gefunden wurde
-                            throw new \RuntimeException("Typ und Subtyp für Asset-ID {$assetId} konnten nicht abgerufen werden.");
                         }
                     }
 
-                    // Kind-Datensatz speichern
                     $reservationItem->save();
                 }
-                // Asset-Status in der jeweiligen Tabelle aktualisieren
-                switch ($itemCategory) {
+
+                // Status des Assets aktualisieren
+                $this->updateAssetStatus($category, (int) $assetId);
+            }
+        }
+
+        return 'Reservierungsdaten wurden erfolgreich gespeichert.';
+    }
+
+    /**
+     * @param int $reservationId
+     * @param string $reservationNumber
+     * @param string $memberName
+     * @param array $reservedItems
+     * @return void
+     * @throws \Doctrine\DBAL\Exception
+     */
+    function sendReservationEmail(int $reservationId, string $reservationNumber, string $memberName, array $reservedItems): void
+    {
+        $configAdapter = $this->framework->getAdapter(Config::class);
+
+        // E-Mail-Adresse aus der Tabelle `tl_dc_config` abrufen
+        $result = $this->db->fetchAssociative('SELECT reservationInfo, reservationInfoText FROM tl_dc_config LIMIT 1');
+        $recipientEmail = $result['reservationInfo'] ?? null;
+        $informationText = html_entity_decode($result['reservationInfoText'] , ENT_QUOTES, 'UTF-8') ?? '<p>Hallo,</p><p>es wurde eine neue Reservierung erstellt.</p>';
+
+        if (empty($recipientEmail)) {
+            throw new \RuntimeException('Keine Empfänger-E-Mail-Adresse in der Konfiguration gefunden.');
+        }
+
+        // Liste der reservierten Assets als HTML formatieren
+        $assetsHtml = '<ul>';
+        foreach ($reservedItems as $item) {
+            $assetsHtml .= '<li>' . htmlspecialchars($item) . '</li>';
+        }
+        $assetsHtml .= '</ul>';
+
+        $informationText = str_replace(
+            ['#memberName#', '#reservationNumber#', '#assetsHtml#'],
+            [$memberName, $reservationNumber, $assetsHtml],
+            $informationText
+        );
+
+        // Erstellen der E-Mail
+        $email = new Email();
+
+        $email->from    = $GLOBALS['TL_ADMIN_EMAIL'] ?? $configAdapter->get('adminEmail') ?? 'reservierung@diversworld.eu';
+        $email->subject = 'Neue Reservierung: ' . $reservationNumber;
+        $email->html = $informationText;
+
+        // Versenden der E-Mail
+        $emailSuccess = $email->sendTo($recipientEmail); // Empfänger
+
+        if (!$emailSuccess) {
+            throw new \Exception('Something went wrong while trying to send the reservation Mail.');
+        }
+    }
+
+    /**
+    * Aktualisiert den Status eines Assets nach der Reservierung.
+    */
+    private function updateAssetStatus(string $category, int $assetId): void
+            {
+                switch ($category) {
                     case 'tl_dc_tanks':
-                        //$connection->update(
-                        $this->db->update(
-                            'tl_dc_tanks',
-                            ['status' => 'reserved'], // Zu aktualisierende Spalten
-                            ['id' => (int)$assetId]  // Bedingung
-                        );
+                        $this->db->update('tl_dc_tanks', ['status' => 'reserved'], ['id' => $assetId]);
                         break;
-
                     case 'tl_dc_regulators':
-                        //$connection->update(
-                        $this->db->update(
-                            'tl_dc_regulators',
-                            ['status' => 'reserved'], // Zu aktualisierende Spalten
-                            ['id' => (int)$assetId]  // Bedingung
-                        );
+                        $this->db->update('tl_dc_regulators', ['status' => 'reserved'], ['id' => $assetId]);
                         break;
-
                     case 'tl_dc_equipment_types':
-                        //$connection->update(
-                        $this->db->update(
-                            'tl_dc_equipment_subtypes',
-                            ['status' => 'reserved'], // Zu aktualisierende Spalten
-                            ['id' => (int)$assetId]  // Bedingung
-                        );
+                        $this->db->update('tl_dc_equipment_subtypes', ['status' => 'reserved'], ['id' => $assetId]);
                         break;
-
                     default:
-                        throw new \RuntimeException("Kategorie '{$itemCategory}' wird nicht unterstützt.");
+                        throw new \RuntimeException('Ungültige Kategorie beim Aktualisieren des Asset-Status.');
                 }
             }
 
-            // Optional: Weiterleitung oder Erfolgsmeldung
-            if (null !== ($redirectPage = PageModel::findById($model->jumpTo))) {
-                throw new RedirectResponseException($redirectPage->getAbsoluteUrl());
-            }
-        }
-
-        // Datum global abrufen
-        $dateFormat = Config::get('dateFormat');
-
-        $data = []; // Datenstruktur vorbereiten
-
-        // Aktuell eingeloggter Benutzer
-        $user = $this->container->get('security.helper')->getUser();
-
-        $template->typeSelection = []; // Standardwert, falls keine Typen vorhanden sind
-
-        if (null !== $types) {
-            foreach ($types as $type) {
-                $template->typeSelection[] = [
-                    'id' => $type->id,
-                    'name' => $type->name,
-                ];
-            }
-        }
-
-        if ($types) {
-            foreach ($types as $type) {
-                // Subtypen abrufen, die diesem Typ zugeordnet sind
-                $subTypesCollection = DcEquipmentSubTypeModel::findBy('pid', $type->id);
-                $subTypes = [];
-
-                if ($subTypesCollection) {
-                    foreach ($subTypesCollection as $subType) {
-                        $subTypes[] = [
-                            'manufacturer'  => $manufacturers[$subType->manufacturer] ?? $subType->manufacturer,
-                            'model'         => $subType->model,
-                            'color'         => $subType->color,
-                            'size'          => $sizes[$subType->size] ?? $subType->size,
-                            'title'         => $subType->title,
-                            'buyDate'       => $subType->buyDate ? date('d.m.Y', (int) $subType->buyDate) : 'N/A',
-                        ];
-                    }
-                }
-
-                // Haupttyp mit zugehörigen Subtypen speichern
-                $data[] = [
-                    'types' => [
-                        'id' => $type->id,
-                        'title' => $type->title,
-                        'subType' => isset($equipmentSubTypes[$type->types][$type->subType])
-                            ? $equipmentSubTypes[$type->types][$type->subType]
-                            : 'Unknown SubType', // Fallback, wenn der Key nicht existiert
-                    ],
-                    'subTypes' => $subTypes,
-                ];
-            }
-        }
-
-        $template->currentUser = $user;
-        $template->sizes = $sizes;
-        $template->manufacturers = $manufacturers;
-        $template->types = $types;
-        $template->subTypes = $equipmentSubTypes;
-
-        System::loadLanguageFile('tl_dc_reservation_items');
-
-        // Kategorien-Auswahl (Dropdown)
-        $categories = [
-            'tl_dc_tanks' => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes']['tl_dc_tanks'],// ?? 'Tanks', // Fallback zu "Tanks"
-            'tl_dc_regulators' => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes']['tl_dc_regulators'],// ?? 'Atemregler', // Fallback zu "Regulatoren"
-            'tl_dc_equipment_types' => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes']['tl_dc_equipment_types']// ?? 'Equipment Typen' // Fallback
-        ];
-        $template->categories = $categories;
-
-        // Kategorie und Subtyp auswählen
-        $category = $request->get('category');
-        $template->selectedCategory = $category;
-        $template->data = $data;
-
-        // Für `tl_dc_equipment_types`: Dynamische Subtypen laden
-        if ('tl_dc_equipment_types' === $category) {
-            $subTypes = $this->helper->getSubTypes(); // Hilfsmethode für die Subtypen
-            $template->subTypes = $subTypes;
-        }
-
+    /**
+     * @param string $category
+     * @return array
+     */
+    function updateAssets( string $category) : array
+    {
         // Verfügbare Assets laden
         // Fetch mappings from the Helpers
         $manufacturers = $this->helper->getManufacturers();
         $sizes = $this->helper->getSizes();
         $equipmentTypes = $this->helper->getEquipmentTypes();
 
+        // Datum global abrufen
+        $dateFormat = Config::get('dateFormat');
+
         // Fetch the pid-to-title mapping from the `tl_dc_equipment_types` table directly
         $equipmentTypesMapping = $this->getEquipmentTypeTitles(); // Custom method, explained below
-        $assets = []; // Standard-Wert setzen
-
-        // Anwenden der Transformationen
         $updatedAssets = [];
+        $assets = $this->getAvailableAssets($category);
 
         switch ($category) {
             case 'tl_dc_tanks':
-                $assets = $this->getAvailableAssets($category);
                 // Verarbeitung für Tanks
                 foreach ($assets as $asset) {
                     $updatedAssets[] = [
@@ -411,12 +510,12 @@ class ModuleBooking extends AbstractFrontendModuleController
                             ? date($dateFormat, (int) $asset['nextCheckDate'])
                             : 'N/A',
                         'status'        => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$asset['status']] ?? 'Unknown',
+                        'price'         => $asset['rentalFee'] ?? 'N/A',
                     ];
                 }
                 break;
 
             case 'tl_dc_regulators':
-                $assets = $this->getAvailableAssets($category);
                 // Verarbeitung für Regulators
                 foreach ($assets as $asset) {
                     $regModel1st = $this->helper->getRegModels1st((int) $asset['manufacturer']);
@@ -434,13 +533,12 @@ class ModuleBooking extends AbstractFrontendModuleController
                         'serialNumber2ndSec'    => $asset['serialNumber2ndSec'] ?? 'Unknown',
                         'regModel2ndSec'        => $regModel2nd[$asset['regModel2ndSec']] ?? 'Unknown',
                         'status'                => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$asset['status']] ?? 'Unknown',
+                        'price'         => $asset['rentalFee'] ?? 'N/A',
                     ];
                 }
                 break;
 
             case 'tl_dc_equipment_types':
-                $assets = $this->getAvailableAssets($category);
-
                 // Verarbeitung für Equipment Types
                 foreach ($assets as $asset) {
                     $updatedAssets[] = [
@@ -459,6 +557,7 @@ class ModuleBooking extends AbstractFrontendModuleController
                         'color'         => $asset['color'] ?? 'N/A',
                         'serialNumber'  => $asset['serialNumber'] ?? 'N/A',
                         'status'        => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$asset['status']] ?? 'Unknown',
+                        'price'         => $asset['rentalFee'] ?? 'N/A',
                     ];
                 }
                 break;
@@ -467,57 +566,15 @@ class ModuleBooking extends AbstractFrontendModuleController
                 // Fallback: Falls keine Kategorie zutrifft, keine Verarbeitung
                 foreach ($assets as $asset) {
                     $updatedAssets[] = [
-                        'id' => $asset['id'] ?? 'N/A',
-                        'title' => $asset['title'] ?? 'N/A',
-                        'manufacturer' => $asset['manufacturer'] ?? 'N/A',
-                        'size' => $asset['size'] ?? 'N/A',
+                        'id'            => $asset['id'] ?? 'N/A',
+                        'title'         => $asset['title'] ?? 'N/A',
+                        'manufacturer'  => $asset['manufacturer'] ?? 'N/A',
+                        'size'          => $asset['size'] ?? 'N/A',
                     ];
                 }
                 break;
         }
-
-        // Zuweisung der transformierten Assets
-        $assets = $updatedAssets;
-        // Optional: Gruppieren nach `pid` nur für Equipment Types
-        if ('tl_dc_equipment_types' === $category) {
-            $groupedAssets = [];
-            foreach ($assets as $asset) {
-                //$groupedAssets[$asset['pid']][] = $asset;
-                // Gruppierung nach Namen des Typs statt ID
-                $groupName = $asset['type'] ?? 'Unbekannter Typ'; // Typ-Bezeichnung verwenden
-                $groupedAssets[$groupName][] = $asset;
-            }
-            $template->groupedAssets = $groupedAssets;
-        } else {
-            $template->groupedAssets = $assets; // Keine Gruppierung für andere Kategorien
-        }
-
-        // Aktuell eingeloggter Benutzer
-        $hasFrontendUser = System::getContainer()->get('contao.security.token_checker')->hasFrontendUser();
-        $userId = null;
-
-        if ($hasFrontendUser) {
-            $user = $this->getUser(); // Benutzer-ID aus der Eigenschaft abrufen
-            $userId = $user->id;
-        }
-
-        // Benutzerinformation ans Template übergeben
-        $template->currentUser = [
-            'userId'       => $userId,
-            'userFullName' => $user->firstname .' '. $user->lastname ?? 'Gast', // Beispiel: Nachname optional
-        ];
-        // Widgets generieren
-        $reservationCheckboxes = $this->generateReservationCheckboxes($assets);
-
-        // Übergabe ans Template
-        $template->reservationCheckboxes = $reservationCheckboxes;
-
-        // Weitergabe an Twig
-        $template->assets = $assets;
-        $template->action = $request->getUri();
-
-        // Frontend-Template zurückgeben
-        return $template->getResponse();
+        return $updatedAssets;
     }
 
     /**
@@ -543,30 +600,36 @@ class ModuleBooking extends AbstractFrontendModuleController
 
     private function getAvailableAssets(string $category): array
     {
-        // Datenbankverbindung abrufen
-        $connection = $this->container->get('database_connection');
-
         // Unterschiedliche Queries für verschiedene Kategorien
         switch ($category) {
             case 'tl_dc_tanks':
-                $query = "SELECT id, title, serialNumber, manufacturer, bazNumber, size, o2clean, owner, checkId, lastCheckDate, nextCheckDate, status FROM tl_dc_tanks WHERE status = 'available'";
+                $query = "SELECT id, title, serialNumber, manufacturer, bazNumber, size, o2clean, owner, checkId, lastCheckDate, nextCheckDate, status, rentalFee FROM tl_dc_tanks WHERE status = 'available'";
                 $params = [];
                 break;
             case 'tl_dc_regulators':
-                $query = "SELECT id, title, manufacturer, serialNumber1st, regModel1st, serialNumber2ndPri, regModel2ndPri, serialNumber2ndSec, regModel2ndSec, status FROM tl_dc_regulators WHERE status = 'available'";
+                $query = "SELECT id, title, manufacturer, serialNumber1st, regModel1st, serialNumber2ndPri, regModel2ndPri, serialNumber2ndSec, regModel2ndSec, status, rentalFee FROM tl_dc_regulators WHERE status = 'available'";
                 $params = [];
                 break;
             case 'tl_dc_equipment_types':
-                $query = "SELECT id, pid, title, status, manufacturer, model, color, size, serialNumber, buyDate, status FROM tl_dc_equipment_subtypes WHERE status = 'available' ORDER BY pid";
+                //$query = "SELECT id, pid, title, status, manufacturer, model, color, size, serialNumber, buyDate, status FROM tl_dc_equipment_subtypes WHERE status = 'available' ORDER BY pid";
+                $query = "SELECT es.id,es.pid, es.title, es.status, es.manufacturer, es.model, es.color, es.size, es.serialNumber, es.buyDate, es.status, et.rentalFee
+                            FROM tl_dc_equipment_subtypes es
+                            INNER JOIN tl_dc_equipment_types et ON es.pid = et.id
+                            WHERE es.status = 'available' ORDER BY es.pid";
                 $params = [];
-
                 break;
             default:
                 return [];
         }
 
         // Ergebnisse abrufen und zurückgeben
-        return $connection->fetchAllAssociative($query, $params);
+        try {
+            return $this->db->fetchAllAssociative($query);
+        } catch (\Exception $e) {
+            // Fehlermeldung bei Problemen mit der Datenbank
+            System::getContainer()->get('monolog.logger.contao.general')->error('Fehler beim Laden der Assets: ' . $e->getMessage());
+            return [];
+        }
     }
 
     private function getAssetDetails(string $category, int $assetId): ?string
@@ -639,8 +702,30 @@ class ModuleBooking extends AbstractFrontendModuleController
                     );
             }
         }
-
         return null;
+    }
+
+    /**
+     * Kombiniert Session-Daten mit Assets der aktuell gewählten Kategorie.
+     */
+    private function combineAssetsWithSession(string $category, array $assets): array
+    {
+        $session = $this->requestStack->getSession();
+        $bag = $session->getBag(ArrayAttributeBag::ATTRIBUTE_NAME);
+        $sessionData = $bag->get('reservation_items', []);
+
+        $selectedAssetIds = [];
+        foreach ($sessionData as $entry) {
+            $selectedAssetIds = array_merge($selectedAssetIds, $entry['selectedAssets'] ?? []);
+        }
+        $selectedAssetIds = array_unique($selectedAssetIds); // Doppelte entfernen
+
+        // Markiere Assets als "ausgewählt", falls sie in der Session sind
+        foreach ($assets as &$asset) {
+            $asset['selected'] = in_array($asset['id'], $selectedAssetIds, true); // Vergleicht IDs
+        }
+
+        return $assets;
     }
 
     protected function generateReservationCheckboxes(array $assets): array
@@ -676,48 +761,7 @@ class ModuleBooking extends AbstractFrontendModuleController
         // MemberID formatieren
         $formattedMemberId = str_pad((string)$userId, 3, '0', STR_PAD_LEFT);
         // Datum hinzufügen
-        $currentDate = date('Ymd');
+        $currentDate = date('ymdHi');
         return $currentDate . $formattedMemberId;
-    }
-
-    function sendReservationEmail(int $reservationId, string $reservationNumber, string $memberName, array $reservedItems): void
-    {
-        $configAdapter = $this->framework->getAdapter(Config::class);
-
-        // E-Mail-Adresse aus der Tabelle `tl_dc_config` abrufen
-        $result = $this->db->fetchAssociative('SELECT reservationInfo, reservationInfoText FROM tl_dc_config LIMIT 1');
-        $recipientEmail = $result['reservationInfo'] ?? null;
-        $informationText = html_entity_decode($result['reservationInfoText'] , ENT_QUOTES, 'UTF-8') ?? '<p>Hallo,</p><p>es wurde eine neue Reservierung erstellt.</p>';
-
-        if (empty($recipientEmail)) {
-            throw new \RuntimeException('Keine Empfänger-E-Mail-Adresse in der Konfiguration gefunden.');
-        }
-
-        // Liste der reservierten Assets als HTML formatieren
-        $assetsHtml = '<ul>';
-        foreach ($reservedItems as $item) {
-            $assetsHtml .= '<li>' . htmlspecialchars($item) . '</li>';
-        }
-        $assetsHtml .= '</ul>';
-
-        $informationText = str_replace(
-            ['#memberName#', '#reservationNumber#', '#assetsHtml#'],
-            [$memberName, $reservationNumber, $assetsHtml],
-            $informationText
-        );
-
-        // Erstellen der E-Mail
-        $email = new Email();
-
-        $email->from    = $GLOBALS['TL_ADMIN_EMAIL'] ?? $configAdapter->get('adminEmail') ?? 'reservierung@diversworld.eu';
-        $email->subject = 'Neue Reservierung: ' . $reservationNumber;
-        $email->html = $informationText;
-
-        // Versenden der E-Mail
-        $emailSuccess = $email->sendTo($recipientEmail); // Empfänger
-
-        if (!$emailSuccess) {
-            throw new \Exception('Something went wrong while trying to send the reservation Mail.');
-        }
     }
 }
