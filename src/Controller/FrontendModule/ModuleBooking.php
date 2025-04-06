@@ -163,12 +163,10 @@ class ModuleBooking extends AbstractFrontendModuleController
                     // Session-Daten neu laden
                     $sessionData = $bag->get('reservation_items', []);
 
-                    // Nachricht, dass die Speicherung funktioniert hat
-                    Message::addConfirmation('Die Reservierungsdaten wurden erfolgreich in der Session gespeichert.');
-
                     // Reservierte Items aus der Session laden
                     $storedAssets = [];
                     foreach ($sessionData as $entry) {
+                        dump($entry);
                         if (!empty($entry['selectedAssets'])) {
                             foreach ($entry['selectedAssets'] as $assetId) {
                                 $assetDetails = $this->getAssetDetails($entry['category'], (int) $assetId);
@@ -179,9 +177,10 @@ class ModuleBooking extends AbstractFrontendModuleController
                         }
                     }
 
+                    $totalPrice = '';
                     // Erfolgsmeldung für gespeicherte Items
                     if (!empty($storedAssets)) {
-                        $message = 'Die folgenden Reservierungen wurden in der Session gespeichert:<br><ul>';
+                        $message = 'Die folgenden Reservierungen wurden vorgemerkt gespeichert:<br><ul>';
                         foreach ($storedAssets as $item) {
                             $message .= '<li>' . htmlspecialchars($item) . '</li>';
                         }
@@ -265,7 +264,6 @@ class ModuleBooking extends AbstractFrontendModuleController
      */
     private function saveDataToSession(array $data): void
     {
-        dump($data);
         $session = $this->requestStack->getSession();
         $bag = $session->getBag(ArrayAttributeBag::ATTRIBUTE_NAME);
         $sessionData = $bag->get('reservation_items', []);
@@ -274,11 +272,27 @@ class ModuleBooking extends AbstractFrontendModuleController
         $userId = $data['userId'] ?? null;
         $category = $data['category'] ?? null;
         $selectedAssets = $data['selectedAssets'] ?? [];
+        $selectedAssets = array_filter($selectedAssets, fn($value) => !empty($value));
         $pid = $data['pid'] ?? null;
 
         // Daten validieren
         if (!$userId || !$category || empty($selectedAssets)) {
             throw new \RuntimeException('Ungültige Daten: Es fehlt der Benutzer, Kategorie oder ausgewählte Assets.');
+        }
+
+        $totalRentalFee = 0; // Variable für die Gesamtsumme
+        foreach ($selectedAssets as $assetId) {
+            $query = $this->db->prepare("SELECT rentalFee FROM {$category} WHERE id = ?"); // Tabelle dynamisch verwenden
+            $result = $query->executeQuery([$assetId])->fetchOne();
+            $totalRentalFee += (float)$result; // `rentalFee` addieren
+        }
+
+        // Füge die Gesamtsumme in die Nachricht hinzu
+        if ($totalRentalFee > 0) {
+            Message::addConfirmation(sprintf(
+                'Die reservierten Gegenstände wurden gespeichert. Gesamtsumme: %.2f €',
+                $totalRentalFee
+            ));
         }
 
         $entryExists = false;
@@ -301,12 +315,11 @@ class ModuleBooking extends AbstractFrontendModuleController
                 'category' => $category,
                 'selectedAssets' => $selectedAssets,
                 'pid' => $pid,
+                'totalRentalFee' => $totalRentalFee,
             ];
         }
-dump($sessionData);
         // Daten in der Session speichern
         $bag->set('reservation_items', $sessionData);
-        Message::addConfirmation('Daten wurden erfolgreich in der Session gespeichert.');
     }
 
     /**
@@ -330,6 +343,8 @@ dump($sessionData);
             $category = $entry['category'] ?? null;
             $selectedAssets = $entry['selectedAssets'] ?? [];
             $pid = $entry['pid'] ?? null;
+            $totalRentalFee = 0; // Mietkosten berechnen
+
 
             if (empty($selectedAssets)) {
                 continue; // Überspringen, wenn keine Assets ausgewählt sind
@@ -337,6 +352,12 @@ dump($sessionData);
 
             if (!$userId || !$category) {
                 throw new \RuntimeException('Ungültige Session-Daten: Benutzer oder Kategorie fehlt.');
+            }
+
+            foreach ($selectedAssets as $assetId) {
+                $query = $this->db->prepare("SELECT rentalFee FROM {$category} WHERE id = ?");
+                $result = $query->executeQuery([$assetId])->fetchOne();
+                $totalRentalFee += (float)$result; // `rentalFee` summieren
             }
 
             // Reservierungstitel generieren
@@ -354,6 +375,7 @@ dump($sessionData);
                 $reservation->asset_type = $category;
                 $reservation->reserved_at = time();
                 $reservation->reservation_status = 'reserved';
+                $reservation->rentalFee = $totalRentalFee; // Gesamtsumme in die Tabelle speichern
                 $reservation->published = 1;
                 $reservation->save();
             }
@@ -639,13 +661,16 @@ dump($sessionData);
 
         switch ($category) {
             case 'tl_dc_tanks':
-                $query = 'SELECT title, size FROM tl_dc_tanks WHERE id = ?';
+                $query = 'SELECT title, size, rentalFee FROM tl_dc_tanks WHERE id = ?';
                 break;
             case 'tl_dc_regulators':
-                $query = 'SELECT title, manufacturer, regModel1st, regModel2ndPri, regModel2ndSec FROM tl_dc_regulators WHERE id = ?';
+                $query = 'SELECT title, manufacturer, regModel1st, regModel2ndPri, regModel2ndSec, rentalFee FROM tl_dc_regulators WHERE id = ?';
                 break;
             case 'tl_dc_equipment_types':
-                $query = 'SELECT title, model, size, color FROM tl_dc_equipment_subtypes WHERE id = ?';
+                $query = 'SELECT es.id,es.pid, es.title, es.model, es.color, es.size, et.rentalFee
+                            FROM tl_dc_equipment_subtypes es
+                            INNER JOIN tl_dc_equipment_types et ON es.pid = et.id
+                            WHERE et.id = ?';
                 break;
             default:
                 return null;
@@ -662,9 +687,10 @@ dump($sessionData);
                     //$sizeMapping = $helper->getSizes();
                     $sizeText = $result['size'].'L' ?? 'Unbekannte Größe';
                     return sprintf(
-                        'Tank: %s (Größe: %s)',
+                        'Tank: %s (Größe: %s), %s',
                         $result['title'] ?? 'Unbekannt',
-                        $sizeText
+                        $sizeText,
+                        number_format((float)$result['rentalFee'], 2, '.', ',') . ' €' ?? 'Unbekannt' // z. B. "123.45 €"
                     );
 
                 case 'tl_dc_regulators':
@@ -680,12 +706,13 @@ dump($sessionData);
                     $regModel2ndSecText = $regModel2ndMapping[$result['regModel2ndSec']] ?? 'N/A';
 
                     return sprintf(
-                        'Regulator: %s (Hersteller: %s, 1st Stage: %s, 2nd Stage (Pri): %s, 2nd Stage (Sec): %s)',
+                        'Regulator: %s (Hersteller: %s, 1st Stage: %s, 2nd Stage (Pri): %s, 2nd Stage (Sec): %s), %s',
                         $result['title'] ?? 'Unbekannt',
                         $manufacturerText,
                         $regModel1stText,
                         $regModel2ndPriText,
-                        $regModel2ndSecText
+                        $regModel2ndSecText,
+                        number_format((float)$result['rentalFee'], 2, '.', ',') . ' €' ?? 'Unbekannt' // z. B. "123.45 €"
                     );
 
                 case 'tl_dc_equipment_types':
@@ -694,11 +721,12 @@ dump($sessionData);
                     $sizeText = $sizeMapping[$result['size']] ?? 'Unbekannte Größe';
 
                     return sprintf(
-                        'Ausrüstung: %s (Modell: %s, Größe: %s, Farbe: %s)',
+                        'Ausrüstung: %s (Modell: %s, Größe: %s, Farbe: %s), %s',
                         $result['title'] ?? 'Unbekannt',
                         $result['model'] ?? 'Kein Modell angegeben',
                         $sizeText,
-                        $result['color'] ?? 'Keine Farbe angegeben'
+                        $result['color'] ?? 'Keine Farbe angegeben',
+                        number_format((float)$result['rentalFee'], 2, '.', ',') . ' €' ?? 'Unbekannt' // z. B. "123.45 €"
                     );
             }
         }

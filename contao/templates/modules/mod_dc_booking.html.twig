@@ -82,6 +82,7 @@
                                         <th>Farbe</th>
                                         <th>Größe</th>
                                         <th>Status</th>
+                                        <th>Leihgebühr</th>
                                         <th>Reservieren</th>
                                     </tr>
                                     </thead>
@@ -96,6 +97,7 @@
                                             <td>{{ asset.color|default('Keine Daten') }}</td>
                                             <td>{{ asset.size|default('Keine Daten') }}</td>
                                             <td>{{ asset.status|default('Keine Daten') }}</td>
+                                            <td>{{ asset.price|default('Keine Daten') }}</td>
                                             <td style="width: 40px;">
                                                 <div class="widget widget-checkbox">
                                                     {{ reservationCheckboxes[asset.id]|raw }}
@@ -122,6 +124,7 @@
                                         <th>Inventarnummer</th>
                                         <th>Größe</th>
                                         <th>Status</th>
+                                        <th>Leihgebühr</th>
                                         <th>Reservieren</th>
                                     {% elseif selectedCategory == 'tl_dc_regulators' %}
                                         <th>Inventarnummer</th>
@@ -131,6 +134,7 @@
                                         <th>Modell 2. Stufe (Primär)</th>
                                         <th>Modell 2. Stufe (Sekundär)</th>
                                         <th>Status</th>
+                                        <th>Leihgebühr</th>
                                         <th>Reservieren</th>
                                     {% endif %}
                                 </tr>
@@ -142,6 +146,7 @@
                                             <td>{{ asset.title|default('Keine Daten') }}</td>
                                             <td>{{ asset.size|default('Keine Daten') }}</td>
                                             <td>{{ asset.status|default('Keine Daten') }}</td>
+                                            <td>{{ asset.price|default('Keine Daten') }}</td>
                                             <td style="width: 40px;">
                                                 <div class="widget widget-checkbox">
                                                     {{ reservationCheckboxes[asset.id]|raw }}
@@ -156,6 +161,7 @@
                                             <td>{{ asset.regModel2ndPri|default('Keine Daten') }}</td>
                                             <td>{{ asset.regModel2ndSec|default('Keine Daten') }}</td>
                                             <td>{{ asset.status|default('Keine Daten') }}</td>
+                                            <td>{{ asset.price|default('Keine Daten') }}</td>
                                             <td style="width: 40px;">
                                                 <div class="widget widget-checkbox">
                                                     {{ reservationCheckboxes[asset.id]|raw }}
