@@ -177,7 +177,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_reservation_items']['created_at'],
             'inputType'         => 'text',
             'save_callback'     => [
-                ['tl_dc_reservation_items', 'setCeratedAt']
+                ['tl_dc_reservation_items', 'setCreatedAt']
             ],
             'eval'              => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
             'sql'               => "varchar(10) NOT NULL default ''"
@@ -302,9 +302,9 @@ class tl_dc_reservation_items extends Backend
                 $types = (int) $dc->activeRecord->types;
                 $subType = (int) $dc->activeRecord->sub_type;
 
-                $query = sprintf("SELECT id, types, subType
+                $query = sprintf("SELECT id, title, subType
                                 FROM tl_dc_equipment_types
-                                WHERE published = 1 AND types = %s AND subType = %s LIMIT 1", $types, $subType
+                                WHERE published = 1 AND title = %s AND subType = %s LIMIT 1", $types, $subType
                 );
 
                 $result = $database->prepare($query)->execute();
@@ -377,7 +377,7 @@ class tl_dc_reservation_items extends Backend
 
         return $options;
     }
-    public function setCeratedAt(string $value, DataContainer $dc): int
+    public function setCreatedAt(string $value, DataContainer $dc): int
     {
         // Prüfen, ob der Wert bereits gesetzt ist
         if (!empty($value)) {

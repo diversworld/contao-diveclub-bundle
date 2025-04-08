@@ -259,7 +259,7 @@ class tl_dc_reservation extends Backend
 
         return $varValue;
     }
-
+/*
     public function updateTitleOnMemberIdChange(DataContainer $dc): void
     {
         if (!$dc->activeRecord) {
@@ -292,7 +292,8 @@ class tl_dc_reservation extends Backend
             'contao.BE.warning',
             sprintf('Title field updated to: %s', $newTitle)
         );
-    }
+    }*/
+
     /**
      * Formatiert den Preis für die Anzeige im Backend
      */

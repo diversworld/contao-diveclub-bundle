@@ -28,7 +28,9 @@ class ReservationReturnedCallback
 
         // Neues Title-Format
         $newStatus = 'returned';
+        $itemStatus = 'available';
 
+        // Status der Items ändern
         $this->db->update(
             'tl_dc_reservation_items', // Reservierungs-Tabelle
             [
@@ -38,12 +40,20 @@ class ReservationReturnedCallback
             ],
             ['pid' => $dc->id]
         );
+        // Status der Reservierung ändern
         $this->db->update(
             'tl_dc_reservation', // Reservierungs-Tabelle
             [
                 'reservation_status' => $newStatus,
             ],
             ['id' => $dc->id]
+        );
+
+        // Status der Assets ändern
+        $this->db->update(
+            'tl_dc_equipment_subTypes',
+            [':status' => $itemStatus],
+            ['id' => $dc->activeRecord->subType]
         );
 
         return $value;

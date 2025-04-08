@@ -29,6 +29,8 @@ class ReservationPickedUpCallback
         // Neues Title-Format
         $newStatus = 'borrowed';
 
+
+        // Status der Items aktualisieren
         $this->db->update(
             'tl_dc_reservation_items', // Reservierungs-Tabelle
             [
@@ -38,12 +40,23 @@ class ReservationPickedUpCallback
             ],
             ['pid' => $dc->id]
         );
+
+        // Status der Reservierung ändern
         $this->db->update(
             'tl_dc_reservation', // Reservierungs-Tabelle
             [
                 'reservation_status' => $newStatus,
             ],
             ['id' => $dc->id]
+        );
+
+        // Status der Assets ändern
+        $this->db->update(
+            'tl_dc_equipment_subTypes',
+            [
+                'status' => $newStatus,
+            ],
+            [ 'id' => $dc->subType ],
         );
 
         return $value;
