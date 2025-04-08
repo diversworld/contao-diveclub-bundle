@@ -19,6 +19,8 @@ use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
 use Diversworld\ContaoDiveclubBundle\DataContainer\DcReservation;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationPickedUpCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationStatusCallback;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationTitleCallback;
 
 /**
@@ -110,6 +112,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'filter'            => true,
             'sorting'           => true,
             'options'           => ['reserved', 'borrowed', 'returned', 'cancelled', 'overdue', 'lost', 'damaged', 'missing'],
+            'save_callback'     => [[ReservationStatusCallback::class, '__invoke']],
             'reference'         => &$GLOBALS['TL_LANG']['tl_dc_reservation'],
             'eval'              => ['includeBlankOption' => true, 'submitOnChange' => true, 'chosen'   => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql'               => "varchar(255) NOT NULL default ''"
@@ -130,6 +133,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
         'picked_up_at'      => [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_reservation']['picked_up_at'],
             'inputType'         => 'text',
+            'save_callback'     => [ReservationPickedUpCallback::class, '__invoke'],
             'eval'              => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
             'sql'               => "varchar(10) NOT NULL default ''"
         ],
