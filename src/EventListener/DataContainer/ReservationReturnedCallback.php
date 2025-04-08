@@ -25,6 +25,7 @@ class ReservationReturnedCallback
 
         // Datum im Format jjjjmmtt
         $currentDate = $value;
+        $assetId = (int) $dc->activeRecord->item_id;        // Das ausgewählte Asset
 
         // Neues Title-Format
         $newStatus = 'returned';
@@ -53,7 +54,7 @@ class ReservationReturnedCallback
         $this->db->update(
             'tl_dc_equipment_subTypes',
             [':status' => $itemStatus],
-            ['id' => $dc->activeRecord->subType]
+            ['id' => $assetId]
         );
 
         return $value;
