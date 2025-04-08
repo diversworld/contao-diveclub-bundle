@@ -20,6 +20,7 @@ use Contao\DC_Table;
 use Contao\System;
 use Diversworld\ContaoDiveclubBundle\DataContainer\DcReservation;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationPickedUpCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationReturnedCallback;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationStatusCallback;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationTitleCallback;
 
@@ -140,6 +141,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
         'returned_at'       => [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_reservation']['returned_at'],
             'inputType'         => 'text',
+            'save_callback'     => [ReservationReturnedCallback::class, '__invoke'],
             'eval'              => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
             'sql'               => "varchar(10) NOT NULL default ''"
         ],
