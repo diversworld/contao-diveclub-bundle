@@ -51,6 +51,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
         'label' => [
             'fields' => ['title','member_id','asset_type','asset_id','reservation_status','rentalFee'],
             'format' => '%s - %s %s %s - %s %s',
+            'showColumns' => true,
         ],
         'global_operations' => [
             'all' => [
