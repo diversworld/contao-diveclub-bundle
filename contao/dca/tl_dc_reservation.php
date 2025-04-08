@@ -274,7 +274,7 @@ class tl_dc_reservation extends Backend
         // Neues Title-Format
         $newTitle = $currentDate . $formattedMemberId;
 
-        Database::getInstance()->update(
+        $this->db->update(
             'tl_dc_reservation', // Reservierungs-Tabelle
             ['title' => $newTitle],
             ['id' => $dc->id]
@@ -285,5 +285,29 @@ class tl_dc_reservation extends Backend
             'contao.BE.warning',
             sprintf('Title field updated to: %s', $newTitle)
         );
+    }
+    /**
+     * Formatiert den Preis für die Anzeige im Backend
+     */
+    public function formatPrice($value): string
+    {
+        return number_format((float)$value, 2, '.', ',') . ' €'; // z. B. "123.45 €"
+    }
+
+    /**
+     * Konvertiert den eingegebenen Preis zurück ins DB-Format
+     */
+    public function convertPrice($value): float
+    {
+        // Logik für leere Eingabe
+        if (empty($value)) {
+            return 0.00;
+        }
+
+        // Entferne eventuell angefügte Währungszeichen und whitespace
+        $value = str_replace(['€', ' '], '', $value);
+
+        // Stelle sicher, dass es ein gültiger Dezimalwert ist
+        return round((float)$value, 2);
     }
 }

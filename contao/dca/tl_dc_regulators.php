@@ -193,7 +193,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
         ],
         'rentalFee'             => [
             'inputType'         => 'text',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_types']['rentalFee'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulators']['rentalFee'],
             'exclude'           => true,
             'search'            => false,
             'filter'            => true,
