@@ -17,7 +17,6 @@ use Contao\Config;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\Email;
 use Contao\FormCheckbox;
 use Contao\Message;
@@ -33,8 +32,6 @@ use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Security;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 
 #[AsFrontendModule(ModuleBooking::TYPE, category: 'dc_modules', template: 'mod_dc_booking')]
@@ -44,10 +41,11 @@ class ModuleBooking extends AbstractFrontendModuleController
 
     protected ?PageModel $page;
     private DcaTemplateHelper $helper;
+    private ContaoFramework $framework;
     private RequestStack $requestStack;
     private Connection $db;
 
-    public function __construct(DcaTemplateHelper $helper, Connection $db, ContaoFramework $framework, RequestStack $requestStack)
+    public function __construct(DcaTemplateHelper $helper, Connection $db, RequestStack $requestStack, ContaoFramework $framework)
     {
         $this->helper = $helper;
         $this->db = $db;
