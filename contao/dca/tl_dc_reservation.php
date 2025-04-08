@@ -162,13 +162,12 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
         ],
         'rentalFee'             => [
             'inputType'         => 'text',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_types']['rentalFee'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_reservation']['rentalFee'],
             'exclude'           => true,
             'search'            => false,
             'filter'            => true,
             'sorting'           => false,
-            'load_callback'     => [['tl_dc_regulators', 'formatPrice']],
-            'save_callback'     => [['tl_dc_regulators', 'convertPrice']],
+            'save_callback'     => [['tl_dc_reservation', 'convertPrice']],
             'eval'              => ['rgxp'=>'digit', 'mandatory'=>false, 'tl_class' => 'w25'], // Beachten Sie "rgxp" für Währungsangaben
             'sql'               => "DECIMAL(10,2) NOT NULL default 0.00"
         ],
