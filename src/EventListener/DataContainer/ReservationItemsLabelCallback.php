@@ -28,7 +28,6 @@ class ReservationItemsLabelCallback
         $typeLabel = $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes'][$row['item_type']] ?? 'Unbekannter Typ';
         $reservedAt = !empty($row['reserved_at']) ? date($GLOBALS['TL_CONFIG']['datimFormat'], (int)$row['reserved_at']) : 'Unbekannt';
         $createdAt = !empty($row['created_at']) ? date($GLOBALS['TL_CONFIG']['datimFormat'], (int)$row['created_at']) : 'Unbekannt';
-        $updatedAt = !empty($row['updated_at']) ? date($GLOBALS['TL_CONFIG']['datimFormat'], (int)$row['updated_at']) : 'Unbekannt';
 
         // Daten basierend auf dem Typ laden
         switch ($row['item_type']) {
@@ -100,13 +99,12 @@ class ReservationItemsLabelCallback
 
         // Format müssen wir entsprechend den Anforderungen anpassen
         return sprintf(
-            '%s, %s - %s - %s - %s (%s)',
+            '%s, %s - %s - %s - %s',
             $row['asset_type'],    // Typ des Assets
             $row['asset_id'],      // ID bzw. Titel des Assets
             $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$row['reservation_status']], // Status der Reservierung
             $reservedAt,           // Zeitpunkt der Reservierung
             $createdAt,            // Zeitpunkt der Erstellung
-            $updatedAt             // Letztes Änderungsdatum
         );
 
     }

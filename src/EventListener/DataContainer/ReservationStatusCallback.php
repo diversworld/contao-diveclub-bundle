@@ -23,6 +23,16 @@ class ReservationStatusCallback
             return '-';
         }
 
+        // Prüfen, ob sich der Status tatsächlich ändert
+        $currentStatus = $dc->activeRecord->reservation_status;
+        if ($currentStatus === $value) {
+            return $value; // Keine Änderung, daher nichts tun
+        }
+        if ($dc->field === 'picked_up_at' && $value) {
+            // Setze Status basierend auf picked_up_at
+            $value = 'borrowed';
+        }
+
         // Datum im Format jjjjmmtt
         $currentDate = time();
 

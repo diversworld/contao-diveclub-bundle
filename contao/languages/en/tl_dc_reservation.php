@@ -50,6 +50,7 @@ $GLOBALS['TL_LANG']['tl_dc_reservation']['nextCheckDate']       = ["Next inspect
 $GLOBALS['TL_LANG']['tl_dc_reservation']['pid']                 = ["Next inspection date", "Select the next inspection date."];
 $GLOBALS['TL_LANG']['tl_dc_reservation']['size']                = ["Size", "Please select the bottle size."];
 $GLOBALS['TL_LANG']['tl_dc_reservation']['member']              = ["Owner", "Owner of the bottle."];
+$GLOBALS['TL_LANG']['tl_dc_reservation']['rentalFee']           = ["Rental fee", "Fee for the usage of the equipment."];
 $GLOBALS['TL_LANG']['tl_dc_reservation']['addNotes']            = ["Add remarks", "Record remarks about the diving equipment."];
 $GLOBALS['TL_LANG']['tl_dc_reservation']['published']           = ["Publish", "Publish the record."];
 $GLOBALS['TL_LANG']['tl_dc_reservation']['start']               = ["Show from", "From when the record should be displayed."];

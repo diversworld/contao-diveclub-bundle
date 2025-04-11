@@ -49,8 +49,8 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'panelLayout' => 'filter;sort,search,limit'
         ],
         'label' => [
-            'fields' => ['title','member_id','asset_type','asset_id','reservation_status','rentalFee'],
-            'format' => '%s - %s %s %s - %s %s',
+            'fields' => ['title','member_id','reservation_status','reserved_at','rentalFee'],
+            'format' => '%s - %s - %s %s - (%s)',
             'showColumns' => true,
         ],
         'global_operations' => [
@@ -72,7 +72,6 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
     'palettes'          => [
         '__selector__'      => ['addArticleInfo'],
         'default'           => '{title_legend},title,alias;
-                                {details_legend},asset_type,asset_id,member_id;
                                 {reservation_legend},reserved_at,picked_up_at,returned_at,reservation_status,rentalFee;
                                 {notes_legend},addNotes;
                                 {publish_legend},published,start,stop;'
@@ -116,7 +115,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'options'           => ['reserved', 'borrowed', 'returned', 'cancelled', 'overdue', 'lost', 'damaged', 'missing'],
             'save_callback'     => [[ReservationStatusCallback::class, '__invoke']],
             'reference'         => &$GLOBALS['TL_LANG']['tl_dc_reservation'],
-            'eval'              => ['includeBlankOption' => true, 'submitOnChange' => true, 'chosen'   => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
+            'eval'              => ['includeBlankOption' => true, 'submitOnChange' => false, 'chosen'   => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql'               => "varchar(255) NOT NULL default ''"
         ],
         'asset_quantity'    => [

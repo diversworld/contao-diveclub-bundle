@@ -17,13 +17,13 @@ namespace Diversworld\ContaoDiveclubBundle\Model;
 
 use Contao\Model;
 use Contao\Model\Collection;
+use Contao\System;
 
 class DcEquipmentSubTypeModel extends Model
 {
     protected static $strTable = 'tl_dc_equipment_subtypes';
 
     public static function findAvailable(): Model|Collection|null
-
     {
         return self::findBy('status', 'available');
     }
@@ -31,5 +31,32 @@ class DcEquipmentSubTypeModel extends Model
     public static function findPublished(): Model|Collection|null
     {
         return self::findBy('published', 1);
+    }
+
+    /**
+     * Find available equipment subtypes with join on equipment types.
+     *
+     * @return array|null
+     */
+    public static function findAvailableWithJoin(): ?array
+    {
+        $db = System::getContainer()->get('database_connection'); // Contao Datenbankdienst
+
+        // SQL-Abfrage für den JOIN
+        $query = "SELECT es.id, es.pid, es.title, es.status, es.manufacturer,
+                         es.model, es.color, es.size, es.serialNumber, es.buyDate,
+                         es.status, et.rentalFee
+                  FROM tl_dc_equipment_subtypes es
+                  INNER JOIN tl_dc_equipment_types et ON es.pid = et.id
+                  WHERE es.status = 'available'
+                  ORDER BY es.pid";
+        try {
+            // Ergebnisse abrufen und zurückgeben
+            return $db->fetchAllAssociative($query);
+        } catch (\Exception $e) {
+            System::getContainer()->get('monolog.logger.contao.general')->error('Fehler bei der Abfrage von verfügbaren EquipmentSubTypes: ' . $e->getMessage(), __METHOD__, TL_ERROR);
+
+            return null;
+        }
     }
 }

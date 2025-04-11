@@ -50,6 +50,7 @@ $GLOBALS['TL_LANG']['tl_dc_reservation']['nextCheckDate']       = ["nächster T�
 $GLOBALS['TL_LANG']['tl_dc_reservation']['pid']                 = ["nächster TÜV-Termin", "Wähle den nächsten TÜV-Termin aus.."];
 $GLOBALS['TL_LANG']['tl_dc_reservation']['size']                = ["Größe", "Bitte die Flaschengröße auswählen."];
 $GLOBALS['TL_LANG']['tl_dc_reservation']['member']              = ["Eigentümer", "Eigentümer der Flasche."];
+$GLOBALS['TL_LANG']['tl_dc_reservation']['rentalFee']           = ["Leihgebühr", "Leihgebühr für die Nutzung des Equipments."];
 $GLOBALS['TL_LANG']['tl_dc_reservation']['addNotes']            = ["Bemerkungen eingeben", "Bemerkungen zum Tauchgerät erfassen."];
 $GLOBALS['TL_LANG']['tl_dc_reservation']['published']           = ["Veröffentlichen", "Den Datensatz veröffentlichen."];
 $GLOBALS['TL_LANG']['tl_dc_reservation']['start']               = ["Anzeigen ab", "Ab wann soll der Datensatz angezeigt werden."];
@@ -59,7 +60,6 @@ $GLOBALS['TL_LANG']['tl_dc_reservation']['member_id']           = ['Mitglied','N
 $GLOBALS['TL_LANG']['tl_dc_reservation']['reserved_at']         = ['Reserviert am','Datum der Reservierung'];
 $GLOBALS['TL_LANG']['tl_dc_reservation']['picked_up_at']        = ['Abgeholt am','Datum der Abholung'];
 $GLOBALS['TL_LANG']['tl_dc_reservation']['returned_at']         = ['Zurückgegeben am','Datum der Rückgabe'];
-
 
 /**
  * References

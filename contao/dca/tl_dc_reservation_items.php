@@ -55,7 +55,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
         'label'             => [
             'fields'            => ['item_type', 'item_id', 'reservation_status','created_at','updated_at'],
             'showColumns'       => true,
-            'format'            => '%s, %s - %s - %s - %s',
+            'format'            => '%s, %s - %s - %s - %s!',
             'label_callback'    => [ReservationItemsLabelCallback::class, '__invoke'],
         ],
         'global_operations' => [

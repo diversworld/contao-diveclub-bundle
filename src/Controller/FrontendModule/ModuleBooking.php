@@ -26,8 +26,10 @@ use Contao\System;
 use Contao\Template;
 use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
 use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentSubTypeModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcReservationItemsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcReservationModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcTanksModel;
 use Diversworld\ContaoDiveclubBundle\Session\Attribute\ArrayAttributeBag;
 use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpFoundation\Request;
@@ -190,9 +192,9 @@ class ModuleBooking extends AbstractFrontendModuleController
         foreach ($sessionData as $entry) {
             if (!empty($entry['selectedAssets'])) {
                 foreach ($entry['selectedAssets'] as $assetId) {
-                    $assetDetails = $this->getAssetDetails($entry['category'], (int) $assetId);
-                    if ($assetDetails) {
-                        $reservedItems[] = $assetDetails;
+                    $itemDetails = $this->getAssetDetails($entry['category'], (int) $assetId);
+                    if ($itemDetails) {
+                        $reservedItems[] = $itemDetails;
                     }
                 }
             }
@@ -370,21 +372,34 @@ class ModuleBooking extends AbstractFrontendModuleController
         $bag = $session->getBag(ArrayAttributeBag::ATTRIBUTE_NAME);
         $sessionData = $bag->get('reservation_items', []);
 
+        // Sicherstellen, dass 'selectedAssets' ein Array ist und leere Einträge entfernen
+        $selectedAssets = $data['selectedAssets'] ?? [];
+        if (!is_array($selectedAssets)) {
+            $selectedAssets = []; // Fallback, falls es kein Array ist
+        }
+
+        // Entferne leere Einträge aus dem Array
+        $selectedAssets = array_filter($selectedAssets, function ($assetId) {
+            return !empty($assetId); // Behält nur nicht-leere Werte
+        });
+
+        // Wenn keine Assets mehr übrig sind, nichts speichern
+        if (empty($selectedAssets)) {
+            return;
+        }
+
         // Verarbeiten und Daten speichern
         $totalRentalFee = 0; // Beispiel: Mietkosten berechnen
 
         // Berechnung des Mietpreises (sichere Extraktion)
-        if (isset($data['selectedAssets']) && is_array($data['selectedAssets'])) {
-            foreach ($data['selectedAssets'] as $assetId) {
-                $assetDetails = $this->getAssetDetails($data['category'], (int) $assetId);
+        foreach ($selectedAssets as $assetId) {
+            $assetDetails = $this->getAssetDetails($data['category'], (int)$assetId);
 
-                if ($assetDetails) {
-                    // Preis aus den Assetdetails extrahieren
-                    preg_match('/([0-9]+\.[0-9]{2}) €/i', $assetDetails, $matches);
+            if ($assetDetails) {
+                preg_match('/([0-9]+\.[0-9]{2}) €/i', $assetDetails, $matches);
 
-                    if (!empty($matches[1])) {
-                        $totalRentalFee += (float)$matches[1];
-                    }
+                if (!empty($matches[1])) {
+                    $totalRentalFee += (float)$matches[1];
                 }
             }
         }
@@ -392,7 +407,7 @@ class ModuleBooking extends AbstractFrontendModuleController
         $sessionData[] = [
             'userId' => $data['userId'],
             'category' => $data['category'],
-            'selectedAssets' => $data['selectedAssets'],
+            'selectedAssets' => $selectedAssets,
             'totalRentalFee' => $totalRentalFee, // Füge die Gesamtsumme hinzu
         ];
 
@@ -696,23 +711,21 @@ class ModuleBooking extends AbstractFrontendModuleController
 
     private function getAvailableAssets(string $category): array
     {
+        $allowedCategories = ['tl_dc_tanks', 'tl_dc_regulators', 'tl_dc_equipment_types'];
+        if (!in_array($category, $allowedCategories, true)) {
+            throw new \InvalidArgumentException('Ungültige Kategorie: ' . htmlspecialchars($category));
+        }
+
         // Unterschiedliche Queries für verschiedene Kategorien
         switch ($category) {
             case 'tl_dc_tanks':
-                $query = "SELECT id, title, serialNumber, manufacturer, bazNumber, size, o2clean, owner, checkId, lastCheckDate, nextCheckDate, status, rentalFee FROM tl_dc_tanks WHERE status = 'available'";
-                $params = [];
+                $result = DcTanksModel::findAvailable();
                 break;
             case 'tl_dc_regulators':
-                $query = "SELECT id, title, manufacturer, serialNumber1st, regModel1st, serialNumber2ndPri, regModel2ndPri, serialNumber2ndSec, regModel2ndSec, status, rentalFee FROM tl_dc_regulators WHERE status = 'available'";
-                $params = [];
+                $result = DcRegulatorsModel::findAvailable();
                 break;
             case 'tl_dc_equipment_types':
-                //$query = "SELECT id, pid, title, status, manufacturer, model, color, size, serialNumber, buyDate, status FROM tl_dc_equipment_subtypes WHERE status = 'available' ORDER BY pid";
-                $query = "SELECT es.id, es.pid, es.title, es.status, es.manufacturer, es.model, es.color, es.size, es.serialNumber, es.buyDate, es.status, et.rentalFee
-                            FROM tl_dc_equipment_subtypes es
-                            INNER JOIN tl_dc_equipment_types et ON es.pid = et.id
-                            WHERE es.status = 'available' ORDER BY es.pid";
-                $params = [];
+                $result = DcEquipmentSubTypeModel::findAvailableWithJoin();
                 break;
             default:
                 return [];
@@ -720,7 +733,7 @@ class ModuleBooking extends AbstractFrontendModuleController
 
         // Ergebnisse abrufen und zurückgeben
         try {
-            return $this->db->fetchAllAssociative($query);
+            return $result->fetchAll() ?? [];
         } catch (\Exception $e) {
             // Fehlermeldung bei Problemen mit der Datenbank
             System::getContainer()->get('monolog.logger.contao.general')->error('Fehler beim Laden der Assets: ' . $e->getMessage());
@@ -730,71 +743,65 @@ class ModuleBooking extends AbstractFrontendModuleController
 
     private function getAssetDetails(string $category, int $assetId): ?string
     {
-        // Abrufen der verfügbaren Assets für die entsprechende Kategorie
-        $availableAssets = $this->getAvailableAssets($category);
-
-        // Filtern des spezifischen Assets basierend auf der ID
-        $assetDetails = array_filter($availableAssets, fn($asset) => (int)$asset['id'] === $assetId);
-
-        // Prüfen, ob das Asset gefunden wurde
-        if (empty($assetDetails)) {
-            return null; // Kein passendes Asset gefunden
-        }
-
-        // Das erste gefundene Asset aus dem Array extrahieren (array_filter gibt ein Array zurück)
-        $assetDetails = array_shift($assetDetails);
-
-        // Rückgabe formatieren basierend auf der Kategorie
         switch ($category) {
             case 'tl_dc_tanks':
-                $sizeText = $assetDetails['size'] . 'L' ?? 'Unbekannte Größe';
+                $asset = DcTanksModel::findByPk($assetId);
+                if (!$asset) {
+                    return null;
+                }
+                $sizeText = $asset->size . 'L';
                 return sprintf(
-                    'Tank: %s (Größe: %s), %s',
-                    $assetDetails['title'] ?? 'Unbekannt',
+                    'Tank: %s (Größe: %s), %.2f €',
+                    $asset->title ?? 'Unbekannt',
                     $sizeText,
-                    number_format((float)$assetDetails['rentalFee'], 2, '.', ',') . ' €' ?? 'Unbekannt'
+                    (float)$asset->rentalFee
                 );
 
             case 'tl_dc_regulators':
+                $asset = DcRegulatorsModel::findByPk($assetId);
+                if (!$asset) {
+                    return null;
+                }
                 $helper = new DcaTemplateHelper();
-
-                // Hersteller und Modelle durch Helper-Methode auflösen
                 $manufacturerMapping = $helper->getManufacturers();
-                $manufacturerText = $manufacturerMapping[$assetDetails['manufacturer']] ?? 'Unbekannter Hersteller';
+                $manufacturerText = $manufacturerMapping[$asset->manufacturer] ?? 'Unbekannter Hersteller';
 
-                $regModel1stMapping = $helper->getRegModels1st((int) $assetDetails['manufacturer']);
-                $regModel1stText = $regModel1stMapping[$assetDetails['regModel1st']] ?? 'N/A';
+                $regModel1stMapping = $helper->getRegModels1st((int) $asset->manufacturer);
+                $regModel1stText = $regModel1stMapping[$asset->regModel1st] ?? 'N/A';
 
-                $regModel2ndMapping = $helper->getRegModels2nd((int) $assetDetails['manufacturer']);
-                $regModel2ndPriText = $regModel2ndMapping[$assetDetails['regModel2ndPri']] ?? 'N/A';
-                $regModel2ndSecText = $regModel2ndMapping[$assetDetails['regModel2ndSec']] ?? 'N/A';
+                $regModel2ndMapping = $helper->getRegModels2nd((int) $asset->manufacturer);
+                $regModel2ndPriText = $regModel2ndMapping[$asset->regModel2ndPri] ?? 'N/A';
+                $regModel2ndSecText = $regModel2ndMapping[$asset->regModel2ndSec] ?? 'N/A';
 
                 return sprintf(
-                    'Regulator: %s (Hersteller: %s, 1st Stage: %s, 2nd Stage (Pri): %s, 2nd Stage (Sec): %s), %s',
-                    $assetDetails['title'] ?? 'Unbekannt',
+                    'Regulator: %s (Hersteller: %s, 1st Stage: %s, 2nd Stage (Pri): %s, 2nd Stage (Sec): %s), %.2f €',
+                    $asset->title ?? 'Unbekannt',
                     $manufacturerText,
                     $regModel1stText,
                     $regModel2ndPriText,
                     $regModel2ndSecText,
-                    number_format((float)$assetDetails['rentalFee'], 2, '.', ',') . ' €' ?? 'Unbekannt'
+                    (float)$asset->rentalFee
                 );
 
             case 'tl_dc_equipment_types':
+                $asset = DcEquipmentSubTypeModel::findByPk($assetId);
+                if (!$asset) {
+                    return null;
+                }
                 $helper = new DcaTemplateHelper();
                 $sizeMapping = $helper->getSizes();
-                $sizeText = $sizeMapping[$assetDetails['size']] ?? 'Unbekannte Größe';
-
+                $sizeText = $sizeMapping[$asset->size] ?? 'Unbekannte Größe';
                 return sprintf(
-                    'Ausrüstung: %s (Modell: %s, Größe: %s, Farbe: %s), %s',
-                    $assetDetails['title'] ?? 'Unbekannt',
-                    $assetDetails['model'] ?? 'Kein Modell angegeben',
+                    'Ausrüstung: %s (Modell: %s, Größe: %s, Farbe: %s), %.2f €',
+                    $asset->title ?? 'Unbekannt',
+                    $asset->model ?? 'Kein Modell angegeben',
                     $sizeText,
-                    $assetDetails['color'] ?? 'Keine Farbe angegeben',
-                    number_format((float)$assetDetails['rentalFee'], 2, '.', ',') . ' €' ?? 'Unbekannt'
+                    $asset->color ?? 'Keine Farbe angegeben',
+                    (float)$asset->rentalFee
                 );
 
             default:
-                return null; // Kategorie unbekannt
+                return null;
         }
     }
 
