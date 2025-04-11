@@ -720,24 +720,16 @@ class ModuleBooking extends AbstractFrontendModuleController
         switch ($category) {
             case 'tl_dc_tanks':
                 $result = DcTanksModel::findAvailable();
-                break;
+                return $result ? $result->fetchAll() : [];
+
             case 'tl_dc_regulators':
                 $result = DcRegulatorsModel::findAvailable();
-                break;
+                return $result ? $result->fetchAll() : [];
+
             case 'tl_dc_equipment_types':
-                $result = DcEquipmentSubTypeModel::findAvailableWithJoin();
-                break;
+                return DcEquipmentSubTypeModel::findAvailableWithJoin() ?? [];
             default:
                 return [];
-        }
-
-        // Ergebnisse abrufen und zurückgeben
-        try {
-            return $result->fetchAll() ?? [];
-        } catch (\Exception $e) {
-            // Fehlermeldung bei Problemen mit der Datenbank
-            System::getContainer()->get('monolog.logger.contao.general')->error('Fehler beim Laden der Assets: ' . $e->getMessage());
-            return [];
         }
     }
 

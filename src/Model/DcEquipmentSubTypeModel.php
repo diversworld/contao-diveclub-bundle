@@ -52,7 +52,11 @@ class DcEquipmentSubTypeModel extends Model
                   ORDER BY es.pid";
         try {
             // Ergebnisse abrufen und zurückgeben
-            return $db->fetchAllAssociative($query);
+            //return $db->fetchAllAssociative($query);
+            $result = $db->fetchAllAssociative($query); // fetchAllAssociative gibt ein Array zurück
+            dump(gettype($result), $result); // Überprüfen, ob das Ergebnis ein Array ist
+            return $result;
+
         } catch (\Exception $e) {
             System::getContainer()->get('monolog.logger.contao.general')->error('Fehler bei der Abfrage von verfügbaren EquipmentSubTypes: ' . $e->getMessage(), __METHOD__, TL_ERROR);
 
