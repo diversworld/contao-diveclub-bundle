@@ -25,6 +25,7 @@ use Contao\PageModel;
 use Contao\System;
 use Contao\Template;
 use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
+use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentSubTypeModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcReservationItemsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcReservationModel;
 use Diversworld\ContaoDiveclubBundle\Session\Attribute\ArrayAttributeBag;
@@ -412,13 +413,14 @@ class ModuleBooking extends AbstractFrontendModuleController
             throw new \RuntimeException('Es sind keine Reservierungsdaten in der Session gespeichert.');
         }
 
+        $totalPrice = $this->calculateTotalPrice($sessionData);
+
         foreach ($sessionData as $entry) {
             $userId = $entry['userId'] ?? null;
             $category = $entry['category'] ?? null;
             $selectedAssets = $entry['selectedAssets'] ?? [];
             $pid = $entry['pid'] ?? null;
-            $totalRentalFee = $entry['totalRentalFee'] ?? 0; // Mietkosten berechnen
-
+            $totalRentalFee = $totalPrice;//$entry['totalRentalFee'] ?? 0; // Mietkosten berechnen
 
             if (empty($selectedAssets)) {
                 continue; // Überspringen, wenn keine Assets ausgewählt sind
@@ -479,7 +481,7 @@ class ModuleBooking extends AbstractFrontendModuleController
 
                     if ('tl_dc_equipment_types' === $category) {
                         $query = $this->db->prepare('SELECT title, subType FROM tl_dc_equipment_types WHERE id = ?');
-                        $result = $query->executeQuery([$pid])->fetchAssociative();
+                        $result = DcEquipmentSubTypeModel::findById($pid);//$query->executeQuery([$pid])->fetchAssociative();
 
                         if ($result) {
                             $reservationItem->types = $result['title'];
@@ -849,10 +851,14 @@ class ModuleBooking extends AbstractFrontendModuleController
 
     protected function generateReservationTitle(int $userId): string
     {
-        // MemberID formatieren
+        // MemberID formatieren. Führende Nullen hinzufügen, um die member_id dreistellig zu machen
         $formattedMemberId = str_pad((string)$userId, 3, '0', STR_PAD_LEFT);
-        // Datum hinzufügen
-        $currentDate = date('ymdHi');
-        return $currentDate . $formattedMemberId;
+
+        // Datum im Format jjjjmmtt
+        $currentDate = date('dmHi');
+        $currentYear = date('Y');
+
+        // Neues Title-Format
+        return $currentYear . '-' . $formattedMemberId . '-' . $currentDate;
     }
 }

@@ -19,7 +19,12 @@ use Contao\DataContainer;
 use Contao\DC_Table;
 use Diversworld\ContaoDiveclubBundle\DataContainer\DcReservation;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ItemReservationCallbackListener;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationItemsHeaderCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationItemsLabelCallback;
 use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
+use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentSubTypeModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorsModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcTanksModel;
 
 /**
  * Table tl_dc_reservation
@@ -43,6 +48,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
             'mode'              => DataContainer::MODE_PARENT,
             'fields'            => ['item_type', 'item_id', 'reservation_status','created_at','updated_at'],
             'headerFields'      => ['title', 'member_id', 'reservation_status','created_at','updated_at'],
+            'header_callback'    => [ReservationItemsHeaderCallback::class, '__invoke'],
             'flag'              => DataContainer::SORT_ASC,
             'panelLayout'       => 'filter;sort,search,limit'
         ],
@@ -50,7 +56,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
             'fields'            => ['item_type', 'item_id', 'reservation_status','created_at','updated_at'],
             'showColumns'       => true,
             'format'            => '%s, %s - %s - %s - %s',
-            'label_callback'    => ['tl_dc_reservation_items', 'setLabel'],
+            'label_callback'    => [ReservationItemsLabelCallback::class, '__invoke'],
         ],
         'global_operations' => [
             'all'               => [
@@ -237,7 +243,6 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
  */
 class tl_dc_reservation_items extends Backend
 {
-
     public function getAvailableAssets(DataContainer $dc): array
     {
         $helper = new DcaTemplateHelper(); // Instanz der Helper-Klasse
@@ -259,13 +264,7 @@ class tl_dc_reservation_items extends Backend
 
         switch ($tableName) {
             case 'tl_dc_tanks':
-                $query = sprintf(
-                    "SELECT id, title, size, status FROM %s
-                   WHERE published = 1
-                   ORDER BY title", $tableName
-                );
-
-                $result = $database->prepare($query)->execute();
+                $result = DcTanksModel::findPublished();
                 $options = [];
                 while ($result->next()) {
                     $statusText = $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$result->status] ?? $result->status;
@@ -276,13 +275,7 @@ class tl_dc_reservation_items extends Backend
                 }
                 break;
             case 'tl_dc_regulators':
-                $query = sprintf(
-                    "SELECT id, title, manufacturer, regModel1st, regModel2ndPri, regModel2ndSec, status FROM tl_dc_regulators
-                   WHERE published = 1
-                   ORDER BY title"
-                );
-
-                $result = $database->prepare($query)->execute();
+                $result = DcRegulatorsModel::findPublished();
                 $options = [];
                 while ($result->next()) {
                     $manufacturerName = $helper->getManufacturers()[$result->manufacturer] ?? 'Unbekannter Hersteller';
@@ -299,15 +292,7 @@ class tl_dc_reservation_items extends Backend
                     return []; // Keine Optionen anzeigen, wenn Werte fehlen
                 }
 
-                $types = (int) $dc->activeRecord->types;
-                $subType = (int) $dc->activeRecord->sub_type;
-
-                $query = sprintf("SELECT id, title, subType
-                                FROM tl_dc_equipment_types
-                                WHERE published = 1 AND title = %s AND subType = %s LIMIT 1", $types, $subType
-                );
-
-                $result = $database->prepare($query)->execute();
+                $result = DcEquipmentSubTypeModel::findPublished();
                 if (!$result->numRows) {
                     return ['Keine Daten in dieser Kategorie verfügbar'];
                 }
@@ -399,92 +384,5 @@ class tl_dc_reservation_items extends Backend
         // Andernfalls ein neues Datum setzen
         return $actualTimeStamp;
     }
-
-    public function setLabel(array $row, string $label, DataContainer $dc): string
-    {
-        $database = Database::getInstance();
-        $helper = new DcaTemplateHelper();
-
-        // Fallback-Werte definieren
-        $typeLabel = $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes'][$row['item_type']] ?? 'Unbekannter Typ';
-        $itemDetails = 'Unbekannt';
-        $createdAt = !empty($row['created_at']) ? date($GLOBALS['TL_CONFIG']['datimFormat'], (int) $row['created_at']) : 'Unbekannt';
-        $updatedAt = !empty($row['updated_at']) ? date($GLOBALS['TL_CONFIG']['datimFormat'], (int) $row['updated_at']) : 'Unbekannt';
-
-        // Daten basierend auf dem Typ laden
-        switch ($row['item_type']) {
-            case 'tl_dc_tanks': // Tanks
-                $result = $database
-                    ->prepare("SELECT title, size FROM tl_dc_tanks WHERE id = ?")
-                    ->execute($row['item_id']);
-
-                if ($result->numRows) {
-                    $itemDetails = sprintf(
-                        'Größe: %sL, Inventarnummer: %s',
-                        $result->size,
-                        $result->title
-                    );
-                } else {
-                    $itemDetails = 'Tank nicht gefunden';
-                }
-                break;
-
-            case 'tl_dc_regulators': // Regulatoren
-                $result = $database
-                    ->prepare("SELECT title, manufacturer, regModel1st, regModel2ndPri, regModel2ndSec FROM tl_dc_regulators WHERE id = ?")
-                    ->execute($row['item_id']);
-
-                if ($result->numRows) {
-                    $manufacturerName = $helper->getManufacturers()[$result->manufacturer] ?? 'Unbekannter Hersteller';
-                    $regModel1st = $helper->getRegModels1st((int) $result->manufacturer)[$result->regModel1st] ?? 'Unbek. 1. Stufe';
-                    $regModel2ndPri = $helper->getRegModels2nd((int) $result->manufacturer)[$result->regModel2ndPri] ?? 'Unbek. 2. Stufe (Primär)';
-                    $regModel2ndSec = $helper->getRegModels2nd((int) $result->manufacturer)[$result->regModel2ndSec] ?? 'Unbek. 2. Stufe (Sekundär)';
-
-                    $itemDetails = sprintf(
-                        'Hersteller: %s, 1. Stufe: %s, 2. Stufe (Primär): %s, 2. Stufe (Sekundär): %s',
-                        $manufacturerName,
-                        $regModel1st,
-                        $regModel2ndPri,
-                        $regModel2ndSec
-                    );
-                } else {
-                    $itemDetails = 'Regulator nicht gefunden';
-                }
-                break;
-
-            case 'tl_dc_equipment_types': // Equipment-Typen
-                $result = $database
-                    ->prepare("SELECT title, manufacturer, model, size FROM tl_dc_equipment_subtypes WHERE id = ?")
-                    ->execute($row['item_id']);
-
-                if ($result->numRows) {
-                    $manufacturerName = $helper->getManufacturers()[$result->manufacturer] ?? 'Unbekannter Hersteller';
-                    $size = $helper->getSizes()[$result->size] ?? $result->size;
-
-                    $itemDetails = sprintf(
-                        '%s, Modell %s, Größe %s',
-                        $manufacturerName,
-                        $result->model,
-                        $size
-                    );
-                } else {
-                    $itemDetails = 'Equipment-Typ nicht gefunden';
-                }
-                break;
-
-            default:
-                $itemDetails = 'Unbekannter Typ';
-                break;
-        }
-
-        // Darstellung des Labels zusammenstellen
-        return sprintf(
-            '%s: %s | Status: %s | Erstellt: %s | Geändert: %s',
-            $typeLabel,
-            $itemDetails,
-            $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$row['reservation_status']] ?? 'Unbekannt',
-            $createdAt,
-            $updatedAt
-        );
-    }
 }
+

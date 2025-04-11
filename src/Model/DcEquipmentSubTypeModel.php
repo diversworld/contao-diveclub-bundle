@@ -16,8 +16,20 @@ declare(strict_types=1);
 namespace Diversworld\ContaoDiveclubBundle\Model;
 
 use Contao\Model;
+use Contao\Model\Collection;
 
 class DcEquipmentSubTypeModel extends Model
 {
     protected static $strTable = 'tl_dc_equipment_subtypes';
+
+    public static function findAvailable(): Model|Collection|null
+
+    {
+        return self::findBy('status', 'available');
+    }
+
+    public static function findPublished(): Model|Collection|null
+    {
+        return self::findBy('published', 1);
+    }
 }

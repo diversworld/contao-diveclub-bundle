@@ -18,10 +18,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class ReservationTitleCallback
 {
     private Connection $db;
+    private LoggerInterface $logger;
 
-    public function __construct(Connection $db)
+
+    public function __construct(Connection $db, LoggerInterface $logger)
     {
         $this->db = $db;
+        $this->logger = $logger;
     }
 
     public function __invoke($value, DataContainer $dc): string
@@ -37,24 +40,36 @@ class ReservationTitleCallback
             return '-0';
         }
 
-        // Führende Nullen hinzufügen, um die member_id dreistellig zu machen
-        $formattedMemberId = str_pad((string)$memberId, 3, '0', STR_PAD_LEFT);
+        // Prüfen, ob der Titel bereits existiert
+        $existingTitle = $dc->activeRecord->title;
+        if (!empty($existingTitle && !empty($value))) {
+            // Wenn ein Titel existiert, diesen Wert zurückgeben
+            return $existingTitle;
+        }
 
-        // Datum im Format jjjjmmtt
-        $currentDate = date('Ymd');
+        try {
+            // Führende Nullen hinzufügen, um die member_id dreistellig zu machen
+            $formattedMemberId = str_pad((string)$memberId, 3, '0', STR_PAD_LEFT);
 
-        // Neues Title-Format
-        $newTitle = $currentDate . $formattedMemberId;
+            // Datum im Format jjjjmmtt
+            $currentDate = date('dmHi');
+            $currentYear = date('Y');
 
-        $this->db->update(
-            'tl_dc_reservation', // Reservierungs-Tabelle
-            [
-                'title' => $newTitle,
-                'alias' => 'id-'.$newTitle
-            ],
-            ['id' => $dc->id]
-        );
+            // Neues Title-Format
+            $newTitle = $currentYear . '-' . $formattedMemberId . '-' . $currentDate;
 
-        return $newTitle;
+            // Optional: alias automatisch setzen
+            $alias = 'id-' . $newTitle;
+
+            return $newTitle; // Nur neuen Titel zurückgeben (kein Datenbank-Update hier)
+        } catch (Exception $e) {
+            // Fehlerprotokollierung
+            $this->logger->error(
+                sprintf('Fehler bei Titelgenerierung in tl_dc_reservation (ID: %d): %s', $dc->id, $e->getMessage())
+            );
+
+            // Originalwert zurückgeben, wenn etwas schiefgeht
+            return $value;
+        }
     }
 }

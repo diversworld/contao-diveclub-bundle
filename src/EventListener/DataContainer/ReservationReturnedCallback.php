@@ -5,6 +5,7 @@ namespace Diversworld\ContaoDiveclubBundle\EventListener\DataContainer;
 
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\DataContainer;
+use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentSubTypeModel;
 use Doctrine\DBAL\Connection;
 
 #[AsCallback(table: 'tl_dc_reservation', target: 'fields.returned_at.save')]
@@ -25,36 +26,48 @@ class ReservationReturnedCallback
 
         // Datum im Format jjjjmmtt
         $currentDate = $value;
-        $assetId = (int) $dc->activeRecord->item_id;        // Das ausgewählte Asset
+        $rentalFee = (float) $dc->activeRecord->rentalFee;        // Das ausgewählte Asset
 
         // Neues Title-Format
         $newStatus = 'returned';
         $itemStatus = 'available';
 
-        // Status der Items ändern
-        $this->db->update(
-            'tl_dc_reservation_items', // Reservierungs-Tabelle
-            [
-                'reservation_status' => $newStatus,
-                'updated_at' => $currentDate,
-                'returned_at' => $currentDate,
-            ],
-            ['pid' => $dc->id]
-        );
+
+        $subtypes = $this->db->fetchAllAssociative('SELECT * FROM tl_dc_reservation_items WHERE pid = ?', [$dc->id]);
+
+        foreach ($subtypes as $subtype) {
+            // Subtype-Status aktualisieren
+            $this->db->update(
+                'tl_dc_reservation_items',
+                [
+                    'reservation_status' => $newStatus,
+                    'updated_at' => $currentDate,
+                    'returned_at' => $currentDate,
+                ],
+                ['id' => $subtype['id']]
+            );
+
+            // Asset-Status aktualisieren (tl_dc_equipment_subtypes)
+            if (!empty($subtype['asset_id'])) { // Sicherstellen, dass eine asset_id existiert
+                $this->db->update(
+                    'tl_dc_equipment_subtypes',
+                    [
+                        'status' => $itemStatus,
+                        'updated_at' => $currentDate,
+                    ],
+                    ['id' => $subtype['asset_id']]
+                );
+            }
+        }
+
         // Status der Reservierung ändern
         $this->db->update(
             'tl_dc_reservation', // Reservierungs-Tabelle
             [
                 'reservation_status' => $newStatus,
+                'rentalFee' => $rentalFee,
             ],
             ['id' => $dc->id]
-        );
-
-        // Status der Assets ändern
-        $this->db->update(
-            'tl_dc_equipment_subTypes',
-            [':status' => $itemStatus],
-            ['id' => $assetId]
         );
 
         return $value;
