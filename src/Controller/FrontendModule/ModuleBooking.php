@@ -65,6 +65,7 @@ class ModuleBooking extends AbstractFrontendModuleController
         System::loadLanguageFile('tl_dc_reservation_items');
 
         $sessionData = $this->getSessionData();
+        dump($sessionData);
         $category = $request->get('category');
 
         // NEU: Gesamtpreis berechnen und ans Template übergeben
@@ -109,6 +110,7 @@ class ModuleBooking extends AbstractFrontendModuleController
 
         // Vorgemerkte Assets immer laden
         $storedAssets = $this->loadStoredAssets($this->getSessionData());
+        dump($storedAssets);
         $template->storedAssets = $storedAssets;
         $template->totalRentalFee = $this->calculateTotalRentalFee($this->getSessionData());
 
@@ -373,17 +375,19 @@ class ModuleBooking extends AbstractFrontendModuleController
     {
         $session = $this->requestStack->getSession();
         $bag = $session->getBag(ArrayAttributeBag::ATTRIBUTE_NAME);
+
+        // Bestehende Session-Daten abrufen
         $sessionData = $bag->get('reservation_items', []);
 
-        // Sicherstellen, dass 'selectedAssets' ein Array ist und leere Einträge entfernen
+        // Sicherstellen, dass 'selectedAssets' ein Array ist
         $selectedAssets = $data['selectedAssets'] ?? [];
         if (!is_array($selectedAssets)) {
-            $selectedAssets = []; // Fallback, falls es kein Array ist
+            $selectedAssets = [];
         }
 
-        // Entferne leere Einträge aus dem Array
+        // Entferne leere Einträge aus dem 'selectedAssets'-Array
         $selectedAssets = array_filter($selectedAssets, function ($assetId) {
-            return !empty($assetId); // Behält nur nicht-leere Werte
+            return !empty($assetId);
         });
 
         // Wenn keine Assets mehr übrig sind, nichts speichern
@@ -391,30 +395,45 @@ class ModuleBooking extends AbstractFrontendModuleController
             return;
         }
 
-        // Verarbeiten und Daten speichern
-        $totalRentalFee = 0; // Beispiel: Mietkosten berechnen
-
-        // Berechnung des Mietpreises (sichere Extraktion)
+        // Gesamtpreis dieser Auswahl berechnen
+        $totalRentalFee = 0.0;
         foreach ($selectedAssets as $assetId) {
-            $assetDetails = $this->getAssetDetails($data['category'], (int)$assetId);
-
+            $assetDetails = $this->getAssetDetails($data['category'], (int) $assetId);
             if ($assetDetails) {
                 preg_match('/([0-9]+\.[0-9]{2}) €/i', $assetDetails, $matches);
-
                 if (!empty($matches[1])) {
-                    $totalRentalFee += (float)$matches[1];
+                    $totalRentalFee += (float) $matches[1];
                 }
             }
         }
 
-        $sessionData[] = [
-            'userId' => $data['userId'],
-            'category' => $data['category'],
-            'selectedAssets' => $selectedAssets,
-            'totalRentalFee' => $totalRentalFee, // Füge die Gesamtsumme hinzu
-        ];
+        // Prüfe, ob ein Eintrag für die aktuelle Kategorie bereits existiert
+        $existingCategoryIndex = null;
+        foreach ($sessionData as $index => $entry) {
+            if (($entry['category'] ?? null) === $data['category']) {
+                $existingCategoryIndex = $index;
+                break;
+            }
+        }
 
-        // Speichere aktualisierte Session-Daten
+        if ($existingCategoryIndex !== null) {
+            // Bestehenden Eintrag aktualisieren (alte Assets beibehalten, neue hinzufügen)
+            $existingAssets = $sessionData[$existingCategoryIndex]['selectedAssets'] ?? [];
+            $mergedAssets = array_unique(array_merge($existingAssets, $selectedAssets));
+
+            $sessionData[$existingCategoryIndex]['selectedAssets'] = $mergedAssets;
+            $sessionData[$existingCategoryIndex]['totalRentalFee'] = $totalRentalFee; // Falls gewünscht, ändern!
+        } else {
+            // Neuer Eintrag für die Kategorie erstellen
+            $sessionData[] = [
+                'userId' => $data['userId'],
+                'category' => $data['category'],
+                'selectedAssets' => $selectedAssets,
+                'totalRentalFee' => $totalRentalFee,
+            ];
+        }
+
+        // Aktualisierte Daten speichern
         $bag->set('reservation_items', $sessionData);
     }
 
@@ -438,7 +457,7 @@ class ModuleBooking extends AbstractFrontendModuleController
             $category = $entry['category'] ?? null;
             $selectedAssets = $entry['selectedAssets'] ?? [];
             $pid = $entry['pid'] ?? null;
-            $totalRentalFee = $totalPrice;//$entry['totalRentalFee'] ?? 0; // Mietkosten berechnen
+            $totalRentalFee = $totalPrice; // Mietkosten berechnen
 
             if (empty($selectedAssets)) {
                 continue; // Überspringen, wenn keine Assets ausgewählt sind
@@ -524,6 +543,9 @@ class ModuleBooking extends AbstractFrontendModuleController
     {
         $configAdapter = $this->framework->getAdapter(Config::class);
 
+        // Währungsformatierung für den Gesamtbetrag
+        $formattedTotalFee = number_format($totalFee, 2, ',', '.') ; // Beispiel: "1234.56" wird zu "1.234,56 €"
+
         // E-Mail-Adresse aus der Tabelle `tl_dc_config` abrufen
         $result = $this->db->fetchAssociative('SELECT reservationInfo, reservationInfoText FROM tl_dc_config LIMIT 1');
         $recipientEmail = $result['reservationInfo'] ?? null;
@@ -542,7 +564,7 @@ class ModuleBooking extends AbstractFrontendModuleController
 
         $informationText = str_replace(
             ['#memberName#', '#reservationNumber#', '#assetsHtml#', '#totalFee#'],
-            [$memberName, $reservationNumber, $assetsHtml, $totalFee],
+            [$memberName, $reservationNumber, $assetsHtml, $formattedTotalFee],
             $informationText
         );
 
@@ -717,13 +739,10 @@ class ModuleBooking extends AbstractFrontendModuleController
         switch ($category) {
             case 'tl_dc_tanks':
                 $result = DcTanksModel::findAvailable();
-                dump($result);
                 return $result ? $result->fetchAll() : [];
-
             case 'tl_dc_regulators':
                 $result = DcRegulatorsModel::findAvailable();
                 return $result ? $result->fetchAll() : [];
-
             case 'tl_dc_equipment_types':
                 $this->equipmentCache = DcEquipmentSubTypeModel::findAvailableWithJoin() ?? [];
                 return $this->equipmentCache;
