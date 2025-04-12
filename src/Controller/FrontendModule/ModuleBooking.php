@@ -19,11 +19,11 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Email;
 use Contao\FormCheckbox;
+use Contao\Template;
 use Contao\Message;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\System;
-use Contao\Template;
 use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
 use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentSubTypeModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorsModel;
@@ -47,6 +47,7 @@ class ModuleBooking extends AbstractFrontendModuleController
     private ContaoFramework $framework;
     private RequestStack $requestStack;
     private Connection $db;
+    private array $equipmentCache = [];
 
     public function __construct(DcaTemplateHelper $helper, Connection $db, RequestStack $requestStack, ContaoFramework $framework)
     {
@@ -137,6 +138,7 @@ class ModuleBooking extends AbstractFrontendModuleController
         // Reservierungen in der Datenbank speichern
         if ('reservationSubmit' === $formType) {
             $this->saveReservationsToDatabase($template, $sessionData);
+            Message::addConfirmation('Die Reservierung gespeichert und die Session-Daten wurden gelöscht.');
             $this->resetSession();
         }
 
@@ -181,6 +183,7 @@ class ModuleBooking extends AbstractFrontendModuleController
         if (empty($sessionData)) {
             throw new \RuntimeException('Keine Reservierungsdaten für die Benachrichtigung vorhanden.');
         }
+        $totalPrice = $this->calculateTotalPrice($sessionData);
 
         // Details aus den Session-Daten extrahieren
         $reservationId = $sessionData[0]['reservationId'] ?? 0; // Beispiel-ID
@@ -205,7 +208,7 @@ class ModuleBooking extends AbstractFrontendModuleController
         }
 
         // E-Mail senden
-        $this->sendReservationEmail($reservationId, $reservationNumber, $memberName, $reservedItems);
+        $this->sendReservationEmail($reservationId, $reservationNumber, $memberName, $reservedItems, $totalPrice);
     }
 
     /**
@@ -444,13 +447,7 @@ class ModuleBooking extends AbstractFrontendModuleController
             if (!$userId || !$category) {
                 throw new \RuntimeException('Ungültige Session-Daten: Benutzer oder Kategorie fehlt.');
             }
-/*
-            foreach ($selectedAssets as $assetId) {
-                $query = $this->db->prepare("SELECT rentalFee FROM {$category} WHERE id = ?");
-                $result = $query->executeQuery([$assetId])->fetchOne();
-                $totalRentalFee += (float)$result; // `rentalFee` summieren
-            }
-*/
+
             // Reservierungstitel generieren
             $reservationTitle = $this->generateReservationTitle((int) $userId);
 
@@ -523,7 +520,7 @@ class ModuleBooking extends AbstractFrontendModuleController
      * @return void
      * @throws \Doctrine\DBAL\Exception
      */
-    function sendReservationEmail(int $reservationId, string $reservationNumber, string $memberName, array $reservedItems): void
+    function sendReservationEmail(int $reservationId, string $reservationNumber, string $memberName, array $reservedItems, float $totalFee): void
     {
         $configAdapter = $this->framework->getAdapter(Config::class);
 
@@ -544,8 +541,8 @@ class ModuleBooking extends AbstractFrontendModuleController
         $assetsHtml .= '</ul>';
 
         $informationText = str_replace(
-            ['#memberName#', '#reservationNumber#', '#assetsHtml#'],
-            [$memberName, $reservationNumber, $assetsHtml],
+            ['#memberName#', '#reservationNumber#', '#assetsHtml#', '#totalFee#'],
+            [$memberName, $reservationNumber, $assetsHtml, $totalFee],
             $informationText
         );
 
@@ -720,6 +717,7 @@ class ModuleBooking extends AbstractFrontendModuleController
         switch ($category) {
             case 'tl_dc_tanks':
                 $result = DcTanksModel::findAvailable();
+                dump($result);
                 return $result ? $result->fetchAll() : [];
 
             case 'tl_dc_regulators':
@@ -727,7 +725,8 @@ class ModuleBooking extends AbstractFrontendModuleController
                 return $result ? $result->fetchAll() : [];
 
             case 'tl_dc_equipment_types':
-                return DcEquipmentSubTypeModel::findAvailableWithJoin() ?? [];
+                $this->equipmentCache = DcEquipmentSubTypeModel::findAvailableWithJoin() ?? [];
+                return $this->equipmentCache;
             default:
                 return [];
         }
@@ -776,20 +775,25 @@ class ModuleBooking extends AbstractFrontendModuleController
                 );
 
             case 'tl_dc_equipment_types':
-                $asset = DcEquipmentSubTypeModel::findByPk($assetId);
+                // Prüfung, ob das Objekt bereits existiert
+                $asset = array_filter($this->equipmentCache, static fn($item) => (int)$item['id'] === $assetId);
+                $asset = reset($asset);
+
                 if (!$asset) {
                     return null;
                 }
+
                 $helper = new DcaTemplateHelper();
                 $sizeMapping = $helper->getSizes();
-                $sizeText = $sizeMapping[$asset->size] ?? 'Unbekannte Größe';
+                $sizeText = $sizeMapping[$asset['size']] ?? 'Unbekannte Größe';
+
                 return sprintf(
                     'Ausrüstung: %s (Modell: %s, Größe: %s, Farbe: %s), %.2f €',
-                    $asset->title ?? 'Unbekannt',
-                    $asset->model ?? 'Kein Modell angegeben',
+                    $asset['title'] ?? 'Unbekannt',
+                    $asset['model'] ?? 'Kein Modell angegeben',
                     $sizeText,
-                    $asset->color ?? 'Keine Farbe angegeben',
-                    (float)$asset->rentalFee
+                    $asset['color'] ?? 'Keine Farbe angegeben',
+                    (float)$asset['rentalFee']
                 );
 
             default:

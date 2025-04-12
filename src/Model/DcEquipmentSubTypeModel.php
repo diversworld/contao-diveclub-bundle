@@ -50,17 +50,7 @@ class DcEquipmentSubTypeModel extends Model
                   INNER JOIN tl_dc_equipment_types et ON es.pid = et.id
                   WHERE es.status = 'available'
                   ORDER BY es.pid";
-        try {
-            // Ergebnisse abrufen und zurückgeben
-            //return $db->fetchAllAssociative($query);
-            $result = $db->fetchAllAssociative($query); // fetchAllAssociative gibt ein Array zurück
-            dump(gettype($result), $result); // Überprüfen, ob das Ergebnis ein Array ist
-            return $result;
 
-        } catch (\Exception $e) {
-            System::getContainer()->get('monolog.logger.contao.general')->error('Fehler bei der Abfrage von verfügbaren EquipmentSubTypes: ' . $e->getMessage(), __METHOD__, TL_ERROR);
-
-            return null;
-        }
+        return $db->fetchAllAssociative($query); // fetchAllAssociative gibt ein Array zurück
     }
 }
