@@ -47,7 +47,6 @@ class ModuleBooking extends AbstractFrontendModuleController
     private ContaoFramework $framework;
     private RequestStack $requestStack;
     private Connection $db;
-    private array $equipmentCache = [];
 
     public function __construct(DcaTemplateHelper $helper, Connection $db, RequestStack $requestStack, ContaoFramework $framework)
     {
@@ -65,7 +64,6 @@ class ModuleBooking extends AbstractFrontendModuleController
         System::loadLanguageFile('tl_dc_reservation_items');
 
         $sessionData = $this->getSessionData();
-
         $category = $request->get('category');
 
         // NEU: Gesamtpreis berechnen und ans Template übergeben
@@ -73,8 +71,7 @@ class ModuleBooking extends AbstractFrontendModuleController
         $template->totalPrice = $totalPrice;
 
         // NEW: Vorgemerkte Reservierungen abrufen
-        $storedAssets = $this->loadStoredAssets($sessionData);
-        $template->storedAssets = $storedAssets;
+        $template->storedAssets = $this->loadStoredAssets($sessionData);
 
         // Session-Daten und ausgewählte Kategorie behandeln
         $template->totalRentalFee = $this->calculateTotalRentalFee($sessionData);
@@ -95,8 +92,6 @@ class ModuleBooking extends AbstractFrontendModuleController
             } else {
                 $template->assets = $availableAssets; // Leeres Array, falls die Kategorie nicht zutrifft
             }
-
-
         }
 
         // Verarbeitung von POST-Daten
@@ -139,7 +134,7 @@ class ModuleBooking extends AbstractFrontendModuleController
 
         // Reservierungen in der Datenbank speichern
         if ('reservationSubmit' === $formType) {
-            $this->saveReservationsToDatabase($template, $sessionData);
+            $this->saveReservationsToDatabase($sessionData);
             Message::addConfirmation('Die Reservierung gespeichert und die Session-Daten wurden gelöscht.');
             $this->resetSession();
         }
@@ -165,7 +160,7 @@ class ModuleBooking extends AbstractFrontendModuleController
     /**
      * Speichert Reservierungen in die Datenbank.
      */
-    private function saveReservationsToDatabase(Template $template, array $sessionData): void
+    private function saveReservationsToDatabase(array $sessionData): void
     {
         try {
             $saveMessage = $this->saveDataToDb();
@@ -194,13 +189,27 @@ class ModuleBooking extends AbstractFrontendModuleController
 
         // Reservierte Items aus Session-Daten
         $reservedItems = [];
-        foreach ($sessionData as $entry) {
+/*        foreach ($sessionData as $entry) {
             if (!empty($entry['selectedAssets'])) {
                 foreach ($entry['selectedAssets'] as $assetId) {
                     $itemDetails = $this->getAssetDetails($entry['category'], (int) $assetId);
                     if ($itemDetails) {
                         $reservedItems[] = $itemDetails;
                     }
+                }
+            }
+        }*/
+
+        foreach ($sessionData as $entry) {
+            $category = $entry['category'] ?? null;
+            $selectedAssets = $entry['selectedAssets'] ?? [];
+            if (!$category || empty($selectedAssets)) {
+                continue;
+            }
+            foreach ($selectedAssets as $assetId) {
+                $assetDetails = $this->getAssetDetails($category, (int)$assetId);
+                if ($assetDetails) {
+                    $reservedItems[] = $assetDetails;
                 }
             }
         }
@@ -223,20 +232,16 @@ class ModuleBooking extends AbstractFrontendModuleController
         foreach ($sessionData as $entry) {
             $category = $entry['category'] ?? null;
             $selectedAssets = $entry['selectedAssets'] ?? [];
-
             if (!$category || empty($selectedAssets)) {
                 continue;
             }
-
             foreach ($selectedAssets as $assetId) {
                 $assetDetails = $this->getAssetDetails($category, (int)$assetId);
-
                 if ($assetDetails) {
                     $storedAssets[] = $assetDetails;
                 }
             }
         }
-
         return $storedAssets;
     }
 
@@ -744,8 +749,7 @@ class ModuleBooking extends AbstractFrontendModuleController
                 $result = DcRegulatorsModel::findAvailable();
                 return $result ? $result->fetchAll() : [];
             case 'tl_dc_equipment_types':
-                $this->equipmentCache = DcEquipmentSubTypeModel::findAvailableWithJoin() ?? [];
-                return $this->equipmentCache;
+                return DcEquipmentSubTypeModel::findAvailableWithJoin() ?? [];
             default:
                 return [];
         }
@@ -795,7 +799,7 @@ class ModuleBooking extends AbstractFrontendModuleController
 
             case 'tl_dc_equipment_types':
                 // Prüfung, ob das Objekt bereits existiert
-                $asset = array_filter($this->equipmentCache, static fn($item) => (int)$item['id'] === $assetId);
+                $asset = array_filter(DcEquipmentSubTypeModel::findAvailableWithJoin(), static fn($item) => (int)$item['id'] === $assetId);
                 $asset = reset($asset);
 
                 if (!$asset) {
