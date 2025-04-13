@@ -65,7 +65,7 @@ class ModuleBooking extends AbstractFrontendModuleController
         System::loadLanguageFile('tl_dc_reservation_items');
 
         $sessionData = $this->getSessionData();
-        dump($sessionData);
+
         $category = $request->get('category');
 
         // NEU: Gesamtpreis berechnen und ans Template übergeben
@@ -110,7 +110,7 @@ class ModuleBooking extends AbstractFrontendModuleController
 
         // Vorgemerkte Assets immer laden
         $storedAssets = $this->loadStoredAssets($this->getSessionData());
-        dump($storedAssets);
+
         $template->storedAssets = $storedAssets;
         $template->totalRentalFee = $this->calculateTotalRentalFee($this->getSessionData());
 
