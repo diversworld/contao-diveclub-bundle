@@ -11,8 +11,7 @@
  */
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckInvoiceModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcConfigModel;
-use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentTypeModel;
-use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentSubTypeModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorControlModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcReservationItemsModel;
@@ -33,7 +32,7 @@ use Diversworld\ContaoDiveclubBundle\Model\DcCalendarEventsModel;
 $GLOBALS['BE_MOD']['diveclub'] = [
 
         'dc_equipment_collection' => [
-            'tables' => ['tl_dc_equipment_types', 'tl_dc_equipment_subtypes'],
+            'tables' => ['tl_dc_equipment'],
         ],
         'dc_regulators_collection' => [
             'tables' => ['tl_dc_regulators','tl_dc_regulator_control'],
@@ -53,6 +52,9 @@ $GLOBALS['BE_MOD']['diveclub'] = [
         'dc_config_collection' => [
             'tables' => ['tl_dc_config'],
         ],
+        'dc_old_equipment_collection' => [
+            'tables' => ['tl_dc_equipment_types', 'tl_dc_equipment_subtypes'],
+        ],
 ];
 
 /**
@@ -63,8 +65,7 @@ $GLOBALS['TL_MODELS']['tl_dc_tanks']                = DcTanksModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_check_invoice']        = DcCheckInvoiceModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_check_proposal']       = DcCheckProposalModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_check_articles']       = DcCheckArticlesModel::class;
-$GLOBALS['TL_MODELS']['tl_dc_equipment_types']      = DcEquipmentSubTypeModel::class;
-$GLOBALS['TL_MODELS']['tl_dc_equipment_subtypes']   = DcEquipmentTypeModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_equipment']            = DcEquipmentModel::class;
 $GLOBALS['TL_MODELS']['tl_calendar_events']         = DcCalendarEventsModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_regulators']           = DcRegulatorsModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_regulator_control']    = DcRegulatorControlModel::class;

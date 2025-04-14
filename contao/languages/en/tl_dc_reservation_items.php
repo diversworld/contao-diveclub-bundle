@@ -15,25 +15,25 @@ declare(strict_types=1);
 /**
  * Legends
  */
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['title_legend']        = "Basic Information";
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['details_legend']      = "Details about the diving equipment";
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['reservation_legend']  = "Reservation";
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['notes_legend']        = "Notes";
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['publish_legend']      = "Publish";
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['title_legend']          = "Basic Information";
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['details_legend']        = "Details about the diving equipment";
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['reservation_legend']    = "Reservation";
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['notes_legend']          = "Notes";
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['publish_legend']        = "Publish";
 
 /**
  * Global operations
  */
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['new']         = ["New", "Create a new item"];
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['new']                   = ["New", "Create a new item"];
 
 /**
  * Operations
  */
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['edit']        = "Edit record with ID: %s";
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['copy']        = "Copy record with ID: %s";
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['delete']      = "Delete record with ID: %s";
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['show']        = "View record with ID: %s";
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['toggle']      = "Publish record with ID: %s";
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['edit']                  = "Edit record with ID: %s";
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['copy']                  = "Copy record with ID: %s";
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['delete']                = "Delete record with ID: %s";
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['show']                  = "View record with ID: %s";
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['toggle']                = "Publish record with ID: %s";
 
 /**
  * Fields
@@ -73,17 +73,17 @@ $GLOBALS['TL_LANG']['XPL']['selected_asset'] = [
  * References
  */
 $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes']             = [
-    'tl_dc_tanks'               => 'Diving equipment',
-    'tl_dc_regulators'          => 'Breathing regulators',
-    'tl_dc_equipment_types'     => 'Equipment',
+    'tl_dc_tanks'       => 'Diving equipment',
+    'tl_dc_regulators'  => 'Breathing regulators',
+    'tl_dc_equipment'   => 'Equipment',
 ];
 
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'] = [
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus']            = [
     'available' => 'available',
     'reserved'  => 'reserved',
     'borrowed'  => 'borrowed',
     'returned'  => 'returned',
-    'cancelled'  => 'canceled',
+    'cancelled' => 'canceled',
     'overdue'   => 'overdue',
     'lost'      => 'lost',
     'damaged'   => 'damaged',
@@ -93,4 +93,4 @@ $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'] = [
 /**
  * Buttons
  */
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['createInvoiceButton'] = "Create an invoice";
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['createInvoiceButton']   = "Create an invoice";

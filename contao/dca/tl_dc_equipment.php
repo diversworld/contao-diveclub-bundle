@@ -19,17 +19,19 @@ use Contao\DC_Table;
 use Contao\FilesModel;
 use Contao\StringUtil;
 use Contao\System;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentHeaderCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentLabelCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentManufacturerOptionsCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentSizeOptionsCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentSubTypeOptionsCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentTypeOptionsCallback;
 use Psr\Log\LoggerInterface;
-use Contao\TemplateLoader;
 
 /**
  * Table tl_dc_tanks
  */
-$GLOBALS['TL_DCA']['tl_dc_equipment_subtypes'] = [
+$GLOBALS['TL_DCA']['tl_dc_equipment'] = [
     'config'        => [
         'dataContainer'     => DC_Table::class,
-        'ptable'            => 'tl_dc_equipment_types',
         'enableVersioning'  => true,
         'sql'               => [
             'keys'          => [
@@ -43,18 +45,16 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_subtypes'] = [
     ],
     'list'          => [
         'sorting'           => [
-            'mode'              => DataContainer::MODE_PARENT,
+            'mode'              => DataContainer::MODE_SORTABLE,
             'fields'            => ['title','alias','published'],
-            'headerFields'      => ['title', 'subType'],
-            'header_callback'   => [EquipmentHeaderCallback::class, '__invoke'],
             'flag'              => DataContainer::SORT_INITIAL_LETTER_ASC,
             'panelLayout'       => 'filter;sort,search,limit'
         ],
         'label'             => [
-            'fields'            => ['title','manufacturer','model','size','status'],
-            'label_callback' 	=> ['tl_dc_equipment_subtypes', 'formatLabel'],
+            'fields'            => ['type','subType','title','manufacturer','model','size','rentalFee','status'],
+            'label_callback' 	=> [EquipmentLabelCallback::class, '__invoke'],
             'showColumns'       => true,
-            'format'            => '%s %s %s %s %s',
+            'format'            => '%s',
         ],
         'global_operations' => [
             'all'               => [
@@ -73,7 +73,8 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_subtypes'] = [
     ],
     'palettes'          => [
         '__selector__'      => ['addNotes'],
-        'default'           => '{title_legend},title,alias,status;
+        'default'           => '{title_legend},type,subType,title,alias;
+                                {status_legend},status,rentalFee;
                                 {details_legend},manufacturer,model,color,size,serialNumber,buyDate;
                                 {notes_legend},addNotes;
                                 {publish_legend},published,start,stop;'
@@ -85,23 +86,18 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_subtypes'] = [
         'id'                => [
             'sql'               => "int(10) unsigned NOT NULL auto_increment"
         ],
-        'pid'               => [
-            'foreignKey'        => 'tl_dc_equipment_types.title',
-            'sql'               => "int(10) unsigned NOT NULL default 0",
-            'relation'          => ['type' => 'belongsTo', 'load' => 'lazy'], // Typ anpassen, falls notwendig
-        ],
         'tstamp'            => [
             'sql'               => "int(10) unsigned NOT NULL default 0"
         ],
         'title'             => [
             'inputType'         => 'text',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_subtypes']['title'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['title'],
             'exclude'           => true,
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
             'flag'              => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'eval'              => ['mandatory' => true, 'maxlength'=>255, 'tl_class' => 'w33'],
+            'eval'              => ['mandatory' => true, 'maxlength'=>255, 'tl_class' => 'w25'],
             'sql'               => "varchar(255) NOT NULL default ''"
         ],
         'alias'             => [
@@ -109,23 +105,53 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_subtypes'] = [
             'inputType'         => 'text',
             'eval'              => ['rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w33'],
             'save_callback' => [
-                ['tl_dc_equipment_subtypes', 'generateAlias']
+                ['tl_dc_equipment', 'generateAlias']
             ],
             'sql'           => "varchar(255) BINARY NOT NULL default ''"
         ],
+        'type'             => [
+            'inputType'         => 'select',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['type'],
+            'exclude'           => true,
+            'search'            => true,
+            'filter'            => true,
+            'sorting'           => true,
+            'options_callback'  => [EquipmentTypeOptionsCallback::class, '__invoke'],
+            'flag'              => DataContainer::SORT_INITIAL_LETTERS_ASC,
+            'eval'              => array('includeBlankOption' => true, 'submitOnChange' => true, 'mandatory' => true, 'tl_class' => 'w25 clr'),
+            'sql'               => "int(10) unsigned NOT NULL default 0",
+        ],
+        'subType' => [
+            'inputType'         => 'select',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['subType'],
+            'exclude'           => true,
+            'options_callback'  => [EquipmentSubTypeOptionsCallback::class, '__invoke'],
+            'eval'              => ['includeBlankOption' => true,'mandatory' => true,'tl_class' => 'w25',],
+            'sql'               => "int(10) unsigned NOT NULL default 0",
+        ],
+        'rentalFee'             => [
+            'inputType'         => 'text',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['rentalFee'],
+            'exclude'           => true,
+            'search'            => false,
+            'filter'            => true,
+            'sorting'           => false,
+            'eval'              => ['rgxp'=>'digit', 'mandatory'=>false, 'tl_class' => 'w25'],
+            'sql'               => "DECIMAL(10,2) NOT NULL default '0.00'"
+        ],
         'manufacturer'      => [
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_subtypes']['manufacturer'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['manufacturer'],
             'inputType'         => 'select',
             'exclude'           => true,
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
-            'options_callback'  => ['tl_dc_equipment_subtypes', 'getManufacturers'],
+            'options_callback'  => [EquipmentManufacturerOptionsCallback::class, '__invoke'],
             'eval'              => ['mandatory' => true, 'tl_class' => 'w25 clr'],
             'sql'               => "int(10) unsigned NOT NULL default 0",
         ],
         'model'             => [
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_subtypes']['model'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['model'],
             'inputType'         => 'text',
             'exclude'           => true,
             'search'            => true,
@@ -135,7 +161,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_subtypes'] = [
             'sql'               => "varchar(255) NOT NULL default ''",
         ],
         'color'             => [
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_subtypes']['color'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['color'],
             'inputType'         => 'text',
             'exclude'           => true,
             'search'            => true,
@@ -145,60 +171,60 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_subtypes'] = [
             'sql'               => "varchar(255) NOT NULL default ''",
         ],
         'size'              => [
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_subtypes']['size'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['size'],
             'inputType'         => 'select',
             'exclude'           => true,
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
-            'options_callback'  => ['tl_dc_equipment_subtypes', 'getSizes'],
+            'options_callback'  => [EquipmentSizeOptionsCallback::class, '__invoke'],
             'eval'              => ['mandatory' => false, 'tl_class' => 'w25'],
             'sql'               => "int(10) unsigned NOT NULL default 0",
         ],
         'serialNumber'      => [
             'inputType'         => 'text',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_subtypes']['serialNumber'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['serialNumber'],
             'exclude'           => true,
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
             'flag'              => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'eval'              => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25 clr'],
+            'eval'              => ['mandatory' => false, 'maxlength' => 50, 'tl_class' => 'w25 clr'],
             'sql'               => "varchar(50) NOT NULL default ''"
         ],
         'buyDate'           => [
             'inputType'         => 'text',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_subtypes']['buyDate'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['buyDate'],
             'exclude'           => true,
             'search'            => true,
             'sorting'           => true,
             'filter'            => true,
             'flag'              => DataContainer::SORT_YEAR_DESC,
-            'eval'              => ['submitOnChange' => true,'rgxp'=>'date', 'doNotCopy'=>false, 'datepicker'=>true, 'tl_class'=>'w25 wizard'],
+            'eval'              => ['rgxp'=>'date', 'doNotCopy'=>false, 'datepicker'=>true, 'tl_class'=>'w25 wizard'],
             'sql'               => "bigint(20) NULL"
         ],
         'status'        => [
             'inputType'         => 'select',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_subtypes']['status'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['status'],
             'exclude'           => true,
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
-            'options'           => &$GLOBALS['TL_LANG']['tl_dc_equipment_subtypes']['itemStatus'],
-            'reference'         => &$GLOBALS['TL_LANG']['tl_dc_equipment_subtypes']['itemStatus'],
-            'eval'              => ['includeBlankOption' => true, 'submitOnChange' => true, 'chosen'   => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
+            'options'           => &$GLOBALS['TL_LANG']['tl_dc_equipment']['itemStatus'],
+            'reference'         => &$GLOBALS['TL_LANG']['tl_dc_equipment']['itemStatus'],
+            'eval'              => ['includeBlankOption' => true, 'chosen' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql'               => "varchar(255) NOT NULL default ''"
         ],
         'addNotes'          => [
             'inputType'         => 'checkbox',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_subtypes']['addNotes'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['addNotes'],
             'exclude'           => true,
-            'eval'              => ['submitOnChange' => true, 'tl_class' => 'w50'],
+            'eval'              => ['submitOnChange' => false, 'tl_class' => 'w50'],
             'sql'               => ['type' => 'boolean', 'default' => false]
         ],
         'notes'             => [
             'inputType'         => 'textarea',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_subtypes']['notes'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['notes'],
             'exclude'           => true,
             'search'            => false,
             'filter'            => false,
@@ -208,7 +234,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_subtypes'] = [
         ],
         'published'         => [
             'inputType'         => 'checkbox',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_subtypes']['published'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['published'],
             'toggle'            => true,
             'filter'            => true,
             'flag'              => DataContainer::SORT_INITIAL_LETTER_DESC,
@@ -217,20 +243,20 @@ $GLOBALS['TL_DCA']['tl_dc_equipment_subtypes'] = [
         ],
         'start'             => [
             'inputType'         => 'text',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_subtypes']['start'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['start'],
             'eval'              => ['rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 clr wizard'],
             'sql'               => "varchar(10) NOT NULL default ''"
         ],
         'stop'              => [
             'inputType'         => 'text',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment_subtypes']['stop'],
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_equipment']['stop'],
             'eval'              => ['rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 wizard'],
             'sql'               => "varchar(10) NOT NULL default ''"
         ]
     ]
 ];
 
-class tl_dc_equipment_subtypes extends Backend
+class tl_dc_equipment extends Backend
 {
     public LoggerInterface $logger;
     /**
@@ -247,7 +273,7 @@ class tl_dc_equipment_subtypes extends Backend
     {
         $aliasExists = static function (string $alias) use ($dc): bool {
             $result = Database::getInstance()
-                ->prepare("SELECT id FROM tl_dc_equipment_subtypes WHERE alias=? AND id!=?")
+                ->prepare("SELECT id FROM tl_dc_equipment WHERE alias=? AND id!=?")
                 ->execute($alias, $dc->id);
             return $result->numRows > 0;
         };
@@ -266,93 +292,5 @@ class tl_dc_equipment_subtypes extends Backend
         }
 
         return $varValue;
-    }
-
-    function getManufacturers()
-    {
-        return $this->getTemplateOptions('manufacturersFile');
-    }
-
-    public function getSizes()
-    {
-        return $this->getTemplateOptions('sizesFile');
-    }
-
-    private function getTemplateOptions($templateName): array
-    {
-        /// Templatepfad über Contao ermitteln
-        $templatePath = $this->getTemplateFromConfig($templateName);
-
-        // Überprüfen, ob die Datei existiert
-        if (!$templatePath || !file_exists($templatePath)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['templateNotFound'], $templatePath));
-        }
-
-        // Dateiinhalt lesen
-        $options = include $templatePath;
-
-        if (!is_array($options)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['templateContent'], $options));
-        }
-
-        return $options;
-    }
-
-    function getTemplateFromConfig($templateName): string
-    {
-        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
-        $configArray = [];
-
-        // Lade die erforderlichen Felder aus der Tabelle tl_dc_config
-        $result = Database::getInstance()->execute("
-            SELECT manufacturersFile, typesFile, subTypesFile, regulatorsFile, sizesFile
-            FROM tl_dc_config
-            LIMIT 1"
-        );
-
-        if ($result->numRows > 0) {
-            // Für jedes Feld die UUID verarbeiten
-            $files = [
-                'manufacturersFile' => $result->manufacturersFile,
-                'typesFile' => $result->typesFile,
-                'subTypesFile' => $result->subTypesFile,
-                'regulatorsFile' => $result->regulatorsFile,
-                'sizesFile'     => $result->sizesFile,
-            ];
-
-            // UUIDs in Pfade umwandeln
-            foreach ($files as $key => $uuid) {
-                if (!empty($uuid)) {
-                    $convertedUuid = StringUtil::binToUuid($uuid);
-                    $fileModel = FilesModel::findByUuid($convertedUuid);
-
-                    if ($fileModel !== null && file_exists($rootDir . '/' . $fileModel->path)) {
-                        $configArray[$key] = $rootDir . '/' . $fileModel->path;
-                    } else {
-                        $configArray[$key] = null; // Datei nicht gefunden oder ungültige UUID
-                    }
-                } else {
-                    $configArray[$key] = null; // Leerer Wert in der DB
-                }
-            }
-        } else {
-            throw new \RuntimeException('Keine Einträge in der Tabelle tl_dc_config gefunden.');
-        }
-
-        return $configArray[$templateName];
-    }
-
-    public function formatLabel(array $row, string $label, DataContainer $dc): string
-    {
-        // Hersteller-Name abrufen
-        $manufacturers = $this->getManufacturers();
-        $manufacturerName = $manufacturers[$row['manufacturer']] ?? 'Unbekannt';
-
-        // Größen-Name abrufen
-        $sizes = $this->getSizes();
-        $sizeName = $sizes[$row['size']] ?? 'Unbekannt';
-
-        // Neues Label-Format mit Text-Werten
-        return sprintf('%s %s %s - %s - %s', $manufacturerName, $row['model'], $sizeName, $row['title'], $GLOBALS['TL_LANG']['tl_dc_equipment_subtypes']['itemStatus'][$row['status']]);
     }
 }

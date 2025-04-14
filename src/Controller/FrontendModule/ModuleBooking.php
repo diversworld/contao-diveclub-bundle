@@ -17,6 +17,7 @@ use Contao\Config;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Routing\PageFinder;
 use Contao\Email;
 use Contao\FormCheckbox;
 use Contao\Template;
@@ -25,13 +26,14 @@ use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\System;
 use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
-use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentSubTypeModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcReservationItemsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcReservationModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcTanksModel;
 use Diversworld\ContaoDiveclubBundle\Session\Attribute\ArrayAttributeBag;
 use Doctrine\DBAL\Connection;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -47,13 +49,15 @@ class ModuleBooking extends AbstractFrontendModuleController
     private ContaoFramework $framework;
     private RequestStack $requestStack;
     private Connection $db;
+    private PageFinder $pageFinder;
 
-    public function __construct(DcaTemplateHelper $helper, Connection $db, RequestStack $requestStack, ContaoFramework $framework)
+    public function __construct(DcaTemplateHelper $helper, Connection $db, RequestStack $requestStack, ContaoFramework $framework, PageFinder $pageFinder)
     {
         $this->helper = $helper;
         $this->db = $db;
         $this->framework = $framework;
         $this->requestStack = $requestStack;
+        $this->pageFinder = $pageFinder;
     }
 
     /**
@@ -85,7 +89,7 @@ class ModuleBooking extends AbstractFrontendModuleController
             $availableAssets = $this->combineAssetsWithSession($category, $availableAssets);
 
             // Zugehörige Assets finden und gruppieren
-            if ($category === 'tl_dc_equipment_types') {
+            if ($category === 'tl_dc_equipment') {
                 $availableAssets = $this->updateAssets($category); // Assets für die Kategorie abrufen
                 $groupedAssets = $this->groupAssetsByType($availableAssets); // Assets nach Typ gruppieren
                 $template->groupedAssets = $groupedAssets; // Gruppierte Assets ans Template übergeben
@@ -96,7 +100,11 @@ class ModuleBooking extends AbstractFrontendModuleController
 
         // Verarbeitung von POST-Daten
         if ($request->isMethod('POST')) {
-            $this->handlePostRequest($request, $template, $sessionData, $category);
+            $response = $this->handlePostRequest($request, $template, $sessionData);
+            if ($response instanceof Response) {
+                // Wenn handlePostRequest eine RedirectResponse oder ähnliches zurückgibt, wird dies ausgeführt
+                return $response;
+            }
         }
 
         // Kategorienauswahl und weiterleiten
@@ -115,31 +123,49 @@ class ModuleBooking extends AbstractFrontendModuleController
     /**
      * POST-Anfrage verarbeiten.
      */
-    private function handlePostRequest(Request $request, Template $template, array $sessionData, ?string $category): void
+    private function handlePostRequest(Request $request, Template $template, array $sessionData): RedirectResponse
     {
-        $formType = $request->request->get('FORM_SUBMIT');
-        $action = $request->request->get('action');
+        //$formType = $request->request->get('FORM_SUBMIT');
+        if ($request->isMethod('POST')) {
+            // Der Wert des gedrückten Buttons
+            $action = $request->request->get('action', '');
+            $seite = $request->getUri();
+            $urlParts = parse_url($seite);
 
-        // Abbrechen und Session zurücksetzen
-        if ('cancel' === $action) {
-            $this->resetSession();
-            Message::addConfirmation('Die Reservierung wurde abgebrochen und die Session-Daten wurden gelöscht.');
-            $this->redirect($request->getUri());
-        }
+            switch ($action) {
+                case 'save':
+                    // Logik für "Speichern"
+                    $this->saveReservationsToDatabase();
+                    $this->sendReservationNotification($sessionData);
+                    Message::addConfirmation('Die Reservierung gespeichert und die Session-Daten wurden gelöscht.');
+                    $this->resetSession();
 
-        // Session-Daten speichern
-        if ('reservationItems_submit' === $formType) {
-            $this->saveSessionData($request->request->all(), $template);
-        }
+                    // Seite neu laden, ohne Query-Parameter
+                    $cleanUrl = $urlParts['scheme'] . '://' . $urlParts['host'] . $urlParts['path'];
 
-        // Reservierungen in der Datenbank speichern
-        if ('reservationSubmit' === $formType) {
-            $this->saveReservationsToDatabase($sessionData);
-            Message::addConfirmation('Die Reservierung gespeichert und die Session-Daten wurden gelöscht.');
-            $this->resetSession();
+                    return new RedirectResponse($cleanUrl);
+
+                case 'cancel':
+                    // Abbrechen und Session zurücksetzen
+                    $this->resetSession();
+                    Message::addConfirmation('Die Reservierung wurde abgebrochen und die Session-Daten wurden gelöscht.');
+
+                    $cleanUrl = $urlParts['scheme'] . '://' . $urlParts['host'] . $urlParts['path'];
+
+                    return new RedirectResponse($cleanUrl); // Rückgabe des RedirectResponse-Objekts
+
+                case 'reserve':
+                    $this->saveSessionData($request->request->all(), $template);
+                    Message::addConfirmation('Ausrüstung vorgemerkt.');
+                    return new RedirectResponse($seite);  // Zurück zum Template
+            }
         }
 
         $template->messages = Message::generate();
+
+        // Default-Fall, falls keine gültige Aktion erkannt wurde
+        return new RedirectResponse($seite);
+
     }
 
     /**
@@ -160,12 +186,11 @@ class ModuleBooking extends AbstractFrontendModuleController
     /**
      * Speichert Reservierungen in die Datenbank.
      */
-    private function saveReservationsToDatabase(array $sessionData): void
+    private function saveReservationsToDatabase(): void
     {
         try {
             $saveMessage = $this->saveDataToDb();
             Message::addConfirmation(htmlspecialchars($saveMessage));
-            $this->sendReservationNotification($sessionData);
         } catch (\Exception $e) {
             Message::addError('Fehler beim Speichern der Reservierungen in der Datenbank.');
             System::getContainer()->get('monolog.logger.contao.general')->error($e->getMessage());
@@ -183,43 +208,17 @@ class ModuleBooking extends AbstractFrontendModuleController
         $totalPrice = $this->calculateTotalPrice($sessionData);
 
         // Details aus den Session-Daten extrahieren
-        $reservationId = $sessionData[0]['reservationId'] ?? 0; // Beispiel-ID
         $reservationNumber = $this->generateReservationTitle((int) $sessionData[0]['userId'] ?? 0);
         $memberName = $this->getCurrentUser()['userFullName'] ?? 'Unbekannt';
 
         // Reservierte Items aus Session-Daten
-        $reservedItems = [];
-/*        foreach ($sessionData as $entry) {
-            if (!empty($entry['selectedAssets'])) {
-                foreach ($entry['selectedAssets'] as $assetId) {
-                    $itemDetails = $this->getAssetDetails($entry['category'], (int) $assetId);
-                    if ($itemDetails) {
-                        $reservedItems[] = $itemDetails;
-                    }
-                }
-            }
-        }*/
-
-        foreach ($sessionData as $entry) {
-            $category = $entry['category'] ?? null;
-            $selectedAssets = $entry['selectedAssets'] ?? [];
-            if (!$category || empty($selectedAssets)) {
-                continue;
-            }
-            foreach ($selectedAssets as $assetId) {
-                $assetDetails = $this->getAssetDetails($category, (int)$assetId);
-                if ($assetDetails) {
-                    $reservedItems[] = $assetDetails;
-                }
-            }
-        }
-
+        $reservedItems = $this->loadStoredAssets($sessionData);
         if (empty($reservedItems)) {
             throw new \RuntimeException('Es wurden keine Assets für die Benachrichtigung reserviert.');
         }
 
         // E-Mail senden
-        $this->sendReservationEmail($reservationId, $reservationNumber, $memberName, $reservedItems, $totalPrice);
+        $this->sendReservationEmail($reservationNumber, $memberName, $reservedItems, $totalPrice);
     }
 
     /**
@@ -334,9 +333,10 @@ class ModuleBooking extends AbstractFrontendModuleController
     private function groupAssetsByType(array $assets): array
     {
         $groupedAssets = [];
+        $types = $this->helper->getEquipmentTypes();
 
         foreach ($assets as $asset) {
-            $type = $asset['type'] ?? 'Unbekannter Typ';
+            $type = $types[$asset['type']] ?? $asset['type'];
             $groupedAssets[$type][] = $asset;
         }
 
@@ -351,7 +351,7 @@ class ModuleBooking extends AbstractFrontendModuleController
         return [
             'tl_dc_tanks' => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes']['tl_dc_tanks'],
             'tl_dc_regulators' => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes']['tl_dc_regulators'],
-            'tl_dc_equipment_types' => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes']['tl_dc_equipment_types'],
+            'tl_dc_equipment' => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes']['tl_dc_equipment'],
         ];
     }
 
@@ -515,16 +515,6 @@ class ModuleBooking extends AbstractFrontendModuleController
                     $reservationItem->reservation_status = 'reserved';
                     $reservationItem->published = 1;
 
-                    if ('tl_dc_equipment_types' === $category) {
-                        $query = $this->db->prepare('SELECT title, subType FROM tl_dc_equipment_types WHERE id = ?');
-                        $result = DcEquipmentSubTypeModel::findById($pid);//$query->executeQuery([$pid])->fetchAssociative();
-
-                        if ($result) {
-                            $reservationItem->types = $result['title'];
-                            $reservationItem->sub_type = $result['subType'];
-                        }
-                    }
-
                     $reservationItem->save();
                 }
 
@@ -544,7 +534,7 @@ class ModuleBooking extends AbstractFrontendModuleController
      * @return void
      * @throws \Doctrine\DBAL\Exception
      */
-    function sendReservationEmail(int $reservationId, string $reservationNumber, string $memberName, array $reservedItems, float $totalFee): void
+    function sendReservationEmail(string $reservationNumber, string $memberName, array $reservedItems, float $totalFee): void
     {
         $configAdapter = $this->framework->getAdapter(Config::class);
 
@@ -600,8 +590,8 @@ class ModuleBooking extends AbstractFrontendModuleController
                     case 'tl_dc_regulators':
                         $this->db->update('tl_dc_regulators', ['status' => 'reserved'], ['id' => $assetId]);
                         break;
-                    case 'tl_dc_equipment_types':
-                        $this->db->update('tl_dc_equipment_subtypes', ['status' => 'reserved'], ['id' => $assetId]);
+                    case 'tl_dc_equipment':
+                        $this->db->update('tl_dc_equipment', ['status' => 'reserved'], ['id' => $assetId]);
                         break;
                     default:
                         throw new \RuntimeException('Ungültige Kategorie beim Aktualisieren des Asset-Status.');
@@ -623,7 +613,7 @@ class ModuleBooking extends AbstractFrontendModuleController
         // Datum global abrufen
         $dateFormat = Config::get('dateFormat');
 
-        // Fetch the pid-to-title mapping from the `tl_dc_equipment_types` table directly
+        // Fetch the pid-to-title mapping from the `tl_dc_equipment` table directly
         $equipmentTypesMapping = $this->getEquipmentTypeTitles(); // Custom method, explained below
         $updatedAssets = [];
         $assets = $this->getAvailableAssets($category);
@@ -675,14 +665,14 @@ class ModuleBooking extends AbstractFrontendModuleController
                 }
                 break;
 
-            case 'tl_dc_equipment_types':
+            case 'tl_dc_equipment':
                 // Verarbeitung für Equipment Types
                 foreach ($assets as $asset) {
                     $updatedAssets[] = [
                         'id'            => $asset['id'],
                         'pid'           => $asset['pid'],
-                        'typeId'        => $equipmentTypesMapping[$asset['pid']] ?? 'N/A', // Hier wird die Type-ID hinzugefügt
-                        'type'          => $equipmentTypes[$equipmentTypesMapping[$asset['pid']]] ?? $asset['pid'],
+                        'typeId'        => $equipmentTypesMapping[$asset['type']] ?? 'N/A', // Hier wird die Type-ID hinzugefügt
+                        'type'          => $equipmentTypes[$equipmentTypesMapping[$asset['type']]] ?? $asset['type'],
                         'category'      => $category,
                         'title'         => $asset['title'] ?? 'N/A', // Mapping für Titel
                         'manufacturer'  => $manufacturers[$asset['manufacturer']] ?? $asset['manufacturer'],
@@ -715,13 +705,13 @@ class ModuleBooking extends AbstractFrontendModuleController
     }
 
     /**
-     * Get the mapping of `pid` to `title` in the `tl_dc_equipment_types` table.
+     * Get the mapping of `pid` to `title` in the `tl_dc_equipment` table.
      */
     private function getEquipmentTypeTitles(): array
     {
         // Fetch the `pid` and `title` from the equipment types table
         $results = $this->db->fetchAllAssociative(
-            'SELECT id AS pid, title FROM tl_dc_equipment_types'
+            'SELECT id AS pid, title FROM tl_dc_equipment'
         );
 
         // Transform the results into a pid-to-title mapping
@@ -735,7 +725,7 @@ class ModuleBooking extends AbstractFrontendModuleController
 
     private function getAvailableAssets(string $category): array
     {
-        $allowedCategories = ['tl_dc_tanks', 'tl_dc_regulators', 'tl_dc_equipment_types'];
+        $allowedCategories = ['tl_dc_tanks', 'tl_dc_regulators', 'tl_dc_equipment'];
         if (!in_array($category, $allowedCategories, true)) {
             throw new \InvalidArgumentException('Ungültige Kategorie: ' . htmlspecialchars($category));
         }
@@ -748,8 +738,9 @@ class ModuleBooking extends AbstractFrontendModuleController
             case 'tl_dc_regulators':
                 $result = DcRegulatorsModel::findAvailable();
                 return $result ? $result->fetchAll() : [];
-            case 'tl_dc_equipment_types':
-                return DcEquipmentSubTypeModel::findAvailableWithJoin() ?? [];
+            case 'tl_dc_equipment':
+                $result = DcEquipmentModel::findAvailable() ?? [];
+                return $result ? $result->fetchAll() : [];
             default:
                 return [];
         }
@@ -797,10 +788,9 @@ class ModuleBooking extends AbstractFrontendModuleController
                     (float)$asset->rentalFee
                 );
 
-            case 'tl_dc_equipment_types':
+            case 'tl_dc_equipment':
                 // Prüfung, ob das Objekt bereits existiert
-                $asset = array_filter(DcEquipmentSubTypeModel::findAvailableWithJoin(), static fn($item) => (int)$item['id'] === $assetId);
-                $asset = reset($asset);
+                $asset = DcEquipmentModel::findByPk($assetId);
 
                 if (!$asset) {
                     return null;
@@ -808,15 +798,15 @@ class ModuleBooking extends AbstractFrontendModuleController
 
                 $helper = new DcaTemplateHelper();
                 $sizeMapping = $helper->getSizes();
-                $sizeText = $sizeMapping[$asset['size']] ?? 'Unbekannte Größe';
+                $sizeText = $sizeMapping[$asset->size] ?? 'Unbekannte Größe';
 
                 return sprintf(
                     'Ausrüstung: %s (Modell: %s, Größe: %s, Farbe: %s), %.2f €',
-                    $asset['title'] ?? 'Unbekannt',
-                    $asset['model'] ?? 'Kein Modell angegeben',
+                    $asset->title ?? 'Unbekannt',
+                    $asset->model ?? 'Kein Modell angegeben',
                     $sizeText,
-                    $asset['color'] ?? 'Keine Farbe angegeben',
-                    (float)$asset['rentalFee']
+                    $asset->color ?? 'Keine Farbe angegeben',
+                    (float)$asset->rentalFee
                 );
 
             default:

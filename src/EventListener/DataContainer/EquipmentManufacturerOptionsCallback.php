@@ -7,10 +7,8 @@ namespace Diversworld\ContaoDiveclubBundle\EventListener\DataContainer;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\DataContainer;
 use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
-use Diversworld\ContaoDiveclubBundle\Service\TemplateService;
 
-
-#[AsCallback(table: 'tl_dc_equipment_types', target: 'fields.manufacturer.options')]
+#[AsCallback(table: 'tl_dc_equipment', target: 'fields.manufacturer.options')]
 class EquipmentManufacturerOptionsCallback
 {
     private DcaTemplateHelper $templateHelper;

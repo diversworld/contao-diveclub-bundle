@@ -23,23 +23,13 @@ class DcaTemplateHelper
     {
         return $this->getTemplateOptions('typesFile');
     }
-    public function getSubTypes(?int $type = null, ?DataContainer $dc = null): array
+    public function getSubTypes( int $typeId): array
     {
-        // Typ entweder aus Parameter ($type) oder DataContainer ($dc) ermitteln
-        if (!$type && $dc && $dc->activeRecord->title) {
-            $type = $dc->activeRecord->types; // Typ aus DataContainer
-        }
-
-        // Wenn kein Typ verfügbar ist, leere Rückgabe
-        if (!$type) {
-            return [];
-        }
-
         // Optionen laden
         $types = $this->getTemplateOptions('subTypesFile');
 
         // Rückgabe der Subtypen für den ermittelten Typ
-        return $types[$type] ?? [];
+        return $types[$typeId] ?? [];
     }
 
     public function getRegModels1st(?int $manufacturer = null, ?DataContainer $dc = null): array

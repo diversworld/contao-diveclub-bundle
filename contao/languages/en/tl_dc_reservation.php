@@ -66,8 +66,7 @@ $GLOBALS['TL_LANG']['tl_dc_reservation']['returned_at']         = ['Returned on'
  */
 $GLOBALS['TL_LANG']['tl_dc_reservation']['tl_dc_tanks']             = 'Diving equipment';
 $GLOBALS['TL_LANG']['tl_dc_reservation']['tl_dc_regulators']        = 'Regulators';
-$GLOBALS['TL_LANG']['tl_dc_reservation']['tl_dc_equipment_types']   = 'Equipment';
-$GLOBALS['TL_LANG']['tl_dc_reservation']['tl_dc_equipment_subtypes']= 'Equipment type';
+$GLOBALS['TL_LANG']['tl_dc_reservation']['tl_dc_equipment']   = 'Equipment';
 
 $GLOBALS['TL_LANG']['tl_dc_reservation']['itemStatus'] = [
     'avaílable' => 'available',

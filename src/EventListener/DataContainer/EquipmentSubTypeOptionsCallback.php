@@ -7,10 +7,9 @@ namespace Diversworld\ContaoDiveclubBundle\EventListener\DataContainer;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\DataContainer;
 use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
-use Diversworld\ContaoDiveclubBundle\Service\TemplateService;
 
-#[AsCallback(table: 'tl_dc_equipment_type', target: 'fields.subType.options')]
-class EquipmentTypeSubTypeOptionsCallback
+#[AsCallback(table: 'tl_dc_equipment', target: 'fields.subType.options')]
+class EquipmentSubTypeOptionsCallback
 {
     private DcaTemplateHelper $templateHelper;
 
@@ -21,6 +20,10 @@ class EquipmentTypeSubTypeOptionsCallback
 
     public function __invoke(DataContainer $dc = null): array
     {
-        return $this->templateHelper->getSubTypes($dc);
+        if (!$dc->activeRecord || !$dc->activeRecord->title) {
+            return [];
+        }
+
+        return $this->templateHelper->getSubTypes((int) $dc->activeRecord->type);
     }
 }

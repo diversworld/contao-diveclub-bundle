@@ -66,8 +66,7 @@ $GLOBALS['TL_LANG']['tl_dc_reservation']['returned_at']         = ['Zurückgegeb
  */
 $GLOBALS['TL_LANG']['tl_dc_reservation']['tl_dc_tanks']             = 'Tauchgeräte';
 $GLOBALS['TL_LANG']['tl_dc_reservation']['tl_dc_regulators']        = 'Atemregler';
-$GLOBALS['TL_LANG']['tl_dc_reservation']['tl_dc_equipment_types']   = 'Ausrüstung';
-$GLOBALS['TL_LANG']['tl_dc_reservation']['tl_dc_equipment_subtypes']= 'Ausrüstungsart';
+$GLOBALS['TL_LANG']['tl_dc_reservation']['tl_dc_equipment']         = 'Ausrüstung';
 
 $GLOBALS['TL_LANG']['tl_dc_reservation']['itemStatus'] = [
     'avaílable' => 'verfügbar',

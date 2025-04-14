@@ -74,9 +74,9 @@ $GLOBALS['TL_LANG']['XPL']['selected_asset'] = [
  * References
  */
 $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes']             = [
-        'tl_dc_tanks'               => 'Tauchgeräte',
-        'tl_dc_regulators'          => 'Atemregler',
-        'tl_dc_equipment_types'     => 'Ausrüstung',
+        'tl_dc_tanks'       => 'Tauchgeräte',
+        'tl_dc_regulators'  => 'Atemregler',
+        'tl_dc_equipment'   => 'Ausrüstung',
     ];
 
 $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'] = [

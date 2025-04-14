@@ -16,8 +16,7 @@ declare(strict_types=1);
 namespace Diversworld\ContaoDiveclubBundle\DataContainer;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
-
-class DcEquipmentTypes
+class DcEquipment
 {
     private ContaoFramework $framework;
 
