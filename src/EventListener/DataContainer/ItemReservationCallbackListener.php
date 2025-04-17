@@ -30,7 +30,7 @@ class ItemReservationCallbackListener
         $pickedUpAt = $dc->activeRecord->picked_up_at;
         $returnedAt = $dc->activeRecord->returned_at;
         $reservationStatus = $dc->activeRecord->reservation_status;
-        $itemType = $dc->activeRecord->item_type;           // Z. B. `tl_dc_tanks`, `tl_dc_regulators`, `tl_dc_equipment_types`
+        $itemType = $dc->activeRecord->item_type;           // Z. B. `tl_dc_tanks`, `tl_dc_regulators`, `tl_dc_equipment`
         $assetId = (int) $dc->activeRecord->item_id;        // Das ausgewählte Asset
 
         if($dc->activeRecord->reservation_status == 'returned' || $dc->activeRecord->reservation_status == 'cancelled' ){
@@ -41,17 +41,13 @@ class ItemReservationCallbackListener
 
         if (!$itemType || !$assetId) {
             return;
-        }
-
-        if($itemType == 'tl_dc_equipment_types'){
-            $itemType = 'tl_dc_equipment_subtypes';
-        }
+		}
 
         // Prüfen, ob es sich um eine unterstützte Tabelle handelt
         $allowedTables = [
             'tl_dc_tanks',
             'tl_dc_regulators',
-            'tl_dc_equipment_subtypes',
+            'tl_dc_equipment',
         ];
 
         if (!in_array($itemType, $allowedTables, true)) {

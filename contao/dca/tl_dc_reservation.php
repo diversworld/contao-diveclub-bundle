@@ -19,6 +19,7 @@ use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
 use Diversworld\ContaoDiveclubBundle\DataContainer\DcReservation;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationMemberIdCallbackListener;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationPickedUpCallback;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationReturnedCallback;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationStatusCallback;
@@ -44,7 +45,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
     'list' => [
         'sorting' => [
             'mode' => DataContainer::MODE_SORTABLE,
-            'fields' => ['title', 'alias', 'published'],
+            'fields' => ['title','member_id','alias', 'published'],
             'flag' => DataContainer::SORT_ASC,
             'panelLayout' => 'filter;sort,search,limit'
         ],
@@ -71,7 +72,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
     ],
     'palettes'          => [
         '__selector__'      => ['addArticleInfo'],
-        'default'           => '{title_legend},title,alias;
+        'default'           => '{title_legend},title,member_id,alias;
                                 {reservation_legend},reserved_at,picked_up_at,returned_at,reservation_status,rentalFee;
                                 {notes_legend},addNotes;
                                 {publish_legend},published,start,stop;'
@@ -118,13 +119,6 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'eval'              => ['includeBlankOption' => true, 'submitOnChange' => false, 'chosen'   => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql'               => "varchar(255) NOT NULL default ''"
         ],
-        'asset_quantity'    => [
-            'inputType'         => 'text',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_reservation']['asset_quantity'],
-            'exclude'           => true,
-            'eval'              => ['rgxp' => 'digit', 'mandatory' => false, 'tl_class' => 'w25'],
-            'sql'               => "int(10) unsigned NOT NULL default 1",
-        ],
         'reserved_at'       => [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_reservation']['reserved_at'],
             'inputType'         => 'text',
@@ -134,14 +128,14 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
         'picked_up_at'      => [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_reservation']['picked_up_at'],
             'inputType'         => 'text',
-            'save_callback'     => [ReservationPickedUpCallback::class, '__invoke'],
+            'save_callback'     => [[ReservationPickedUpCallback::class, '__invoke']],
             'eval'              => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
             'sql'               => "varchar(10) NOT NULL default ''"
         ],
         'returned_at'       => [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_reservation']['returned_at'],
             'inputType'         => 'text',
-            'save_callback'     => [ReservationReturnedCallback::class, '__invoke'],
+            'save_callback'     => [[ReservationReturnedCallback::class, '__invoke']],
             'eval'              => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
             'sql'               => "varchar(10) NOT NULL default ''"
         ],
@@ -161,6 +155,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
+			'save_callback'		=> [[ReservationMemberIdCallbackListener::class, '__invoke']],
             'foreignKey'        => 'tl_member.CONCAT(firstname, " ", lastname)',
             'eval'              => array('submitOnChange' => true, 'includeBlankOption' => true, 'tl_class' => 'w25'),
             'sql'               => "varchar(255) NOT NULL default ''",
@@ -173,7 +168,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'search'            => false,
             'filter'            => true,
             'sorting'           => false,
-            'save_callback'     => [['tl_dc_reservation', 'convertPrice']],
+            //'save_callback'     => [['tl_dc_reservation', 'convertPrice']],
             'eval'              => ['rgxp'=>'digit', 'mandatory'=>false, 'tl_class' => 'w25'], // Beachten Sie "rgxp" für Währungsangaben
             'sql'               => "DECIMAL(10,2) NOT NULL default '0.00'"
         ],

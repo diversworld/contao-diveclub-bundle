@@ -14,8 +14,8 @@ use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-#[AsCallback(table: 'tl_dc_reservation', target: 'fields.title.save')]
-class ReservationTitleCallback
+#[AsCallback(table: 'tl_dc_reservation', target: 'fields.member_id.save')]
+class ReservationMemberIdCallbackListener
 {
     private Connection $db;
     private LoggerInterface $logger;
@@ -33,35 +33,39 @@ class ReservationTitleCallback
             return '-';
         }
 
-        $memberId = (int) $dc->activeRecord->member_id;
+        $memberId = (int) $value; // Letzte Eingabe der `member_id`
+        $currentMemberId = (int) $dc->activeRecord->member_id; // Aktueller in der Datenbank gespeicherter Wert
+        $existingTitle = $dc->activeRecord->title; // Aktueller Titelwert
 
         // Falls keine member_id vorhanden ist, nichts tun
         if ($memberId === 0) {
             return '-0';
         }
 
-        // Prüfen, ob der Titel bereits existiert
-        $existingTitle = $dc->activeRecord->title;
-        if (!empty($existingTitle && !empty($value) && $value === '-0')) {
+        if (!empty($existingTitle)) {
             // Wenn ein Titel existiert, diesen Wert zurückgeben
-            return $existingTitle;
+            return $value;
         }
 
         try {
             // Führende Nullen hinzufügen, um die member_id dreistellig zu machen
             $formattedMemberId = str_pad((string)$memberId, 3, '0', STR_PAD_LEFT);
-
             // Datum im Format jjjjmmtt
-            $currentDate = date('dmHi');
+            $currentDateTime = date('dmHi');
             $currentYear = date('Y');
 
             // Neues Title-Format
-            $newTitle = $currentYear . '-' . $formattedMemberId . '-' . $currentDate;
+            $newTitle = sprintf('%s-%s-%s', $currentYear, $formattedMemberId, $currentDateTime);
 
-            // Optional: alias automatisch setzen
+            // Titel dem `activeRecord` zuweisen
+            $dc->activeRecord->title = $newTitle;
+
+            // Optional: Alias generieren, falls gewünscht
             $alias = 'id-' . $newTitle;
+            $dc->activeRecord->alias = $alias;
 
-            return $newTitle; // Nur neuen Titel zurückgeben (kein Datenbank-Update hier)
+            return $value; // Nur neuen Titel zurückgeben (kein Datenbank-Update hier)
+
         } catch (Exception $e) {
             // Fehlerprotokollierung
             $this->logger->error(

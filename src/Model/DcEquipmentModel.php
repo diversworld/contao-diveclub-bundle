@@ -31,4 +31,13 @@ class DcEquipmentModel extends Model
     {
         return self::findBy('published', 1);
     }
+	
+	public static function findByTypeAndSubType($type, $subType, array $arrOptions = [])
+    {
+        $t = static::$strTable;
+        $arrColumns = ["$t.type = ? AND $t.subType = ?"];
+        $arrValues = [$type, $subType];
+
+        return static::findBy($arrColumns, $arrValues, $arrOptions);
+    }
 }

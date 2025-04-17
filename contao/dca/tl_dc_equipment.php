@@ -36,7 +36,6 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
         'sql'               => [
             'keys'          => [
                 'id'            => 'primary',
-                'pid'           => 'index',
                 'tstamp'        => 'index',
                 'alias'         => 'index',
                 'published,start,stop' => 'index'
@@ -86,6 +85,9 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
         'id'                => [
             'sql'               => "int(10) unsigned NOT NULL auto_increment"
         ],
+		'pid'               => [
+             'sql'              => "int(10) unsigned NOT NULL default 0"
+	    ],
         'tstamp'            => [
             'sql'               => "int(10) unsigned NOT NULL default 0"
         ],

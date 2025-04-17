@@ -21,8 +21,9 @@ use Diversworld\ContaoDiveclubBundle\DataContainer\DcReservation;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ItemReservationCallbackListener;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationItemsHeaderCallback;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationItemsLabelCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationItemsSubTypeOptionsCallback;
 use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
-use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentSubTypeModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcTanksModel;
 
@@ -46,16 +47,16 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
     'list'                  => [
         'sorting'               => [
             'mode'              => DataContainer::MODE_PARENT,
-            'fields'            => ['item_type', 'item_id', 'reservation_status','created_at','updated_at'],
-            'headerFields'      => ['title', 'member_id', 'reservation_status','created_at','updated_at'],
-            'header_callback'    => [ReservationItemsHeaderCallback::class, '__invoke'],
+            'fields'            => ['item_type', 'reservation_status','created_at','updated_at'],
+            'headerFields'      => ['title', 'member_id','reservation_status','created_at','updated_at'],
+            'header_callback'   => [ReservationItemsHeaderCallback::class, '__invoke'],
             'flag'              => DataContainer::SORT_ASC,
             'panelLayout'       => 'filter;sort,search,limit'
         ],
         'label'             => [
-            'fields'            => ['item_type', 'item_id', 'reservation_status','created_at','updated_at'],
+            'fields'            => ['item_type','item_id','types','subType','reservation_status','created_at','updated_at'],
             'showColumns'       => true,
-            'format'            => '%s, %s - %s - %s - %s!',
+            'format'            => '%s, %s - %s | %s - %s - %s - %s!',
             'label_callback'    => [ReservationItemsLabelCallback::class, '__invoke'],
         ],
         'global_operations' => [
@@ -82,7 +83,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
     ],
     'subpalettes'           => [
         'addNotes'              => 'notes',
-        'item_type_tl_dc_equipment_types' => 'types,sub_type', // Subpalette für "tl_dc_equipment_types"
+        'item_type_tl_dc_equipment' => 'types,sub_type', // Subpalette für "tl_dc_equipment_types"
     ],
     'fields'                => [
         'id'                    => [
@@ -105,7 +106,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
             'sorting'           => true,
             'options'           => &$GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes'],
             'reference'         => &$GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes'],
-            'eval'              => ['includeBlankOption' => true, 'submitOnChange' => true, 'chosen' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
+            'eval'              => [ 'includeBlankOption' => true, 'submitOnChange' => true, 'chosen' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql'               => "varchar(255) NOT NULL default ''"
         ],
         'types'             => [
@@ -124,7 +125,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
             'exclude'           => true,
             'filter'            => true,
             'sorting'           => true,
-            'options_callback'  => ['tl_dc_reservation_items', 'getEquipmentSubTypes'], // Callback-Funktion für dynamische Optionen
+            'options_callback'  => ['tl_dc_reservation_items', 'getEquipmentSubTypes'],//[ReservationItemsSubTypeOptionsCallback::class, '__invoke'],
             'eval'              => ['mandatory' => false, 'submitOnChange' => true,'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w25'],
             'sql'               => "varchar(255) NOT NULL default ''",
         ],
@@ -245,7 +246,8 @@ class tl_dc_reservation_items extends Backend
 {
     public function getAvailableAssets(DataContainer $dc): array
     {
-        $helper = new DcaTemplateHelper(); // Instanz der Helper-Klasse
+        // Instanz der Helper-Klasse
+		$helper = new DcaTemplateHelper();
         // Sicherstellen, dass $dc->activeRecord existiert und asset_type gesetzt ist
         if (!$dc->activeRecord || !$dc->activeRecord->item_type) {
             return [];
@@ -255,12 +257,9 @@ class tl_dc_reservation_items extends Backend
         $tableName = $dc->activeRecord->item_type;
 
         // Prüfen, ob die Tabelle existiert (Sicherheitsvorkehrung)
-        if (!in_array($tableName, ['tl_dc_tanks', 'tl_dc_regulators', 'tl_dc_equipment_types'], true)) {
+        if (!in_array($tableName, ['tl_dc_tanks', 'tl_dc_regulators', 'tl_dc_equipment'], true)) {
             return [];
         }
-
-        // Datenbank-Abfrage zur Ermittlung der verfügbaren Asset-IDs
-        $database = Database::getInstance();
 
         switch ($tableName) {
             case 'tl_dc_tanks':
@@ -287,33 +286,32 @@ class tl_dc_reservation_items extends Backend
                     $options[$result->id] = $manufacturerName." - ".$regModel1st.' - '.$regModel2ndPri.' - '.$regModel2ndSec. ' ' . $status;
                 }
                 break;
-            case 'tl_dc_equipment_types':
-                if (empty($dc->activeRecord->types) || empty($dc->activeRecord->sub_type)) {
+            case 'tl_dc_equipment':
+/*                if (empty($dc->activeRecord->types) || empty($dc->activeRecord->sub_type)) {
                     return []; // Keine Optionen anzeigen, wenn Werte fehlen
                 }
+*/
+                //$result = DcEquipmentModel::findByTypeAndSubType($dc->activeRecord->types, $dc->activeRecord->sub_type);//findPublished();
+				$result = DcEquipmentModel::findBy(
+					['type = ? AND subType = ? AND published = ?'],
+					[$dc->activeRecord->types, $dc->activeRecord->sub_type, '1']
+				);
 
-                $result = DcEquipmentSubTypeModel::findPublished();
-                if (!$result->numRows) {
+                if ($result === null || $result->count() < 1) {
                     return ['Keine Daten in dieser Kategorie verfügbar'];
                 }
 
-                $pid = $result->id;
-
-                $query = sprintf(
-                    "SELECT id, title, manufacturer, model, size, status FROM  tl_dc_equipment_subtypes
-                   WHERE pid = %s AND published = 1
-                   ORDER BY title", $pid
-                );
-
-                $result = $database->prepare($query)->execute();
+				$vendors = $helper->getManufacturers();
+				$sizes = $helper->getSizes();
 
                 // Optionen für das Dropdown erstellen
                 $options = [];
                 while ($result->next()) {
-                    $manufacturerName = $helper->getManufacturers()[$result->manufacturer] ?? 'Unbekannter Hersteller';
-                    $size = $helper->getSizes()[$result->size] ?? 'Unbek. Größe';
+                    $manufacturerName = $vendors[$result->manufacturer] ?? 'Unbekannter Hersteller';
+                    $size = $sizes[$result->size] ?? 'Unbek. Größe';
                     $statusText = $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$result->status] ?? $result->status;
                     $status = $result->status ? ' (' . $statusText . ')' : '';
+
                     $options[$result->id] = $manufacturerName.' - '.$result->model.' - '.$size. ' ' . $status;
                 }
                 break;
@@ -328,7 +326,7 @@ class tl_dc_reservation_items extends Backend
         }
 
         $database = Database::getInstance();
-        $item = $database->prepare("SELECT title, status FROM tl_dc_equipment_subtypes WHERE id = ?")
+        $item = $database->prepare("SELECT title, status FROM tl_dc_equipment WHERE id = ?")
             ->execute($dc->activeRecord->item_id);
 
         if ($item->numRows > 0) {
@@ -358,7 +356,7 @@ class tl_dc_reservation_items extends Backend
         {
             return[];
         }
-        $options = $helper->getSubTypes((int) $dc->activeRecord->types, $dc);
+        $options = $helper->getSubTypes((int) $dc->activeRecord->types);
 
         return $options;
     }
@@ -368,7 +366,7 @@ class tl_dc_reservation_items extends Backend
         if (!empty($value)) {
             return (int) $value; // Wenn der Wert existiert, keinen neuen Timestamp setzen
         }
-
+		$dc->activeRecord->reserved_at = time();
         // Aktuellen Zeitstempel im angegebenen Format zurückgeben
         return time();
 
@@ -376,8 +374,6 @@ class tl_dc_reservation_items extends Backend
 
     public function setUpdatedAt(string $value, DataContainer $dc): int
     {
-        //$datimFormat = $GLOBALS['TL_CONFIG']['datimFormat'] ?? 'Y-m-d H:i:s'; // Fallback, falls nicht gesetzt
-
         //$actualTimeStamp = date($datimFormat);
         $actualTimeStamp = time();
 

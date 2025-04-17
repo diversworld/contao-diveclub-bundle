@@ -23,50 +23,91 @@ class ReservationPickedUpCallback
 
     public function __invoke($value, DataContainer $dc): string
     {
-        $this->logger->info('ReservationPickedUpCallback'. $value, [__METHOD__, 'ReservationPickedUpCallback']);
         if (!$dc->activeRecord) {
             return '-';
         }
 
-        // Datum im Format jjjjmmtt
-        $currentDate = $value;
-        // Neues Title-Format
-        $newStatus = 'borrowed';
+        // Prüfen, ob `picked_up_at` einen Wert enthält
+        if (empty($value)) {
+            return $value; // Nichts tun, wenn das Feld leer ist
+        }
 
-        $subtypes = DcReservationItemsModel::findBy('pid', $dc->id);
+        try {
+            // Status und Datum für die Aktualisierung setzen
+            $newStatus = 'borrowed';
+            $currentDate = time(); // Aktuelles Datum
 
-        foreach ($subtypes as $subtype) {
-            // Subtype-Status aktualisieren
+            // Verbundene Reservierungselemente (Assets) abrufen:
+            $reservationItems = DcReservationItemsModel::findBy('pid', $dc->id); // Alle Items für die Reservierung holen
+            if ($reservationItems === null) {
+                $this->logger->info(sprintf('Keine Reservierungsitems gefunden für Reservierung ID: %d', $dc->id), [__METHOD__]);
+                return $value; // Keine Items verknüpft, keine Änderungen
+            }
+
+            foreach ($reservationItems as $reservationItem) {
+                // Name der Tabelle basierend auf `item_type` definieren
+                $tableName = $reservationItem->item_type;
+
+                // Unterstützte Tabellen überprüfen
+                $allowedTables = [
+                    'tl_dc_tanks',
+                    'tl_dc_regulators',
+                    'tl_dc_equipment',
+                ];
+
+                if (!in_array($tableName, $allowedTables, true)) {
+                    $this->logger->error(sprintf('Ungültige Tabelle: %s für Asset ID: %d', $tableName, $reservationItem->item_id), [__METHOD__]);
+                    continue; // Überspringen, wenn Tabelle nicht unterstützt
+                }
+
+                // Status in der Asset-Tabelle aktualisieren
+                $this->db->update(
+                    $tableName, // Entsprechende Tabelle
+                    [
+                        'status' => $newStatus,
+                    ],
+                    ['id' => $reservationItem->item_id] // Bedingung: ID des Items
+                );
+
+                // Protokollierung der Aktualisierung (Debugging)
+                $this->logger->info(sprintf(
+                    'Status von Asset ID %d in Tabelle %s auf %s geändert.',
+                    $reservationItem->item_id,
+                    $tableName,
+                    $newStatus
+                ));
+            }
+
+            $dc->activeRecord->reservation_status = $newStatus;
+            // Status der Reservierungsitems aktualisieren
             $this->db->update(
                 'tl_dc_reservation_items',
                 [
                     'reservation_status' => $newStatus,
                     'updated_at' => $currentDate,
                 ],
-                ['id' => $subtype->id]
+                ['pid' => $dc->id] // Alle Items der aktuellen Reservierung
             );
 
-            // Asset-Status aktualisieren (tl_dc_equipment_subtypes)
-            if (!empty($subtype->asset_id)) { // Sicherstellen, dass eine asset_id existiert
-                $this->db->update(
-                    'tl_dc_equipment_subtypes',
-                    [
-                        'status' => $newStatus,
-                        'updated_at' => $currentDate,
-                    ],
-                    ['id' => $subtype->asset_id]
-                );
-            }
-        }
-        // Status der Reservierung ändern
-        $this->db->update(
-            'tl_dc_reservation', // Reservierungs-Tabelle
-            [
-                'reservation_status' => $newStatus,
-            ],
-            ['id' => $dc->id]
-        );
+            // Status der Hauptreservierung aktualisieren
+            $this->db->update(
+                'tl_dc_reservation',
+                [
+                    'reservation_status' => $newStatus,
+                    'updated_at' => $currentDate,
+                ],
+                ['id' => $dc->id]
+            );
 
-        return $value;
+        } catch (\Exception $e) {
+            // Fehlerprotokollierung
+            $this->logger->error(sprintf(
+                'Fehler beim Aktualisieren der Assets für Reservierung ID %d: %s',
+                $dc->id,
+                $e->getMessage()
+            ), [__METHOD__]);
+        }
+
+        return $value; // Rückgabe des ursprünglichen Feldwertes
     }
 }

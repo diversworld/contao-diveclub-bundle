@@ -17,7 +17,6 @@ use Contao\Config;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\Routing\PageFinder;
 use Contao\Email;
 use Contao\FormCheckbox;
 use Contao\Template;
@@ -49,15 +48,13 @@ class ModuleBooking extends AbstractFrontendModuleController
     private ContaoFramework $framework;
     private RequestStack $requestStack;
     private Connection $db;
-    private PageFinder $pageFinder;
 
-    public function __construct(DcaTemplateHelper $helper, Connection $db, RequestStack $requestStack, ContaoFramework $framework, PageFinder $pageFinder)
+    public function __construct(DcaTemplateHelper $helper, Connection $db, RequestStack $requestStack, ContaoFramework $framework)
     {
         $this->helper = $helper;
         $this->db = $db;
         $this->framework = $framework;
         $this->requestStack = $requestStack;
-        $this->pageFinder = $pageFinder;
     }
 
     /**
@@ -85,12 +82,13 @@ class ModuleBooking extends AbstractFrontendModuleController
         // Verfügbarkeit und Kategorienauswahl
         if ($category) {
             $availableAssets = $this->updateAssets($category);
+
             $template->reservationCheckboxes = $this->generateReservationCheckboxes($availableAssets);
             $availableAssets = $this->combineAssetsWithSession($category, $availableAssets);
 
             // Zugehörige Assets finden und gruppieren
             if ($category === 'tl_dc_equipment') {
-                $availableAssets = $this->updateAssets($category); // Assets für die Kategorie abrufen
+                //$availableAssets = $this->updateAssets($category); // Assets für die Kategorie abrufen
                 $groupedAssets = $this->groupAssetsByType($availableAssets); // Assets nach Typ gruppieren
                 $template->groupedAssets = $groupedAssets; // Gruppierte Assets ans Template übergeben
             } else {
@@ -125,6 +123,7 @@ class ModuleBooking extends AbstractFrontendModuleController
      */
     private function handlePostRequest(Request $request, Template $template, array $sessionData): RedirectResponse
     {
+
         //$formType = $request->request->get('FORM_SUBMIT');
         if ($request->isMethod('POST')) {
             // Der Wert des gedrückten Buttons
@@ -188,6 +187,10 @@ class ModuleBooking extends AbstractFrontendModuleController
      */
     private function saveReservationsToDatabase(): void
     {
+        $session = $this->requestStack->getSession();
+        $bag = $session->getBag(ArrayAttributeBag::ATTRIBUTE_NAME);
+        $sessionData = $bag->get('reservation_items', []); // Alle gespeicherten Reservierungsdaten abrufen
+
         try {
             $saveMessage = $this->saveDataToDb();
             Message::addConfirmation(htmlspecialchars($saveMessage));
@@ -234,8 +237,9 @@ class ModuleBooking extends AbstractFrontendModuleController
             if (!$category || empty($selectedAssets)) {
                 continue;
             }
-            foreach ($selectedAssets as $assetId) {
-                $assetDetails = $this->getAssetDetails($category, (int)$assetId);
+
+            foreach ($selectedAssets as $asset) {
+                $assetDetails = $this->getAssetDetails($category, (int)$asset['assetId']);
                 if ($assetDetails) {
                     $storedAssets[] = $assetDetails;
                 }
@@ -310,9 +314,9 @@ class ModuleBooking extends AbstractFrontendModuleController
             }
 
             // Preise der Assets summieren
-            foreach ($selectedAssets as $assetId) {
+            foreach ($selectedAssets as $asset) {
                 // Asset-Details abrufen
-                $assetDetails = $this->getAssetDetails($category, (int)$assetId);
+                $assetDetails = $this->getAssetDetails($category, (int)$asset['assetId']);
 
                 if ($assetDetails) {
                     // Mietgebühr extrahieren
@@ -390,6 +394,9 @@ class ModuleBooking extends AbstractFrontendModuleController
             $selectedAssets = [];
         }
 
+        // Entferne leere oder ungültige Einträge aus dem Array
+        //$selectedAssets = array_filter($selectedAssets, static fn($assetId) => !empty($assetId));
+
         // Entferne leere Einträge aus dem 'selectedAssets'-Array
         $selectedAssets = array_filter($selectedAssets, function ($assetId) {
             return !empty($assetId);
@@ -400,17 +407,23 @@ class ModuleBooking extends AbstractFrontendModuleController
             return;
         }
 
+        // Falls übergeben, `type` und `subType` aus dem Formular abrufen
+        $type = $data['type'] ?? null;
+        $subType = $data['subType'] ?? null;
+
         // Gesamtpreis dieser Auswahl berechnen
-        $totalRentalFee = 0.0;
-        foreach ($selectedAssets as $assetId) {
+        $totalRentalFee = array_reduce($selectedAssets, function ($carry, $assetId) use ($data) {
             $assetDetails = $this->getAssetDetails($data['category'], (int) $assetId);
             if ($assetDetails) {
-                preg_match('/([0-9]+\.[0-9]{2}) €/i', $assetDetails, $matches);
-                if (!empty($matches[1])) {
-                    $totalRentalFee += (float) $matches[1];
+                if (preg_match('/([0-9]+\.[0-9]{2}) €/i', $assetDetails, $matches)) {
+                    $carry += (float) $matches[1];
                 }
             }
-        }
+            return $carry;
+        }, 0.0);
+
+        // Prüfen, ob ein Eintrag für die aktuelle Kategorie existiert
+        //$existingCategoryIndex = array_search($data['category'], array_column($sessionData, 'category'));
 
         // Prüfe, ob ein Eintrag für die aktuelle Kategorie bereits existiert
         $existingCategoryIndex = null;
@@ -426,14 +439,33 @@ class ModuleBooking extends AbstractFrontendModuleController
             $existingAssets = $sessionData[$existingCategoryIndex]['selectedAssets'] ?? [];
             $mergedAssets = array_unique(array_merge($existingAssets, $selectedAssets));
 
-            $sessionData[$existingCategoryIndex]['selectedAssets'] = $mergedAssets;
+            // Assets-Knotenstruktur erweitern (type und subType hinzufügen)
+            $assetDetails = [];
+            foreach ($mergedAssets as $assetId) {
+                $assetDetails[] = [
+                    'assetId' => $assetId,
+                    'type' => $type,
+                    'subType' => $subType,
+                ];
+            }
+
+            $sessionData[$existingCategoryIndex]['selectedAssets'] = $assetDetails;
             $sessionData[$existingCategoryIndex]['totalRentalFee'] = $totalRentalFee; // Falls gewünscht, ändern!
         } else {
             // Neuer Eintrag für die Kategorie erstellen
+            $assetDetails = [];
+            foreach ($selectedAssets as $assetId) {
+                $assetDetails[] = [
+                    'assetId' => $assetId,
+                    'type' => $type,
+                    'subType' => $subType,
+                ];
+            }
+
             $sessionData[] = [
                 'userId' => $data['userId'],
                 'category' => $data['category'],
-                'selectedAssets' => $selectedAssets,
+                'selectedAssets' => $assetDetails,
                 'totalRentalFee' => $totalRentalFee,
             ];
         }
@@ -461,7 +493,6 @@ class ModuleBooking extends AbstractFrontendModuleController
             $userId = $entry['userId'] ?? null;
             $category = $entry['category'] ?? null;
             $selectedAssets = $entry['selectedAssets'] ?? [];
-            $pid = $entry['pid'] ?? null;
             $totalRentalFee = $totalPrice; // Mietkosten berechnen
 
             if (empty($selectedAssets)) {
@@ -494,7 +525,15 @@ class ModuleBooking extends AbstractFrontendModuleController
 
             $reservationId = $reservation->id;
 
-            foreach ($selectedAssets as $assetId) {
+            foreach ($selectedAssets as $asset) {
+                $assetId = $asset['assetId'] ?? null;
+                $type = $asset['type'] ?? null;
+                $subType = $asset['subType'] ?? null;
+
+                if (!$assetId) {
+                    continue; // Überspringen, wenn kein Asset vorhanden ist
+                }
+
                 $existingItem = DcReservationItemsModel::findOneBy([
                     'pid=? AND item_id=?',
                 ], [
@@ -507,8 +546,10 @@ class ModuleBooking extends AbstractFrontendModuleController
                     $reservationItem = new DcReservationItemsModel();
                     $reservationItem->pid = $reservationId;
                     $reservationItem->tstamp = time();
-                    $reservationItem->item_id = (int) $assetId;
+                    $reservationItem->item_id = (int) $assetId ?? null;
                     $reservationItem->item_type = $category;
+                    $reservationItem->types = (int) $type  ?? null;
+                    $reservationItem->sub_type = (int) $subType ?? null;
                     $reservationItem->reserved_at = time();
                     $reservationItem->created_at = time();
                     $reservationItem->updated_at = time();
@@ -613,8 +654,8 @@ class ModuleBooking extends AbstractFrontendModuleController
         // Datum global abrufen
         $dateFormat = Config::get('dateFormat');
 
-        // Fetch the pid-to-title mapping from the `tl_dc_equipment` table directly
-        $equipmentTypesMapping = $this->getEquipmentTypeTitles(); // Custom method, explained below
+        // Fetch the id-to-title mapping from the `tl_dc_equipment` table directly
+        //$equipmentTypesMapping = $this->getEquipmentTypeTitles(); // Custom method, explained below
         $updatedAssets = [];
         $assets = $this->getAvailableAssets($category);
 
@@ -660,7 +701,7 @@ class ModuleBooking extends AbstractFrontendModuleController
                         'serialNumber2ndSec'    => $asset['serialNumber2ndSec'] ?? 'Unknown',
                         'regModel2ndSec'        => $regModel2nd[$asset['regModel2ndSec']] ?? 'Unknown',
                         'status'                => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$asset['status']] ?? 'Unknown',
-                        'price'         => $asset['rentalFee'] ?? 'N/A',
+                        'price'                 => $asset['rentalFee'] ?? 'N/A',
                     ];
                 }
                 break;
@@ -668,11 +709,13 @@ class ModuleBooking extends AbstractFrontendModuleController
             case 'tl_dc_equipment':
                 // Verarbeitung für Equipment Types
                 foreach ($assets as $asset) {
+					$equipmentSubTypes = $this->helper->getSubTypes($asset['id']);
                     $updatedAssets[] = [
                         'id'            => $asset['id'],
-                        'pid'           => $asset['pid'],
-                        'typeId'        => $equipmentTypesMapping[$asset['type']] ?? 'N/A', // Hier wird die Type-ID hinzugefügt
-                        'type'          => $equipmentTypes[$equipmentTypesMapping[$asset['type']]] ?? $asset['type'],
+                        'type'          => $equipmentTypes[$asset['type']] ?? $asset['type'],
+						'subType'       => $equipmentSubTypes[$asset['subType']] ?? $asset['subType'],
+                        'typeId'        => $asset['type'], // Indexwert behalten
+                        'subTypeId'     => $asset['subType'], // Indexwert behalten
                         'category'      => $category,
                         'title'         => $asset['title'] ?? 'N/A', // Mapping für Titel
                         'manufacturer'  => $manufacturers[$asset['manufacturer']] ?? $asset['manufacturer'],
@@ -704,25 +747,6 @@ class ModuleBooking extends AbstractFrontendModuleController
         return $updatedAssets;
     }
 
-    /**
-     * Get the mapping of `pid` to `title` in the `tl_dc_equipment` table.
-     */
-    private function getEquipmentTypeTitles(): array
-    {
-        // Fetch the `pid` and `title` from the equipment types table
-        $results = $this->db->fetchAllAssociative(
-            'SELECT id AS pid, title FROM tl_dc_equipment'
-        );
-
-        // Transform the results into a pid-to-title mapping
-        $mapping = [];
-        foreach ($results as $row) {
-            $mapping[$row['pid']] = $row['title'];
-        }
-
-        return $mapping;
-    }
-
     private function getAvailableAssets(string $category): array
     {
         $allowedCategories = ['tl_dc_tanks', 'tl_dc_regulators', 'tl_dc_equipment'];
@@ -751,6 +775,7 @@ class ModuleBooking extends AbstractFrontendModuleController
         switch ($category) {
             case 'tl_dc_tanks':
                 $asset = DcTanksModel::findByPk($assetId);
+
                 if (!$asset) {
                     return null;
                 }
@@ -798,15 +823,19 @@ class ModuleBooking extends AbstractFrontendModuleController
 
                 $helper = new DcaTemplateHelper();
                 $sizeMapping = $helper->getSizes();
+                $types = $helper->getEquipmentTypes();
+                $subTypes = $helper->getSubTypes($asset->type);
                 $sizeText = $sizeMapping[$asset->size] ?? 'Unbekannte Größe';
 
                 return sprintf(
-                    'Ausrüstung: %s (Modell: %s, Größe: %s, Farbe: %s), %.2f €',
-                    $asset->title ?? 'Unbekannt',
-                    $asset->model ?? 'Kein Modell angegeben',
-                    $sizeText,
-                    $asset->color ?? 'Keine Farbe angegeben',
-                    (float)$asset->rentalFee
+                    'Ausrüstung: %s %s - %s (Modell: %s, Größe: %s, Farbe: %s), %.2f €',
+                        $types[$asset->type] ?? 'Unbekannt',
+                                $subTypes[$asset->subType] ?? 'Unbekannt',
+                                $asset->title ?? 'Unbekannt',
+                                $asset->model ?? 'Kein Modell angegeben',
+                                $sizeText,
+                                $asset->color ?? 'Keine Farbe angegeben',
+                                (float)$asset->rentalFee
                 );
 
             default:
@@ -825,7 +854,15 @@ class ModuleBooking extends AbstractFrontendModuleController
 
         $selectedAssetIds = [];
         foreach ($sessionData as $entry) {
-            $selectedAssetIds = array_merge($selectedAssetIds, $entry['selectedAssets'] ?? []);
+            // Prüfen, ob 'selectedAssets' ein Array ist
+            $selectedAssets = is_array($entry['selectedAssets'] ?? null) ? $entry['selectedAssets'] : [];
+
+            // Extrahiere nur die `assetId`-Werte aus jedem Eintrag in `selectedAssets`
+            $assetIds = array_map(static function ($asset) {
+                return $asset['assetId'];
+            }, $selectedAssets);
+
+            $selectedAssetIds = array_merge($selectedAssetIds, $assetIds);
         }
         $selectedAssetIds = array_unique($selectedAssetIds); // Doppelte entfernen
 

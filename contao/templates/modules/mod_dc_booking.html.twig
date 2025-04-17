@@ -84,7 +84,7 @@
             </div>
             <div class="reservation-assets">
                 <h2>Verfügbare Ausrüstungsgegenstände</h2>
-                {% if selectedCategory == 'tl_dc_equipment_types' %}
+                {% if selectedCategory == 'tl_dc_equipment' %}
                     {# Kategorie equipment_types benötigt groupedAssets #}
                     {% if groupedAssets is not empty %}
                         {% for subType, assets in groupedAssets %}
@@ -119,9 +119,9 @@
                                             <div class="widget widget-checkbox">
                                                 {{ reservationCheckboxes[asset.id]|raw }}
                                             </div>
-                                            <input type="hidden" name="pid" value="{{ asset.pid }}">
-                                            <input type="hidden" name="type_id" value="{{ asset.typeId }}">
                                             <input type="hidden" name="category" value="{{ asset.category }}">
+											<input type="hidden" name="type" value="{{ asset.typeId }}">
+											<input type="hidden" name="subType" value="{{ asset.subTypeId }}">
                                         </td>
                                     </tr>
                                 {% endfor %}

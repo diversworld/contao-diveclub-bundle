@@ -23,7 +23,7 @@ class DcaTemplateHelper
     {
         return $this->getTemplateOptions('typesFile');
     }
-    public function getSubTypes( int $typeId): array
+    public function getSubTypes(int $typeId): array
     {
         // Optionen laden
         $types = $this->getTemplateOptions('subTypesFile');

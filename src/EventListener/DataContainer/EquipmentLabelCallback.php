@@ -10,7 +10,7 @@ use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use function Symfony\Component\Translation\t;
 
-#[AsCallback(table: 'tl_example', target: 'list.label.label')]
+#[AsCallback(table: 'tl_dc_equipment', target: 'list.label.label')]
 class EquipmentLabelCallback
 {
     private TranslatorInterface $translator;

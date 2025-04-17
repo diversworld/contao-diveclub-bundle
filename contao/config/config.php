@@ -51,7 +51,7 @@ $GLOBALS['BE_MOD']['diveclub'] = [
         ],
         'dc_config_collection' => [
             'tables' => ['tl_dc_config'],
-        ]
+        ],
 ];
 
 /**

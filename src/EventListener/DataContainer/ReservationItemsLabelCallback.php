@@ -7,6 +7,10 @@ namespace Diversworld\ContaoDiveclubBundle\EventListener\DataContainer;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\DataContainer;
 use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
+use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorsModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcReservationItemsModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcTanksModel;
 use Doctrine\DBAL\Connection;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -29,11 +33,13 @@ class ReservationItemsLabelCallback
         $reservedAt = !empty($row['reserved_at']) ? date($GLOBALS['TL_CONFIG']['datimFormat'], (int)$row['reserved_at']) : 'Unbekannt';
         $createdAt = !empty($row['created_at']) ? date($GLOBALS['TL_CONFIG']['datimFormat'], (int)$row['created_at']) : 'Unbekannt';
 
+        $sizes = $this->helper->getSizes();
+
         // Daten basierend auf dem Typ laden
         switch ($row['item_type']) {
             case 'tl_dc_tanks': // Tanks
-                $result = $this->db
-                    ->fetchAssociative("SELECT title, size, rentalFee FROM tl_dc_tanks WHERE id = ?", [(int)$row['item_id']]);
+                $dbResult = DcTanksModel::findById((int)$row['item_id']);
+                $result = $dbResult->row();
 
                 if ($result)  {
                     $row['asset_type'] = $typeLabel;
@@ -49,9 +55,8 @@ class ReservationItemsLabelCallback
                 break;
 
             case 'tl_dc_regulators': // Regulatoren
-                $result = $this->db
-                    ->fetchAssociative("SELECT title, manufacturer, regModel1st, regModel2ndPri, regModel2ndSec, rentalFee FROM tl_dc_regulators WHERE id = ?", [(int)$row['item_id']]);
-
+                $dbResult = DcRegulatorsModel::findById((int)$row['item_id']);
+                $result = $dbResult->row();
                 if ($result) {
                     $manufacturerName = $this->helper->getManufacturers()[$result['manufacturer']] ?? 'Unbekannter Hersteller';
                     $row['asset_type'] = $typeLabel;
@@ -70,17 +75,15 @@ class ReservationItemsLabelCallback
                 }
                 break;
 
-            case 'tl_dc_equipment_types': // Equipment-Typen
-                $result = $this->db
-                    ->fetchAssociative("SELECT es.id, es.pid, es.title, es.manufacturer, es.model, es.size, et.rentalFee
-                                        FROM tl_dc_equipment_subtypes es
-                                        INNER JOIN tl_dc_equipment_types et ON es.pid = et.id
-                                        WHERE es.id = ?", [(int)$row['item_id']]);
+            case 'tl_dc_equipment': // Equipment-Typen
+                $dbResult = DcEquipmentModel::findById((int)$row['item_id']);
+                $result = $dbResult->row();
 
                 if ($result) {
                     $row['asset_type'] = $typeLabel;
-                    $row['asset_id'] = sprintf('%s - %s, (Miete: %s €)',
-                        $result['size'] ?? 'Unbekannt',
+                    $row['asset_id'] = sprintf('%s, %s - %s, (Miete: %s €)',
+                        $result['model'] ?? 'Kein Modell',
+                        $sizes[$result['size']] ?? 'Unbekannt',
                         $result['title'] ?? 'Kein Titel',
                         number_format((float)$result['rentalFee'], 2, ',', '.')
                     );
