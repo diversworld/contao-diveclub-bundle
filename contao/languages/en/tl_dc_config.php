@@ -10,6 +10,7 @@ $GLOBALS['TL_LANG']['tl_dc_config']['sizes_legend'] = "Template mit Größen wä
 $GLOBALS['TL_LANG']['tl_dc_config']['types_legend'] = "Template mit Typen wählen";
 $GLOBALS['TL_LANG']['tl_dc_config']['template_legend'] = "Template configuration";
 $GLOBALS['TL_LANG']['tl_dc_config']['reservation_legend'] = 'Reservation';
+$GLOBALS['TL_LANG']['tl_dc_config']['conditions_legend'] = 'Conditions';
 
 /**
  * Global operations
@@ -40,3 +41,4 @@ $GLOBALS['TL_LANG']['tl_dc_config']['regulatorsFile'] = ['Regulator-Template', '
 $GLOBALS['TL_LANG']['tl_dc_config']['reservationMessage'] = ['Reservation Message', 'Text displayed when reserving equipment'];
 $GLOBALS['TL_LANG']['tl_dc_config']['reservationInfo'] = ['Mail Adress', 'Mail-Adress which get information about a new reservation.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['reservationInfoText'] = ['Mail text', 'Mail-text which will be send to the Mail-Adresses on reservation.'];
+$GLOBALS['TL_LANG']['tl_dc_config’][‘rentalConditions'] = ['Rental conditions', 'Conditions for the use of the rented assets'];

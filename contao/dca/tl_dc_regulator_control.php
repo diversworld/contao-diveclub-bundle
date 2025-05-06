@@ -206,7 +206,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'search'            => false,
             'filter'            => false,
             'sorting'           => false,
-            'eval'              => ['rte' => 'tinyMCE', 'tl_class'=>'w33'],
+            'eval'              => ['style'=>'height:60px', 'decodeEntities'=>true, 'rte'=>'tinyMCE', 'basicEntities'=>true, 'tl_class'=>'clr'],
             'sql'               => 'text NULL',
         ],
         'published'         => [

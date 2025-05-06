@@ -248,7 +248,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'search'            => false,
             'filter'            => false,
             'sorting'           => false,
-            'eval'              => ['rte' => 'tinyMCE', 'tl_class' => 'clr'],
+            'eval'              => ['style'=>'height:60px', 'decodeEntities'=>true, 'rte'=>'tinyMCE', 'basicEntities'=>true, 'tl_class'=>'clr'],
             'sql'               => 'text NULL'
         ],
         'published'         => [

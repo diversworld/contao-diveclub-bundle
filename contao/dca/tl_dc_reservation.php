@@ -113,9 +113,9 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
-            'options'           => ['reserved', 'borrowed', 'returned', 'cancelled', 'overdue', 'lost', 'damaged', 'missing'],
+            'options'           => &$GLOBALS['TL_LANG']['tl_dc_reservation']['itemStatus'],
             'save_callback'     => [[ReservationStatusCallback::class, '__invoke']],
-            'reference'         => &$GLOBALS['TL_LANG']['tl_dc_reservation'],
+            'reference'         => &$GLOBALS['TL_LANG']['tl_dc_reservation']['itemStatus'],
             'eval'              => ['includeBlankOption' => true, 'submitOnChange' => false, 'chosen'   => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql'               => "varchar(255) NOT NULL default ''"
         ],
@@ -185,7 +185,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'search'            => false,
             'filter'            => true,
             'sorting'           => false,
-            'eval'              => ['rte' => 'tinyMCE', 'tl_class' => 'clr'],
+            'eval'              => ['style'=>'height:60px', 'decodeEntities'=>true, 'rte'=>'tinyMCE', 'basicEntities'=>true, 'tl_class'=>'clr'],
             'sql'               => 'text NULL'
         ],
         'published'         => [

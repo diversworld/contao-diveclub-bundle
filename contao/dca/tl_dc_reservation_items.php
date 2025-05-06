@@ -49,7 +49,6 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
             'mode'              => DataContainer::MODE_PARENT,
             'fields'            => ['item_type', 'reservation_status','created_at','updated_at'],
             'headerFields'      => ['title', 'member_id','reservation_status','created_at','updated_at'],
-            'header_callback'   => [ReservationItemsHeaderCallback::class, '__invoke'],
             'flag'              => DataContainer::SORT_ASC,
             'panelLayout'       => 'filter;sort,search,limit'
         ],
@@ -211,7 +210,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
             'search'            => false,
             'filter'            => true,
             'sorting'           => false,
-            'eval'              => ['rte' => 'tinyMCE', 'tl_class' => 'clr'],
+            'eval'              => ['style'=>'height:60px', 'decodeEntities'=>true, 'rte'=>'tinyMCE', 'basicEntities'=>true, 'tl_class'=>'clr'],
             'sql'               => 'text NULL'
         ],
         'published'         => [

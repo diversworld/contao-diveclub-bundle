@@ -7,6 +7,7 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\DataContainer;
 use Diversworld\ContaoDiveclubBundle\Model\DcReservationItemsModel;
 use Doctrine\DBAL\Connection;
+use Exception;
 use Psr\Log\LoggerInterface;
 
 #[AsCallback(table: 'tl_dc_reservation', target: 'fields.picked_up_at.save')]
@@ -36,6 +37,8 @@ class ReservationPickedUpCallback
             // Status und Datum für die Aktualisierung setzen
             $newStatus = 'borrowed';
             $currentDate = time(); // Aktuelles Datum
+
+            //$dc->activeRecord->reservation_status = $newStatus;
 
             // Verbundene Reservierungselemente (Assets) abrufen:
             $reservationItems = DcReservationItemsModel::findBy('pid', $dc->id); // Alle Items für die Reservierung holen
@@ -78,13 +81,15 @@ class ReservationPickedUpCallback
                 ));
             }
 
-            $dc->activeRecord->reservation_status = $newStatus;
+
+
             // Status der Reservierungsitems aktualisieren
             $this->db->update(
                 'tl_dc_reservation_items',
                 [
                     'reservation_status' => $newStatus,
                     'updated_at' => $currentDate,
+                    'picked_up_at' => $currentDate,
                 ],
                 ['pid' => $dc->id] // Alle Items der aktuellen Reservierung
             );
@@ -94,12 +99,11 @@ class ReservationPickedUpCallback
                 'tl_dc_reservation',
                 [
                     'reservation_status' => $newStatus,
-                    'updated_at' => $currentDate,
                 ],
                 ['id' => $dc->id]
             );
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Fehlerprotokollierung
             $this->logger->error(sprintf(
                 'Fehler beim Aktualisieren der Assets für Reservierung ID %d: %s',

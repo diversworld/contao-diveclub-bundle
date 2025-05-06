@@ -12,6 +12,7 @@ $GLOBALS['TL_LANG']['tl_dc_config']['regulator_legend'] = "Template mit Atemregl
 $GLOBALS['TL_LANG']['tl_dc_config']['template_legend'] = "Templates Konfiguration";
 $GLOBALS['TL_LANG']['tl_dc_config']['publish_legend']    = 'Veröffentlichung';
 $GLOBALS['TL_LANG']['tl_dc_config']['reservation_legend'] = 'Reservierung';
+$GLOBALS['TL_LANG']['tl_dc_config']['conditions_legend'] = 'Bedingungen';
 
 /**
  * Global operations
@@ -45,3 +46,4 @@ $GLOBALS['TL_LANG']['tl_dc_config']['stop']              = ['Enddatum', 'Geben S
 $GLOBALS['TL_LANG']['tl_dc_config']['reservationMessage'] = ['Mitteilung Reservierung', 'Text, der bei einer Reservierung von Ausrüstung angezeigt wird.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['reservationInfo'] = ['Info-Mail-Adresse', 'Geben Sie eine, oder mehrere durch komma getrennte, E-Mail-Adresse an, die über neue Reservierungen informiert werden soll.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['reservationInfoText'] = ['Info-Mail-Text', 'GText der MAail, die bei einer Reservierung an die angegebenen Adressen gesendet wird.'];
+$GLOBALS['TL_LANG']['tl_dc_config']['rentalConditions'] = ['Leihbedingungen', 'Bedingungen für die Nutzung der ausgelihenen Assets.'];

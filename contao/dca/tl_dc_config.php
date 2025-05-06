@@ -56,6 +56,7 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
                                 {types_legend},addTypes;
                                 {regulator_legend},addRegulators;
                                 {reservation_legend},reservationMessage,reservationInfo,reservationInfoText;
+                                {conditions_legend},rentalConditions;
                                 {publish_legend},published,start,stop;'
     ],
     'subpalettes'   => [
@@ -162,14 +163,23 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
             'inputType'             => 'textarea',
             'label'                 => &$GLOBALS['TL_LANG']['tl_dc_config']['reservationInfoText'],
             'exclude'               => true,
-            'eval'                  => ['mandatory' => false, 'tl_class' => 'clr'],
+            //'eval'                  => ['mandatory' => false, 'tl_class' => 'clr'],
+            'eval'                  => ['style'=>'height:60px', 'decodeEntities'=>true, 'rte'=>'tinyMCE', 'basicEntities'=>true, 'tl_class'=>'clr'],
             'sql'                   => "text NULL"
         ],
         'reservationMessage'    => [
             'inputType'             => 'textarea',
             'label'                 => &$GLOBALS['TL_LANG']['tl_dc_config']['reservationMessage'],
             'exclude'               => true,
-            'eval'                  => ['mandatory' => false, 'tl_class' => 'clr'],
+            //'eval'                  => ['mandatory' => false, 'tl_class' => 'clr'],
+            'eval'                  => ['style'=>'height:60px', 'decodeEntities'=>true, 'rte'=>'tinyMCE', 'basicEntities'=>true, 'tl_class'=>'clr'],
+            'sql'                   => "text NULL"
+        ],
+        'rentalConditions'    => [
+            'inputType'             => 'textarea',
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_config']['rentalConditions'],
+            'exclude'               => true,
+            'eval'                  => ['style'=>'height:60px', 'decodeEntities'=>true, 'rte'=>'tinyMCE', 'basicEntities'=>true, 'tl_class'=>'clr'],
             'sql'                   => "text NULL"
         ],
         'published'             => [
