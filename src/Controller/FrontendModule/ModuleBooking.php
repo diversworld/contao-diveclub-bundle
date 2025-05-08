@@ -105,6 +105,9 @@ class ModuleBooking extends AbstractFrontendModuleController
             }
         }
 
+        $result = $this->db->fetchAssociative('SELECT rentalConditions FROM tl_dc_config LIMIT 1');
+        $template->rentalConditions = $result['rentalConditions'] ?? null;
+
         // Kategorienauswahl und weiterleiten
         $template->categories = $this->getCategories();
         $template->action = $request->getUri();

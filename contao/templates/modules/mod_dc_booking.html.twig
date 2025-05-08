@@ -4,8 +4,9 @@
 <div class="row">
     <div class="col m12">
         <p>Bitte wähle die gewünschten Ausrüstungsteile aus der Liste. Mit dem Absenden des Formulars, werden die gewählten Teile für Dich vorgemerkt.</p>
-        <p>Vorgemerkte Ausrüstung reservieren<br></p>
-        <p>Vorgemerkten Ausrüstung wieder freigegeben.</p>
+        {% if rentalConditions is not empty %}
+            {{ rentalConditions|raw }}
+        {% endif %}
     </div>
     <div class="col m3">
         {# Form select #}
