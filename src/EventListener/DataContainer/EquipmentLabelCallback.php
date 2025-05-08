@@ -26,19 +26,19 @@ class EquipmentLabelCallback
     {
         // Typ und Untertyp-Name abrufen
         $types = $this->templateHelper->getEquipmentTypes();
-        $labels[0] = $types[$row['type']] ?? 'Unbekannt';
+        $labels[0] = $types[$row['type']] ?? '-';
         $subTypes = $this->templateHelper->getSubTypes($row['type']);
-        $labels[1] = $subTypes[$row['subType']] ?? 'Unbekannt';
+        $labels[1] = $subTypes[$row['subType']] ?? '-';
 
         // Hersteller-Name abrufen
         $manufacturers = $this->templateHelper->getManufacturers();
-        $labels[3] = $manufacturers[$row['manufacturer']] ?? 'Unbekannt';
+        $labels[3] = $manufacturers[$row['manufacturer']] ?? '-';
 
         // Größen-Name abrufen
         $sizes = $this->templateHelper->getSizes();
-        $labels[5] = $sizes[$row['size']] ?? 'Unbekannt';
+        $labels[5] = $sizes[$row['size']] ?? '-';
         $labels[6] = number_format((float)$row['rentalFee'], 2, '.', ',') . ' €'; // z. B. "123.45 €"
-        $labels[7] = $GLOBALS['TL_LANG']['tl_dc_equipment']['itemStatus'][$row['status']] ?? 'Unbekannt';
+        $labels[7] = $GLOBALS['TL_LANG']['tl_dc_equipment']['itemStatus'][$row['status']] ?? '-';
 
         return $labels;
     }

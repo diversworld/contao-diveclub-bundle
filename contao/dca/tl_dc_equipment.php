@@ -159,7 +159,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
-            'eval'              => array('mandatory' => false, 'tl_class' => 'w25'),
+            'eval'              => array('mandatory' => false, 'includeBlankOption' => true, 'tl_class' => 'w25'),
             'sql'               => "varchar(255) NOT NULL default ''",
         ],
         'color'             => [
@@ -180,7 +180,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
             'filter'            => true,
             'sorting'           => true,
             'options_callback'  => [EquipmentSizeOptionsCallback::class, '__invoke'],
-            'eval'              => ['mandatory' => false, 'tl_class' => 'w25'],
+            'eval'              => ['mandatory' => false, 'includeBlankOption' => true, 'tl_class' => 'w25'],
             'sql'               => "int(10) unsigned NOT NULL default 0",
         ],
         'serialNumber'      => [

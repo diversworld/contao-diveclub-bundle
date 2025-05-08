@@ -44,7 +44,7 @@ class ReservationItemsLabelCallback
                 if ($result)  {
                     $row['asset_type'] = $typeLabel;
                     $row['asset_id'] = sprintf('%sL - %s, (Miete: %s €)',
-                        $result['size'] ?? 'Unbekannt',
+                        $result['size'] ?? '-',
                         $result['title'] ?? 'Kein Titel',
                         number_format((float) $result['rentalFee'], 2, ',', '.')
                     );
@@ -63,9 +63,9 @@ class ReservationItemsLabelCallback
                     $row['asset_id'] = sprintf('%s - %s, 1.Stufe: %s, 2.Stufe Pri.: %s, 2.Stufe Sec.: %s, (Miete: %s €)',
                         $result['title'] ?? 'Kein Titel',
                         $manufacturerName,
-                        $result['regModel1st'] ?? 'Unbek.',
-                        $result['regModel2ndPri'] ?? 'Unbek.',
-                        $result['regModel2ndSec'] ?? 'Unbek.',
+                        $result['regModel1st'] ?? '-',
+                        $result['regModel2ndPri'] ?? '-',
+                        $result['regModel2ndSec'] ?? '-',
                         number_format((float)$result['rentalFee'], 2, ',', '.')
                     );
                 } else {
@@ -83,7 +83,7 @@ class ReservationItemsLabelCallback
                     $row['asset_type'] = $typeLabel;
                     $row['asset_id'] = sprintf('%s, %s - %s, (Miete: %s €)',
                         $result['model'] ?? 'Kein Modell',
-                        $sizes[$result['size']] ?? 'Unbekannt',
+                        $sizes[$result['size']] ?? '-',
                         $result['title'] ?? 'Kein Titel',
                         number_format((float)$result['rentalFee'], 2, ',', '.')
                     );
@@ -95,8 +95,8 @@ class ReservationItemsLabelCallback
                 break;
 
             default:
-                $row['asset_type'] = 'Unbekannt';
-                $row['asset_id'] = 'Unbekannt';
+                $row['asset_type'] = '-';
+                $row['asset_id'] = '-';
                 break;
         }
 

@@ -32,7 +32,7 @@ class EquipmentHeaderCallback
 
         if (!$parentId) {
             $this->logger->error('Keine Parent-ID gefunden.');
-            return ['Typ: unbekannt', 'Art: unbekannt'];
+            return ['Typ: -', 'Art: -'];
         }
 
         // 2. Subtypen aus Template laden
@@ -49,7 +49,7 @@ class EquipmentHeaderCallback
 
         if (!$record) {
             $this->logger->error("Kein Datensatz für Parent-ID {$parentId} gefunden.");
-            return ['Typ: unbekannt', 'Art: unbekannt'];
+            return ['Typ: -', 'Art: -'];
         }
 
         // 4. Typ und SubTyp auflösen

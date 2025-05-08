@@ -26,10 +26,23 @@ class DcaTemplateHelper
     public function getSubTypes(int $typeId): array
     {
         // Optionen laden
-        $types = $this->getTemplateOptions('subTypesFile');
+        //$types = $this->getTemplateOptions('subTypesFile');
 
         // Rückgabe der Subtypen für den ermittelten Typ
-        return $types[$typeId] ?? [];
+        //return $types[$typeId] ?? [];
+        $types = $this->getEquipmentTypes(); // Equipment-Typen laden
+
+        foreach ($types as $tid => $typeData) {
+            // Wenn der Typ übereinstimmt, Subtypen extrahieren
+            if ($tid == $typeId) {
+                // Subtypen-Array extrahieren
+                $typeName = array_key_first($typeData); // Typ-Name (z. B. "Anzüge")
+                return $typeData[$typeName];
+            }
+        }
+
+        return []; // Keine Subtypen gefunden
+
     }
 
     public function getRegModels1st(?int $manufacturer = null, ?DataContainer $dc = null): array

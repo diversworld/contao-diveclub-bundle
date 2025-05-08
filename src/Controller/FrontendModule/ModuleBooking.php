@@ -65,6 +65,9 @@ class ModuleBooking extends AbstractFrontendModuleController
         System::loadLanguageFile('tl_dc_reservation_items');
 
         $sessionData = $this->getSessionData();
+        $equipmentTypes = $this->helper->getEquipmentTypes(); // Typen/Subtypen laden
+        $template->equipmentTypes = $equipmentTypes;
+
         $category = $request->get('category');
 
         // NEU: Gesamtpreis berechnen und ans Template übergeben
@@ -89,7 +92,7 @@ class ModuleBooking extends AbstractFrontendModuleController
             // Zugehörige Assets finden und gruppieren
             if ($category === 'tl_dc_equipment') {
                 //$availableAssets = $this->updateAssets($category); // Assets für die Kategorie abrufen
-                $groupedAssets = $this->groupAssetsByType($availableAssets); // Assets nach Typ gruppieren
+                $groupedAssets = $this->groupAssetsByType($availableAssets, $equipmentTypes); // Assets nach Typ gruppieren
                 $template->groupedAssets = $groupedAssets; // Gruppierte Assets ans Template übergeben
             } else {
                 $template->assets = $availableAssets; // Leeres Array, falls die Kategorie nicht zutrifft
@@ -337,15 +340,42 @@ class ModuleBooking extends AbstractFrontendModuleController
     /**
      * Gruppiert Assets nach Typ.
      */
-    private function groupAssetsByType(array $assets): array
+    private function groupAssetsByType(array $assets, array $equipmentTypes): array
     {
         $groupedAssets = [];
         $types = $this->helper->getEquipmentTypes();
-
+ dump($types);
         foreach ($assets as $asset) {
+            $typeId = $asset['typeId'] ?? 'unknown';
+            $subTypeId = $asset['subTypeId'] ?? 'unknown';
+
+            // Typnamen und Subtypen aus den Equipment-Typen extrahieren
+            foreach ($equipmentTypes as $typeKey => $typeData) {
+                if ($typeKey == $typeId) {
+                    $typeName = array_key_first($typeData);
+                    $subtypes = $typeData[$typeName];
+
+                    // Subtypen-Name ermitteln
+                    $subTypeName = $subtypes[$subTypeId] ?? 'unknown_subtype';
+
+                    if (!isset($groupedAssets[$typeName])) {
+                        $groupedAssets[$typeName] = [];
+                    }
+
+                    if (!isset($groupedAssets[$typeName][$subTypeName])) {
+                        $groupedAssets[$typeName][$subTypeName] = [];
+                    }
+
+                    // Asset zur entsprechenden Gruppe hinzufügen
+                    $groupedAssets[$typeName][$subTypeName][] = $asset;
+                }
+            }
+        }
+
+        /*foreach ($assets as $asset) {
             $type = $types[$asset['type']] ?? $asset['type'];
             $groupedAssets[$type][] = $asset;
-        }
+        }*/
 
         return $groupedAssets;
     }
