@@ -77,6 +77,11 @@ class ModuleBooking extends AbstractFrontendModuleController
         // NEW: Vorgemerkte Reservierungen abrufen
         $template->storedAssets = $this->loadStoredAssets($sessionData);
 
+        // Member Liste an das Template übergeben
+        $memberResult = $this->db->prepare('SELECT id, firstname, lastname FROM tl_member ORDER BY lastname, firstname')->executeQuery();
+        // Ergebnisse in ein assoziatives Array umwandeln
+        $template->memberList = $memberResult->fetchAllAssociative();
+
         // Session-Daten und ausgewählte Kategorie behandeln
         $template->totalRentalFee = $this->calculateTotalRentalFee($sessionData);
         $template->selectedCategory = $category;
@@ -117,6 +122,10 @@ class ModuleBooking extends AbstractFrontendModuleController
 
         // Vorgemerkte Assets immer laden
         $storedAssets = $this->loadStoredAssets($this->getSessionData());
+
+        // selectedMember aus Request (oder per Default null)
+        $selectedMember = $request->get('reservedFor'); // Wert aus GET-Parameter
+        $template->selectedMember = $selectedMember; // An das Template übergeben
 
         $template->storedAssets = $storedAssets;
         $template->totalRentalFee = $this->calculateTotalRentalFee($this->getSessionData());
@@ -371,11 +380,6 @@ class ModuleBooking extends AbstractFrontendModuleController
                 }
             }
         }
-
-        /*foreach ($assets as $asset) {
-            $type = $types[$asset['type']] ?? $asset['type'];
-            $groupedAssets[$type][] = $asset;
-        }*/
 
         return $groupedAssets;
     }

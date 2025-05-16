@@ -25,11 +25,23 @@
         </form>
     </div>
     <div class="col m2">&nbsp;</div>
-    <div class="col m7">
+    <div class="col m3">
         {# Angemeldeter Nutzer #}
         <label for="currentUser">Angemeldeter Benutzer:</label>
         <p>{{ currentUser.userFullName| default('Gast') }}</p>
     </div>
+    <div class="col m4">
+        <label for="reservedFor">Reservieren für:</label>
+        <select name="reservedFor" id="reservedFor" class="form-control">
+            <option value="">-- Bitte auswählen --</option>
+            {% for member in memberList %}
+                <option value="{{ member.id }}" {% if member is not null and member.id == selectedMember %}selected{% endif %}>
+                    {{ member.firstname }} {{ member.lastname }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
     <div class="col m12">
 
     </div>
@@ -70,13 +82,13 @@
 </div>
 <div class="row">
     <form method="POST" id="reservationForm" action="{{ action }}">
-    {# Formular Liste   #}
+        {# Formular Liste   #}
         <div class="col m12">
             {# Button vormerken #}
 
         </div>
         <div class="col m12">
-        {# Liste Checkboxen #}
+            {# Liste Checkboxen #}
             <div class="col-md-6">
                 <input type="hidden" name="FORM_SUBMIT" value="reservationItems_submit" />
                 <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
@@ -202,6 +214,3 @@
     </form>
     {# Formular Liste ende #}
 </div>
-
-
-
