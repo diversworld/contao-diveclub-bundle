@@ -68,7 +68,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
         ]
     ],
     'palettes'          => [
-        '__selector__'      => ['addArticleInfo'],
+        '__selector__'      => ['addNotes'],
         'default'           => '{title_legend},title,alias,status,rentalFee;
                                 {1stStage_legend},manufacturer,serialNumber1st,regModel1st;
                                 {2ndstage_legend},serialNumber2ndPri,regModel2ndPri,serialNumber2ndSec,regModel2ndSec;

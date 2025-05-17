@@ -66,7 +66,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
         ]
     ],
     'palettes'          => [
-        '__selector__'      => ['addArticleInfo'],
+        '__selector__'      => ['addNotes'],
         'default'           => '{title_legend},title,alias;
                                 {details_legend},proposalDate,checkId;
                                 {vendor_legend},vendorName,vendorWebsite,vendorStreet,vendorPostal,vendorCity,vendorEmail,vendorPhone,vendorMobile;
@@ -196,6 +196,13 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
             'sorting'           => true,
             'eval'              => ['maxlength'=>64, 'rgxp'=>'phone', 'decodeEntities'=>true, 'feEditable'=>true, 'feGroup'=>'contact', 'tl_class'=>'w25'],
             'sql'               => "varchar(64) NULL default ''"
+        ],
+        'addNotes'          => [
+            'inputType'         => 'checkbox',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_reservation']['addNotes'],
+            'exclude'           => true,
+            'eval'              => ['submitOnChange' => true, 'tl_class' => 'w50'],
+            'sql'               => ['type' => 'boolean', 'default' => false]
         ],
         'notes'             => [
             'inputType'         => 'textarea',

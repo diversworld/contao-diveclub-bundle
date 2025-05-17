@@ -71,7 +71,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
         ]
     ],
     'palettes'          => [
-        '__selector__'      => ['addArticleInfo'],
+        '__selector__'      => ['addNotes'],
         'default'           => '{title_legend},title,member_id,alias;
                                 {reservation_legend},reserved_at,picked_up_at,returned_at,reservation_status,rentalFee;
                                 {notes_legend},addNotes;
@@ -158,7 +158,19 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
 			'save_callback'		=> [[ReservationMemberIdCallbackListener::class, '__invoke']],
             'foreignKey'        => 'tl_member.CONCAT(firstname, " ", lastname)',
             'eval'              => array('submitOnChange' => true, 'includeBlankOption' => true, 'tl_class' => 'w25'),
-            'sql'               => "varchar(255) NOT NULL default ''",
+            'sql'               => "int(10) unsigned NOT NULL default 0", // Speichert eine ID (Int)
+            'relation'          => array('type' => 'hasOne', 'load' => 'lazy')
+        ],
+        'reservedFor'         => [
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_reservation']['reservedFor'],
+            'inputType'         => 'select',
+            'exclude'           => true,
+            'search'            => true,
+            'filter'            => true,
+            'sorting'           => true,
+            'foreignKey'        => 'tl_member.CONCAT(firstname, " ", lastname)',
+            'eval'              => array('submitOnChange' => true, 'includeBlankOption' => true, 'tl_class' => 'w25'),
+            'sql'               => "int(10) unsigned NOT NULL default 0", // Speichert eine ID (Int)
             'relation'          => array('type' => 'hasOne', 'load' => 'lazy')
         ],
         'rentalFee'             => [
@@ -168,7 +180,6 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'search'            => false,
             'filter'            => true,
             'sorting'           => false,
-            //'save_callback'     => [['tl_dc_reservation', 'convertPrice']],
             'eval'              => ['rgxp'=>'digit', 'mandatory'=>false, 'tl_class' => 'w25'], // Beachten Sie "rgxp" für Währungsangaben
             'sql'               => "DECIMAL(10,2) NOT NULL default '0.00'"
         ],
@@ -182,9 +193,6 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
         'notes'             => [
             'inputType'         => 'textarea',
             'exclude'           => true,
-            'search'            => false,
-            'filter'            => true,
-            'sorting'           => false,
             'eval'              => ['style'=>'height:60px', 'decodeEntities'=>true, 'rte'=>'tinyMCE', 'basicEntities'=>true, 'tl_class'=>'clr'],
             'sql'               => 'text NULL'
         ],

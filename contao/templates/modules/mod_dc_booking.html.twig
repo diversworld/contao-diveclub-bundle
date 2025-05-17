@@ -32,8 +32,8 @@
     </div>
     <div class="col m4">
         <label for="reservedFor">Reservieren für:</label>
-        <select name="reservedFor" id="reservedFor" class="form-control">
-            <option value="">-- Bitte auswählen --</option>
+        <select name="reservedFor" id="reservedFor" class="form-control" onchange="this.form.submit();">
+        <option value="">-- Bitte auswählen --</option>
             {% for member in memberList %}
                 <option value="{{ member.id }}" {% if member is not null and member.id == selectedMember %}selected{% endif %}>
                     {{ member.firstname }} {{ member.lastname }}

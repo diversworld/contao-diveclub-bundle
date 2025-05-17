@@ -67,7 +67,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_invoice'] = array(
         )
     ),
     'palettes'          => array(
-        '__selector__'      => array('addArticleInfo'),
+        '__selector__'      => array('addNotes'),
         'default'           => '{title_legend},title,alias;
                                 {details_legend},member,checkId;
                                 {article_legend},invoiceArticles,priceTotal;
@@ -181,6 +181,13 @@ $GLOBALS['TL_DCA']['tl_dc_check_invoice'] = array(
             'save_callback' => ['tl_dc_check_invoice', 'calculateTotalPrice'],
             'sql'           => "DECIMAL(10,2) NOT NULL default '0.00'"
         ),
+        'addNotes'          => [
+            'inputType'         => 'checkbox',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_reservation']['addNotes'],
+            'exclude'           => true,
+            'eval'              => ['submitOnChange' => true, 'tl_class' => 'w50'],
+            'sql'               => ['type' => 'boolean', 'default' => false]
+        ],
         'notes'         => array(
             'inputType'     => 'textarea',
             'exclude'       => true,

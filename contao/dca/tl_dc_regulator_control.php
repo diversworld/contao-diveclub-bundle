@@ -68,9 +68,9 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
         ]
     ],
     'palettes'      => [
-        '__selector__'      => ['addArticleInfo'],
+        '__selector__'      => ['addNotes'],
         'default'           => '{title_legend},title,alias;
-                                {details_legend},actualCheckDate,midPressurePre,inhalePressurePre,exhalePressurePre,midPressurePost,inhalePressurePost,exhalePressurePost,nextCheckDate;
+                                {details_legend},actualCheckDate,nextCheckDate,midPressurePre30,midPressurePre200,inhalePressurePre,exhalePressurePre,midPressurePost30,midPressurePost200,inhalePressurePost,exhalePressurePost;
                                 {notes_legend},addNotes;
                                 {publish_legend},published,start,stop;'
     ],
@@ -120,9 +120,29 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'onsubmit_callback'     => [SetRegNextCheckDateCallback::class, '__invoke'],
             'sql'                   => "bigint(20) NULL"
         ],
-        'midPressurePre'    => [
+        'nextCheckDate'     => [
             'inputType'             => 'text',
-            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['midPreussurePre'],
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['nextCheckDate'],
+            'exclude'               => true,
+            'sorting'               => true,
+            'filter'                => true,
+            'flag'                  => DataContainer::SORT_YEAR_DESC,
+            'eval'                  => ['submitOnChange' => true, 'rgxp'=>'date', 'doNotCopy'=>false, 'datepicker'=>true, 'tl_class'=>'w25 wizard'],
+            'sql'                   => "bigint(20) NULL"
+        ],
+        'midPressurePre30'    => [
+            'inputType'             => 'text',
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['midPreussurePre30'],
+            'exclude'               => true,
+            'search'                => true,
+            'filter'                => true,
+            'sorting'               => true,
+            'eval'                  => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25 clr'],
+            'sql'                   => "varchar(50) NOT NULL default ''"
+        ],
+        'midPressurePre200'    => [
+            'inputType'             => 'text',
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['midPreussurePre200'],
             'exclude'               => true,
             'search'                => true,
             'filter'                => true,
@@ -150,9 +170,19 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'eval'                  => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25'],
             'sql'                   => "varchar(50) NOT NULL default ''"
         ],
-        'midPressurePost'   => [
+        'midPressurePost30'   => [
             'inputType'             => 'text',
-            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['midPreussurePost'],
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['midPreussurePost30'],
+            'exclude'               => true,
+            'search'                => true,
+            'filter'                => true,
+            'sorting'               => true,
+            'eval'                  => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25 clr'],
+            'sql'                   => "varchar(50) NOT NULL default ''"
+        ],
+        'midPressurePost200'   => [
+            'inputType'             => 'text',
+            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['midPreussurePost200'],
             'exclude'               => true,
             'search'                => true,
             'filter'                => true,
@@ -181,16 +211,6 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'flag'                  => DataContainer::SORT_INITIAL_LETTER_ASC,
             'eval'                  => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25'],
             'sql'                   => "varchar(50) NOT NULL default ''"
-        ],
-        'nextCheckDate'     => [
-            'inputType'             => 'text',
-            'label'                 => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['nextCheckDate'],
-            'exclude'               => true,
-            'sorting'               => true,
-            'filter'                => true,
-            'flag'                  => DataContainer::SORT_YEAR_DESC,
-            'eval'                  => ['submitOnChange' => true, 'rgxp'=>'date', 'doNotCopy'=>false, 'datepicker'=>true, 'tl_class'=>'w25 wizard'],
-            'sql'                   => "bigint(20) NULL"
         ],
         'addNotes'          => [
             'inputType'             => 'checkbox',

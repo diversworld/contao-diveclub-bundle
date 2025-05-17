@@ -124,8 +124,8 @@ class ModuleBooking extends AbstractFrontendModuleController
         $storedAssets = $this->loadStoredAssets($this->getSessionData());
 
         // selectedMember aus Request (oder per Default null)
-        $selectedMember = $request->get('reservedFor'); // Wert aus GET-Parameter
-        $template->selectedMember = $selectedMember; // An das Template übergeben
+        $selectedMember = $this->requestStack->getSession()->get('selectedMember', null); // Hole den von der Session gespeicherten Benutzer
+        $template->selectedMember = $selectedMember; // Ins Template laden
 
         $template->storedAssets = $storedAssets;
         $template->totalRentalFee = $this->calculateTotalRentalFee($this->getSessionData());
@@ -145,6 +145,14 @@ class ModuleBooking extends AbstractFrontendModuleController
             $action = $request->request->get('action', '');
             $seite = $request->getUri();
             $urlParts = parse_url($seite);
+
+            // Speichere den Benutzer, für den reserviert werden soll
+            $selectedMember = $request->request->get('reservedFor');
+
+            if ($selectedMember) {
+                $session = $this->requestStack->getSession();
+                $session->set('selectedMember', $selectedMember); // Benutzer in Session speichern
+            }
 
             switch ($action) {
                 case 'save':
@@ -205,6 +213,10 @@ class ModuleBooking extends AbstractFrontendModuleController
         $session = $this->requestStack->getSession();
         $bag = $session->getBag(ArrayAttributeBag::ATTRIBUTE_NAME);
         $sessionData = $bag->get('reservation_items', []); // Alle gespeicherten Reservierungsdaten abrufen
+
+        if (empty($sessionData)) {
+            throw new \RuntimeException('Keine Reservierungsdaten gefunden.');
+        }
 
         try {
             $saveMessage = $this->saveDataToDb();
@@ -353,7 +365,7 @@ class ModuleBooking extends AbstractFrontendModuleController
     {
         $groupedAssets = [];
         $types = $this->helper->getEquipmentTypes();
- dump($types);
+
         foreach ($assets as $asset) {
             $typeId = $asset['typeId'] ?? 'unknown';
             $subTypeId = $asset['subTypeId'] ?? 'unknown';
@@ -519,6 +531,7 @@ class ModuleBooking extends AbstractFrontendModuleController
         $session = $this->requestStack->getSession();
         $bag = $session->getBag(ArrayAttributeBag::ATTRIBUTE_NAME);
         $sessionData = $bag->get('reservation_items', []); // Alle gespeicherten Reservierungsdaten abrufen
+        $selectedMember = $session->get('selectedMember'); // Gehe auf den gespeicherten Benutzer ein
 
         if (empty($sessionData)) {
             throw new \RuntimeException('Es sind keine Reservierungsdaten in der Session gespeichert.');
@@ -529,6 +542,7 @@ class ModuleBooking extends AbstractFrontendModuleController
         foreach ($sessionData as $entry) {
             $userId = $entry['userId'] ?? null;
             $category = $entry['category'] ?? null;
+            $selectedMember = $entry['selectedMember'] ?? [];
             $selectedAssets = $entry['selectedAssets'] ?? [];
             $totalRentalFee = $totalPrice; // Mietkosten berechnen
 
@@ -552,6 +566,7 @@ class ModuleBooking extends AbstractFrontendModuleController
                 $reservation->alias = 'id-' . $reservationTitle;
                 $reservation->tstamp = time();
                 $reservation->member_id = $userId;
+                $reservation->reservedFor = $selectedMember['name'] ?? null;
                 $reservation->asset_type = $category;
                 $reservation->reserved_at = time();
                 $reservation->reservation_status = 'reserved';

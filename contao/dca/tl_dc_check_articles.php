@@ -67,7 +67,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_articles'] = [
         ]
     ],
     'palettes'      => [
-        '__selector__'      => ['addArticleInfo'],
+        '__selector__'      => ['addArticleNotes'],
         'default'           => '{title_legend},title,alias;
                                 {article_legend},articleSize,articlePriceNetto,articlePriceBrutto,default;
                                 {notes_legend},addNotes;
@@ -137,6 +137,13 @@ $GLOBALS['TL_DCA']['tl_dc_check_articles'] = [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['default'],
             'inputType'         => 'checkbox',
             'eval'              => ['tl_class'=>'w25'],
+            'sql'               => ['type' => 'boolean', 'default' => false]
+        ],
+        'addArticleNotes'          => [
+            'inputType'         => 'checkbox',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_reservation']['addNotes'],
+            'exclude'           => true,
+            'eval'              => ['submitOnChange' => true, 'tl_class' => 'w50'],
             'sql'               => ['type' => 'boolean', 'default' => false]
         ],
         'articleNotes'      => [
