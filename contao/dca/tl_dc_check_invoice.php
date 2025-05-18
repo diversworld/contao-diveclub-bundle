@@ -16,9 +16,7 @@ use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
-use Diversworld\ContaoDiveclubBundle\DataContainer\Tanks;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckInvoiceModel;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 /**
  * Table tl_dc_check_invoice
@@ -224,8 +222,6 @@ $GLOBALS['TL_DCA']['tl_dc_check_invoice'] = array(
 /**
  * Provide miscellaneous methods that are used by the data configuration array.
  *
- * @property Tanks $Tanks
- *
  * @internal
  */
 class tl_dc_check_invoice extends Backend
@@ -253,7 +249,7 @@ class tl_dc_check_invoice extends Backend
         // Generate the alias if there is none
         if (!$varValue)
         {
-            $varValue = System::getContainer()->get('contao.slug')->generate($dc->activeRecord->title, CheckInvoiceModel::findById($dc->activeRecord->pid)->jumpTo, $aliasExists);
+            $varValue = System::getContainer()->get('contao.slug')->generate($dc->activeRecord->title, DcCheckInvoiceModel::findById($dc->activeRecord->pid)->jumpTo, $aliasExists);
         }
         elseif (preg_match('/^[1-9]\d*$/', $varValue))
         {

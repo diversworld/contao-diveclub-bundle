@@ -16,10 +16,6 @@ use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
-use Diversworld\ContaoDiveclubBundle\DataContainer\Tanks;
-use Symfony\Component\String\Slugger\SluggerInterface;
-use Contao\CoreBundle\Monolog\ContaoContext;
-use Diversworld\ContaoDiveclubBundle\DataContainer\DcCheckProposal;
 
 /**
  * Table tl_dc_check_articles
@@ -179,8 +175,6 @@ $GLOBALS['TL_DCA']['tl_dc_check_articles'] = [
 
 /**
  * Provide miscellaneous methods that are used by the data configuration array.
- *
- * @property DcTanks $DcTanks
  *
  * @internal
  */
