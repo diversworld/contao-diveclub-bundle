@@ -104,9 +104,20 @@ class ModuleBooking extends AbstractFrontendModuleController
             }
         }
 
+        $session = $this->requestStack->getSession();
+        $bag = $session->getBag(ArrayAttributeBag::ATTRIBUTE_NAME);
+        $selectedMember = $bag->get('selectedMember') ?? null; // Hole den von der Session gespeicherten Benutzer
+
+        if ($selectedMember === null) {
+            $selectedMember = $this->getCurrentUser() ?? null;
+            $session->getBag('attributes')->set('selectedMember', $selectedMember);
+        }
+
+        $template->selectedMember = $selectedMember; // Ins Template laden
+
         // Verarbeitung von POST-Daten
         if ($request->isMethod('POST')) {
-            $response = $this->handlePostRequest($request, $template, $sessionData);
+            $response = $this->handlePostRequest($request, $template, $sessionData, (int) $selectedMember);
             if ($response instanceof Response) {
                 // Wenn handlePostRequest eine RedirectResponse oder ähnliches zurückgibt, wird dies ausgeführt
                 return $response;
@@ -123,10 +134,6 @@ class ModuleBooking extends AbstractFrontendModuleController
         // Vorgemerkte Assets immer laden
         $storedAssets = $this->loadStoredAssets($this->getSessionData());
 
-        // selectedMember aus Request (oder per Default null)
-        $selectedMember = $this->requestStack->getSession()->get('selectedMember', null); // Hole den von der Session gespeicherten Benutzer
-        $template->selectedMember = $selectedMember; // Ins Template laden
-
         $template->storedAssets = $storedAssets;
         $template->totalRentalFee = $this->calculateTotalRentalFee($this->getSessionData());
 
@@ -136,54 +143,76 @@ class ModuleBooking extends AbstractFrontendModuleController
     /**
      * POST-Anfrage verarbeiten.
      */
-    private function handlePostRequest(Request $request, Template $template, array $sessionData): RedirectResponse
+    private function handlePostRequest(Request $request, Template $template, array $sessionData, int $selectedMember): RedirectResponse
     {
+        $formType = $request->request->get('FORM_SUBMIT', null);
+        $action = $request->request->get('action', ''); // Der Wert des gedrückten Buttons
+        $seite = $request->getUri();
+        $urlParts = parse_url($seite);
 
-        //$formType = $request->request->get('FORM_SUBMIT');
-        if ($request->isMethod('POST')) {
-            // Der Wert des gedrückten Buttons
-            $action = $request->request->get('action', '');
-            $seite = $request->getUri();
-            $urlParts = parse_url($seite);
-
-            // Speichere den Benutzer, für den reserviert werden soll
+        // 1. Speichere den Benutzer, für den reserviert werden soll
+        if ($formType === 'reservation_select_member') {
             $selectedMember = $request->request->get('reservedFor');
 
+            // Validierung: Überprüfen, ob der ausgewählte Benutzer existiert
             if ($selectedMember) {
-                $session = $this->requestStack->getSession();
-                $session->set('selectedMember', $selectedMember); // Benutzer in Session speichern
+                $member = $this->db->fetchAssociative('SELECT id FROM tl_member WHERE id = ?', [$selectedMember]);
+                if ($member) {
+                    $session = $this->requestStack->getSession();
+                    $bag = $session->getBag(ArrayAttributeBag::ATTRIBUTE_NAME);
+
+                    // Benutzer speichern
+                    $bag->set('selectedMember', $selectedMember);
+
+                    // Sicherstelllen, dass dieser auch in den Session-Daten (reservation_items) ist
+                    $sessionData = $bag->get('reservation_items', []);
+                    foreach ($sessionData as &$reservation) {
+                        $reservation['selectedMember'] = $selectedMember;
+                    }
+                    $bag->set('reservation_items', $sessionData);
+                } else {
+                    Message::addError('Der ausgewählte Benutzer wurde nicht gefunden.');
+                }
             }
 
-            switch ($action) {
-                case 'save':
-                    // Logik für "Speichern"
-                    $this->saveReservationsToDatabase();
-                    $this->sendReservationNotification($sessionData);
-                    Message::addConfirmation('Die Reservierung gespeichert und die Session-Daten wurden gelöscht.');
-                    $this->resetSession();
+            // Zurück zur aktuellen Seite
+            return new RedirectResponse($seite);
+        }
 
-                    // Seite neu laden, ohne Query-Parameter
-                    $cleanUrl = $urlParts['scheme'] . '://' . $urlParts['host'] . $urlParts['path'];
 
-                    return new RedirectResponse($cleanUrl);
+        switch ($action) {
+            case 'save':
+                // Logik für "Speichern"
+                $this->saveReservationsToDatabase();
+                $this->sendReservationNotification($sessionData);
+                Message::addConfirmation('Die Reservierung gespeichert und die Session-Daten wurden gelöscht.');
+                $this->resetSession();
 
-                case 'cancel':
-                    // Abbrechen und Session zurücksetzen
-                    $this->resetSession();
-                    Message::addConfirmation('Die Reservierung wurde abgebrochen und die Session-Daten wurden gelöscht.');
+                // Seite neu laden, ohne Query-Parameter
+                $cleanUrl = $urlParts['scheme'] . '://' . $urlParts['host'] . $urlParts['path'];
 
-                    $cleanUrl = $urlParts['scheme'] . '://' . $urlParts['host'] . $urlParts['path'];
+                return new RedirectResponse($cleanUrl);
 
-                    return new RedirectResponse($cleanUrl); // Rückgabe des RedirectResponse-Objekts
+            case 'cancel':
+                // Abbrechen und Session zurücksetzen
+                $this->resetSession();
+                Message::addConfirmation('Die Reservierung wurde abgebrochen und die Session-Daten wurden gelöscht.');
 
-                case 'reserve':
-                    $this->saveSessionData($request->request->all(), $template);
-                    Message::addConfirmation('Ausrüstung vorgemerkt.');
-                    return new RedirectResponse($seite);  // Zurück zum Template
-            }
+                $cleanUrl = $urlParts['scheme'] . '://' . $urlParts['host'] . $urlParts['path'];
+
+                return new RedirectResponse($cleanUrl); // Rückgabe des RedirectResponse-Objekts
+
+            case 'reserve':
+                // Logik für "Reservieren"
+                $this->saveSessionData($request->request->all(), $template);
+                Message::addConfirmation('Ausrüstung vorgemerkt.');
+                return new RedirectResponse($seite);  // Zurück zum Template
         }
 
         $template->messages = Message::generate();
+
+        // 3. Standardverarbeitung: Falls keine Aktion erkannt wurde
+        Message::addError('Ungültige Aktion.');
 
         // Default-Fall, falls keine gültige Aktion erkannt wurde
         return new RedirectResponse($seite);
@@ -293,6 +322,7 @@ class ModuleBooking extends AbstractFrontendModuleController
         $session = $this->requestStack->getSession();
         $bag = $session->getBag(ArrayAttributeBag::ATTRIBUTE_NAME);
         $bag->set('reservation_items', []);
+        $bag->set('selectedMember', null);
     }
 
     /**
@@ -373,8 +403,8 @@ class ModuleBooking extends AbstractFrontendModuleController
             // Typnamen und Subtypen aus den Equipment-Typen extrahieren
             foreach ($equipmentTypes as $typeKey => $typeData) {
                 if ($typeKey == $typeId) {
-                    $typeName = array_key_first($typeData);
-                    $subtypes = $typeData[$typeName];
+                    $typeName = $typeData['name'] ?? 'unknown_type';
+                    $subtypes = $typeData['subtypes'];
 
                     // Subtypen-Name ermitteln
                     $subTypeName = $subtypes[$subTypeId] ?? 'unknown_subtype';
@@ -433,6 +463,7 @@ class ModuleBooking extends AbstractFrontendModuleController
     {
         $session = $this->requestStack->getSession();
         $bag = $session->getBag(ArrayAttributeBag::ATTRIBUTE_NAME);
+        $selectedMember =$bag->get('selectedMember');
 
         // Bestehende Session-Daten abrufen
         $sessionData = $bag->get('reservation_items', []);
@@ -442,9 +473,6 @@ class ModuleBooking extends AbstractFrontendModuleController
         if (!is_array($selectedAssets)) {
             $selectedAssets = [];
         }
-
-        // Entferne leere oder ungültige Einträge aus dem Array
-        //$selectedAssets = array_filter($selectedAssets, static fn($assetId) => !empty($assetId));
 
         // Entferne leere Einträge aus dem 'selectedAssets'-Array
         $selectedAssets = array_filter($selectedAssets, function ($assetId) {
@@ -484,9 +512,20 @@ class ModuleBooking extends AbstractFrontendModuleController
         }
 
         if ($existingCategoryIndex !== null) {
+
             // Bestehenden Eintrag aktualisieren (alte Assets beibehalten, neue hinzufügen)
             $existingAssets = $sessionData[$existingCategoryIndex]['selectedAssets'] ?? [];
-            $mergedAssets = array_unique(array_merge($existingAssets, $selectedAssets));
+
+            $existingAssetIds = [];
+            // 1. IDs aus `$existingAssets` extrahieren
+            foreach ($existingAssets as $asset) {
+                if (isset($asset['assetId'])) {
+                    $existingAssetIds[] = $asset['assetId'];
+                }
+            }
+
+            // 2. Assets zusammenführen und Duplikate entfernen
+            $mergedAssets = array_unique(array_merge($existingAssetIds, $selectedAssets)); // ["37", "39"]
 
             // Assets-Knotenstruktur erweitern (type und subType hinzufügen)
             $assetDetails = [];
@@ -516,6 +555,7 @@ class ModuleBooking extends AbstractFrontendModuleController
                 'category' => $data['category'],
                 'selectedAssets' => $assetDetails,
                 'totalRentalFee' => $totalRentalFee,
+                'selectedMember' => $selectedMember, // Füge den Benutzer hinzu
             ];
         }
 
@@ -531,7 +571,7 @@ class ModuleBooking extends AbstractFrontendModuleController
         $session = $this->requestStack->getSession();
         $bag = $session->getBag(ArrayAttributeBag::ATTRIBUTE_NAME);
         $sessionData = $bag->get('reservation_items', []); // Alle gespeicherten Reservierungsdaten abrufen
-        $selectedMember = $session->get('selectedMember'); // Gehe auf den gespeicherten Benutzer ein
+        $selectedMember = $bag->get('selectedMember'); // Gehe auf den gespeicherten Benutzer ein
 
         if (empty($sessionData)) {
             throw new \RuntimeException('Es sind keine Reservierungsdaten in der Session gespeichert.');
@@ -542,7 +582,7 @@ class ModuleBooking extends AbstractFrontendModuleController
         foreach ($sessionData as $entry) {
             $userId = $entry['userId'] ?? null;
             $category = $entry['category'] ?? null;
-            $selectedMember = $entry['selectedMember'] ?? [];
+            $reservedFor = $entry['selectedMember'];
             $selectedAssets = $entry['selectedAssets'] ?? [];
             $totalRentalFee = $totalPrice; // Mietkosten berechnen
 
@@ -566,7 +606,7 @@ class ModuleBooking extends AbstractFrontendModuleController
                 $reservation->alias = 'id-' . $reservationTitle;
                 $reservation->tstamp = time();
                 $reservation->member_id = $userId;
-                $reservation->reservedFor = $selectedMember['name'] ?? null;
+                $reservation->reservedFor = $reservedFor ?? null;
                 $reservation->asset_type = $category;
                 $reservation->reserved_at = time();
                 $reservation->reservation_status = 'reserved';
@@ -879,16 +919,17 @@ class ModuleBooking extends AbstractFrontendModuleController
                 $subTypes = $helper->getSubTypes($asset->type);
                 $sizeText = $sizeMapping[$asset->size] ?? 'Unbekannte Größe';
 
-                return sprintf(
+                $info =  sprintf(
                     'Ausrüstung: %s %s - %s (Modell: %s, Größe: %s, Farbe: %s), %.2f €',
-                        $types[$asset->type] ?? 'Unbekannt',
-                                $subTypes[$asset->subType] ?? 'Unbekannt',
-                                $asset->title ?? 'Unbekannt',
-                                $asset->model ?? 'Kein Modell angegeben',
-                                $sizeText,
-                                $asset->color ?? 'Keine Farbe angegeben',
-                                (float)$asset->rentalFee
+                    $types[$asset->type]['name'] ?? 'Unbekannt',
+                    $subTypes[$asset->subType] ?? 'Unbekannt',
+                    $asset->title ?? 'Unbekannt',
+                    $asset->model ?? 'Kein Modell angegeben',
+                    $sizeText,
+                    $asset->color ?? 'Keine Farbe angegeben',
+                    (float)$asset->rentalFee
                 );
+                return $info;
 
             default:
                 return null;

@@ -36,8 +36,8 @@ class DcaTemplateHelper
             // Wenn der Typ übereinstimmt, Subtypen extrahieren
             if ($tid == $typeId) {
                 // Subtypen-Array extrahieren
-                $typeName = array_key_first($typeData); // Typ-Name (z. B. "Anzüge")
-                return $typeData[$typeName];
+                $typeName = $typeData['name']; // Typ-Name (z. B. "Anzüge")
+                return $typeData['subtypes'];
             }
         }
 
