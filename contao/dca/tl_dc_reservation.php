@@ -45,12 +45,12 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
     'list' => [
         'sorting' => [
             'mode' => DataContainer::MODE_SORTABLE,
-            'fields' => ['title','member_id','alias', 'published'],
+            'fields' => ['title','member_id','reservedFor','alias', 'published'],
             'flag' => DataContainer::SORT_ASC,
             'panelLayout' => 'filter;sort,search,limit'
         ],
         'label' => [
-            'fields' => ['title','member_id','reservation_status','reserved_at','rentalFee'],
+            'fields' => ['title','member_id','reservedFor','reservation_status','reserved_at','rentalFee'],
             'format' => '%s - %s - %s %s - (%s)',
             'showColumns' => true,
         ],
@@ -72,8 +72,8 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
     ],
     'palettes'          => [
         '__selector__'      => ['addNotes'],
-        'default'           => '{title_legend},title,member_id,alias;
-                                {reservation_legend},reserved_at,picked_up_at,returned_at,reservation_status,rentalFee;
+        'default'           => '{title_legend},title,alias;
+                                {reservation_legend},member_id,reservedFor,reserved_at,picked_up_at,returned_at,reservation_status,rentalFee;
                                 {notes_legend},addNotes;
                                 {publish_legend},published,start,stop;'
     ],
@@ -157,7 +157,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'sorting'           => true,
 			'save_callback'		=> [[ReservationMemberIdCallbackListener::class, '__invoke']],
             'foreignKey'        => 'tl_member.CONCAT(firstname, " ", lastname)',
-            'eval'              => array('submitOnChange' => true, 'includeBlankOption' => true, 'tl_class' => 'w25'),
+            'eval'              => array('submitOnChange' => true, 'includeBlankOption' => true, 'tl_class' => 'w25 clr'),
             'sql'               => "int(10) unsigned NOT NULL default 0", // Speichert eine ID (Int)
             'relation'          => array('type' => 'hasOne', 'load' => 'lazy')
         ],

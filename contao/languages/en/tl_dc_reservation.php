@@ -57,6 +57,7 @@ $GLOBALS['TL_LANG']['tl_dc_reservation']['start']               = ["Show from", 
 $GLOBALS['TL_LANG']['tl_dc_reservation']['stop']                = ["Show until", "Until when the record should be displayed."];
 $GLOBALS['TL_LANG']['tl_dc_reservation']['reservation_status']  = ['Status','Status of the reservation'];
 $GLOBALS['TL_LANG']['tl_dc_reservation']['member_id']           = ['Member','Name of the club member'];
+$GLOBALS['TL_LANG']['tl_dc_reservation']['reservedFor']         = ['Reserved for','Name of Member for whom the reservation was made'];
 $GLOBALS['TL_LANG']['tl_dc_reservation']['reserved_at']         = ['Reserved on','Date of the reservation'];
 $GLOBALS['TL_LANG']['tl_dc_reservation']['picked_up_at']        = ['Picked up on','Date of pick-up'];
 $GLOBALS['TL_LANG']['tl_dc_reservation']['returned_at']         = ['Returned on','Date of the return'];

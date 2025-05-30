@@ -48,7 +48,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
         'sorting'               => [
             'mode'              => DataContainer::MODE_PARENT,
             'fields'            => ['item_type', 'reservation_status','created_at','updated_at'],
-            'headerFields'      => ['title', 'member_id','reservation_status','created_at','updated_at'],
+            'headerFields'      => ['title', 'member_id','reservedFor','reservation_status','created_at','updated_at'],
             'flag'              => DataContainer::SORT_ASC,
             'panelLayout'       => 'filter;sort,search,limit'
         ],
