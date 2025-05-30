@@ -137,7 +137,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'search'                => true,
             'filter'                => true,
             'sorting'               => true,
-            'eval'                  => ['mandatory' => false, 'maxlength' => 50, 'tl_class' => 'w25 clr'],
+            'eval'                  => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25 clr'],
             'sql'                   => "varchar(50) NOT NULL default ''"
         ],
         'midPressurePre200'    => [
@@ -147,7 +147,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'search'                => true,
             'filter'                => true,
             'sorting'               => true,
-            'eval'                  => ['mandatory' => false, 'maxlength' => 50, 'tl_class' => 'w25'],
+            'eval'                  => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25 clr'],
             'sql'                   => "varchar(50) NOT NULL default ''"
         ],
         'inhalePressurePre' => [
@@ -157,7 +157,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'search'                => true,
             'filter'                => true,
             'sorting'               => true,
-            'eval'                  => ['mandatory' => false, 'maxlength' => 50, 'tl_class' => 'w25'],
+            'eval'                  => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25'],
             'sql'                   => "varchar(50) NOT NULL default ''"
         ],
         'exhalePressurePre' => [
@@ -167,7 +167,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'search'                => true,
             'filter'                => true,
             'sorting'               => true,
-            'eval'                  => ['mandatory' => false, 'maxlength' => 50, 'tl_class' => 'w25'],
+            'eval'                  => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25'],
             'sql'                   => "varchar(50) NOT NULL default ''"
         ],
         'midPressurePost30'   => [
@@ -177,7 +177,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'search'                => true,
             'filter'                => true,
             'sorting'               => true,
-            'eval'                  => ['mandatory' => false, 'maxlength' => 50, 'tl_class' => 'w25 clr'],
+            'eval'                  => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25 clr'],
             'sql'                   => "varchar(50) NOT NULL default ''"
         ],
         'midPressurePost200'   => [
@@ -187,7 +187,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'search'                => true,
             'filter'                => true,
             'sorting'               => true,
-            'eval'                  => ['mandatory' => false, 'maxlength' => 50, 'tl_class' => 'w25'],
+            'eval'                  => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25 clr'],
             'sql'                   => "varchar(50) NOT NULL default ''"
         ],
         'inhalePressurePost'=> [
@@ -197,7 +197,8 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'search'                => true,
             'filter'                => true,
             'sorting'               => true,
-            'eval'                  => ['mandatory' => false, 'maxlength' => 50, 'tl_class' => 'w25'],
+            'flag'                  => DataContainer::SORT_INITIAL_LETTER_ASC,
+            'eval'                  => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25'],
             'sql'                   => "varchar(50) NOT NULL default ''"
         ],
         'exhalePressurePost'=> [
@@ -207,7 +208,8 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'search'                => true,
             'filter'                => true,
             'sorting'               => true,
-            'eval'                  => ['mandatory' => false, 'maxlength' => 50, 'tl_class' => 'w25'],
+            'flag'                  => DataContainer::SORT_INITIAL_LETTER_ASC,
+            'eval'                  => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25'],
             'sql'                   => "varchar(50) NOT NULL default ''"
         ],
         'addNotes'          => [
