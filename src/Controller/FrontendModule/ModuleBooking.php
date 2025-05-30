@@ -571,7 +571,6 @@ class ModuleBooking extends AbstractFrontendModuleController
         $session = $this->requestStack->getSession();
         $bag = $session->getBag(ArrayAttributeBag::ATTRIBUTE_NAME);
         $sessionData = $bag->get('reservation_items', []); // Alle gespeicherten Reservierungsdaten abrufen
-        $selectedMember = $bag->get('selectedMember'); // Gehe auf den gespeicherten Benutzer ein
 
         if (empty($sessionData)) {
             throw new \RuntimeException('Es sind keine Reservierungsdaten in der Session gespeichert.');

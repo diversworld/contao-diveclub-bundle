@@ -25,11 +25,6 @@ class DcaTemplateHelper
     }
     public function getSubTypes(int $typeId): array
     {
-        // Optionen laden
-        //$types = $this->getTemplateOptions('subTypesFile');
-
-        // Rückgabe der Subtypen für den ermittelten Typ
-        //return $types[$typeId] ?? [];
         $types = $this->getEquipmentTypes(); // Equipment-Typen laden
 
         foreach ($types as $tid => $typeData) {
@@ -42,7 +37,6 @@ class DcaTemplateHelper
         }
 
         return []; // Keine Subtypen gefunden
-
     }
 
     public function getRegModels1st(?int $manufacturer = null, ?DataContainer $dc = null): array
