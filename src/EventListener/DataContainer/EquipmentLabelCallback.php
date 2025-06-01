@@ -13,19 +13,17 @@ use function Symfony\Component\Translation\t;
 #[AsCallback(table: 'tl_dc_equipment', target: 'list.label.label')]
 class EquipmentLabelCallback
 {
-    private TranslatorInterface $translator;
     private DcaTemplateHelper $templateHelper;
 
-    public function __construct(DcaTemplateHelper $templateHelper, TranslatorInterface $translator)
+    public function __construct(DcaTemplateHelper $templateHelper)
     {
-        $this->translator = $translator;
         $this->templateHelper = $templateHelper;
     }
 
     public function __invoke(array $row, string $label, DataContainer $dc, array $labels): array
     {
         // Typ und Untertyp-Name abrufen
-        $types = $this->templateHelper->getEquipmentTypes();
+        $types = $this->templateHelper->getEquipmentFlatTypes();
         $labels[0] = $types[$row['type']] ?? '-';
         $subTypes = $this->templateHelper->getSubTypes($row['type']);
         $labels[1] = $subTypes[$row['subType']] ?? '-';

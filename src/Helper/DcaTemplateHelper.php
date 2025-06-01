@@ -23,6 +23,22 @@ class DcaTemplateHelper
     {
         return $this->getTemplateOptions('typesFile');
     }
+
+    public function getEquipmentFlatTypes(): array
+    {
+        $types = $this->getTemplateOptions('typesFile');
+
+        // Flache Struktur erstellen
+        $flattenedOptions = [];
+        foreach ($types as $id => $typeData) {
+            if (isset($typeData['name'])) { // Sicherstellen, dass der Name-Index existiert
+                $flattenedOptions[$id] = $typeData['name']; // Verwenden Sie den 'name'-Wert
+            }
+        }
+
+        return $flattenedOptions; // ['1' => 'Anzüge', '2' => 'ABC-Equipment', ...]
+    }
+
     public function getSubTypes(int $typeId): array
     {
         $types = $this->getEquipmentTypes(); // Equipment-Typen laden
@@ -31,7 +47,6 @@ class DcaTemplateHelper
             // Wenn der Typ übereinstimmt, Subtypen extrahieren
             if ($tid == $typeId) {
                 // Subtypen-Array extrahieren
-                $typeName = $typeData['name']; // Typ-Name (z. B. "Anzüge")
                 return $typeData['subtypes'];
             }
         }

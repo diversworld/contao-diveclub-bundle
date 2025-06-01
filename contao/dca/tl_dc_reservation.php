@@ -51,7 +51,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
         ],
         'label' => [
             'fields' => ['title','member_id','reservedFor','reservation_status','reserved_at','rentalFee'],
-            'format' => '%s - %s - %s %s - (%s)',
+            'format' => '%s - %s/%s - %s %s - (%s)',
             'showColumns' => true,
         ],
         'global_operations' => [
@@ -153,7 +153,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'inputType'         => 'select',
             'exclude'           => true,
             'search'            => true,
-            'filter'            => true,
+            'filter'            => false,
             'sorting'           => true,
 			'save_callback'		=> [[ReservationMemberIdCallbackListener::class, '__invoke']],
             'foreignKey'        => 'tl_member.CONCAT(firstname, " ", lastname)',
@@ -166,7 +166,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'inputType'         => 'select',
             'exclude'           => true,
             'search'            => true,
-            'filter'            => true,
+            'filter'            => false,
             'sorting'           => true,
             'foreignKey'        => 'tl_member.CONCAT(firstname, " ", lastname)',
             'eval'              => array('submitOnChange' => true, 'includeBlankOption' => true, 'tl_class' => 'w25'),

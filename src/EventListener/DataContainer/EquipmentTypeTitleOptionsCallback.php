@@ -19,6 +19,6 @@ class EquipmentTypeTitleOptionsCallback
 
     public function __invoke(): array
     {
-        return $this->templateHelper->getEquipmentTypes();
+        return $this->templateHelper->getEquipmentFlatTypes();
     }
 }

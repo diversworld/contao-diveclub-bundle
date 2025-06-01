@@ -20,6 +20,7 @@ use Contao\DC_Table;
 use Diversworld\ContaoDiveclubBundle\DataContainer\DcReservation;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ItemReservationCallbackListener;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationItemsLabelCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationItemsSubTypeOptionsCallback;
 use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
 use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorsModel;
@@ -122,7 +123,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
             'exclude'           => true,
             'filter'            => true,
             'sorting'           => true,
-            'options_callback'  => ['tl_dc_reservation_items', 'getEquipmentSubTypes'],//[ReservationItemsSubTypeOptionsCallback::class, '__invoke'],
+            'options_callback'  => [ReservationItemsSubTypeOptionsCallback::class, '__invoke'],
             'eval'              => ['mandatory' => false, 'submitOnChange' => true,'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w25'],
             'sql'               => "varchar(255) NOT NULL default ''",
         ],
@@ -180,18 +181,14 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
         'created_at'        => [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_reservation_items']['created_at'],
             'inputType'         => 'text',
-            'save_callback'     => [
-                ['tl_dc_reservation_items', 'setCreatedAt']
-            ],
+            'save_callback'     => [['tl_dc_reservation_items', 'setCreatedAt']],
             'eval'              => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
             'sql'               => "varchar(10) NOT NULL default ''"
         ],
         'updated_at'        => [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_reservation_items']['updated_at'],
             'inputType'         => 'text',
-            'save_callback'     => [
-                ['tl_dc_reservation_items', 'setUpdatedAt']
-            ],
+            'save_callback'     => [['tl_dc_reservation_items', 'setUpdatedAt']],
             'eval'              => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
             'sql'               => "varchar(10) NOT NULL default ''"
         ],
@@ -284,11 +281,6 @@ class tl_dc_reservation_items extends Backend
                 }
                 break;
             case 'tl_dc_equipment':
-/*                if (empty($dc->activeRecord->types) || empty($dc->activeRecord->sub_type)) {
-                    return []; // Keine Optionen anzeigen, wenn Werte fehlen
-                }
-*/
-                //$result = DcEquipmentModel::findByTypeAndSubType($dc->activeRecord->types, $dc->activeRecord->sub_type);//findPublished();
 				$result = DcEquipmentModel::findBy(
 					['type = ? AND subType = ? AND published = ?'],
 					[$dc->activeRecord->types, $dc->activeRecord->sub_type, '1']
