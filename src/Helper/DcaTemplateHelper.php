@@ -35,7 +35,6 @@ class DcaTemplateHelper
                 $flattenedOptions[$id] = $typeData['name']; // Verwenden Sie den 'name'-Wert
             }
         }
-
         return $flattenedOptions; // ['1' => 'Anzüge', '2' => 'ABC-Equipment', ...]
     }
 
