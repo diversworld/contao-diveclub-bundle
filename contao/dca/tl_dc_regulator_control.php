@@ -17,8 +17,8 @@ use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
 use Contao\TemplateLoader;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\RegControlHeaderCallback;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\SetRegNextCheckDateCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\DataContainer\RegControlHeaderCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\DataContainer\SetRegNextCheckDateCallback;
 
 /**
  * Table tl_dc_check_articles

@@ -20,6 +20,8 @@ use Contao\FilesModel;
 use Contao\StringUtil;
 use Contao\System;
 use Diversworld\ContaoDiveclubBundle\DataContainer\DcCheckProposal;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentManufacturerOptionsCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ManufacturerOptionsCallbackListener;
 
 /**
  * Table tl_dc_regulators
@@ -48,7 +50,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
         'label'             => [
             'fields'        => ['title','manufacturer','regModel1st','regModel2ndPri','regModel2ndSec','status'],
             'showColumns'   => true,
-            'format'        => '%s - %s - %s %s %s',
+            'format'        => '%s - %s - %s %s %s %s',
             'label_callback' => ['tl_dc_regulators', 'customLabelCallback']
         ],
         'global_operations' => [
@@ -110,8 +112,9 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
-            'options_callback'  => array('tl_dc_regulators', 'getManufacturers'),
-            'eval'              => array('includeBlankOption' => true, 'submitOnChange' => true, 'mandatory' => true, 'tl_class' => 'w25 clr'),
+            'options_callback'  =>[EquipmentManufacturerOptionsCallback::class, '__invoke'],
+            'reference'         => &$GLOBALS['TL_LANG']['tl_dc_regulators']['manufacturer'],
+            'eval'              => ['includeBlankOption' => true, 'submitOnChange' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql'               => "varchar(255) NOT NULL default ''",
         ],
         'serialNumber1st'   => [
@@ -133,7 +136,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'filter'            => true,
             'sorting'           => true,
             'options_callback'  => ['tl_dc_regulators', 'getRegModels1st'],
-            'eval'              => ['includeBlankOption' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w25'],
+            'eval'              => ['submitOnChange' => true, 'includeBlankOption' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql'               => "varchar(255) NOT NULL default ''"
         ],
         'serialNumber2ndPri'=> [
@@ -186,9 +189,9 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
-            'options'           => &$GLOBALS['TL_LANG']['tl_dc_regulators']['itemStatus'],//['auvailable','reserved', 'borrowed', 'returned', 'cancelled', 'overdue', 'lost', 'damaged', 'missing'],
+            'options'           => &$GLOBALS['TL_LANG']['tl_dc_regulators']['itemStatus'],
             'reference'         => &$GLOBALS['TL_LANG']['tl_dc_regulators']['itemStatus'],
-            'eval'              => ['includeBlankOption' => true, 'submitOnChange' => true, 'chosen'   => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
+            'eval'              => ['includeBlankOption' => true, 'submitOnChange' => false, 'chosen'   => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql'               => "varchar(255) NOT NULL default ''"
         ],
         'rentalFee'             => [
@@ -423,14 +426,6 @@ class tl_dc_regulators extends Backend
         }
 
         return $args;
-    }
-
-    /**
-     * Formatiert den Preis für die Anzeige im Backend
-     */
-    public function formatPrice($value): string
-    {
-        return number_format((float)$value, 2, '.', ',') . ' €'; // z. B. "123.45 €"
     }
 
     /**

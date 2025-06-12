@@ -19,11 +19,11 @@ use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
 use Diversworld\ContaoDiveclubBundle\DataContainer\DcReservation;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationMemberIdCallbackListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationPickedUpCallback;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationReturnedCallback;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationStatusCallback;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationTitleCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\DataContainer\ReservationMemberIdCallbackListener;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\DataContainer\ReservationPickedUpCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\DataContainer\ReservationReturnedCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\DataContainer\ReservationStatusCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\DataContainer\ReservationTitleCallback;
 
 /**
  * Table tl_dc_reservation

@@ -19,11 +19,11 @@ use Contao\DC_Table;
 use Contao\FilesModel;
 use Contao\StringUtil;
 use Contao\System;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentLabelCallback;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentManufacturerOptionsCallback;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentSizeOptionsCallback;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentSubTypeOptionsCallback;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentTypeOptionsCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\DataContainer\EquipmentLabelCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\DataContainer\EquipmentManufacturerOptionsCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\DataContainer\EquipmentSizeOptionsCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\DataContainer\EquipmentSubTypeOptionsCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\DataContainer\EquipmentTypeOptionsCallback;
 use Psr\Log\LoggerInterface;
 
 /**
