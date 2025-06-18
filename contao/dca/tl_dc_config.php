@@ -138,12 +138,6 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
             'eval'                  => array('fieldType'=>'radio', 'files' => true, 'tl_class'=>'w33clr'),
             'sql'                   => "binary(16) NULL"
         ),
-        'subTypesFile'          => array
-        (
-            'inputType'             => 'fileTree',
-            'eval'                  => array('fieldType'=>'radio', 'files' => true, 'tl_class'=>'w33clr'),
-            'sql'                   => "binary(16) NULL"
-        ),
         'regulatorsFile'        => array
         (
             'inputType'             => 'fileTree',

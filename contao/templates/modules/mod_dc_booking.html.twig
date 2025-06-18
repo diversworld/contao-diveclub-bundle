@@ -24,13 +24,13 @@
             </select>
         </form>
     </div>
-    <div class="col m2">&nbsp;</div>
+    <div class="col m3">&nbsp;</div>
     <div class="col m3">
         {# Angemeldeter Nutzer #}
         <label for="currentUser">Angemeldeter Benutzer:</label>
         <p>{{ currentUser.userFullName| default('Gast') }}</p>
     </div>
-    <div class="col m4">
+    <div class="col m3">
         <form method="POST" action="{{ action }}">
             <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
             <input type="hidden" name="FORM_SUBMIT" value="reservation_select_member">

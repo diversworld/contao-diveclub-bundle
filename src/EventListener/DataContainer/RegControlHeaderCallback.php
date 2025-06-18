@@ -8,7 +8,6 @@ use Contao\Input;
 use Contao\System;
 use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
 use Doctrine\DBAL\Connection;
-use Contao\TemplateLoader;
 use Psr\Log\LoggerInterface;
 
 #[AsCallback(table: 'tl_dc_control_card', target: 'list.sorting.header')]
@@ -57,18 +56,10 @@ class RegControlHeaderCallback
         $models1st = $this->templateHelper->getRegModels1st($manufacturerId, $dc);
         $models2nd = $this->templateHelper->getRegModels2nd($manufacturerId, $dc);
 
-        dump($record);
-        dump($models1st);
-        dump($models2nd);
-        dump($manufacturers);
         // 5. Modelle auflösen
         $record['regModel1st'] = $models1st[(int)$record['regModel1st']] ?? '';
         $record['regModel2ndPri'] = $models2nd[(int)$record['regModel2ndPri']] ?? '';
         $record['regModel2ndSec'] = $models2nd[(int)$record['regModel2ndSec']] ?? '';
-
-        dump($record['regModel1st']);
-        dump($record['regModel2ndPri']);
-        dump($record['regModel2ndSec']);
 
         // 6. Sprachdatei laden und Mapping vorbereiten
         System::loadLanguageFile('tl_dc_regulators');
@@ -80,7 +71,7 @@ class RegControlHeaderCallback
             'Modell 2. Stufe (primär)' => 'regModel2ndPri',
             'Modell 2. Stufe (sekundär)' => 'regModel2ndSec',
         ];
-dump($mapping);
+
         foreach ($mapping as $labelKey => $recordField) {
             $labels[$GLOBALS['TL_LANG']['tl_dc_regulators'][$recordField][0] ?? $labelKey] = $record[$recordField] ?? 'Nicht verfügbar';
         }

@@ -1,7 +1,36 @@
 <?php
 return [
-'1' => 'Anzüge',
-'2' => 'Atemregler',
-'3' => 'ABC-Equipment',
-'4' => 'Sonstiges',
+    // Typ-ID: 1
+    '1' => [
+        'name' => 'Anzüge',
+        'subtypes' => [
+            '1' => 'shorties',
+            '2' => 'nass',
+            '3' => 'halbtrocken',
+            '4' => 'trocken',
+        ],
+    ],
+    // Typ-ID: 2
+    '2' => [
+        'name' => 'ABC-Equipment',
+        'subtypes' => [
+            '1' => 'Masken',
+            '2' => 'Schnorchel',
+            '3' => 'Schwimmbadflossen',
+            '4' => 'Geräteflossen',
+        ],
+    ],
+    // Typ-ID: 3
+    '3' => [
+        'name' => 'Sonstiges',
+        'subtypes' => [
+            '1' => 'Kopfhauben',
+            '2' => 'Handschuhe',
+            '3' => 'Füßlinge',
+            '4' => 'Lampen',
+            '5' => 'Kompasse',
+            '6' => 'Bojen',
+            '7' => 'Halsbänder',
+        ],
+    ],
 ];

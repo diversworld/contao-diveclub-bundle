@@ -36,7 +36,6 @@ $GLOBALS['TL_LANG']['tl_dc_config']['templatePath'] = ['Templatepfad', 'Bitte de
 $GLOBALS['TL_LANG']['tl_dc_config']['manufacturer_template'] = ['Hersteller-Template', 'Eine neue Template-Konfiguration anlegen.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['sizesFile'] = ['Größen-Template', 'Eine neue Template-Konfiguration anlegen.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['typesFile'] = ['Ausrüstungs-Template', 'Eine neue Template-Konfiguration anlegen.'];
-$GLOBALS['TL_LANG']['tl_dc_config']['subTypesFile'] = ['Typen-Template', 'Eine neue Template-Konfiguration anlegen.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['regulatorsFile'] = ['Regulator-Template', 'Eine neue Template-Konfiguration anlegen.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['reservationMessage'] = ['Reservation Message', 'Text displayed when reserving equipment'];
 $GLOBALS['TL_LANG']['tl_dc_config']['reservationInfo'] = ['Mail Adress', 'Mail-Adress which get information about a new reservation.'];
