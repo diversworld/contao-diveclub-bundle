@@ -14,28 +14,23 @@ declare(strict_types=1);
 
 namespace Diversworld\ContaoDiveclubBundle\Controller\FrontendModule;
 
-use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Routing\ScopeMatcher;
-use Contao\Date;
-use Contao\FrontendUser;
 use Contao\Input;
 use Contao\ModuleModel;
 use Contao\PageModel;
-use Contao\System;
 use Contao\Template;
+use Diversworld\ContaoDiveclubBundle\Model\DcCalendarEventsModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcCheckArticlesModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckProposalModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Diversworld\ContaoDiveclubBundle\Model\DcCheckArticlesModel;
-use Diversworld\ContaoDiveclubBundle\Model\DcCalendarEventsModel;
 
 #[AsFrontendModule(DcListingController::TYPE, category: 'dc_modules', template: 'mod_dc_listing')]
 class DcListingController extends AbstractFrontendModuleController
@@ -43,6 +38,22 @@ class DcListingController extends AbstractFrontendModuleController
     public const TYPE = 'dc_listing';
 
     protected ?PageModel $page;
+
+    /**
+     * Lazyload services.
+     */
+    public static function getSubscribedServices(): array
+    {
+        $services = parent::getSubscribedServices();
+
+        $services['contao.framework'] = ContaoFramework::class;
+        $services['database_connection'] = Connection::class;
+        $services['security.helper'] = Security::class;
+        $services['contao.routing.scope_matcher'] = ScopeMatcher::class;
+        $services['translator'] = TranslatorInterface::class;
+
+        return $services;
+    }
 
     /**
      * This method extends the parent __invoke method,
@@ -62,22 +73,6 @@ class DcListingController extends AbstractFrontendModuleController
         return parent::__invoke($request, $model, $section, $classes);
     }
 
-    /**
-     * Lazyload services.
-     */
-    public static function getSubscribedServices(): array
-    {
-        $services = parent::getSubscribedServices();
-
-        $services['contao.framework'] = ContaoFramework::class;
-        $services['database_connection'] = Connection::class;
-        $services['contao.routing.scope_matcher'] = ScopeMatcher::class;
-        $services['security.helper'] = Security::class;
-        $services['translator'] = TranslatorInterface::class;
-
-        return $services;
-    }
-
     protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
     {
         $eventAlias = Input::get('auto_item');
@@ -87,7 +82,7 @@ class DcListingController extends AbstractFrontendModuleController
 
         $proposal = DcCheckProposalModel::findBy('checkId', $event->id);
 
-        if( $proposal !== false){
+        if ($proposal !== false) {
             $articles = DcCheckArticlesModel::findBy('pid', $proposal->id);
         } else {
             $articles = [];
