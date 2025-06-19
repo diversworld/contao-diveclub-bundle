@@ -27,7 +27,6 @@ use Diversworld\ContaoDiveclubBundle\Model\DcCheckArticlesModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckProposalModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -48,7 +47,7 @@ class DcListingController extends AbstractFrontendModuleController
 
         $services['contao.framework'] = ContaoFramework::class;
         $services['database_connection'] = Connection::class;
-        $services['security.helper'] = Security::class;
+        //$services['security.helper'] = Security::class;
         $services['contao.routing.scope_matcher'] = ScopeMatcher::class;
         $services['translator'] = TranslatorInterface::class;
 
