@@ -16,8 +16,6 @@ namespace Diversworld\ContaoDiveclubBundle\Controller\FrontendModule;
 
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
-use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\Input;
 use Contao\ModuleModel;
 use Contao\PageModel;
@@ -25,11 +23,9 @@ use Contao\Template;
 use Diversworld\ContaoDiveclubBundle\Model\DcCalendarEventsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckArticlesModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckProposalModel;
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AsFrontendModule(DcListingController::TYPE, category: 'dc_modules', template: 'mod_dc_listing')]
 class DcListingController extends AbstractFrontendModuleController
@@ -41,18 +37,19 @@ class DcListingController extends AbstractFrontendModuleController
     /**
      * Lazyload services.
      */
+    /*
     public static function getSubscribedServices(): array
     {
         $services = parent::getSubscribedServices();
 
         $services['contao.framework'] = ContaoFramework::class;
         $services['database_connection'] = Connection::class;
-        //$services['security.helper'] = Security::class;
+        $services['security.helper'] = 'security.helper';
         $services['contao.routing.scope_matcher'] = ScopeMatcher::class;
         $services['translator'] = TranslatorInterface::class;
 
         return $services;
-    }
+    }*/
 
     /**
      * This method extends the parent __invoke method,
