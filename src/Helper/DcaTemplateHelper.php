@@ -1,4 +1,5 @@
 <?php
+
 namespace Diversworld\ContaoDiveclubBundle\Helper;
 
 use Contao\Database;
@@ -7,6 +8,7 @@ use Contao\FilesModel;
 use Contao\StringUtil;
 use Contao\System;
 use Exception;
+use RuntimeException;
 
 class DcaTemplateHelper
 {
@@ -15,13 +17,85 @@ class DcaTemplateHelper
         return $this->getTemplateOptions('manufacturersFile');
     }
 
+    /**
+     * Gibt die Optionen für eine Vorlage zurück.
+     */
+    public function getTemplateOptions($templateName): array
+    {
+        // Templatepfad über Contao ermitteln
+        $templatePath = $this->getTemplateFromConfig($templateName);
+
+        // Überprüfen, ob die Datei existiert
+        if (!$templatePath || !file_exists($templatePath)) {
+            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['templateNotFound'], $templatePath));
+        }
+
+        $options = include $templatePath;
+
+        if (!is_array($options)) {
+            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['templateContent'], $options));
+        }
+
+        return $options;
+    }
+
+    private function getTemplateFromConfig($templateName): string
+    {
+        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
+        $configArray = [];
+
+        // Lade die erforderlichen Felder aus der Tabelle tl_dc_config
+        $result = Database::getInstance()->execute("
+            SELECT manufacturersFile, typesFile, regulatorsFile, sizesFile
+            FROM tl_dc_config
+            LIMIT 1"
+        );
+
+        if ($result->numRows > 0) {
+            // Für jedes Feld die UUID verarbeiten
+            $files = [
+                'manufacturersFile' => $result->manufacturersFile,
+                'typesFile' => $result->typesFile,
+                'regulatorsFile' => $result->regulatorsFile,
+                'sizesFile' => $result->sizesFile,
+            ];
+
+            // UUIDs in Pfade umwandeln
+            foreach ($files as $key => $uuid) {
+                if (!empty($uuid)) {
+                    $convertedUuid = StringUtil::binToUuid($uuid);
+                    $fileModel = FilesModel::findByUuid($convertedUuid);
+
+                    if ($fileModel !== null && file_exists($rootDir . '/' . $fileModel->path)) {
+                        $configArray[$key] = $rootDir . '/' . $fileModel->path;
+                    } else {
+                        $configArray[$key] = null; // Datei nicht gefunden oder ungültige UUID
+                    }
+                } else {
+                    $configArray[$key] = null; // Leerer Wert in der DB
+                }
+            }
+        } else {
+            throw new RuntimeException('Keine Einträge in der Tabelle tl_dc_config gefunden.');
+        }
+
+        switch ($templateName) {
+            case 'dc_regulator_data':
+                return $configArray['regulatorsFile'];
+            case 'dc_equipment_types':
+                return $configArray['typesFile'];
+            case 'dc_equipment_sizes':
+                return $configArray['sizesFile'];
+            case 'dc_equipment_manufacturers':
+                return $configArray['manufacturersFile'];
+            default:
+                return $configArray[$templateName];
+        }
+    }
+
     public function getSizes()
     {
         return $this->getTemplateOptions('sizesFile');
-    }
-    public function getEquipmentTypes()
-    {
-        return $this->getTemplateOptions('typesFile');
     }
 
     public function getEquipmentFlatTypes(): array
@@ -51,6 +125,11 @@ class DcaTemplateHelper
         }
 
         return []; // Keine Subtypen gefunden
+    }
+
+    public function getEquipmentTypes()
+    {
+        return $this->getTemplateOptions('typesFile');
     }
 
     public function getRegModels1st(?int $manufacturer = null, ?DataContainer $dc = null): array
@@ -92,84 +171,5 @@ class DcaTemplateHelper
 
         // Rückgabe der Modelle für die zweite Stufe
         return $models[$manufacturer]['regModel2nd'];
-    }
-
-    /**
-     * Gibt die Optionen für eine Vorlage zurück.
-     */
-    public function getTemplateOptions($templateName): array
-    {
-        // Templatepfad über Contao ermitteln
-        $templatePath = $this->getTemplateFromConfig($templateName);
-
-        // Überprüfen, ob die Datei existiert
-        if (!$templatePath || !file_exists($templatePath)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['templateNotFound'], $templatePath));
-        }
-
-        $options = include $templatePath;
-
-        if (!is_array($options)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['templateContent'], $options));
-        }
-
-        return $options;
-    }
-
-    private function getTemplateFromConfig($templateName): string
-    {
-        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
-        $configArray = [];
-
-        // Lade die erforderlichen Felder aus der Tabelle tl_dc_config
-        $result = Database::getInstance()->execute("
-            SELECT manufacturersFile, typesFile, subTypesFile, regulatorsFile, sizesFile
-            FROM tl_dc_config
-            LIMIT 1"
-        );
-
-        if ($result->numRows > 0) {
-            // Für jedes Feld die UUID verarbeiten
-            $files = [
-                'manufacturersFile' => $result->manufacturersFile,
-                'typesFile' => $result->typesFile,
-                'subTypesFile' => $result->subTypesFile,
-                'regulatorsFile' => $result->regulatorsFile,
-                'sizesFile'     => $result->sizesFile,
-            ];
-
-            // UUIDs in Pfade umwandeln
-            foreach ($files as $key => $uuid) {
-                if (!empty($uuid)) {
-                    $convertedUuid = StringUtil::binToUuid($uuid);
-                    $fileModel = FilesModel::findByUuid($convertedUuid);
-
-                    if ($fileModel !== null && file_exists($rootDir . '/' . $fileModel->path)) {
-                        $configArray[$key] = $rootDir . '/' . $fileModel->path;
-                    } else {
-                        $configArray[$key] = null; // Datei nicht gefunden oder ungültige UUID
-                    }
-                } else {
-                    $configArray[$key] = null; // Leerer Wert in der DB
-                }
-            }
-        } else {
-            throw new \RuntimeException('Keine Einträge in der Tabelle tl_dc_config gefunden.');
-        }
-
-        switch ($templateName) {
-            case 'dc_regulator_data':
-                return $configArray['regulatorsFile'];
-            case 'dc_equipment_subTypes':
-                return $configArray['subTypesFile'];
-            case 'dc_equipment_types':
-                return $configArray['typesFile'];
-            case 'dc_equipment_sizes':
-                return $configArray['sizesFile'];
-            case 'dc_equipment_manufacturers':
-                return $configArray['manufacturersFile'];
-            default:
-                return $configArray[$templateName];
-        }
     }
 }

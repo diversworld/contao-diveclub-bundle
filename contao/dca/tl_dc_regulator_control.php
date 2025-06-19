@@ -70,7 +70,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
     'palettes' => [
         '__selector__' => ['addNotes'],
         'default' => '{title_legend},title,alias;
-                                {details_legend},actualCheckDate,nextCheckDate,midPressurePre30,midPressurePre200,inhalePressurePre,exhalePressurePre,midPressurePost30,midPressurePost200,inhalePressurePost,exhalePressurePost;
+                                {details_legend},actualCheckDate,nextCheckDate,price,midPressurePre30,midPressurePre200,inhalePressurePre,exhalePressurePre,midPressurePost30,midPressurePost200,inhalePressurePost,exhalePressurePost;
                                 {notes_legend},addNotes;
                                 {publish_legend},published,start,stop;'
     ],
@@ -97,13 +97,13 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'filter' => true,
             'sorting' => true,
             'flag' => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w33'],
+            'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'alias' => [
             'search' => true,
             'inputType' => 'text',
-            'eval' => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w33'],
+            'eval' => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
             'save_callback' => [
                 ['tl_dc_regulator_control', 'generateAlias']
             ],
@@ -119,6 +119,12 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'eval' => ['submitOnChange' => true, 'rgxp' => 'date', 'doNotCopy' => false, 'datepicker' => true, 'tl_class' => 'w25 wizard'],
             'onsubmit_callback' => [SetRegNextCheckDateCallback::class, '__invoke'],
             'sql' => "bigint(20) NULL"
+        ],
+        'price' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['articlePriceNetto'],
+            'inputType' => 'text',
+            'eval' => ['submitOnChange' => true, 'tl_class' => 'w25'],
+            'sql' => "DECIMAL(10,2) NOT NULL default '0.00'",
         ],
         'nextCheckDate' => [
             'inputType' => 'text',
@@ -137,7 +143,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'search' => true,
             'filter' => true,
             'sorting' => true,
-            'eval' => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25 clr'],
+            'eval' => ['mandatory' => false, 'maxlength' => 50, 'tl_class' => 'w25 clr'],
             'sql' => "varchar(50) NOT NULL default ''"
         ],
         'midPressurePre200' => [
@@ -147,7 +153,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'search' => true,
             'filter' => true,
             'sorting' => true,
-            'eval' => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25 clr'],
+            'eval' => ['mandatory' => false, 'maxlength' => 50, 'tl_class' => 'w25'],
             'sql' => "varchar(50) NOT NULL default ''"
         ],
         'inhalePressurePre' => [
@@ -157,7 +163,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'search' => true,
             'filter' => true,
             'sorting' => true,
-            'eval' => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25'],
+            'eval' => ['mandatory' => false, 'maxlength' => 50, 'tl_class' => 'w25'],
             'sql' => "varchar(50) NOT NULL default ''"
         ],
         'exhalePressurePre' => [
@@ -167,7 +173,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'search' => true,
             'filter' => true,
             'sorting' => true,
-            'eval' => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25'],
+            'eval' => ['mandatory' => false, 'maxlength' => 50, 'tl_class' => 'w25'],
             'sql' => "varchar(50) NOT NULL default ''"
         ],
         'midPressurePost30' => [
@@ -177,7 +183,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'search' => true,
             'filter' => true,
             'sorting' => true,
-            'eval' => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25 clr'],
+            'eval' => ['mandatory' => false, 'maxlength' => 50, 'tl_class' => 'w25 clr'],
             'sql' => "varchar(50) NOT NULL default ''"
         ],
         'midPressurePost200' => [
@@ -187,7 +193,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'search' => true,
             'filter' => true,
             'sorting' => true,
-            'eval' => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25 clr'],
+            'eval' => ['mandatory' => false, 'maxlength' => 50, 'tl_class' => 'w25'],
             'sql' => "varchar(50) NOT NULL default ''"
         ],
         'inhalePressurePost' => [
@@ -198,7 +204,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'filter' => true,
             'sorting' => true,
             'flag' => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'eval' => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25'],
+            'eval' => ['mandatory' => false, 'maxlength' => 50, 'tl_class' => 'w25'],
             'sql' => "varchar(50) NOT NULL default ''"
         ],
         'exhalePressurePost' => [
@@ -209,7 +215,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'filter' => true,
             'sorting' => true,
             'flag' => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'eval' => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25'],
+            'eval' => ['mandatory' => false, 'maxlength' => 50, 'tl_class' => 'w25'],
             'sql' => "varchar(50) NOT NULL default ''"
         ],
         'addNotes' => [
