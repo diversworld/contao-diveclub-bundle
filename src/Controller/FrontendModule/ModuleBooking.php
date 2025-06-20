@@ -346,14 +346,14 @@ class ModuleBooking extends AbstractFrontendModuleController
                         'size' => $asset['size'] . "L" ?? 'N/A',
                         'category' => $category,
                         'o2clean' => $asset['o2clean'] ?? 'N/A',
-                        'owner' => $asset['owner'] ?? 'Unknown',
+                        'owner' => $asset['owner'] ?? '-',
                         'lastCheckDate' => $asset['lastCheckDate']
                             ? date($dateFormat, (int)$asset['lastCheckDate'])
                             : 'N/A',
                         'nextCheckDate' => $asset['nextCheckDate']
                             ? date($dateFormat, (int)$asset['nextCheckDate'])
                             : 'N/A',
-                        'status' => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$asset['status']] ?? 'Unknown',
+                        'status' => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$asset['status']] ?? '-',
                         'price' => $asset['rentalFee'] ?? 'N/A',
                     ];
                 }
@@ -370,13 +370,13 @@ class ModuleBooking extends AbstractFrontendModuleController
                         'title' => $asset['title'] ?? 'N/A', // Standardwert setzen
                         'manufacturer' => $manufacturers[$asset['manufacturer']] ?? $asset['manufacturer'],
                         'category' => $category,
-                        'serialNumber1st' => $asset['serialNumber1st'] ?? 'Unknown',
-                        'regModel1st' => $regModel1st[$asset['regModel1st']] ?? 'Unknown',
-                        'serialNumber2ndPri' => $asset['serialNumber2ndPri'] ?? 'Unknown',
-                        'regModel2ndPri' => $regModel2nd[$asset['regModel2ndPri']] ?? 'Unknown',
-                        'serialNumber2ndSec' => $asset['serialNumber2ndSec'] ?? 'Unknown',
-                        'regModel2ndSec' => $regModel2nd[$asset['regModel2ndSec']] ?? 'Unknown',
-                        'status' => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$asset['status']] ?? 'Unknown',
+                        'serialNumber1st' => $asset['serialNumber1st'] ?? ' ',
+                        'regModel1st' => $regModel1st[$asset['regModel1st']] ?? ' ',
+                        'serialNumber2ndPri' => $asset['serialNumber2ndPri'] ?? ' ',
+                        'regModel2ndPri' => $regModel2nd[$asset['regModel2ndPri']] ?? ' ',
+                        'serialNumber2ndSec' => $asset['serialNumber2ndSec'] ?? ' ',
+                        'regModel2ndSec' => $regModel2nd[$asset['regModel2ndSec']] ?? ' ',
+                        'status' => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$asset['status']] ?? 'N/A',
                         'price' => $asset['rentalFee'] ?? 'N/A',
                     ];
                 }
@@ -402,7 +402,7 @@ class ModuleBooking extends AbstractFrontendModuleController
                         'model' => $asset['model'] ?? 'N/A',
                         'color' => $asset['color'] ?? 'N/A',
                         'serialNumber' => $asset['serialNumber'] ?? 'N/A',
-                        'status' => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$asset['status']] ?? 'Unknown',
+                        'status' => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$asset['status']] ?? 'N/A',
                         'price' => $asset['rentalFee'] ?? 'N/A',
                     ];
                 }
