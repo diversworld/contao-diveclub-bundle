@@ -11,6 +11,7 @@ declare(strict_types=1);
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/diversworld/contao-diveclub-bundle
  */
+
 namespace Diversworld\ContaoDiveclubBundle\Controller\FrontendModule;
 
 use Contao\Config;
@@ -19,11 +20,11 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Email;
 use Contao\FormCheckbox;
-use Contao\Template;
 use Contao\Message;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\System;
+use Contao\Template;
 use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
 use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorsModel;
@@ -32,6 +33,9 @@ use Diversworld\ContaoDiveclubBundle\Model\DcReservationModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcTanksModel;
 use Diversworld\ContaoDiveclubBundle\Session\Attribute\ArrayAttributeBag;
 use Doctrine\DBAL\Connection;
+use Exception;
+use InvalidArgumentException;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -117,7 +121,7 @@ class ModuleBooking extends AbstractFrontendModuleController
 
         // Verarbeitung von POST-Daten
         if ($request->isMethod('POST')) {
-            $response = $this->handlePostRequest($request, $template, $sessionData, (int) $selectedMember);
+            $response = $this->handlePostRequest($request, $template, $sessionData, (int)$selectedMember);
             if ($response instanceof Response) {
                 // Wenn handlePostRequest eine RedirectResponse oder ähnliches zurückgibt, wird dies ausgeführt
                 return $response;
@@ -138,6 +142,405 @@ class ModuleBooking extends AbstractFrontendModuleController
         $template->totalRentalFee = $this->calculateTotalRentalFee($this->getSessionData());
 
         return $template->getResponse();
+    }
+
+    /**
+     * Session-Daten abrufen.
+     */
+    private function getSessionData(): array
+    {
+        $session = $this->requestStack->getSession();
+        $bag = $session->getBag(ArrayAttributeBag::ATTRIBUTE_NAME);
+        return $bag->get('reservation_items', []);
+    }
+
+    /**
+     * Berechnet den Gesamtpreis der reservierten Assets aus der Session.
+     */
+    private function calculateTotalPrice(array $sessionData): float
+    {
+        $totalPrice = 0.0;
+
+        foreach ($sessionData as $entry) {
+            $category = $entry['category'] ?? null;
+            $selectedAssets = $entry['selectedAssets'] ?? [];
+
+            if (!$category || empty($selectedAssets)) {
+                continue;
+            }
+
+            // Preise der Assets summieren
+            foreach ($selectedAssets as $asset) {
+                // Asset-Details abrufen
+                $assetDetails = $this->getAssetDetails($category, (int)$asset['assetId']);
+
+                if ($assetDetails) {
+                    // Mietgebühr extrahieren
+                    preg_match('/([0-9]+(\.[0-9]{2})?) €/i', $assetDetails, $matches);
+
+                    if (!empty($matches[1])) {
+                        $totalPrice += (float)$matches[1];
+                    }
+                }
+            }
+        }
+        return $totalPrice;
+    }
+
+    private function getAssetDetails(string $category, int $assetId): ?string
+    {
+        switch ($category) {
+            case 'tl_dc_tanks':
+                $asset = DcTanksModel::findByPk($assetId);
+
+                if (!$asset) {
+                    return null;
+                }
+                $sizeText = $asset->size . 'L';
+                return sprintf(
+                    'Tank: %s (Größe: %s), %.2f €',
+                    $asset->title ?? 'Unbekannt',
+                    $sizeText,
+                    (float)$asset->rentalFee
+                );
+
+            case 'tl_dc_regulators':
+                $asset = DcRegulatorsModel::findByPk($assetId);
+                if (!$asset) {
+                    return null;
+                }
+                $helper = new DcaTemplateHelper();
+                $manufacturerMapping = $helper->getManufacturers();
+                $manufacturerText = $manufacturerMapping[$asset->manufacturer] ?? 'Unbekannter Hersteller';
+
+                $regModel1stMapping = $helper->getRegModels1st((int)$asset->manufacturer);
+                $regModel1stText = $regModel1stMapping[$asset->regModel1st] ?? 'N/A';
+
+                $regModel2ndMapping = $helper->getRegModels2nd((int)$asset->manufacturer);
+                $regModel2ndPriText = $regModel2ndMapping[$asset->regModel2ndPri] ?? 'N/A';
+                $regModel2ndSecText = $regModel2ndMapping[$asset->regModel2ndSec] ?? 'N/A';
+
+                return sprintf(
+                    'Regulator: %s (Hersteller: %s, 1st Stage: %s, 2nd Stage (Pri): %s, 2nd Stage (Sec): %s), %.2f €',
+                    $asset->title ?? 'Unbekannt',
+                    $manufacturerText,
+                    $regModel1stText,
+                    $regModel2ndPriText,
+                    $regModel2ndSecText,
+                    (float)$asset->rentalFee
+                );
+
+            case 'tl_dc_equipment':
+                // Prüfung, ob das Objekt bereits existiert
+                $asset = DcEquipmentModel::findByPk($assetId);
+
+                if (!$asset) {
+                    return null;
+                }
+
+                $helper = new DcaTemplateHelper();
+                $sizeMapping = $helper->getSizes();
+                $types = $helper->getEquipmentTypes();
+                $subTypes = $helper->getSubTypes($asset->type);
+                $sizeText = $sizeMapping[$asset->size] ?? 'Unbekannte Größe';
+
+                $info = sprintf(
+                    'Ausrüstung: %s %s - %s (Modell: %s, Größe: %s, Farbe: %s), %.2f €',
+                    $types[$asset->type]['name'] ?? 'Unbekannt',
+                    $subTypes[$asset->subType] ?? 'Unbekannt',
+                    $asset->title ?? 'Unbekannt',
+                    $asset->model ?? 'Kein Modell angegeben',
+                    $sizeText,
+                    $asset->color ?? 'Keine Farbe angegeben',
+                    (float)$asset->rentalFee
+                );
+                return $info;
+
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * Lädt die vorgemerkten Assets aus den Session-Daten.
+     */
+    private function loadStoredAssets(array $sessionData): array
+    {
+        $storedAssets = [];
+
+        foreach ($sessionData as $entry) {
+            $category = $entry['category'] ?? null;
+            $selectedAssets = $entry['selectedAssets'] ?? [];
+            if (!$category || empty($selectedAssets)) {
+                continue;
+            }
+
+            foreach ($selectedAssets as $asset) {
+                $assetDetails = $this->getAssetDetails($category, (int)$asset['assetId']);
+                if ($assetDetails) {
+                    $storedAssets[] = $assetDetails;
+                }
+            }
+        }
+        return $storedAssets;
+    }
+
+    /**
+     * Berechnet die Gesamtsumme der Mietkosten.
+     */
+    private function calculateTotalRentalFee(array $sessionData): float
+    {
+        $totalRentalFee = 0.0;
+        foreach ($sessionData as $entry) {
+            $totalRentalFee += (float)($entry['totalRentalFee'] ?? 0);
+        }
+        return $totalRentalFee;
+    }
+
+    /**
+     * Benutzerinformationen abrufen.
+     */
+    private function getCurrentUser(): array
+    {
+        $hasFrontendUser = System::getContainer()->get('contao.security.token_checker')->hasFrontendUser();
+
+        if ($hasFrontendUser) {
+            $user = $this->getUser();
+            return [
+                'userId' => $user->id,
+                'userFullName' => trim($user->firstname . ' ' . $user->lastname) ?: 'Gast',
+            ];
+        }
+
+        return ['userId' => null, 'userFullName' => 'Gast'];
+    }
+
+    /**
+     * @param string $category
+     * @return array
+     */
+    function updateAssets(string $category): array
+    {
+        // Verfügbare Assets laden
+        // Fetch mappings from the Helpers
+        $manufacturers = $this->helper->getManufacturers();
+        $sizes = $this->helper->getSizes();
+        $equipmentTypes = $this->helper->getEquipmentTypes();
+
+        // Datum global abrufen
+        $dateFormat = Config::get('dateFormat');
+
+        // Fetch the id-to-title mapping from the `tl_dc_equipment` table directly
+        //$equipmentTypesMapping = $this->getEquipmentTypeTitles(); // Custom method, explained below
+        $updatedAssets = [];
+        $assets = $this->getAvailableAssets($category);
+
+        switch ($category) {
+            case 'tl_dc_tanks':
+                // Verarbeitung für Tanks
+                foreach ($assets as $asset) {
+                    $updatedAssets[] = [
+                        'id' => $asset['id'] ?? 'N/A',
+                        'title' => $asset['title'] ?? 'N/A', // Standardwert, falls 'title' fehlt
+                        'manufacturer' => $manufacturers[$asset['manufacturer']] ?? $asset['manufacturer'],
+                        'size' => $asset['size'] . "L" ?? 'N/A',
+                        'category' => $category,
+                        'o2clean' => $asset['o2clean'] ?? 'N/A',
+                        'owner' => $asset['owner'] ?? 'Unknown',
+                        'lastCheckDate' => $asset['lastCheckDate']
+                            ? date($dateFormat, (int)$asset['lastCheckDate'])
+                            : 'N/A',
+                        'nextCheckDate' => $asset['nextCheckDate']
+                            ? date($dateFormat, (int)$asset['nextCheckDate'])
+                            : 'N/A',
+                        'status' => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$asset['status']] ?? 'Unknown',
+                        'price' => $asset['rentalFee'] ?? 'N/A',
+                    ];
+                }
+                break;
+
+            case 'tl_dc_regulators':
+                // Verarbeitung für Regulators
+                foreach ($assets as $asset) {
+                    $regModel1st = $this->helper->getRegModels1st((int)$asset['manufacturer']);
+                    $regModel2nd = $this->helper->getRegModels2nd((int)$asset['manufacturer']);
+
+                    $updatedAssets[] = [
+                        'id' => $asset['id'] ?? 'N/A',
+                        'title' => $asset['title'] ?? 'N/A', // Standardwert setzen
+                        'manufacturer' => $manufacturers[$asset['manufacturer']] ?? $asset['manufacturer'],
+                        'category' => $category,
+                        'serialNumber1st' => $asset['serialNumber1st'] ?? 'Unknown',
+                        'regModel1st' => $regModel1st[$asset['regModel1st']] ?? 'Unknown',
+                        'serialNumber2ndPri' => $asset['serialNumber2ndPri'] ?? 'Unknown',
+                        'regModel2ndPri' => $regModel2nd[$asset['regModel2ndPri']] ?? 'Unknown',
+                        'serialNumber2ndSec' => $asset['serialNumber2ndSec'] ?? 'Unknown',
+                        'regModel2ndSec' => $regModel2nd[$asset['regModel2ndSec']] ?? 'Unknown',
+                        'status' => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$asset['status']] ?? 'Unknown',
+                        'price' => $asset['rentalFee'] ?? 'N/A',
+                    ];
+                }
+                break;
+
+            case 'tl_dc_equipment':
+                // Verarbeitung für Equipment Types
+                foreach ($assets as $asset) {
+                    $equipmentSubTypes = $this->helper->getSubTypes($asset['id']);
+                    $updatedAssets[] = [
+                        'id' => $asset['id'],
+                        'type' => $equipmentTypes[$asset['type']] ?? $asset['type'],
+                        'subType' => $equipmentSubTypes[$asset['subType']] ?? $asset['subType'],
+                        'typeId' => $asset['type'], // Indexwert behalten
+                        'subTypeId' => $asset['subType'], // Indexwert behalten
+                        'category' => $category,
+                        'title' => $asset['title'] ?? 'N/A', // Mapping für Titel
+                        'manufacturer' => $manufacturers[$asset['manufacturer']] ?? $asset['manufacturer'],
+                        'size' => $sizes[$asset['size']] ?? $asset['size'],
+                        'buyDate' => $asset['buyDate']
+                            ? date($dateFormat, (int)$asset['buyDate'])
+                            : 'N/A',
+                        'model' => $asset['model'] ?? 'N/A',
+                        'color' => $asset['color'] ?? 'N/A',
+                        'serialNumber' => $asset['serialNumber'] ?? 'N/A',
+                        'status' => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$asset['status']] ?? 'Unknown',
+                        'price' => $asset['rentalFee'] ?? 'N/A',
+                    ];
+                }
+                break;
+
+            default:
+                // Fallback: Falls keine Kategorie zutrifft, keine Verarbeitung
+                foreach ($assets as $asset) {
+                    $updatedAssets[] = [
+                        'id' => $asset['id'] ?? 'N/A',
+                        'title' => $asset['title'] ?? 'N/A',
+                        'manufacturer' => $asset['manufacturer'] ?? 'N/A',
+                        'size' => $asset['size'] ?? 'N/A',
+                    ];
+                }
+                break;
+        }
+        return $updatedAssets;
+    }
+
+    private function getAvailableAssets(string $category): array
+    {
+        $allowedCategories = ['tl_dc_tanks', 'tl_dc_regulators', 'tl_dc_equipment'];
+        if (!in_array($category, $allowedCategories, true)) {
+            throw new InvalidArgumentException('Ungültige Kategorie: ' . htmlspecialchars($category));
+        }
+
+        // Unterschiedliche Queries für verschiedene Kategorien
+        switch ($category) {
+            case 'tl_dc_tanks':
+                $result = DcTanksModel::findAvailable();
+                return $result ? $result->fetchAll() : [];
+            case 'tl_dc_regulators':
+                $result = DcRegulatorsModel::findAvailable();
+                return $result ? $result->fetchAll() : [];
+            case 'tl_dc_equipment':
+                $result = DcEquipmentModel::findAvailable() ?? [];
+                return $result ? $result->fetchAll() : [];
+            default:
+                return [];
+        }
+    }
+
+    protected function generateReservationCheckboxes(array $assets): array
+    {
+        $checkboxes = [];
+
+        foreach ($assets as $asset) {
+            // Erzeuge eine Checkbox für jedes Asset
+            $widget = new FormCheckbox([
+                'inputType' => 'checkbox',
+                'id' => 'reserved_' . $asset['id'],  // Eindeutige ID
+                'name' => 'selectedAssets[]',         // Array-Name für Mehrfachauswahl
+                'class' => 'tl_checkbox',                 // CSS-Klasse
+                // Wichtig: Optionen setzen
+                'options' => [
+                    [
+                        'value' => $asset['id'],
+                        'label' => $GLOBALS['TL_LANG']['MSC']['reservationCheckbox'],
+                    ]
+                ],
+                'checked' => false,
+            ]);
+
+            // Widget als HTML zurückgeben
+            $checkboxes[$asset['id']] = $widget->parse();
+        }
+
+        return $checkboxes;
+    }
+
+    /**
+     * Kombiniert Session-Daten mit Assets der aktuell gewählten Kategorie.
+     */
+    private function combineAssetsWithSession(string $category, array $assets): array
+    {
+        $session = $this->requestStack->getSession();
+        $bag = $session->getBag(ArrayAttributeBag::ATTRIBUTE_NAME);
+        $sessionData = $bag->get('reservation_items', []);
+
+        $selectedAssetIds = [];
+        foreach ($sessionData as $entry) {
+            // Prüfen, ob 'selectedAssets' ein Array ist
+            $selectedAssets = is_array($entry['selectedAssets'] ?? null) ? $entry['selectedAssets'] : [];
+
+            // Extrahiere nur die `assetId`-Werte aus jedem Eintrag in `selectedAssets`
+            $assetIds = array_map(static function ($asset) {
+                return $asset['assetId'];
+            }, $selectedAssets);
+
+            $selectedAssetIds = array_merge($selectedAssetIds, $assetIds);
+        }
+        $selectedAssetIds = array_unique($selectedAssetIds); // Doppelte entfernen
+
+        // Markiere Assets als "ausgewählt", falls sie in der Session sind
+        foreach ($assets as &$asset) {
+            $asset['selected'] = in_array($asset['id'], $selectedAssetIds, true); // Vergleicht IDs
+        }
+
+        return $assets;
+    }
+
+    /**
+     * Gruppiert Assets nach Typ.
+     */
+    private function groupAssetsByType(array $assets, array $equipmentTypes): array
+    {
+        $groupedAssets = [];
+        $types = $this->helper->getEquipmentTypes();
+
+        foreach ($assets as $asset) {
+            $typeId = $asset['typeId'] ?? 'unknown';
+            $subTypeId = $asset['subTypeId'] ?? 'unknown';
+
+            // Typnamen und Subtypen aus den Equipment-Typen extrahieren
+            foreach ($equipmentTypes as $typeKey => $typeData) {
+                if ($typeKey == $typeId) {
+                    $typeName = $typeData['name'] ?? 'unknown_type';
+                    $subtypes = $typeData['subtypes'];
+
+                    // Subtypen-Name ermitteln
+                    $subTypeName = $subtypes[$subTypeId] ?? 'unknown_subtype';
+
+                    if (!isset($groupedAssets[$typeName])) {
+                        $groupedAssets[$typeName] = [];
+                    }
+
+                    if (!isset($groupedAssets[$typeName][$subTypeName])) {
+                        $groupedAssets[$typeName][$subTypeName] = [];
+                    }
+
+                    // Asset zur entsprechenden Gruppe hinzufügen
+                    $groupedAssets[$typeName][$subTypeName][] = $asset;
+                }
+            }
+        }
+
+        return $groupedAssets;
     }
 
     /**
@@ -220,21 +623,6 @@ class ModuleBooking extends AbstractFrontendModuleController
     }
 
     /**
-     * Speichert Reservierungsdaten in der Session.
-     */
-    private function saveSessionData(array $data, Template $template): void
-    {
-        try {
-            $this->saveDataToSession($data);
-            $storedAssets = $this->loadStoredAssets($this->getSessionData());
-            $this->displaySuccessMessage($storedAssets, $template);
-        } catch (\Exception $e) {
-            Message::addError('Es gab ein Problem beim Speichern der Reservierungsdaten in der Session.');
-            System::getContainer()->get('monolog.logger.contao.general')->error($e->getMessage());
-        }
-    }
-
-    /**
      * Speichert Reservierungen in die Datenbank.
      */
     private function saveReservationsToDatabase(): void
@@ -244,15 +632,143 @@ class ModuleBooking extends AbstractFrontendModuleController
         $sessionData = $bag->get('reservation_items', []); // Alle gespeicherten Reservierungsdaten abrufen
 
         if (empty($sessionData)) {
-            throw new \RuntimeException('Keine Reservierungsdaten gefunden.');
+            throw new RuntimeException('Keine Reservierungsdaten gefunden.');
         }
 
         try {
             $saveMessage = $this->saveDataToDb();
             Message::addConfirmation(htmlspecialchars($saveMessage));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Message::addError('Fehler beim Speichern der Reservierungen in der Datenbank.');
             System::getContainer()->get('monolog.logger.contao.general')->error($e->getMessage());
+        }
+    }
+
+    /**
+     * Save Data to Database
+     */
+    function saveDataToDb(): string
+    {
+        $session = $this->requestStack->getSession();
+        $bag = $session->getBag(ArrayAttributeBag::ATTRIBUTE_NAME);
+        $sessionData = $bag->get('reservation_items', []); // Alle gespeicherten Reservierungsdaten abrufen
+
+        if (empty($sessionData)) {
+            throw new RuntimeException('Es sind keine Reservierungsdaten in der Session gespeichert.');
+        }
+
+        $totalPrice = $this->calculateTotalPrice($sessionData);
+
+        foreach ($sessionData as $entry) {
+            $userId = $entry['userId'] ?? null;
+            $category = $entry['category'] ?? null;
+            $reservedFor = $entry['selectedMember'];
+            $selectedAssets = $entry['selectedAssets'] ?? [];
+            $totalRentalFee = $totalPrice; // Mietkosten berechnen
+
+            if (empty($selectedAssets)) {
+                continue; // Überspringen, wenn keine Assets ausgewählt sind
+            }
+
+            if (!$userId || !$category) {
+                throw new RuntimeException('Ungültige Session-Daten: Benutzer oder Kategorie fehlt.');
+            }
+
+            // Reservierungstitel generieren
+            $reservationTitle = $this->generateReservationTitle((int)$userId);
+
+            // Prüfen, ob eine Reservierung existiert
+            $reservation = DcReservationModel::findOneBy(['title=?'], [$reservationTitle]);
+            if (null === $reservation) {
+                // Neue Reservierung erstellen
+                $reservation = new DcReservationModel();
+                $reservation->title = $reservationTitle;
+                $reservation->alias = 'id-' . $reservationTitle;
+                $reservation->tstamp = time();
+                $reservation->member_id = $userId;
+                $reservation->reservedFor = $reservedFor ?? null;
+                $reservation->asset_type = $category;
+                $reservation->reserved_at = time();
+                $reservation->reservation_status = 'reserved';
+                $reservation->rentalFee = $totalRentalFee; // Gesamtsumme in die Tabelle speichern
+                $reservation->published = 1;
+                $reservation->save();
+            }
+
+            $reservationId = $reservation->id;
+
+            foreach ($selectedAssets as $asset) {
+                $assetId = $asset['assetId'] ?? null;
+                $type = $asset['type'] ?? null;
+                $subType = $asset['subType'] ?? null;
+
+                if (!$assetId) {
+                    continue; // Überspringen, wenn kein Asset vorhanden ist
+                }
+
+                $existingItem = DcReservationItemsModel::findOneBy([
+                    'pid=? AND item_id=?',
+                ], [
+                    $reservationId,
+                    $assetId,
+                ]);
+
+                if (null === $existingItem) {
+                    // Neue Reservierung für dieses Asset erstellen
+                    $reservationItem = new DcReservationItemsModel();
+                    $reservationItem->pid = $reservationId;
+                    $reservationItem->tstamp = time();
+                    $reservationItem->item_id = (int)$assetId ?? null;
+                    $reservationItem->item_type = $category;
+                    $reservationItem->types = (int)$type ?? null;
+                    $reservationItem->sub_type = (int)$subType ?? null;
+                    $reservationItem->reserved_at = time();
+                    $reservationItem->created_at = time();
+                    $reservationItem->updated_at = time();
+                    $reservationItem->reservation_status = 'reserved';
+                    $reservationItem->published = 1;
+
+                    $reservationItem->save();
+                }
+
+                // Status des Assets aktualisieren
+                $this->updateAssetStatus($category, (int)$assetId);
+            }
+        }
+
+        return 'Reservierungsdaten wurden erfolgreich gespeichert.';
+    }
+
+    protected function generateReservationTitle(int $userId): string
+    {
+        // MemberID formatieren. Führende Nullen hinzufügen, um die member_id dreistellig zu machen
+        $formattedMemberId = str_pad((string)$userId, 3, '0', STR_PAD_LEFT);
+
+        // Datum im Format jjjjmmtt
+        $currentDate = date('dmHi');
+        $currentYear = date('Y');
+
+        // Neues Title-Format
+        return $currentYear . '-' . $formattedMemberId . '-' . $currentDate;
+    }
+
+    /**
+     * Aktualisiert den Status eines Assets nach der Reservierung.
+     */
+    private function updateAssetStatus(string $category, int $assetId): void
+    {
+        switch ($category) {
+            case 'tl_dc_tanks':
+                $this->db->update('tl_dc_tanks', ['status' => 'reserved'], ['id' => $assetId]);
+                break;
+            case 'tl_dc_regulators':
+                $this->db->update('tl_dc_regulators', ['status' => 'reserved'], ['id' => $assetId]);
+                break;
+            case 'tl_dc_equipment':
+                $this->db->update('tl_dc_equipment', ['status' => 'reserved'], ['id' => $assetId]);
+                break;
+            default:
+                throw new RuntimeException('Ungültige Kategorie beim Aktualisieren des Asset-Status.');
         }
     }
 
@@ -262,56 +778,82 @@ class ModuleBooking extends AbstractFrontendModuleController
     private function sendReservationNotification(array $sessionData): void
     {
         if (empty($sessionData)) {
-            throw new \RuntimeException('Keine Reservierungsdaten für die Benachrichtigung vorhanden.');
+            throw new RuntimeException('Keine Reservierungsdaten für die Benachrichtigung vorhanden.');
         }
         $totalPrice = $this->calculateTotalPrice($sessionData);
 
         // Details aus den Session-Daten extrahieren
-        $reservationNumber = $this->generateReservationTitle((int) $sessionData[0]['userId'] ?? 0);
+        $reservationNumber = $this->generateReservationTitle((int)$sessionData[0]['userId'] ?? 0);
         $memberName = $this->getCurrentUser()['userFullName'] ?? 'Unbekannt';
+        $selectedMemberId = $sessionData[0]['selectedMember'] ?? null;
+
+        if ($selectedMemberId !== null) {
+            $member = $this->db->fetchAssociative('SELECT firstname, lastname FROM tl_member WHERE id = ?', [(int)$selectedMemberId]);
+            $reservedFor = $member ? trim($member['firstname'] . ' ' . $member['lastname']) : 'Unbekannt';
+        } else {
+            $reservedFor = 'Unbekannt';
+        }
 
         // Reservierte Items aus Session-Daten
         $reservedItems = $this->loadStoredAssets($sessionData);
         if (empty($reservedItems)) {
-            throw new \RuntimeException('Es wurden keine Assets für die Benachrichtigung reserviert.');
+            throw new RuntimeException('Es wurden keine Assets für die Benachrichtigung reserviert.');
         }
 
         // E-Mail senden
-        $this->sendReservationEmail($reservationNumber, $memberName, $reservedItems, $totalPrice);
+        $this->sendReservationEmail($reservationNumber, $memberName, $reservedFor, $reservedItems, $totalPrice);
     }
 
     /**
-     * Lädt die vorgemerkten Assets aus den Session-Daten.
+     * @param int $reservationId
+     * @param string $reservationNumber
+     * @param string $memberName
+     * @param array $reservedItems
+     * @return void
+     * @throws \Doctrine\DBAL\Exception
      */
-    private function loadStoredAssets(array $sessionData): array
+    function sendReservationEmail(string $reservationNumber, string $memberName, string $reservedFor, array $reservedItems, float $totalFee): void
     {
-        $storedAssets = [];
+        $configAdapter = $this->framework->getAdapter(Config::class);
 
-        foreach ($sessionData as $entry) {
-            $category = $entry['category'] ?? null;
-            $selectedAssets = $entry['selectedAssets'] ?? [];
-            if (!$category || empty($selectedAssets)) {
-                continue;
-            }
+        // Währungsformatierung für den Gesamtbetrag
+        $formattedTotalFee = number_format($totalFee, 2, ',', '.'); // Beispiel: "1234.56" wird zu "1.234,56 €"
 
-            foreach ($selectedAssets as $asset) {
-                $assetDetails = $this->getAssetDetails($category, (int)$asset['assetId']);
-                if ($assetDetails) {
-                    $storedAssets[] = $assetDetails;
-                }
-            }
+        // E-Mail-Adresse aus der Tabelle `tl_dc_config` abrufen
+        $result = $this->db->fetchAssociative('SELECT reservationInfo, reservationInfoText FROM tl_dc_config LIMIT 1');
+        $recipientEmail = $result['reservationInfo'] ?? null;
+        $informationText = html_entity_decode($result['reservationInfoText'], ENT_QUOTES, 'UTF-8') ?? '<p>Hallo,</p><p>es wurde eine neue Reservierung erstellt.</p>';
+
+        if (empty($recipientEmail)) {
+            throw new RuntimeException('Keine Empfänger-E-Mail-Adresse in der Konfiguration gefunden.');
         }
-        return $storedAssets;
-    }
 
-    /**
-     * Session-Daten abrufen.
-     */
-    private function getSessionData(): array
-    {
-        $session = $this->requestStack->getSession();
-        $bag = $session->getBag(ArrayAttributeBag::ATTRIBUTE_NAME);
-        return $bag->get('reservation_items', []);
+        // Liste der reservierten Assets als HTML formatieren
+        $assetsHtml = '<ul>';
+        foreach ($reservedItems as $item) {
+            $assetsHtml .= '<li>' . htmlspecialchars($item) . '</li>';
+        }
+        $assetsHtml .= '</ul>';
+
+        $informationText = str_replace(
+            ['#memberName#', '#reservationNumber#', '#assetsHtml#', '#totalFee#', '#reservedFor#'],
+            [$memberName, $reservationNumber, $assetsHtml, $formattedTotalFee, $reservedFor],
+            $informationText
+        );
+
+        // Erstellen der E-Mail
+        $email = new Email();
+
+        $email->from = $GLOBALS['TL_ADMIN_EMAIL'] ?? $configAdapter->get('adminEmail') ?? 'reservierung@diversworld.eu';
+        $email->subject = 'Neue Reservierung: ' . $reservationNumber;
+        $email->html = $informationText;
+
+        // Versenden der E-Mail
+        $emailSuccess = $email->sendTo($recipientEmail); // Empfänger
+
+        if (!$emailSuccess) {
+            throw new Exception('Something went wrong while trying to send the reservation Mail.');
+        }
     }
 
     /**
@@ -326,134 +868,18 @@ class ModuleBooking extends AbstractFrontendModuleController
     }
 
     /**
-     * Berechnet die Gesamtsumme der Mietkosten.
+     * Speichert Reservierungsdaten in der Session.
      */
-    private function calculateTotalRentalFee(array $sessionData): float
+    private function saveSessionData(array $data, Template $template): void
     {
-        $totalRentalFee = 0.0;
-        foreach ($sessionData as $entry) {
-            $totalRentalFee += (float) ($entry['totalRentalFee'] ?? 0);
+        try {
+            $this->saveDataToSession($data);
+            $storedAssets = $this->loadStoredAssets($this->getSessionData());
+            $this->displaySuccessMessage($storedAssets, $template);
+        } catch (Exception $e) {
+            Message::addError('Es gab ein Problem beim Speichern der Reservierungsdaten in der Session.');
+            System::getContainer()->get('monolog.logger.contao.general')->error($e->getMessage());
         }
-        return $totalRentalFee;
-    }
-
-    /**
-     * Benutzerinformationen abrufen.
-     */
-    private function getCurrentUser(): array
-    {
-        $hasFrontendUser = System::getContainer()->get('contao.security.token_checker')->hasFrontendUser();
-
-        if ($hasFrontendUser) {
-            $user = $this->getUser();
-            return [
-                'userId' => $user->id,
-                'userFullName' => trim($user->firstname . ' ' . $user->lastname) ?: 'Gast',
-            ];
-        }
-
-        return ['userId' => null, 'userFullName' => 'Gast'];
-    }
-
-    /**
-     * Berechnet den Gesamtpreis der reservierten Assets aus der Session.
-     */
-    private function calculateTotalPrice(array $sessionData): float
-    {
-        $totalPrice = 0.0;
-
-        foreach ($sessionData as $entry) {
-            $category = $entry['category'] ?? null;
-            $selectedAssets = $entry['selectedAssets'] ?? [];
-
-            if (!$category || empty($selectedAssets)) {
-                continue;
-            }
-
-            // Preise der Assets summieren
-            foreach ($selectedAssets as $asset) {
-                // Asset-Details abrufen
-                $assetDetails = $this->getAssetDetails($category, (int)$asset['assetId']);
-
-                if ($assetDetails) {
-                    // Mietgebühr extrahieren
-                    preg_match('/([0-9]+(\.[0-9]{2})?) €/i', $assetDetails, $matches);
-
-                    if (!empty($matches[1])) {
-                        $totalPrice += (float)$matches[1];
-                    }
-                }
-            }
-        }
-        return $totalPrice;
-    }
-
-    /**
-     * Gruppiert Assets nach Typ.
-     */
-    private function groupAssetsByType(array $assets, array $equipmentTypes): array
-    {
-        $groupedAssets = [];
-        $types = $this->helper->getEquipmentTypes();
-
-        foreach ($assets as $asset) {
-            $typeId = $asset['typeId'] ?? 'unknown';
-            $subTypeId = $asset['subTypeId'] ?? 'unknown';
-
-            // Typnamen und Subtypen aus den Equipment-Typen extrahieren
-            foreach ($equipmentTypes as $typeKey => $typeData) {
-                if ($typeKey == $typeId) {
-                    $typeName = $typeData['name'] ?? 'unknown_type';
-                    $subtypes = $typeData['subtypes'];
-
-                    // Subtypen-Name ermitteln
-                    $subTypeName = $subtypes[$subTypeId] ?? 'unknown_subtype';
-
-                    if (!isset($groupedAssets[$typeName])) {
-                        $groupedAssets[$typeName] = [];
-                    }
-
-                    if (!isset($groupedAssets[$typeName][$subTypeName])) {
-                        $groupedAssets[$typeName][$subTypeName] = [];
-                    }
-
-                    // Asset zur entsprechenden Gruppe hinzufügen
-                    $groupedAssets[$typeName][$subTypeName][] = $asset;
-                }
-            }
-        }
-
-        return $groupedAssets;
-    }
-
-    /**
-     * Optionale Kategorien abrufen.
-     */
-    private function getCategories(): array
-    {
-        return [
-            'tl_dc_tanks' => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes']['tl_dc_tanks'],
-            'tl_dc_regulators' => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes']['tl_dc_regulators'],
-            'tl_dc_equipment' => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes']['tl_dc_equipment'],
-        ];
-    }
-
-    /**
-     * Erfolgsmeldung für gespeicherte Assets anzeigen.
-     */
-    private function displaySuccessMessage(array $storedAssets, Template $template): void
-    {
-        if (!empty($storedAssets)) {
-            $message = sprintf(
-                'Die reservierten Gegenstände wurden gespeichert: Gesamtsumme <strong>%.2f €</strong>',
-                $this->calculateTotalRentalFee($this->getSessionData())
-            );
-            Message::addConfirmation($message);
-        } else {
-            Message::addError('Keine Auswahl getroffen.');
-        }
-
-        $template->messages = Message::generate();
     }
 
     /**
@@ -463,7 +889,7 @@ class ModuleBooking extends AbstractFrontendModuleController
     {
         $session = $this->requestStack->getSession();
         $bag = $session->getBag(ArrayAttributeBag::ATTRIBUTE_NAME);
-        $selectedMember =$bag->get('selectedMember');
+        $selectedMember = $bag->get('selectedMember');
 
         // Bestehende Session-Daten abrufen
         $sessionData = $bag->get('reservation_items', []);
@@ -490,10 +916,10 @@ class ModuleBooking extends AbstractFrontendModuleController
 
         // Gesamtpreis dieser Auswahl berechnen
         $totalRentalFee = array_reduce($selectedAssets, function ($carry, $assetId) use ($data) {
-            $assetDetails = $this->getAssetDetails($data['category'], (int) $assetId);
+            $assetDetails = $this->getAssetDetails($data['category'], (int)$assetId);
             if ($assetDetails) {
                 if (preg_match('/([0-9]+\.[0-9]{2}) €/i', $assetDetails, $matches)) {
-                    $carry += (float) $matches[1];
+                    $carry += (float)$matches[1];
                 }
             }
             return $carry;
@@ -564,446 +990,32 @@ class ModuleBooking extends AbstractFrontendModuleController
     }
 
     /**
-     * Save Data to Database
+     * Erfolgsmeldung für gespeicherte Assets anzeigen.
      */
-    function saveDataToDb(): string
+    private function displaySuccessMessage(array $storedAssets, Template $template): void
     {
-        $session = $this->requestStack->getSession();
-        $bag = $session->getBag(ArrayAttributeBag::ATTRIBUTE_NAME);
-        $sessionData = $bag->get('reservation_items', []); // Alle gespeicherten Reservierungsdaten abrufen
-
-        if (empty($sessionData)) {
-            throw new \RuntimeException('Es sind keine Reservierungsdaten in der Session gespeichert.');
+        if (!empty($storedAssets)) {
+            $message = sprintf(
+                'Die reservierten Gegenstände wurden gespeichert: Gesamtsumme <strong>%.2f €</strong>',
+                $this->calculateTotalRentalFee($this->getSessionData())
+            );
+            Message::addConfirmation($message);
+        } else {
+            Message::addError('Keine Auswahl getroffen.');
         }
 
-        $totalPrice = $this->calculateTotalPrice($sessionData);
-
-        foreach ($sessionData as $entry) {
-            $userId = $entry['userId'] ?? null;
-            $category = $entry['category'] ?? null;
-            $reservedFor = $entry['selectedMember'];
-            $selectedAssets = $entry['selectedAssets'] ?? [];
-            $totalRentalFee = $totalPrice; // Mietkosten berechnen
-
-            if (empty($selectedAssets)) {
-                continue; // Überspringen, wenn keine Assets ausgewählt sind
-            }
-
-            if (!$userId || !$category) {
-                throw new \RuntimeException('Ungültige Session-Daten: Benutzer oder Kategorie fehlt.');
-            }
-
-            // Reservierungstitel generieren
-            $reservationTitle = $this->generateReservationTitle((int) $userId);
-
-            // Prüfen, ob eine Reservierung existiert
-            $reservation = DcReservationModel::findOneBy(['title=?'], [$reservationTitle]);
-            if (null === $reservation) {
-                // Neue Reservierung erstellen
-                $reservation = new DcReservationModel();
-                $reservation->title = $reservationTitle;
-                $reservation->alias = 'id-' . $reservationTitle;
-                $reservation->tstamp = time();
-                $reservation->member_id = $userId;
-                $reservation->reservedFor = $reservedFor ?? null;
-                $reservation->asset_type = $category;
-                $reservation->reserved_at = time();
-                $reservation->reservation_status = 'reserved';
-                $reservation->rentalFee = $totalRentalFee; // Gesamtsumme in die Tabelle speichern
-                $reservation->published = 1;
-                $reservation->save();
-            }
-
-            $reservationId = $reservation->id;
-
-            foreach ($selectedAssets as $asset) {
-                $assetId = $asset['assetId'] ?? null;
-                $type = $asset['type'] ?? null;
-                $subType = $asset['subType'] ?? null;
-
-                if (!$assetId) {
-                    continue; // Überspringen, wenn kein Asset vorhanden ist
-                }
-
-                $existingItem = DcReservationItemsModel::findOneBy([
-                    'pid=? AND item_id=?',
-                ], [
-                    $reservationId,
-                    $assetId,
-                ]);
-
-                if (null === $existingItem) {
-                    // Neue Reservierung für dieses Asset erstellen
-                    $reservationItem = new DcReservationItemsModel();
-                    $reservationItem->pid = $reservationId;
-                    $reservationItem->tstamp = time();
-                    $reservationItem->item_id = (int) $assetId ?? null;
-                    $reservationItem->item_type = $category;
-                    $reservationItem->types = (int) $type  ?? null;
-                    $reservationItem->sub_type = (int) $subType ?? null;
-                    $reservationItem->reserved_at = time();
-                    $reservationItem->created_at = time();
-                    $reservationItem->updated_at = time();
-                    $reservationItem->reservation_status = 'reserved';
-                    $reservationItem->published = 1;
-
-                    $reservationItem->save();
-                }
-
-                // Status des Assets aktualisieren
-                $this->updateAssetStatus($category, (int) $assetId);
-            }
-        }
-
-        return 'Reservierungsdaten wurden erfolgreich gespeichert.';
+        $template->messages = Message::generate();
     }
 
     /**
-     * @param int $reservationId
-     * @param string $reservationNumber
-     * @param string $memberName
-     * @param array $reservedItems
-     * @return void
-     * @throws \Doctrine\DBAL\Exception
+     * Optionale Kategorien abrufen.
      */
-    function sendReservationEmail(string $reservationNumber, string $memberName, array $reservedItems, float $totalFee): void
+    private function getCategories(): array
     {
-        $configAdapter = $this->framework->getAdapter(Config::class);
-
-        // Währungsformatierung für den Gesamtbetrag
-        $formattedTotalFee = number_format($totalFee, 2, ',', '.') ; // Beispiel: "1234.56" wird zu "1.234,56 €"
-
-        // E-Mail-Adresse aus der Tabelle `tl_dc_config` abrufen
-        $result = $this->db->fetchAssociative('SELECT reservationInfo, reservationInfoText FROM tl_dc_config LIMIT 1');
-        $recipientEmail = $result['reservationInfo'] ?? null;
-        $informationText = html_entity_decode($result['reservationInfoText'] , ENT_QUOTES, 'UTF-8') ?? '<p>Hallo,</p><p>es wurde eine neue Reservierung erstellt.</p>';
-
-        if (empty($recipientEmail)) {
-            throw new \RuntimeException('Keine Empfänger-E-Mail-Adresse in der Konfiguration gefunden.');
-        }
-
-        // Liste der reservierten Assets als HTML formatieren
-        $assetsHtml = '<ul>';
-        foreach ($reservedItems as $item) {
-            $assetsHtml .= '<li>' . htmlspecialchars($item) . '</li>';
-        }
-        $assetsHtml .= '</ul>';
-
-        $informationText = str_replace(
-            ['#memberName#', '#reservationNumber#', '#assetsHtml#', '#totalFee#'],
-            [$memberName, $reservationNumber, $assetsHtml, $formattedTotalFee],
-            $informationText
-        );
-
-        // Erstellen der E-Mail
-        $email = new Email();
-
-        $email->from    = $GLOBALS['TL_ADMIN_EMAIL'] ?? $configAdapter->get('adminEmail') ?? 'reservierung@diversworld.eu';
-        $email->subject = 'Neue Reservierung: ' . $reservationNumber;
-        $email->html = $informationText;
-
-        // Versenden der E-Mail
-        $emailSuccess = $email->sendTo($recipientEmail); // Empfänger
-
-        if (!$emailSuccess) {
-            throw new \Exception('Something went wrong while trying to send the reservation Mail.');
-        }
-    }
-
-    /**
-    * Aktualisiert den Status eines Assets nach der Reservierung.
-    */
-    private function updateAssetStatus(string $category, int $assetId): void
-            {
-                switch ($category) {
-                    case 'tl_dc_tanks':
-                        $this->db->update('tl_dc_tanks', ['status' => 'reserved'], ['id' => $assetId]);
-                        break;
-                    case 'tl_dc_regulators':
-                        $this->db->update('tl_dc_regulators', ['status' => 'reserved'], ['id' => $assetId]);
-                        break;
-                    case 'tl_dc_equipment':
-                        $this->db->update('tl_dc_equipment', ['status' => 'reserved'], ['id' => $assetId]);
-                        break;
-                    default:
-                        throw new \RuntimeException('Ungültige Kategorie beim Aktualisieren des Asset-Status.');
-                }
-            }
-
-    /**
-     * @param string $category
-     * @return array
-     */
-    function updateAssets( string $category) : array
-    {
-        // Verfügbare Assets laden
-        // Fetch mappings from the Helpers
-        $manufacturers = $this->helper->getManufacturers();
-        $sizes = $this->helper->getSizes();
-        $equipmentTypes = $this->helper->getEquipmentTypes();
-
-        // Datum global abrufen
-        $dateFormat = Config::get('dateFormat');
-
-        // Fetch the id-to-title mapping from the `tl_dc_equipment` table directly
-        //$equipmentTypesMapping = $this->getEquipmentTypeTitles(); // Custom method, explained below
-        $updatedAssets = [];
-        $assets = $this->getAvailableAssets($category);
-
-        switch ($category) {
-            case 'tl_dc_tanks':
-                // Verarbeitung für Tanks
-                foreach ($assets as $asset) {
-                    $updatedAssets[] = [
-                        'id'            => $asset['id'] ?? 'N/A',
-                        'title'         => $asset['title'] ?? 'N/A', // Standardwert, falls 'title' fehlt
-                        'manufacturer'  => $manufacturers[$asset['manufacturer']] ?? $asset['manufacturer'],
-                        'size'          => $asset['size']."L" ?? 'N/A',
-                        'category'      => $category,
-                        'o2clean'       => $asset['o2clean'] ?? 'N/A',
-                        'owner'         => $asset['owner'] ?? 'Unknown',
-                        'lastCheckDate' => $asset['lastCheckDate']
-                            ? date($dateFormat, (int) $asset['lastCheckDate'])
-                            : 'N/A',
-                        'nextCheckDate' => $asset['nextCheckDate']
-                            ? date($dateFormat, (int) $asset['nextCheckDate'])
-                            : 'N/A',
-                        'status'        => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$asset['status']] ?? 'Unknown',
-                        'price'         => $asset['rentalFee'] ?? 'N/A',
-                    ];
-                }
-                break;
-
-            case 'tl_dc_regulators':
-                // Verarbeitung für Regulators
-                foreach ($assets as $asset) {
-                    $regModel1st = $this->helper->getRegModels1st((int) $asset['manufacturer']);
-                    $regModel2nd = $this->helper->getRegModels2nd((int) $asset['manufacturer']);
-
-                    $updatedAssets[] = [
-                        'id'                    => $asset['id'] ?? 'N/A',
-                        'title'                 => $asset['title'] ?? 'N/A', // Standardwert setzen
-                        'manufacturer'          => $manufacturers[$asset['manufacturer']] ?? $asset['manufacturer'],
-                        'category'              => $category,
-                        'serialNumber1st'       => $asset['serialNumber1st'] ?? 'Unknown',
-                        'regModel1st'           => $regModel1st[$asset['regModel1st']] ?? 'Unknown',
-                        'serialNumber2ndPri'    => $asset['serialNumber2ndPri'] ?? 'Unknown',
-                        'regModel2ndPri'        => $regModel2nd[$asset['regModel2ndPri']] ?? 'Unknown',
-                        'serialNumber2ndSec'    => $asset['serialNumber2ndSec'] ?? 'Unknown',
-                        'regModel2ndSec'        => $regModel2nd[$asset['regModel2ndSec']] ?? 'Unknown',
-                        'status'                => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$asset['status']] ?? 'Unknown',
-                        'price'                 => $asset['rentalFee'] ?? 'N/A',
-                    ];
-                }
-                break;
-
-            case 'tl_dc_equipment':
-                // Verarbeitung für Equipment Types
-                foreach ($assets as $asset) {
-					$equipmentSubTypes = $this->helper->getSubTypes($asset['id']);
-                    $updatedAssets[] = [
-                        'id'            => $asset['id'],
-                        'type'          => $equipmentTypes[$asset['type']] ?? $asset['type'],
-						'subType'       => $equipmentSubTypes[$asset['subType']] ?? $asset['subType'],
-                        'typeId'        => $asset['type'], // Indexwert behalten
-                        'subTypeId'     => $asset['subType'], // Indexwert behalten
-                        'category'      => $category,
-                        'title'         => $asset['title'] ?? 'N/A', // Mapping für Titel
-                        'manufacturer'  => $manufacturers[$asset['manufacturer']] ?? $asset['manufacturer'],
-                        'size'          => $sizes[$asset['size']] ?? $asset['size'],
-                        'buyDate'       => $asset['buyDate']
-                            ? date($dateFormat, (int) $asset['buyDate'])
-                            : 'N/A',
-                        'model'         => $asset['model'] ?? 'N/A',
-                        'color'         => $asset['color'] ?? 'N/A',
-                        'serialNumber'  => $asset['serialNumber'] ?? 'N/A',
-                        'status'        => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$asset['status']] ?? 'Unknown',
-                        'price'         => $asset['rentalFee'] ?? 'N/A',
-                    ];
-                }
-                break;
-
-            default:
-                // Fallback: Falls keine Kategorie zutrifft, keine Verarbeitung
-                foreach ($assets as $asset) {
-                    $updatedAssets[] = [
-                        'id'            => $asset['id'] ?? 'N/A',
-                        'title'         => $asset['title'] ?? 'N/A',
-                        'manufacturer'  => $asset['manufacturer'] ?? 'N/A',
-                        'size'          => $asset['size'] ?? 'N/A',
-                    ];
-                }
-                break;
-        }
-        return $updatedAssets;
-    }
-
-    private function getAvailableAssets(string $category): array
-    {
-        $allowedCategories = ['tl_dc_tanks', 'tl_dc_regulators', 'tl_dc_equipment'];
-        if (!in_array($category, $allowedCategories, true)) {
-            throw new \InvalidArgumentException('Ungültige Kategorie: ' . htmlspecialchars($category));
-        }
-
-        // Unterschiedliche Queries für verschiedene Kategorien
-        switch ($category) {
-            case 'tl_dc_tanks':
-                $result = DcTanksModel::findAvailable();
-                return $result ? $result->fetchAll() : [];
-            case 'tl_dc_regulators':
-                $result = DcRegulatorsModel::findAvailable();
-                return $result ? $result->fetchAll() : [];
-            case 'tl_dc_equipment':
-                $result = DcEquipmentModel::findAvailable() ?? [];
-                return $result ? $result->fetchAll() : [];
-            default:
-                return [];
-        }
-    }
-
-    private function getAssetDetails(string $category, int $assetId): ?string
-    {
-        switch ($category) {
-            case 'tl_dc_tanks':
-                $asset = DcTanksModel::findByPk($assetId);
-
-                if (!$asset) {
-                    return null;
-                }
-                $sizeText = $asset->size . 'L';
-                return sprintf(
-                    'Tank: %s (Größe: %s), %.2f €',
-                    $asset->title ?? 'Unbekannt',
-                    $sizeText,
-                    (float)$asset->rentalFee
-                );
-
-            case 'tl_dc_regulators':
-                $asset = DcRegulatorsModel::findByPk($assetId);
-                if (!$asset) {
-                    return null;
-                }
-                $helper = new DcaTemplateHelper();
-                $manufacturerMapping = $helper->getManufacturers();
-                $manufacturerText = $manufacturerMapping[$asset->manufacturer] ?? 'Unbekannter Hersteller';
-
-                $regModel1stMapping = $helper->getRegModels1st((int) $asset->manufacturer);
-                $regModel1stText = $regModel1stMapping[$asset->regModel1st] ?? 'N/A';
-
-                $regModel2ndMapping = $helper->getRegModels2nd((int) $asset->manufacturer);
-                $regModel2ndPriText = $regModel2ndMapping[$asset->regModel2ndPri] ?? 'N/A';
-                $regModel2ndSecText = $regModel2ndMapping[$asset->regModel2ndSec] ?? 'N/A';
-
-                return sprintf(
-                    'Regulator: %s (Hersteller: %s, 1st Stage: %s, 2nd Stage (Pri): %s, 2nd Stage (Sec): %s), %.2f €',
-                    $asset->title ?? 'Unbekannt',
-                    $manufacturerText,
-                    $regModel1stText,
-                    $regModel2ndPriText,
-                    $regModel2ndSecText,
-                    (float)$asset->rentalFee
-                );
-
-            case 'tl_dc_equipment':
-                // Prüfung, ob das Objekt bereits existiert
-                $asset = DcEquipmentModel::findByPk($assetId);
-
-                if (!$asset) {
-                    return null;
-                }
-
-                $helper = new DcaTemplateHelper();
-                $sizeMapping = $helper->getSizes();
-                $types = $helper->getEquipmentTypes();
-                $subTypes = $helper->getSubTypes($asset->type);
-                $sizeText = $sizeMapping[$asset->size] ?? 'Unbekannte Größe';
-
-                $info =  sprintf(
-                    'Ausrüstung: %s %s - %s (Modell: %s, Größe: %s, Farbe: %s), %.2f €',
-                    $types[$asset->type]['name'] ?? 'Unbekannt',
-                    $subTypes[$asset->subType] ?? 'Unbekannt',
-                    $asset->title ?? 'Unbekannt',
-                    $asset->model ?? 'Kein Modell angegeben',
-                    $sizeText,
-                    $asset->color ?? 'Keine Farbe angegeben',
-                    (float)$asset->rentalFee
-                );
-                return $info;
-
-            default:
-                return null;
-        }
-    }
-
-    /**
-     * Kombiniert Session-Daten mit Assets der aktuell gewählten Kategorie.
-     */
-    private function combineAssetsWithSession(string $category, array $assets): array
-    {
-        $session = $this->requestStack->getSession();
-        $bag = $session->getBag(ArrayAttributeBag::ATTRIBUTE_NAME);
-        $sessionData = $bag->get('reservation_items', []);
-
-        $selectedAssetIds = [];
-        foreach ($sessionData as $entry) {
-            // Prüfen, ob 'selectedAssets' ein Array ist
-            $selectedAssets = is_array($entry['selectedAssets'] ?? null) ? $entry['selectedAssets'] : [];
-
-            // Extrahiere nur die `assetId`-Werte aus jedem Eintrag in `selectedAssets`
-            $assetIds = array_map(static function ($asset) {
-                return $asset['assetId'];
-            }, $selectedAssets);
-
-            $selectedAssetIds = array_merge($selectedAssetIds, $assetIds);
-        }
-        $selectedAssetIds = array_unique($selectedAssetIds); // Doppelte entfernen
-
-        // Markiere Assets als "ausgewählt", falls sie in der Session sind
-        foreach ($assets as &$asset) {
-            $asset['selected'] = in_array($asset['id'], $selectedAssetIds, true); // Vergleicht IDs
-        }
-
-        return $assets;
-    }
-
-    protected function generateReservationCheckboxes(array $assets): array
-    {
-        $checkboxes = [];
-
-        foreach ($assets as $asset) {
-            // Erzeuge eine Checkbox für jedes Asset
-            $widget = new FormCheckbox([
-                'inputType' => 'checkbox',
-                'id'        => 'reserved_' . $asset['id'],  // Eindeutige ID
-                'name'      => 'selectedAssets[]',         // Array-Name für Mehrfachauswahl
-                'class'     => 'tl_checkbox',                 // CSS-Klasse
-                // Wichtig: Optionen setzen
-                'options'   => [
-                    [
-                        'value' => $asset['id'],
-                        'label' => $GLOBALS['TL_LANG']['MSC']['reservationCheckbox'],
-                    ]
-                ],
-                'checked'   => false,
-            ]);
-
-            // Widget als HTML zurückgeben
-            $checkboxes[$asset['id']] = $widget->parse();
-        }
-
-        return $checkboxes;
-    }
-
-    protected function generateReservationTitle(int $userId): string
-    {
-        // MemberID formatieren. Führende Nullen hinzufügen, um die member_id dreistellig zu machen
-        $formattedMemberId = str_pad((string)$userId, 3, '0', STR_PAD_LEFT);
-
-        // Datum im Format jjjjmmtt
-        $currentDate = date('dmHi');
-        $currentYear = date('Y');
-
-        // Neues Title-Format
-        return $currentYear . '-' . $formattedMemberId . '-' . $currentDate;
+        return [
+            'tl_dc_tanks' => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes']['tl_dc_tanks'],
+            'tl_dc_regulators' => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes']['tl_dc_regulators'],
+            'tl_dc_equipment' => $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes']['tl_dc_equipment'],
+        ];
     }
 }
