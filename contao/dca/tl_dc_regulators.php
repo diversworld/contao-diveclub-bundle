@@ -21,46 +21,45 @@ use Contao\StringUtil;
 use Contao\System;
 use Diversworld\ContaoDiveclubBundle\DataContainer\DcCheckProposal;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentManufacturerOptionsCallback;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ManufacturerOptionsCallbackListener;
 
 /**
  * Table tl_dc_regulators
  */
 $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
-    'config'            => [
-        'dataContainer'     => DC_Table::class,
-        'ctable'            => ['tl_dc_regulator_control'],
-        'enableVersioning'  => true,
-        'sql'               => [
+    'config' => [
+        'dataContainer' => DC_Table::class,
+        'ctable' => ['tl_dc_regulator_control'],
+        'enableVersioning' => true,
+        'sql' => [
             'keys' => [
-                'id'        => 'primary',
-                'tstamp'    => 'index',
-                'alias'     => 'index',
+                'id' => 'primary',
+                'tstamp' => 'index',
+                'alias' => 'index',
                 'published,start,stop' => 'index'
             ]
         ],
     ],
-    'list'              => [
-        'sorting'           => [
-            'mode'          => DataContainer::MODE_SORTABLE,
-            'fields'        => ['title','alias','regModel1st','regModel2ndPri','regModel2ndSec','published'],
-            'flag'          => DataContainer::SORT_ASC,
-            'panelLayout'   => 'filter;sort,search,limit'
+    'list' => [
+        'sorting' => [
+            'mode' => DataContainer::MODE_SORTABLE,
+            'fields' => ['title', 'alias', 'regModel1st', 'regModel2ndPri', 'regModel2ndSec', 'published'],
+            'flag' => DataContainer::SORT_ASC,
+            'panelLayout' => 'filter;sort,search,limit'
         ],
-        'label'             => [
-            'fields'        => ['title','manufacturer','regModel1st','regModel2ndPri','regModel2ndSec','status'],
-            'showColumns'   => true,
-            'format'        => '%s - %s - %s %s %s %s',
+        'label' => [
+            'fields' => ['title', 'manufacturer', 'regModel1st', 'regModel2ndPri', 'regModel2ndSec', 'status'],
+            'showColumns' => true,
+            'format' => '%s - %s - %s %s %s %s',
             'label_callback' => ['tl_dc_regulators', 'customLabelCallback']
         ],
         'global_operations' => [
             'all' => [
-                'href'       => 'act=select',
-                'class'      => 'header_edit_all',
+                'href' => 'act=select',
+                'class' => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"'
             ]
         ],
-        'operations'        => [
+        'operations' => [
             'edit',
             'children',
             'copy',
@@ -69,175 +68,175 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'toggle'
         ]
     ],
-    'palettes'          => [
-        '__selector__'      => ['addNotes'],
-        'default'           => '{title_legend},title,alias,status,rentalFee;
+    'palettes' => [
+        '__selector__' => ['addNotes'],
+        'default' => '{title_legend},title,alias,status,rentalFee;
                                 {1stStage_legend},manufacturer,serialNumber1st,regModel1st;
                                 {2ndstage_legend},serialNumber2ndPri,regModel2ndPri,serialNumber2ndSec,regModel2ndSec;
                                 {notes_legend},addNotes;
                                 {publish_legend},published,start,stop;'
     ],
-    'subpalettes'       => [
-        'addNotes'          => 'notes',
+    'subpalettes' => [
+        'addNotes' => 'notes',
     ],
-    'fields'            => [
-        'id'                => [
-            'sql'           => "int(10) unsigned NOT NULL auto_increment"
+    'fields' => [
+        'id' => [
+            'sql' => "int(10) unsigned NOT NULL auto_increment"
         ],
-        'tstamp'            => [
-            'sql'           => "int(10) unsigned NOT NULL default 0"
+        'tstamp' => [
+            'sql' => "int(10) unsigned NOT NULL default 0"
         ],
-        'title'             => [
-            'inputType'     => 'text',
-            'label'         => &$GLOBALS['TL_LANG']['tl_dc_regulators']['title'],
-            'exclude'       => true,
-            'search'        => true,
-            'filter'        => true,
-            'sorting'       => true,
-            'flag'          => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'eval'          => ['mandatory' => true, 'maxlength' => 25, 'tl_class' => 'w25'],
-            'sql'           => "varchar(255) NOT NULL default ''"
+        'title' => [
+            'inputType' => 'text',
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_regulators']['title'],
+            'exclude' => true,
+            'search' => true,
+            'filter' => true,
+            'sorting' => true,
+            'flag' => DataContainer::SORT_INITIAL_LETTER_ASC,
+            'eval' => ['mandatory' => true, 'maxlength' => 25, 'tl_class' => 'w25'],
+            'sql' => "varchar(255) NOT NULL default ''"
         ],
-        'alias'             => [
-            'search'        => true,
-            'inputType'     => 'text',
-            'eval'          => ['rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w25'],
+        'alias' => [
+            'search' => true,
+            'inputType' => 'text',
+            'eval' => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
             'save_callback' => [['tl_dc_regulators', 'generateAlias']],
-            'sql'           => "varchar(255) BINARY NOT NULL default ''"
+            'sql' => "varchar(255) BINARY NOT NULL default ''"
         ],
-        'manufacturer'      => [
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulators']['manufacturer'],
-            'inputType'         => 'select',
-            'exclude'           => true,
-            'search'            => true,
-            'filter'            => true,
-            'sorting'           => true,
-            'options_callback'  =>[EquipmentManufacturerOptionsCallback::class, '__invoke'],
-            'reference'         => &$GLOBALS['TL_LANG']['tl_dc_regulators']['manufacturer'],
-            'eval'              => ['includeBlankOption' => true, 'submitOnChange' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
-            'sql'               => "varchar(255) NOT NULL default ''",
+        'manufacturer' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_regulators']['manufacturer'],
+            'inputType' => 'select',
+            'exclude' => true,
+            'search' => true,
+            'filter' => true,
+            'sorting' => true,
+            'options_callback' => [EquipmentManufacturerOptionsCallback::class, '__invoke'],
+            'reference' => &$GLOBALS['TL_LANG']['tl_dc_regulators']['manufacturer'],
+            'eval' => ['includeBlankOption' => true, 'submitOnChange' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'serialNumber1st'   => [
-            'inputType'         => 'text',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulators']['serialNumber1st'],
-            'exclude'           => true,
-            'search'            => true,
-            'filter'            => true,
-            'sorting'           => true,
-            'flag'              => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'eval'              => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25'],
-            'sql'               => "varchar(50) NOT NULL default ''"
+        'serialNumber1st' => [
+            'inputType' => 'text',
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_regulators']['serialNumber1st'],
+            'exclude' => true,
+            'search' => true,
+            'filter' => true,
+            'sorting' => true,
+            'flag' => DataContainer::SORT_INITIAL_LETTER_ASC,
+            'eval' => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25'],
+            'sql' => "varchar(50) NOT NULL default ''"
         ],
-        'regModel1st'       => [
-            'inputType'         => 'select',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulators']['regModel1st'],
-            'exclude'           => true,
-            'search'            => true,
-            'filter'            => true,
-            'sorting'           => true,
-            'options_callback'  => ['tl_dc_regulators', 'getRegModels1st'],
-            'eval'              => ['submitOnChange' => true, 'includeBlankOption' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w25'],
-            'sql'               => "varchar(255) NOT NULL default ''"
+        'regModel1st' => [
+            'inputType' => 'select',
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_regulators']['regModel1st'],
+            'exclude' => true,
+            'search' => true,
+            'filter' => true,
+            'sorting' => true,
+            'options_callback' => ['tl_dc_regulators', 'getRegModels1st'],
+            'eval' => ['submitOnChange' => true, 'includeBlankOption' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w25'],
+            'sql' => "varchar(255) NOT NULL default ''"
         ],
-        'serialNumber2ndPri'=> [
-            'inputType'         => 'text',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulators']['serialNumber2ndPri'],
-            'exclude'           => true,
-            'search'            => true,
-            'filter'            => true,
-            'sorting'           => true,
-            'flag'              => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'eval'              => ['mandatory' => false, 'maxlength' => 50, 'tl_class' => 'w25 clr'],
-            'sql'               => "varchar(50) NOT NULL default ''"
+        'serialNumber2ndPri' => [
+            'inputType' => 'text',
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_regulators']['serialNumber2ndPri'],
+            'exclude' => true,
+            'search' => true,
+            'filter' => true,
+            'sorting' => true,
+            'flag' => DataContainer::SORT_INITIAL_LETTER_ASC,
+            'eval' => ['mandatory' => false, 'maxlength' => 50, 'tl_class' => 'w25 clr'],
+            'sql' => "varchar(50) NOT NULL default ''"
         ],
-        'regModel2ndPri'    => [
-            'inputType'         => 'select',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulators']['regModel2ndPri'],
-            'exclude'           => true,
-            'search'            => true,
-            'filter'            => true,
-            'sorting'           => true,
-            'options_callback'  => ['tl_dc_regulators', 'getRegModels2nd'],
-            'eval'              => ['includeBlankOption' => true, 'submitOnChange' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
-            'sql'               => "varchar(255) NOT NULL default ''"
+        'regModel2ndPri' => [
+            'inputType' => 'select',
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_regulators']['regModel2ndPri'],
+            'exclude' => true,
+            'search' => true,
+            'filter' => true,
+            'sorting' => true,
+            'options_callback' => ['tl_dc_regulators', 'getRegModels2nd'],
+            'eval' => ['includeBlankOption' => true, 'submitOnChange' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
+            'sql' => "varchar(255) NOT NULL default ''"
         ],
-        'serialNumber2ndSec'=> [
-            'inputType'         => 'text',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulators']['serialNumber2ndSec'],
-            'exclude'           => true,
-            'search'            => true,
-            'filter'            => true,
-            'sorting'           => true,
-            'eval'              => ['mandatory' => false, 'maxlength' => 50, 'tl_class' => 'w25'],
-            'sql'               => "varchar(50) NOT NULL default ''"
+        'serialNumber2ndSec' => [
+            'inputType' => 'text',
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_regulators']['serialNumber2ndSec'],
+            'exclude' => true,
+            'search' => true,
+            'filter' => true,
+            'sorting' => true,
+            'eval' => ['mandatory' => false, 'maxlength' => 50, 'tl_class' => 'w25'],
+            'sql' => "varchar(50) NOT NULL default ''"
         ],
-        'regModel2ndSec'    => [
-            'inputType'         => 'select',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulators']['regModel2ndSec'],
-            'exclude'           => true,
-            'search'            => true,
-            'filter'            => true,
-            'sorting'           => true,
-            'options_callback'  => ['tl_dc_regulators', 'getRegModels2nd'],
-            'eval'              => ['includeBlankOption' => true,'submitOnChange' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w25'],
-            'sql'               => "varchar(255) NOT NULL default ''"
+        'regModel2ndSec' => [
+            'inputType' => 'select',
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_regulators']['regModel2ndSec'],
+            'exclude' => true,
+            'search' => true,
+            'filter' => true,
+            'sorting' => true,
+            'options_callback' => ['tl_dc_regulators', 'getRegModels2nd'],
+            'eval' => ['includeBlankOption' => true, 'submitOnChange' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w25'],
+            'sql' => "varchar(255) NOT NULL default ''"
         ],
-        'status'        => [
-            'inputType'         => 'select',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulators']['status'],
-            'exclude'           => true,
-            'search'            => true,
-            'filter'            => true,
-            'sorting'           => true,
-            'options'           => &$GLOBALS['TL_LANG']['tl_dc_regulators']['itemStatus'],
-            'reference'         => &$GLOBALS['TL_LANG']['tl_dc_regulators']['itemStatus'],
-            'eval'              => ['includeBlankOption' => true, 'submitOnChange' => false, 'chosen'   => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
-            'sql'               => "varchar(255) NOT NULL default ''"
+        'status' => [
+            'inputType' => 'select',
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_regulators']['status'],
+            'exclude' => true,
+            'search' => true,
+            'filter' => true,
+            'sorting' => true,
+            'options' => &$GLOBALS['TL_LANG']['tl_dc_regulators']['itemStatus'],
+            'reference' => &$GLOBALS['TL_LANG']['tl_dc_regulators']['itemStatus'],
+            'eval' => ['includeBlankOption' => true, 'submitOnChange' => false, 'chosen' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
+            'sql' => "varchar(255) NOT NULL default ''"
         ],
-        'rentalFee'             => [
-            'inputType'         => 'text',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulators']['rentalFee'],
-            'exclude'           => true,
-            'search'            => false,
-            'filter'            => true,
-            'sorting'           => false,
-            'save_callback'     => [['tl_dc_regulators', 'convertPrice']],
-            'eval'              => ['rgxp'=>'digit', 'mandatory'=>false, 'tl_class' => 'w25'], // Beachten Sie "rgxp" für Währungsangaben
-            'sql'               => "DECIMAL(10,2) NOT NULL default '0.00'"
+        'rentalFee' => [
+            'inputType' => 'text',
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_regulators']['rentalFee'],
+            'exclude' => true,
+            'search' => false,
+            'filter' => true,
+            'sorting' => false,
+            'save_callback' => [['tl_dc_regulators', 'convertPrice']],
+            'eval' => ['rgxp' => 'digit', 'mandatory' => false, 'tl_class' => 'w25'], // Beachten Sie "rgxp" für Währungsangaben
+            'sql' => "DECIMAL(10,2) NOT NULL default '0.00'"
         ],
-        'addNotes'          => [
-            'inputType'         => 'checkbox',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_regulators']['addNotes'],
-            'exclude'           => true,
-            'eval'              => ['submitOnChange' => true, 'tl_class' => 'w50'],
-            'sql'               => ['type' => 'boolean', 'default' => false]
+        'addNotes' => [
+            'inputType' => 'checkbox',
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_regulators']['addNotes'],
+            'exclude' => true,
+            'eval' => ['submitOnChange' => true, 'tl_class' => 'w50'],
+            'sql' => ['type' => 'boolean', 'default' => false]
         ],
-        'notes'             => [
-            'inputType'         => 'textarea',
-            'exclude'           => true,
-            'search'            => false,
-            'filter'            => true,
-            'sorting'           => false,
-            'eval'              => ['style'=>'height:60px', 'decodeEntities'=>true, 'rte'=>'tinyMCE', 'basicEntities'=>true, 'tl_class'=>'clr'],
-            'sql'               => 'text NULL'
+        'notes' => [
+            'inputType' => 'textarea',
+            'exclude' => true,
+            'search' => false,
+            'filter' => true,
+            'sorting' => false,
+            'eval' => ['style' => 'height:60px', 'decodeEntities' => true, 'rte' => 'tinyMCE', 'basicEntities' => true, 'tl_class' => 'clr'],
+            'sql' => 'text NULL'
         ],
-        'published'         => [
-            'toggle'            => true,
-            'filter'            => true,
-            'flag'              => DataContainer::SORT_INITIAL_LETTER_DESC,
-            'inputType'         => 'checkbox',
-            'eval'              => ['doNotCopy'=>true, 'tl_class' => 'w50'],
-            'sql'               => ['type' => 'boolean', 'default' => false]
+        'published' => [
+            'toggle' => true,
+            'filter' => true,
+            'flag' => DataContainer::SORT_INITIAL_LETTER_DESC,
+            'inputType' => 'checkbox',
+            'eval' => ['doNotCopy' => true, 'tl_class' => 'w50'],
+            'sql' => ['type' => 'boolean', 'default' => false]
         ],
-        'start'             => [
-            'inputType'         => 'text',
-            'eval'              => ['rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 clr wizard'],
-            'sql'               => "varchar(10) NOT NULL default ''"
+        'start' => [
+            'inputType' => 'text',
+            'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 clr wizard'],
+            'sql' => "varchar(10) NOT NULL default ''"
         ],
-        'stop'              => [
-            'inputType'         => 'text',
-            'eval'              => ['rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 wizard'],
-            'sql'               => "varchar(10) NOT NULL default ''"
+        'stop' => [
+            'inputType' => 'text',
+            'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
+            'sql' => "varchar(10) NOT NULL default ''"
         ]
     ]
 ];
@@ -278,20 +277,33 @@ class tl_dc_regulators extends Backend
                 [],
                 $aliasExists
             );
-        }
-        elseif (preg_match('/^[1-9]\d*$/', $varValue)) {
+        } elseif (preg_match('/^[1-9]\d*$/', $varValue)) {
             throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
-        }
-        elseif ($aliasExists($varValue)) {
+        } elseif ($aliasExists($varValue)) {
             throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
         }
 
         return $varValue;
     }
 
-    public function getManufacturers()
+    public function getRegModels1st(DataContainer $dc): array
     {
-        return $this->getTemplateOptions('manufacturersFile');
+        // Sicherstellen, dass ein aktiver Datensatz vorhanden ist
+        if (!$dc->activeRecord || !$dc->activeRecord->manufacturer) {
+            return [];
+        }
+
+        // Ermittle den aktuellen Typ aus dem aktiven Datensatz
+        $manufacturer = $dc->activeRecord->manufacturer; // Aktueller Hersteller
+        $models = $this->getTemplateOptions('regulatorsFile');
+
+        // Prüfen, ob der Hersteller existiert und Modelle für die erste Stufe definiert sind
+        if (!isset($models[$manufacturer]['regModel1st']) || !is_array($models[$manufacturer]['regModel1st'])) {
+            return [];
+        }
+
+        // Rückgabe der Modelle für die erste Stufe
+        return $models[$manufacturer]['regModel1st'];
     }
 
     private function getTemplateOptions($templateName)
@@ -320,7 +332,7 @@ class tl_dc_regulators extends Backend
 
         // Lade die erforderlichen Felder aus der Tabelle tl_dc_config
         $result = Database::getInstance()->execute("
-            SELECT manufacturersFile, typesFile, subTypesFile, regulatorsFile, sizesFile
+            SELECT manufacturersFile, typesFile, regulatorsFile, sizesFile
             FROM tl_dc_config
             LIMIT 1"
         );
@@ -330,9 +342,8 @@ class tl_dc_regulators extends Backend
             $files = [
                 'manufacturersFile' => $result->manufacturersFile,
                 'typesFile' => $result->typesFile,
-                'subTypesFile' => $result->subTypesFile,
                 'regulatorsFile' => $result->regulatorsFile,
-                'sizesFile'     => $result->sizesFile,
+                'sizesFile' => $result->sizesFile,
             ];
 
             // UUIDs in Pfade umwandeln
@@ -351,30 +362,10 @@ class tl_dc_regulators extends Backend
                 }
             }
         } else {
-            throw new \RuntimeException('Keine Einträge in der Tabelle tl_dc_config gefunden.');
+            throw new RuntimeException('Keine Einträge in der Tabelle tl_dc_config gefunden.');
         }
 
         return $configArray[$templateName];
-    }
-
-    public function getRegModels1st(DataContainer $dc): array
-    {
-        // Sicherstellen, dass ein aktiver Datensatz vorhanden ist
-        if (!$dc->activeRecord || !$dc->activeRecord->manufacturer) {
-            return [];
-        }
-
-        // Ermittle den aktuellen Typ aus dem aktiven Datensatz
-        $manufacturer = $dc->activeRecord->manufacturer; // Aktueller Hersteller
-        $models = $this->getTemplateOptions('regulatorsFile');
-
-        // Prüfen, ob der Hersteller existiert und Modelle für die erste Stufe definiert sind
-        if (!isset($models[$manufacturer]['regModel1st']) || !is_array($models[$manufacturer]['regModel1st'])) {
-            return [];
-        }
-
-        // Rückgabe der Modelle für die erste Stufe
-        return $models[$manufacturer]['regModel1st'];
     }
 
     public function getRegModels2nd(DataContainer $dc): array
@@ -426,6 +417,11 @@ class tl_dc_regulators extends Backend
         }
 
         return $args;
+    }
+
+    public function getManufacturers()
+    {
+        return $this->getTemplateOptions('manufacturersFile');
     }
 
     /**
