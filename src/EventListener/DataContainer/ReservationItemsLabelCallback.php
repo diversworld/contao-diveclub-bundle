@@ -9,10 +9,8 @@ use Contao\DataContainer;
 use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
 use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorsModel;
-use Diversworld\ContaoDiveclubBundle\Model\DcReservationItemsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcTanksModel;
 use Doctrine\DBAL\Connection;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AsCallback(table: 'tl_dc_reservation_items', target: 'list.label.label')]
 class ReservationItemsLabelCallback
@@ -39,14 +37,13 @@ class ReservationItemsLabelCallback
         switch ($row['item_type']) {
             case 'tl_dc_tanks': // Tanks
                 $dbResult = DcTanksModel::findById((int)$row['item_id']);
-                $result = $dbResult->row();
-
-                if ($result)  {
+                if ($dbResult) {
+                    $result = $dbResult->row();
                     $row['asset_type'] = $typeLabel;
                     $row['asset_id'] = sprintf('%sL - %s, (Miete: %s €)',
                         $result['size'] ?? '-',
                         $result['title'] ?? 'Kein Titel',
-                        number_format((float) $result['rentalFee'], 2, ',', '.')
+                        number_format((float)$result['rentalFee'], 2, ',', '.')
                     );
                 } else {
                     $row['asset_type'] = $typeLabel;
@@ -56,8 +53,8 @@ class ReservationItemsLabelCallback
 
             case 'tl_dc_regulators': // Regulatoren
                 $dbResult = DcRegulatorsModel::findById((int)$row['item_id']);
-                $result = $dbResult->row();
-                if ($result) {
+                if ($dbResult) {
+                    $result = $dbResult->row();
                     $manufacturerName = $this->helper->getManufacturers()[$result['manufacturer']] ?? 'Unbekannter Hersteller';
                     $row['asset_type'] = $typeLabel;
                     $row['asset_id'] = sprintf('%s - %s, 1.Stufe: %s, 2.Stufe Pri.: %s, 2.Stufe Sec.: %s, (Miete: %s €)',
@@ -71,15 +68,13 @@ class ReservationItemsLabelCallback
                 } else {
                     $row['asset_type'] = $typeLabel;
                     $row['asset_id'] = 'Regulator nicht gefunden';
-
                 }
                 break;
 
             case 'tl_dc_equipment': // Equipment-Typen
                 $dbResult = DcEquipmentModel::findById((int)$row['item_id']);
-                $result = $dbResult->row();
-
-                if ($result) {
+                if ($dbResult) {
+                    $result = $dbResult->row();
                     $row['asset_type'] = $typeLabel;
                     $row['asset_id'] = sprintf('%s, %s - %s, (Miete: %s €)',
                         $result['model'] ?? 'Kein Modell',
@@ -90,13 +85,7 @@ class ReservationItemsLabelCallback
                 } else {
                     $row['asset_type'] = $typeLabel;
                     $row['asset_id'] = 'Equipment nicht gefunden';
-
                 }
-                break;
-
-            default:
-                $row['asset_type'] = '-';
-                $row['asset_id'] = '-';
                 break;
         }
 
