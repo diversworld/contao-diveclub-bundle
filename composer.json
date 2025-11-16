@@ -22,11 +22,13 @@
         "source": "https://github.com/diversworld/contao-diveclub-bundle"
     },
     "require": {
-        "php": "^8.1",
-        "contao/core-bundle": "^5.0"
+        "php": "^8.2",
+        "contao/core-bundle": "^5.3"
     },
     "require-dev": {
-        "contao/manager-plugin": "^2.12"
+        "contao/manager-plugin": "^2.12",
+        "slevomat/coding-standard": "^8.0",
+        "squizlabs/php_codesniffer": "^3.8"
     },
     "autoload": {
         "psr-4": {
