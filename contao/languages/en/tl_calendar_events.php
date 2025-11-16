@@ -45,7 +45,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['default'] = ["Standard", "This articl
 /**
  * References
  */
-$GLOBALS['TL_LANG']['tl_dc_courses']['courseCategory'] = "Beginner";
-$GLOBALS['TL_LANG']['tl_dc_courses']['courseCategory'] = "Specialty";
-$GLOBALS['TL_LANG']['tl_dc_courses']['courseCategory'] = "Professional";
-$GLOBALS['TL_LANG']['tl_dc_courses']['courseCategory'] = "Technical";
+$GLOBALS['TL_LANG']['tl_dc_divecourse']['courseCategory'] = "Beginner";
+$GLOBALS['TL_LANG']['tl_dc_divecourse']['courseCategory'] = "Specialty";
+$GLOBALS['TL_LANG']['tl_dc_divecourse']['courseCategory'] = "Professional";
+$GLOBALS['TL_LANG']['tl_dc_divecourse']['courseCategory'] = "Technical";
