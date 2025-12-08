@@ -25,7 +25,7 @@ use Diversworld\ContaoDiveclubBundle\Model\DcDiveCourseModel;
 $GLOBALS['TL_DCA']['tl_dc_dive_course'] = [
     'config' => [
         'dataContainer' => DC_Table::class,
-        'ctable' => ['tl_content'],
+        'ctable' => ['tl_dc_course_modules','tl_content'],
         'enableVersioning' => true,
         'sql' => [
             'keys' => [
@@ -57,6 +57,11 @@ $GLOBALS['TL_DCA']['tl_dc_dive_course'] = [
         'operations' => [
             'edit' => [
                 'label' => ['Bearbeiten', 'Kurs bearbeiten'],
+            ],
+            'modules' => [
+                'label' => &$GLOBALS['TL_LANG']['tl_dc_courses']['modules'],
+                'href' => 'table=tl_dc_course_modules',
+                'icon' => 'modules.svg',
             ],
             'children',
             'copy',
