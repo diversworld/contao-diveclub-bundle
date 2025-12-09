@@ -16,12 +16,12 @@ namespace Diversworld\ContaoDiveclubBundle\Model;
 
 use Contao\Model;
 
-class DcCoursesModel extends Model
+class DcCourseExercisesModel extends Model
 {
-    protected static $strTable = 'tl_dc_courses';
+    protected static $strTable = 'tl_dc_course_exercises';
 
-    public static function findPublished()
+    public static function findByModule($moduleId)
     {
-        return static::findBy(['published=?'], [1], ['order' => 'title']);
+        return static::findBy(['pid=?'], [$moduleId], ['order' => 'sorting']);
     }
 }

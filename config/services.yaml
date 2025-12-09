@@ -15,6 +15,10 @@ services:
         class: Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper
         public: true
 
+    # Make the FQCN service explicitly public to allow fetching via container by class name
+    Diversworld\ContaoDiveclubBundle\Helper\CourseProgressHelper:
+        public: true
+
     # Add a session bag
     diversworld.contao_diveclub_bundle.session.factory:
         class: Diversworld\ContaoDiveclubBundle\Session\SessionFactory
