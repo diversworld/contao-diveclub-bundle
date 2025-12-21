@@ -15,14 +15,16 @@ use Diversworld\ContaoDiveclubBundle\Model\DcCheckArticlesModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckInvoiceModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckProposalModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcConfigModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcCourseExercisesModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcCourseModulesModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcCourseStudentsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcDiveCourseModel;
-use Diversworld\ContaoDiveclubBundle\Model\DcDiveModuleModel;
-use Diversworld\ContaoDiveclubBundle\Model\DcDiveProgressModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorControlModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcReservationItemsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcReservationModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcStudentExercisesModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcTanksModel;
 
 /**
@@ -46,13 +48,18 @@ $GLOBALS['BE_MOD']['diveclub'] = [
         'tables' => ['tl_dc_tanks', 'tl_dc_check_invoice'],
     ],
     'dc_course_collection' => [
-        'tables' => ['tl_dc_dive_course', 'tl_dc_participant', 'tl_content', 'tl_dive_progress'],
+        'tables' => [
+            'tl_dc_dive_course',
+            'tl_dc_course_modules',
+            'tl_dc_course_exercises'
+        ],
     ],
-    'dc_dive_module_collection' => [
-        'tables' => ['tl_dc_dive_module'],
-    ],
-    'dc_dive_progress_collection' => [
-        'tables' => ['tl_dc_dive_progress'],
+    'dc_dive_student_collection' => [
+        'tables' => [
+            'tl_dc_students',
+            'tl_dc_course_students',
+            'tl_dc_student_exercises'
+        ],
     ],
     'dc_reservation_collection' => [
         'tables' => ['tl_dc_reservation', 'tl_dc_reservation_items'],
@@ -68,7 +75,7 @@ $GLOBALS['BE_MOD']['diveclub'] = [
 /**
  * Models
  */
-$GLOBALS['TL_MODELS']['tl_dc_divecourse'] = DcDiveCourseModel::class;
+
 $GLOBALS['TL_MODELS']['tl_dc_tanks'] = DcTanksModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_check_invoice'] = DcCheckInvoiceModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_check_proposal'] = DcCheckProposalModel::class;
@@ -80,8 +87,11 @@ $GLOBALS['TL_MODELS']['tl_dc_regulator_control'] = DcRegulatorControlModel::clas
 $GLOBALS['TL_MODELS']['tl_dc_config'] = DcConfigModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_reservation'] = DcReservationModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_reservation_items'] = DcReservationItemsModel::class;
-$GLOBALS['TL_MODELS']['tl_dc_dive_module'] = DcDiveModuleModel::class;
-$GLOBALS['TL_MODELS']['tl_dc_dive_progress'] = DcDiveProgressModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_dive_course'] = DcDiveCourseModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_course_modules'] = DcCourseModulesModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_course_exercises'] = DcCourseExercisesModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_student_exercises'] = DcStudentExercisesModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_course_students'] = DcCourseStudentsModel::class;
 
 /**
  * Frontend Modules

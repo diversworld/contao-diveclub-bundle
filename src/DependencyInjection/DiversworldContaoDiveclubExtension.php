@@ -14,24 +14,17 @@ declare(strict_types=1);
 
 namespace Diversworld\ContaoDiveclubBundle\DependencyInjection;
 
-use Diversworld\ContaoDiveclubBundle\ParameterBag\BackendParameterBag;
+use Exception;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
-class DiversworldContaoDiveclubExtension extends Extension
+class
+DiversworldContaoDiveclubExtension extends Extension
 {
     /**
-     * {@inheritdoc}
-     */
-    public function getAlias(): string
-    {
-        return Configuration::ROOT_KEY;
-    }
-
-    /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
@@ -41,7 +34,7 @@ class DiversworldContaoDiveclubExtension extends Extension
 
         $loader = new YamlFileLoader(
             $container,
-            new FileLocator(__DIR__.'/../../config')
+            new FileLocator(__DIR__ . '/../../config')
         );
 
         $loader->load('parameters.yaml');
@@ -50,8 +43,8 @@ class DiversworldContaoDiveclubExtension extends Extension
 
         $rootKey = $this->getAlias();
 
-        $container->setParameter($rootKey.'.module_title', $config['module_title']);
-        $container->setParameter($rootKey.'.module_description', $config['module_description']);
+        $container->setParameter($rootKey . '.module_title', $config['module_title']);
+        $container->setParameter($rootKey . '.module_description', $config['module_description']);
 
         // Werte aus Configuration nach $GLOBALS['TL_LANG'] für MOD übernehmen
         $moduleTitle = $config['module_title'] ?? 'Diveclub Manager'; // Fallback
@@ -61,5 +54,13 @@ class DiversworldContaoDiveclubExtension extends Extension
             $moduleTitle,
             $moduleDescription,
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAlias(): string
+    {
+        return Configuration::ROOT_KEY;
     }
 }

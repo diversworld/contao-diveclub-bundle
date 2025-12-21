@@ -10,7 +10,7 @@ class AddDefaultReservationTexts extends AbstractMigration
 {
     private Connection $connection;
 
-    private function __construct(Connection $connection)
+    public function __construct(Connection $connection)
     {
         $this->connection = $connection;
     }
@@ -22,10 +22,18 @@ class AddDefaultReservationTexts extends AbstractMigration
 
     public function shouldRun(): bool
     {
-        $schemaManager = $this->connection->getSchemaManager();
+        $schemaManager = $this->connection->createSchemaManager();
+
+        // 1. Tabelle muss existieren
+        if (!$schemaManager->tablesExist(['tl_dc_config'])) {
+            return false;
+        }
+
+        // 2. Migration nur ausführen, wenn die Tabelle noch leer ist
+        $count = $this->connection->fetchOne("SELECT COUNT(*) FROM tl_dc_config");
 
         // Stelle sicher, dass die Tabelle existiert
-        return $schemaManager->tablesExist(['tl_dc_config']);
+        return (int)$count === 0;
     }
 
     public function run(): MigrationResult

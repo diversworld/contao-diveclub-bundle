@@ -7,8 +7,11 @@ declare(strict_types=1);
  * Übungen / Skills pro Modul
  */
 
+use Contao\Backend;
+use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
+use Contao\System;
 
 $GLOBALS['TL_DCA']['tl_dc_course_exercises'] = [
     'config' => [
@@ -16,6 +19,7 @@ $GLOBALS['TL_DCA']['tl_dc_course_exercises'] = [
         'ptable' => 'tl_dc_course_modules',
         'ctable' => ['tl_dc_student_exercises'],
         'enableVersioning' => true,
+        'markAsCopy' => 'headline',
         'sql' => [
             'keys' => [
                 'id' => 'primary',
@@ -29,8 +33,9 @@ $GLOBALS['TL_DCA']['tl_dc_course_exercises'] = [
         'sorting' => [
             'mode' => DataContainer::MODE_PARENT,
             'fields' => ['sorting', 'title'],
+            'headerFields' => ['shortcode', 'title'],
             'flag' => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'panelLayout' => 'filter;search,limit',
+            'panelLayout' => 'sort,filter;search,limit',
         ],
         'label' => [
             'fields' => ['title', 'required'],
@@ -45,30 +50,41 @@ $GLOBALS['TL_DCA']['tl_dc_course_exercises'] = [
         ],
         'operations' => [
             'edit',
-            'student_exercises' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_dc_course_exercises']['student_exercises'],
-                'href' => 'table=tl_dc_student_exercises',
-                'icon' => 'accounts.svg',
-            ],
+            'children',
             'copy',
+            'cut',
             'delete',
-            'show',
             'toggle',
+            'show',
         ],
     ],
 
     'palettes' => [
-        'default' => '{title_legend},title,alias;{detail_legend},description,required,duration,notes;{publish_legend},published'
+        'default' => '{title_legend},title,alias;
+                      {detail_legend},description,required,duration,notes;
+                      {publish_legend},published,start,stop'
     ],
 
     'fields' => [
-        'id' => ['sql' => "int(10) unsigned NOT NULL auto_increment"],
-        'pid' => ['foreignKey' => 'tl_dc_course_modules.title', 'sql' => "int(10) unsigned NOT NULL default 0"],
-        'tstamp' => ['sql' => "int(10) unsigned NOT NULL default 0"],
-        'sorting' => ['label' => &$GLOBALS['TL_LANG']['tl_dc_course_exercises']['sorting'], 'sql' => "int(10) unsigned NOT NULL default 0"],
+        'id' => [
+            'sql' => "int(10) unsigned NOT NULL auto_increment"
+        ],
+        'pid' => [
+            'foreignKey' => 'tl_dc_course_modules.title',
+            'sql' => "int(10) unsigned NOT NULL default 0"
+        ],
+        'sorting' => [
+            'sql' => "int(10) unsigned NOT NULL default 0"
+        ],
+        'tstamp' => [
+            'sql' => "int(10) unsigned NOT NULL default 0"
+        ],
         'title' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_exercises']['title'],
             'inputType' => 'text',
+            'search' => true,
+            'filter' => true,
+            'sorting' => true,
             'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
@@ -84,9 +100,22 @@ $GLOBALS['TL_DCA']['tl_dc_course_exercises'] = [
             'eval' => ['rte' => 'tinyMCE', 'tl_class' => 'clr'],
             'sql' => "text NULL",
         ],
+        'prerequisites' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_exercises']['prerequisites'],
+            'inputType' => 'select',
+            'search' => true,
+            'filter' => true,
+            'sorting' => true,
+            'options_callback' => ['tl_dc_course_exercises', 'getExerciseOptions'],
+            'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr w50'],
+            'sql' => "int(10) unsigned NOT NULL default 0",
+        ],
         'required' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_exercises']['required'],
             'inputType' => 'checkbox',
+            'search' => true,
+            'filter' => true,
+            'sorting' => true,
             'eval' => ['tl_class' => 'w50'],
             'sql' => ['type' => 'boolean', 'default' => false],
         ],
@@ -108,5 +137,77 @@ $GLOBALS['TL_DCA']['tl_dc_course_exercises'] = [
             'eval' => ['tl_class' => 'w50 clr'],
             'sql' => ['type' => 'boolean', 'default' => false],
         ],
+        'start' => [
+            'inputType' => 'text',
+            'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'clr w50 wizard'],
+            'sql' => "varchar(10) NOT NULL default ''"
+        ],
+        'stop' => [
+            'inputType' => 'text',
+            'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
+            'sql' => "varchar(10) NOT NULL default ''"
+        ]
     ],
 ];
+
+class tl_dc_course_exercises extends Backend
+{
+    /**
+     * Auto-generate the event alias if it has not been set yet
+     *
+     * @param mixed $varValue
+     * @param DataContainer $dc
+     *
+     * @return mixed
+     *
+     * @throws Exception
+     */
+    public function generateAlias(mixed $varValue, DataContainer $dc): mixed
+    {
+        $aliasExists = static function (string $alias) use ($dc): bool {
+            $result = Database::getInstance()
+                ->prepare("SELECT id FROM tl_dc_course_exercises WHERE alias=? AND id!=?")
+                ->execute($alias, $dc->id);
+
+            return $result->numRows > 0;
+        };
+
+        // Generate the alias if there is none
+        if (!$varValue) {
+            $varValue = System::getContainer()->get('contao.slug')->generate(
+                $dc->activeRecord->title,
+                [],
+                $aliasExists
+            );
+        } elseif (preg_match('/^[1-9]\d*$/', $varValue)) {
+            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
+        } elseif ($aliasExists($varValue)) {
+            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
+        }
+
+        return $varValue;
+    }
+
+    /**
+     * Get all exercises grouped by their modules as options
+     */
+    public function getExerciseOptions(): array
+    {
+        $options = [];
+        $db = Database::getInstance();
+
+        // Holen aller Module und ihrer Übungen
+        $objExercises = $db->execute("
+            SELECT e.id, e.title AS exerciseTitle, m.title AS moduleTitle
+            FROM tl_dc_course_exercises e
+            LEFT JOIN tl_dc_course_modules m ON e.pid = m.id
+            ORDER BY m.title, e.sorting
+        ");
+
+        while ($objExercises->next()) {
+            $options[$objExercises->moduleTitle][$objExercises->id] = $objExercises->exerciseTitle;
+        }
+
+        return $options;
+    }
+}

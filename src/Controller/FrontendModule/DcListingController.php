@@ -14,8 +14,10 @@ declare(strict_types=1);
 
 namespace Diversworld\ContaoDiveclubBundle\Controller\FrontendModule;
 
+use Contao\ContentModel;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
+use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\Input;
 use Contao\ModuleModel;
 use Contao\PageModel;
@@ -34,35 +36,17 @@ class DcListingController extends AbstractFrontendModuleController
 
     protected ?PageModel $page;
 
-    /**
-     * Lazyload services.
-     */
-    /*
-    public static function getSubscribedServices(): array
+    public function __construct(private readonly ScopeMatcher $scopeMatcher)
     {
-        $services = parent::getSubscribedServices();
-
-        $services['contao.framework'] = ContaoFramework::class;
-        $services['database_connection'] = Connection::class;
-        $services['security.helper'] = 'security.helper';
-        $services['contao.routing.scope_matcher'] = ScopeMatcher::class;
-        $services['translator'] = TranslatorInterface::class;
-
-        return $services;
-    }*/
+    }
 
     /**
-     * This method extends the parent __invoke method,
-     * its usage is usually not necessary.
+     * @param ContentModel $model
      */
-    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
+    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null): Response
     {
-        // Get the page model
-        $this->page = $page;
-
-        $scopeMatcher = $this->container->get('contao.routing.scope_matcher');
-
-        if ($this->page instanceof PageModel && $scopeMatcher->isFrontendRequest($request)) {
+        if ($this->scopeMatcher->isFrontendRequest($request)) {
+            // Frontend-spezifische Logik hier, falls nötig
             $this->page->loadDetails();
         }
 

@@ -24,10 +24,5 @@ class DcCourseStudentsModel extends Model
     {
         return static::findBy(['course_id=?'], [$courseId]);
     }
-
-    public static function findCoursesByStudent($studentId)
-    {
-        return static::findBy(['student_id=?'], [$studentId]);
-    }
 }
 

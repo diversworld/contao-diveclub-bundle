@@ -16,9 +16,9 @@ namespace Diversworld\ContaoDiveclubBundle\Model;
 
 use Contao\Model;
 
-class DcCoursesModel extends Model
+class DcDiveCourseModel extends Model
 {
-    protected static $strTable = 'tl_dc_courses';
+    protected static $strTable = 'tl_dc_dive_course';
 
     public static function findPublished()
     {

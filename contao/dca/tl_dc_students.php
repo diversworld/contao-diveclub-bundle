@@ -13,11 +13,14 @@ use Contao\DC_Table;
 $GLOBALS['TL_DCA']['tl_dc_students'] = [
     'config' => [
         'dataContainer' => DC_Table::class,
+        'ctable' => ['tl_dc_course_students'],
         'enableVersioning' => true,
+        'markAsCopy' => 'headline',
         'sql' => [
             'keys' => [
                 'id' => 'primary',
                 'lastname' => 'index',
+                'phone' => 'index',
                 'email' => 'index',
             ],
         ],
@@ -26,13 +29,13 @@ $GLOBALS['TL_DCA']['tl_dc_students'] = [
     'list' => [
         'sorting' => [
             'mode' => DataContainer::MODE_SORTABLE,
-            'fields' => ['lastname', 'firstname'],
+            'fields' => ['sorting', 'lastname', 'firstname'],
             'flag' => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'panelLayout' => 'filter;search,limit',
+            'panelLayout' => 'sort,filter;search,limit',
         ],
         'label' => [
-            'fields' => ['lastname', 'firstname', 'birthdate'],
-            'format' => '%s, %s <span style="color:#b3b3b3; padding-left:8px;">%s</span>',
+            'fields' => ['lastname', 'firstname', 'birthdate', 'phone', 'email'],
+            'format' => '%s, %s <span style="color:#b3b3b3; padding-left:8px;">%s</span>, %s, %s',
         ],
         'global_operations' => [
             'all' => [
@@ -43,24 +46,37 @@ $GLOBALS['TL_DCA']['tl_dc_students'] = [
         ],
         'operations' => [
             'edit',
-            'courses' => [
+            '!courses' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_dc_students']['courses'],
                 'href' => 'table=tl_dc_course_students',
-                'icon' => 'calendar.svg',
+                'icon' => 'modules.svg',
+                'primary' => true,
+                'showInHeader' => true
             ],
+            'children',
             'copy',
+            'cut',
             'delete',
-            'show',
             'toggle',
+            'show',
         ],
     ],
     'palettes' => [
-        'default' => '{personal_legend},firstname,lastname,birthdate,email,phone;{medical_legend},medical_ok,notes;{publish_legend},published'
+        'default' => '{personal_legend},firstname,lastname,birthdate,email,phone;
+                      {medical_legend},medical_ok,notes;
+                      {publish_legend},published,start,stop'
     ],
 
     'fields' => [
-        'id' => ['sql' => "int(10) unsigned NOT NULL auto_increment"],
-        'tstamp' => ['sql' => "int(10) unsigned NOT NULL default 0"],
+        'id' => [
+            'sql' => "int(10) unsigned NOT NULL auto_increment"
+        ],
+        'sorting' => [
+            'sql' => "int(10) unsigned NOT NULL default 0"
+        ],
+        'tstamp' => [
+            'sql' => "int(10) unsigned NOT NULL default 0"
+        ],
         'firstname' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_students']['firstname'],
             'inputType' => 'text',
@@ -109,5 +125,15 @@ $GLOBALS['TL_DCA']['tl_dc_students'] = [
             'eval' => ['tl_class' => 'w50 clr'],
             'sql' => ['type' => 'boolean', 'default' => true],
         ],
+        'start' => [
+            'inputType' => 'text',
+            'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'clr w50 wizard'],
+            'sql' => "varchar(10) NOT NULL default ''"
+        ],
+        'stop' => [
+            'inputType' => 'text',
+            'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
+            'sql' => "varchar(10) NOT NULL default ''"
+        ]
     ],
 ];

@@ -31,6 +31,7 @@ $GLOBALS['TL_LANG']['tl_dc_divecourse']['edit'] = "Datensatz mit ID: %s bearbeit
 $GLOBALS['TL_LANG']['tl_dc_divecourse']['copy'] = "Datensatz mit ID: %s kopieren";
 $GLOBALS['TL_LANG']['tl_dc_divecourse']['delete'] = "Datensatz mit ID: %s löschen";
 $GLOBALS['TL_LANG']['tl_dc_divecourse']['show'] = "Datensatz mit ID: %s ansehen";
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['modules'] = ['Modulverwaltung', 'Verwalten der Kursmodule'];
 
 /**
  * Fields

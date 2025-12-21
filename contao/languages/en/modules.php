@@ -17,14 +17,17 @@ declare(strict_types=1);
  */
 //$GLOBALS['TL_LANG']['MOD']['diveclub']                  = ['Diveclub Manager', 'Manage equipment, dive courses, etc.'];
 
-$GLOBALS['TL_LANG']['MOD']['dc_course_collection']      = ['Dive Courses', 'Manage dive courses'];
-$GLOBALS['TL_LANG']['MOD']['dc_regulator_collection']   = ['Regulators', 'Manage regulators'];
-$GLOBALS['TL_LANG']['MOD']['dc_tanks_collection']       = ['Diving Equipment', 'Manage diving equipment'];
-$GLOBALS['TL_LANG']['MOD']['dc_check_collection']       = ['TÜV Offers', 'Manage offers for TÜV inspections'];
-$GLOBALS['TL_LANG']['MOD']['dc_equipment_collection']   = ['Equipment', 'Manage equipment'];
-$GLOBALS['TL_LANG']['MOD']['dc_config_collection']      = ['Configuration', 'Config for the Diveclub Manager'];
+$GLOBALS['TL_LANG']['MOD']['dc_course_collection'] = ['Dive Courses', 'Manage dive courses'];
+$GLOBALS['TL_LANG']['MOD']['dc_regulator_collection'] = ['Regulators', 'Manage regulators'];
+$GLOBALS['TL_LANG']['MOD']['dc_tanks_collection'] = ['Diving Equipment', 'Manage diving equipment'];
+$GLOBALS['TL_LANG']['MOD']['dc_check_collection'] = ['TÜV Offers', 'Manage offers for TÜV inspections'];
+$GLOBALS['TL_LANG']['MOD']['dc_equipment_collection'] = ['Equipment', 'Manage equipment'];
+$GLOBALS['TL_LANG']['MOD']['dc_config_collection'] = ['Configuration', 'Config for the Diveclub Manager'];
+$GLOBALS['TL_LANG']['MOD']['dc_dive_module_collection'] = ['Modules', 'Manage the copurse modules'];
+$GLOBALS['TL_LANG']['MOD']['dc_dive_student_collection'] = ['Students', 'Manage the course students'];
+$GLOBALS['TL_LANG']['MOD']['dc_old_equipment_collection'] = ['Old Equipment Tables', 'Old Tables'];
 
-$GLOBALS['TL_LANG']['FMD']['dc_modules']                = ['Dive Club Manager', 'Modules of the Dive Club Manager'];
-$GLOBALS['TL_LANG']['FMD']['dc_listing']                = ['Offer Details', 'Dive Club Manager'];
-$GLOBALS['TL_LANG']['FMD']['dc_tanks_listing']          = ['Dive Tanks', 'List of recorded Dive Tanks'];
-$GLOBALS['TL_LANG']['FMD']['dc_equipment_listing']      = ['Diving Equipment', 'List of recorded diving equipment'];
+$GLOBALS['TL_LANG']['FMD']['dc_modules'] = ['Dive Club Manager', 'Modules of the Dive Club Manager'];
+$GLOBALS['TL_LANG']['FMD']['dc_listing'] = ['Offer Details', 'Dive Club Manager'];
+$GLOBALS['TL_LANG']['FMD']['dc_tanks_listing'] = ['Dive Tanks', 'List of recorded Dive Tanks'];
+$GLOBALS['TL_LANG']['FMD']['dc_equipment_listing'] = ['Diving Equipment', 'List of recorded diving equipment'];
