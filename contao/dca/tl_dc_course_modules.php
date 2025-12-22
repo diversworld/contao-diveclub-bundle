@@ -101,7 +101,7 @@ $GLOBALS['TL_DCA']['tl_dc_course_modules'] = [
             'sql' => "varchar(255) BINARY NOT NULL default ''",
         ],
         'shortcode' => [
-            'label' => ['Kurzcode', 'z. B. M1, T2, etc.'],
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['shortcode'],
             'inputType' => 'text',
             'search' => true,
             'sorting' => true,

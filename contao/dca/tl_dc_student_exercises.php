@@ -102,8 +102,8 @@ $GLOBALS['TL_DCA']['tl_dc_student_exercises'] = [
         'status' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_student_exercises']['status'],
             'inputType' => 'select',
-            'options' => ['pending', 'ok', 'repeat', 'failed'],
-            'reference' => &$GLOBALS['TL_LANG']['tl_dc_student_exercises']['status'],
+            'reference' => &$GLOBALS['TL_LANG']['tl_dc_student_exercises']['itemStatus'],
+            'options' => &$GLOBALS['TL_LANG']['tl_dc_student_exercises']['itemStatus'],
             'eval' => ['tl_class' => 'w50'],
             'sql' => "varchar(16) NOT NULL default 'pending'",
         ],
@@ -122,7 +122,7 @@ $GLOBALS['TL_DCA']['tl_dc_student_exercises'] = [
         'notes' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_student_exercises']['notes'],
             'inputType' => 'textarea',
-            'eval' => ['tl_class' => 'clr'],
+            'eval' => ['style' => 'height:60px', 'decodeEntities' => true, 'rte' => 'tinyMCE', 'basicEntities' => true, 'tl_class' => 'clr'],
             'sql' => "text NULL",
         ],
         'published' => [

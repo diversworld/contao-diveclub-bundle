@@ -18,6 +18,8 @@ use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
 use Diversworld\ContaoDiveclubBundle\DataContainer\DcDiveCourse;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseCategoryOptionsCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseTypeOptionsCallback;
 use Diversworld\ContaoDiveclubBundle\Model\DcDiveCourseModel;
 
 /**
@@ -41,7 +43,7 @@ $GLOBALS['TL_DCA']['tl_dc_dive_course'] = [
     'list' => [
         'sorting' => [
             'mode' => DataContainer::MODE_SORTABLE,
-            'fields' => ['sorting', 'title'],
+            'fields' => ['title'],
             'flag' => DataContainer::SORT_INITIAL_LETTER_ASC,
             'panelLayout' => 'sort,filter;search,limit',
         ],
@@ -71,6 +73,12 @@ $GLOBALS['TL_DCA']['tl_dc_dive_course'] = [
             'delete',
             'toggle',
             'show',
+            'new_after' => [
+                'label' => ['Neu danach', 'Neue Zuordnung hinzufügen'],
+                'href' => 'act=create&amp;mode=1',
+                'icon' => 'new.svg', // Das Plus-Icon
+                'attributes' => 'onclick="Backend.getScrollOffset()"'
+            ],
         ]
     ],
     'palettes' => [
@@ -101,12 +109,13 @@ $GLOBALS['TL_DCA']['tl_dc_dive_course'] = [
             'sql' => "int(10) unsigned NOT NULL default 0"
         ],
         'title' => [
-            'label' => ['Kurstitel', 'Titel des Tauchkurses'],
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['title'],
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'alias' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['alias'],
             'search' => true,
             'inputType' => 'text',
             'eval' => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w33'],
@@ -114,9 +123,11 @@ $GLOBALS['TL_DCA']['tl_dc_dive_course'] = [
             'sql' => "varchar(255) BINARY NOT NULL default ''",
         ],
         'course_type' => [
-            'label' => ['Kurstyp', 'Art des Kurses (z. B. OWD, AOWD, Rescue)'],
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['course_type'],
             'inputType' => 'select',
-            'options' => ['OWD', 'AOWD', 'Rescue', 'Nitrox', 'Specialty'],
+            //'options' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['itemCourseType'],
+            //'reference' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['itemCourseType'],
+            'options_callback' => [CourseTypeOptionsCallback::class, '__invoke'],
             'eval' => ['mandatory' => true, 'tl_class' => 'w33'],
             'sql' => "varchar(32) NOT NULL default ''",
         ],
@@ -133,24 +144,25 @@ $GLOBALS['TL_DCA']['tl_dc_dive_course'] = [
             'sql' => "varchar(16) NOT NULL default ''",
         ],
         'instructor' => [
-            'label' => ['Tauchlehrer', 'Verantwortlicher Ausbilder'],
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['instructor'],
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 128, 'tl_class' => 'w33'],
             'sql' => "varchar(128) NOT NULL default ''",
         ],
         'max_participants' => [
-            'label' => ['Max. Teilnehmer', 'Begrenzung der Teilnehmerzahl'],
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['max_participants'],
             'inputType' => 'text',
             'eval' => ['rgxp' => 'digit', 'tl_class' => 'w33'],
             'sql' => "smallint(5) unsigned NOT NULL default 0",
         ],
         'price' => [
-            'label' => ['Preis', 'Teilnahmegebühr (optional)'],
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['max_participants'],
             'inputType' => 'text',
             'eval' => ['rgxp' => 'price', 'tl_class' => 'w33'],
             'sql' => "decimal(10,2) NOT NULL default '0.00'",
         ],
         'description' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['description'],
             'inputType' => 'textarea',
             'exclude' => true,
             'search' => true,
@@ -160,6 +172,7 @@ $GLOBALS['TL_DCA']['tl_dc_dive_course'] = [
             'sql' => 'text NULL'
         ],
         'requirements' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['requirements'],
             'inputType' => 'textarea',
             'exclude' => true,
             'search' => true,
@@ -174,8 +187,9 @@ $GLOBALS['TL_DCA']['tl_dc_dive_course'] = [
             'search' => true,
             'filter' => true,
             'sorting' => true,
-            'reference' => &$GLOBALS['TL_LANG']['tl_dc_courses'],
-            'options' => ['basic', 'specialty', 'professional'],
+            'options_callback' => [CourseCategoryOptionsCallback::class, '__invoke'],
+//            'reference' => &$GLOBALS['TL_LANG']['tl_dc_courses']['itemCategory'],
+//            'options' => &$GLOBALS['TL_LANG']['tl_dc_courses']['itemCategory'],
             'eval' => ['includeBlankOption' => true, 'tl_class' => 'w33'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],

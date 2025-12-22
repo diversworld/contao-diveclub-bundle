@@ -25,9 +25,11 @@ class DcaTemplateHelper
         // Templatepfad über Contao ermitteln
         $templatePath = $this->getTemplateFromConfig($templateName);
 
-        // Überprüfen, ob die Datei existiert
-        if (!$templatePath || !file_exists($templatePath)) {
+        // Überprüfen, ob der Pfad leer ist oder die Datei nicht existiert
+        if (empty($templatePath) || !file_exists($templatePath)) {
             throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['templateNotFound'], $templatePath));
+            // Wenn nichts konfiguriert ist, geben wir ein leeres Array zurück statt abzustürzen
+            return [];
         }
 
         $options = include $templatePath;
@@ -46,7 +48,7 @@ class DcaTemplateHelper
 
         // Lade die erforderlichen Felder aus der Tabelle tl_dc_config
         $result = Database::getInstance()->execute("
-            SELECT manufacturersFile, typesFile, regulatorsFile, sizesFile
+            SELECT manufacturersFile, typesFile, regulatorsFile, sizesFile, courseTypesFile, courseCategoriesFile
             FROM tl_dc_config
             LIMIT 1"
         );
@@ -58,6 +60,8 @@ class DcaTemplateHelper
                 'typesFile' => $result->typesFile,
                 'regulatorsFile' => $result->regulatorsFile,
                 'sizesFile' => $result->sizesFile,
+                'courseTypesFile' => $result->courseTypesFile,
+                'courseCategoriesFile' => $result->courseCategoriesFile,
             ];
 
             // UUIDs in Pfade umwandeln
@@ -88,6 +92,10 @@ class DcaTemplateHelper
                 return $configArray['sizesFile'];
             case 'dc_equipment_manufacturers':
                 return $configArray['manufacturersFile'];
+            case 'dc_course_types':
+                return $configArray['courseTypesFile'];
+            case 'dc_course_categories':
+                return $configArray['courseCategoriesFile'];
             default:
                 return $configArray[$templateName];
         }
@@ -130,6 +138,16 @@ class DcaTemplateHelper
     public function getEquipmentTypes()
     {
         return $this->getTemplateOptions('typesFile');
+    }
+
+    public function getCourseTypes(): array
+    {
+        return $this->getTemplateOptions('courseTypesFile');
+    }
+
+    public function getCourseCategories(): array
+    {
+        return $this->getTemplateOptions('courseCategoriesFile');
     }
 
     public function getRegModels1st(?int $manufacturer = null, ?DataContainer $dc = null): array

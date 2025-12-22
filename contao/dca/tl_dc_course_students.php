@@ -95,8 +95,8 @@ $GLOBALS['TL_DCA']['tl_dc_course_students'] = [
         'status' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_students']['status'],
             'inputType' => 'select',
-            'options' => ['registered', 'active', 'completed', 'dropped'],
-            'reference' => &$GLOBALS['TL_LANG']['tl_dc_course_students']['status'],
+            'reference' => &$GLOBALS['TL_LANG']['tl_dc_course_students']['itemStatus'],
+            'options' => &$GLOBALS['TL_LANG']['tl_dc_course_students']['itemStatus'],
             'eval' => ['tl_class' => 'w33'],
             'sql' => "varchar(16) NOT NULL default 'registered'",
         ],
@@ -115,7 +115,7 @@ $GLOBALS['TL_DCA']['tl_dc_course_students'] = [
         'notes' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_students']['notes'],
             'inputType' => 'textarea',
-            'eval' => ['tl_class' => 'clr'],
+            'eval' => ['style' => 'height:60px', 'decodeEntities' => true, 'rte' => 'tinyMCE', 'basicEntities' => true, 'tl_class' => 'clr'],
             'sql' => "text NULL",
         ],
         'published' => [
@@ -170,8 +170,8 @@ class tl_dc_course_students extends Backend
 
             if ($objCheck->numRows < 1) {
                 // 3. Übung als 'pending' anlegen
-                $db->prepare("INSERT INTO tl_dc_student_exercises (pid, tstamp, exercise_id, status) VALUES (?, ?, ?, ?)")
-                    ->execute($assignmentId, time(), $objExercises->id, 'pending');
+                $db->prepare("INSERT INTO tl_dc_student_exercises (pid, tstamp, exercise_id, status, published) VALUES (?, ?, ?, ?, ?)")
+                    ->execute($assignmentId, time(), $objExercises->id, 'pending', 1);
             }
         }
     }

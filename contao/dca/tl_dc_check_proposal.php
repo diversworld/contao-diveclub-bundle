@@ -13,50 +13,50 @@ declare(strict_types=1);
  */
 
 use Contao\Backend;
+use Contao\CoreBundle\EventListener\Widget\HttpUrlListener;
+use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
-use Contao\CoreBundle\Monolog\ContaoContext;
-use Contao\CoreBundle\EventListener\Widget\HttpUrlListener;
 use Diversworld\ContaoDiveclubBundle\DataContainer\DcCheckProposal;
 
 /**
  * Table tl_dc_check_invoice
  */
 $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
-    'config'            => [
-        'dataContainer'     => DC_Table::class,
-        'ctable'            => ['tl_dc_check_articles'],
-        'enableVersioning'  => true,
-        'sql'               => [
+    'config' => [
+        'dataContainer' => DC_Table::class,
+        'ctable' => ['tl_dc_check_articles'],
+        'enableVersioning' => true,
+        'sql' => [
             'keys' => [
-                'id'        => 'primary',
-                'tstamp'    => 'index',
-                'alias'     => 'index',
+                'id' => 'primary',
+                'tstamp' => 'index',
+                'alias' => 'index',
                 'published,start,stop' => 'index'
             ]
         ],
     ],
-    'list'              => [
-        'sorting'           => [
-            'mode'          => DataContainer::MODE_SORTABLE,
-            'fields'        => ['title','alias','published'],
-            'flag'          => DataContainer::SORT_ASC,
-            'panelLayout'   => 'filter;sort,search,limit'
+    'list' => [
+        'sorting' => [
+            'mode' => DataContainer::MODE_SORTABLE,
+            'fields' => ['title', 'alias', 'published'],
+            'flag' => DataContainer::SORT_ASC,
+            'panelLayout' => 'filter;sort,search,limit'
         ],
-        'label'             => [
-            'fields' => ['title','vendorName','checkId'],
+        'label' => [
+            'fields' => ['title', 'vendorName', 'checkId'],
             'format' => '%s %s %s',
         ],
         'global_operations' => [
             'all' => [
-                'href'       => 'act=select',
-                'class'      => 'header_edit_all',
+                'href' => 'act=select',
+                'class' => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"'
             ]
         ],
-        'operations'        => [
+        'operations' => [
             'edit',
             'children',
             'copy',
@@ -65,46 +65,46 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
             'toggle'
         ]
     ],
-    'palettes'          => [
-        '__selector__'      => ['addNotes'],
-        'default'           => '{title_legend},title,alias;
+    'palettes' => [
+        '__selector__' => ['addNotes'],
+        'default' => '{title_legend},title,alias;
                                 {details_legend},proposalDate,checkId;
                                 {vendor_legend},vendorName,vendorWebsite,vendorStreet,vendorPostal,vendorCity,vendorEmail,vendorPhone,vendorMobile;
                                 {notes_legend},notes;
                                 {publish_legend},published,start,stop;'
     ],
-    'subpalettes'       => [
+    'subpalettes' => [
     ],
-    'fields'            => [
-        'id'                => [
-            'sql'           => "int(10) unsigned NOT NULL auto_increment"
+    'fields' => [
+        'id' => [
+            'sql' => "int(10) unsigned NOT NULL auto_increment"
         ],
-        'tstamp'            => [
-            'sql'           => "int(10) unsigned NOT NULL default 0"
+        'tstamp' => [
+            'sql' => "int(10) unsigned NOT NULL default 0"
         ],
-        'title'             => [
-            'inputType'     => 'text',
-            'label'         => &$GLOBALS['TL_LANG']['tl_dc_check_proposal']['title'],
-            'exclude'       => true,
-            'search'        => true,
-            'filter'        => true,
-            'sorting'       => true,
-            'flag'          => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'eval'          => ['mandatory' => true, 'maxlength' => 25, 'tl_class' => 'w33'],
-            'sql'           => "varchar(255) NOT NULL default ''"
+        'title' => [
+            'inputType' => 'text',
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_check_proposal']['title'],
+            'exclude' => true,
+            'search' => true,
+            'filter' => true,
+            'sorting' => true,
+            'flag' => DataContainer::SORT_INITIAL_LETTER_ASC,
+            'eval' => ['mandatory' => true, 'maxlength' => 25, 'tl_class' => 'w33'],
+            'sql' => "varchar(255) NOT NULL default ''"
         ],
-        'alias'             => [
-            'search'        => true,
-            'inputType'     => 'text',
-            'eval'          => ['rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w33'],
+        'alias' => [
+            'search' => true,
+            'inputType' => 'text',
+            'eval' => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w33'],
             'save_callback' => [['tl_dc_check_proposal', 'generateAlias']],
-            'sql'           => "varchar(255) BINARY NOT NULL default ''"
+            'sql' => "varchar(255) BINARY NOT NULL default ''"
         ],
-        'checkId'           => [
-            'inputType'         => 'select', // 'select' für Dropdown
-            'foreignKey'        => 'tl_calendar_events.title',
+        'checkId' => [
+            'inputType' => 'select', // 'select' für Dropdown
+            'foreignKey' => 'tl_calendar_events.title',
             //'options_callback'  => [['tl_dc_check_proposal', 'getCalenarOptions']],
-            'options_callback'  => function() {
+            'options_callback' => function () {
                 $options = [];
                 $db = Database::getInstance();
                 $result = $db->execute("SELECT id, title FROM tl_calendar_events WHERE addCheckInfo = '1'");
@@ -115,121 +115,121 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
                 }
                 return $options;
             },
-            'save_callback'     => [
+            'save_callback' => [
                 ['tl_dc_check_proposal', 'updateEventVendorInfo']
             ], // Spezifische Callback-Methode
-            'eval'              => [
+            'eval' => [
                 'includeBlankOption' => true, // Ermöglicht eine leere Auswahl als Standardvalue
-                'mandatory'          => false,
-                'chosen'             => true, // Bessere Darstellung des Dropdowns
-                'tl_class'           => 'w25', // CSS-Klasse fürs Layout
+                'mandatory' => false,
+                'chosen' => true, // Bessere Darstellung des Dropdowns
+                'tl_class' => 'w25', // CSS-Klasse fürs Layout
             ],
-            'sql'               => "int(10) unsigned NULL default 0",
+            'sql' => "int(10) unsigned NULL default 0",
         ],
-        'proposalDate'      => [
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_check_proposal']['proposalDate'],
-            'inputType'         => 'text',
-            'eval'              => ['rgxp'=>'date', 'datepicker'=>true, 'tl_class'=>'w25 clr wizard'],
-            'sql'               => "varchar(10) NULL default ''"
+        'proposalDate' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_check_proposal']['proposalDate'],
+            'inputType' => 'text',
+            'eval' => ['rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w25 clr wizard'],
+            'sql' => "varchar(10) NULL default ''"
         ],
-        'vendorName'        => [
-            'exclude'           => true,
-            'flag'              => SORT_STRING,
-            'inputType'         => 'text',
-            'search'            => true,
-            'sorting'           => true,
-            'eval'              => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w33',],
-            'sql'               => "varchar(255) NULL default ''",
+        'vendorName' => [
+            'exclude' => true,
+            'flag' => SORT_STRING,
+            'inputType' => 'text',
+            'search' => true,
+            'sorting' => true,
+            'eval' => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w33',],
+            'sql' => "varchar(255) NULL default ''",
         ],
-        'vendorWebsite'     => [
-            'search'            => true,
-            'inputType'         => 'text',
-            'eval'              => ['rgxp'=>HttpUrlListener::RGXP_NAME, 'maxlength'=>255, 'feEditable'=>true, 'feGroup'=>'contact', 'tl_class'=>'w33'],
-            'sql'               => "varchar(255) NULL default ''"
+        'vendorWebsite' => [
+            'search' => true,
+            'inputType' => 'text',
+            'eval' => ['rgxp' => HttpUrlListener::RGXP_NAME, 'maxlength' => 255, 'feEditable' => true, 'feGroup' => 'contact', 'tl_class' => 'w33'],
+            'sql' => "varchar(255) NULL default ''"
         ],
-        'vendorStreet'      => [
-            'exclude'           => true,
-            'flag'              => SORT_STRING,
-            'inputType'         => 'text',
-            'search'            => true,
-            'sorting'           => true,
-            'eval'              => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w33 clr',],
-            'sql'               => "varchar(255) NOT NULL default ''",
+        'vendorStreet' => [
+            'exclude' => true,
+            'flag' => SORT_STRING,
+            'inputType' => 'text',
+            'search' => true,
+            'sorting' => true,
+            'eval' => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w33 clr',],
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'vendorPostal'      => [
-            'exclude'           => true,
-            'inputType'         => 'text',
-            'search'            => true,
-            'sorting'           => true,
-            'eval'              => ['maxlength' => 12, 'tl_class' => 'w25',],
-            'sql'               => "varchar(32) NULL default ''",
+        'vendorPostal' => [
+            'exclude' => true,
+            'inputType' => 'text',
+            'search' => true,
+            'sorting' => true,
+            'eval' => ['maxlength' => 12, 'tl_class' => 'w25',],
+            'sql' => "varchar(32) NULL default ''",
         ],
-        'vendorCity'        => [
-            'exclude'           => true,
-            'flag'              => SORT_STRING,
-            'inputType'         => 'text',
-            'search'            => true,
-            'sorting'           => true,
-            'eval'              => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w33',],
-            'sql'               => "varchar(255) NULL default ''",
+        'vendorCity' => [
+            'exclude' => true,
+            'flag' => SORT_STRING,
+            'inputType' => 'text',
+            'search' => true,
+            'sorting' => true,
+            'eval' => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w33',],
+            'sql' => "varchar(255) NULL default ''",
         ],
-        'vendorEmail'       => [
-            'default'           => null,
-            'exclude'           => true,
-            'inputType'         => 'text',
-            'sorting'           => true,
-            'eval'              => ['mandatory'=>false, 'maxlength'=>255, 'rgxp'=>'email', 'unique'=>false, 'decodeEntities'=>true, 'feEditable'=>true, 'feGroup'=>'contact', 'tl_class'=>'w25 clr'],
-            'sql'               => "varchar(255) NULL default ''"
-		],
-        'vendorPhone'       => [
-            'default'           => null,
-            'exclude'           => true,
-            'inputType'         => 'text',
-            'sorting'           => true,
-            'eval'              => ['maxlength'=>64, 'rgxp'=>'phone', 'decodeEntities'=>true, 'feEditable'=>true, 'feGroup'=>'contact', 'tl_class'=>'w25'],
-            'sql'               => "varchar(64) NULL default ''"
+        'vendorEmail' => [
+            'default' => null,
+            'exclude' => true,
+            'inputType' => 'text',
+            'sorting' => true,
+            'eval' => ['mandatory' => false, 'maxlength' => 255, 'rgxp' => 'email', 'unique' => false, 'decodeEntities' => true, 'feEditable' => true, 'feGroup' => 'contact', 'tl_class' => 'w25 clr'],
+            'sql' => "varchar(255) NULL default ''"
         ],
-        'vendorMobile'      => [
-            'default'           => null,
-            'exclude'           => true,
-            'inputType'         => 'text',
-            'sorting'           => true,
-            'eval'              => ['maxlength'=>64, 'rgxp'=>'phone', 'decodeEntities'=>true, 'feEditable'=>true, 'feGroup'=>'contact', 'tl_class'=>'w25'],
-            'sql'               => "varchar(64) NULL default ''"
+        'vendorPhone' => [
+            'default' => null,
+            'exclude' => true,
+            'inputType' => 'text',
+            'sorting' => true,
+            'eval' => ['maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'feEditable' => true, 'feGroup' => 'contact', 'tl_class' => 'w25'],
+            'sql' => "varchar(64) NULL default ''"
         ],
-        'addNotes'          => [
-            'inputType'         => 'checkbox',
-            'label'             => &$GLOBALS['TL_LANG']['tl_dc_reservation']['addNotes'],
-            'exclude'           => true,
-            'eval'              => ['submitOnChange' => true, 'tl_class' => 'w50'],
-            'sql'               => ['type' => 'boolean', 'default' => false]
+        'vendorMobile' => [
+            'default' => null,
+            'exclude' => true,
+            'inputType' => 'text',
+            'sorting' => true,
+            'eval' => ['maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'feEditable' => true, 'feGroup' => 'contact', 'tl_class' => 'w25'],
+            'sql' => "varchar(64) NULL default ''"
         ],
-        'notes'             => [
-            'inputType'         => 'textarea',
-            'exclude'           => true,
-            'search'            => false,
-            'filter'            => true,
-            'sorting'           => false,
-            'eval'              => ['rte' => 'tinyMCE', 'tl_class' => 'clr'],
-            'sql'               => 'text NULL'
+        'addNotes' => [
+            'inputType' => 'checkbox',
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_reservation']['addNotes'],
+            'exclude' => true,
+            'eval' => ['submitOnChange' => true, 'tl_class' => 'w50'],
+            'sql' => ['type' => 'boolean', 'default' => false]
         ],
-        'published'         => [
-            'toggle'            => true,
-            'filter'            => true,
-            'flag'              => DataContainer::SORT_INITIAL_LETTER_DESC,
-            'inputType'         => 'checkbox',
-            'eval'              => ['doNotCopy'=>true, 'tl_class' => 'w50'],
-            'sql'               => ['type' => 'boolean', 'default' => false]
+        'notes' => [
+            'inputType' => 'textarea',
+            'exclude' => true,
+            'search' => false,
+            'filter' => true,
+            'sorting' => false,
+            'eval' => ['style' => 'height:60px', 'decodeEntities' => true, 'rte' => 'tinyMCE', 'basicEntities' => true, 'tl_class' => 'clr'],
+            'sql' => 'text NULL'
         ],
-        'start'             => [
-            'inputType'         => 'text',
-            'eval'              => ['rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 clr wizard'],
-            'sql'               => "varchar(10) NOT NULL default ''"
+        'published' => [
+            'toggle' => true,
+            'filter' => true,
+            'flag' => DataContainer::SORT_INITIAL_LETTER_DESC,
+            'inputType' => 'checkbox',
+            'eval' => ['doNotCopy' => true, 'tl_class' => 'w50'],
+            'sql' => ['type' => 'boolean', 'default' => false]
         ],
-        'stop'              => [
-            'inputType'         => 'text',
-            'eval'              => ['rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50 wizard'],
-            'sql'               => "varchar(10) NOT NULL default ''"
+        'start' => [
+            'inputType' => 'text',
+            'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 clr wizard'],
+            'sql' => "varchar(10) NOT NULL default ''"
+        ],
+        'stop' => [
+            'inputType' => 'text',
+            'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
+            'sql' => "varchar(10) NOT NULL default ''"
         ]
     ]
 ];
@@ -270,11 +270,9 @@ class tl_dc_check_proposal extends Backend
                 [],
                 $aliasExists
             );
-        }
-        elseif (preg_match('/^[1-9]\d*$/', $varValue)) {
+        } elseif (preg_match('/^[1-9]\d*$/', $varValue)) {
             throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
-        }
-        elseif ($aliasExists($varValue)) {
+        } elseif ($aliasExists($varValue)) {
             throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
         }
 
@@ -297,8 +295,8 @@ class tl_dc_check_proposal extends Backend
     /**
      * Funktion, um die Vendor-Info in das zugehörige Event zu schreiben
      *
-     * @param mixed          $varValue Der neue Wert des Feldes (checkId)
-     * @param DataContainer  $dc       Das DataContainer-Objekt des aktuellen Datensatzes
+     * @param mixed $varValue Der neue Wert des Feldes (checkId)
+     * @param DataContainer $dc Das DataContainer-Objekt des aktuellen Datensatzes
      *
      * @return mixed
      */
@@ -328,7 +326,7 @@ class tl_dc_check_proposal extends Backend
                     ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)]
                 );
             } else {
-                throw new \RuntimeException(sprintf('Das Event mit der ID %d existiert nicht.', $varValue));
+                throw new RuntimeException(sprintf('Das Event mit der ID %d existiert nicht.', $varValue));
             }
         }
         // Rückgabe des gespeicherten Wertes

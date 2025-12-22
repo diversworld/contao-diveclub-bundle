@@ -1,5 +1,8 @@
 <?php
 
+$GLOBALS['TL_LANG']['tl_dc_student_exercises']['exercise_legend'] = "Übung";
+$GLOBALS['TL_LANG']['tl_dc_student_exercises']['result_legend'] = "Ergebnis";
+$GLOBALS['TL_LANG']['tl_dc_student_exercises']['notes_legend'] = "Bemerkungen";
 $GLOBALS['TL_LANG']['tl_dc_student_exercises']['publish_legend'] = "Veröffentlichen";
 
 
@@ -17,6 +20,14 @@ $GLOBALS['TL_LANG']['tl_dc_student_exercises']['dateCompleted'] = ['Abgeschlosse
 $GLOBALS['TL_LANG']['tl_dc_student_exercises']['instructor'] = ['Instruktor', 'Bewertender Ausbilder'];
 $GLOBALS['TL_LANG']['tl_dc_student_exercises']['notes'] = ['Notizen', 'Interne Bemerkungen'];
 
-$GLOBALS['TL_LANG']['tl_dc_dive_module']['published'] = ['Veröffentlicht', 'Markieren Sie das Equipment als veröffentlicht.'];
-$GLOBALS['TL_LANG']['tl_dc_dive_module']['start'] = ['Startdatum', 'Geben Sie ein Startdatum an.'];
-$GLOBALS['TL_LANG']['tl_dc_dive_module']['stop'] = ['Enddatum', 'Geben Sie ein Enddatum an.'];
+$GLOBALS['TL_LANG']['tl_dc_student_exercises']['published'] = ['Veröffentlicht', 'Markieren Sie das Equipment als veröffentlicht.'];
+$GLOBALS['TL_LANG']['tl_dc_student_exercises']['start'] = ['Startdatum', 'Geben Sie ein Startdatum an.'];
+$GLOBALS['TL_LANG']['tl_dc_student_exercises']['stop'] = ['Enddatum', 'Geben Sie ein Enddatum an.'];
+
+
+$GLOBALS['TL_LANG']['tl_dc_course_exercises']['itemStatus'] = [
+    'pending' => 'Warten',
+    'ok' => 'In Ordnung',
+    'repeat' => 'Wiederholen',
+    'failed' => 'Nicht erreicht'
+];

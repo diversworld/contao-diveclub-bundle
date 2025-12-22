@@ -1,6 +1,8 @@
 <?php
 
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['publish_legend'] = "Veröffentlichen";
+$GLOBALS['TL_LANG']['tl_dc_students']['personal_legend'] = "Tauchschüler";
+$GLOBALS['TL_LANG']['tl_dc_students']['medical_legend'] = "Medizininformationen";
+$GLOBALS['TL_LANG']['tl_dc_students']['publish_legend'] = "Veröffentlichen";
 
 $GLOBALS['TL_LANG']['tl_dc_students']['courses'] = ['Tauchkurse', 'Tauchkurse, die der Schüler besucht hat'];
 
@@ -18,6 +20,6 @@ $GLOBALS['TL_LANG']['tl_dc_students']['phone'] = ['Telefon', 'Telefonnummer'];
 $GLOBALS['TL_LANG']['tl_dc_students']['medical_ok'] = ['Tauchtauglich', 'Tauchtauglichkeitsnachweis vorhanden'];
 $GLOBALS['TL_LANG']['tl_dc_students']['notes'] = ['Notizen', 'Interne Hinweise'];
 
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['published'] = ['Veröffentlicht', 'Markieren Sie das Equipment als veröffentlicht.'];
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['start'] = ['Startdatum', 'Geben Sie ein Startdatum an.'];
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['stop'] = ['Enddatum', 'Geben Sie ein Enddatum an.'];
+$GLOBALS['TL_LANG']['tl_dc_students']['published'] = ['Veröffentlicht', 'Markieren Sie das Equipment als veröffentlicht.'];
+$GLOBALS['TL_LANG']['tl_dc_students']['start'] = ['Startdatum', 'Geben Sie ein Startdatum an.'];
+$GLOBALS['TL_LANG']['tl_dc_students']['stop'] = ['Enddatum', 'Geben Sie ein Enddatum an.'];

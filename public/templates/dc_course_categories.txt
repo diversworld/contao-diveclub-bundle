@@ -1,0 +1,8 @@
+<?php
+
+return [
+    'basic' => 'Grundkurs',
+    'specialty' => 'Spezialkurse',
+    'mixgas' => 'Mischgastauchen',
+    'professional' => 'Professionell'
+];

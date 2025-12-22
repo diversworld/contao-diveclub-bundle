@@ -116,7 +116,7 @@ $GLOBALS['TL_DCA']['tl_dc_students'] = [
         'notes' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_students']['notes'],
             'inputType' => 'textarea',
-            'eval' => ['tl_class' => 'clr'],
+            'eval' => ['style' => 'height:60px', 'decodeEntities' => true, 'rte' => 'tinyMCE', 'basicEntities' => true, 'tl_class' => 'clr'],
             'sql' => "text NULL",
         ],
         'published' => [

@@ -1,0 +1,19 @@
+<?php
+
+return [
+    'try' => 'Schnuppertauchen',
+    'basic' => 'GDL Pool Diver (DTSA Grundtauchschein)',
+    'gdlsd' => 'GDL* Sports Diver (DTSA*)',
+    'gdlasd' => 'GDL** Advanced Sports Diver (DTSA**)',
+    'gdldl' => 'GDL*** Dive Leader (DTSA***)',
+    'gdldd' => 'GDL Deep Diver (SK Tiefer Tauchen)',
+    'gdlgl' => 'GDL Dive Group Leader (AK Gruppenführung)',
+    'gdldsd' => 'GDL Dry Suit Diver (SK Trockentauchen)',
+    'gdlnavd' => 'GDL Navigation Diver (AK Orientierung beim Tauchen)',
+    'gdlnd' => 'GDL Night Diver (AK Nachttauchen)',
+    'gdlsard' => 'GDL Safety & Rescue Diver (AK Tauchsicherheit & Rettung)',
+    'gdlsrd' => 'GDL Self Rescue Diver (SK Problemlösungen beim Tauchen)',
+    'gdknx1' => 'GDL Basic Nitrox Diver (DTSA Nitrox*)',
+    'gdlnx2' => 'GDL Advanced Nitrox Diver (DTSA Nitrox**)',
+    'gdltb' => 'GDL Advanced Skills Diver (DTSA TEC Basic)',
+];

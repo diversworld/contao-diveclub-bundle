@@ -207,7 +207,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_invoice'] = array(
             'search' => false,
             'filter' => true,
             'sorting' => false,
-            'eval' => array('rte' => 'tinyMCE', 'tl_class' => 'clr'),
+            'eval' => array('style' => 'height:60px', 'decodeEntities' => true, 'rte' => 'tinyMCE', 'basicEntities' => true, 'tl_class' => 'clr'),
             'sql' => 'text NULL'
         ),
         'published' => array
