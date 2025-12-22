@@ -15,77 +15,77 @@ declare(strict_types=1);
 /**
  * Legends
  */
-$GLOBALS['TL_LANG']['tl_dc_tanks']['title_legend']      = "Stammdaten";
-$GLOBALS['TL_LANG']['tl_dc_tanks']['details_legend']    = "Details zum Tauchgerät";
-$GLOBALS['TL_LANG']['tl_dc_tanks']['notes_legend']      = "Notizen";
-$GLOBALS['TL_LANG']['tl_dc_tanks']['publish_legend']    = "Veröffentlichen";
+$GLOBALS['TL_LANG']['tl_dc_tanks']['title_legend'] = "Stammdaten";
+$GLOBALS['TL_LANG']['tl_dc_tanks']['details_legend'] = "Details zum Tauchgerät";
+$GLOBALS['TL_LANG']['tl_dc_tanks']['notes_legend'] = "Notizen";
+$GLOBALS['TL_LANG']['tl_dc_tanks']['publish_legend'] = "Veröffentlichen";
 
 /**
-* Global operations
-*/
+ * Global operations
+ */
 $GLOBALS['TL_LANG']['tl_dc_tanks']['new'] = ["Neu", "Ein neues Element anlegen"];
 
 /**
  * Operations
  */
-$GLOBALS['TL_LANG']['tl_dc_tanks']['edit']      = "Datensatz mit ID: %s bearbeiten";
-$GLOBALS['TL_LANG']['tl_dc_tanks']['copy']      = "Datensatz mit ID: %s kopieren";
-$GLOBALS['TL_LANG']['tl_dc_tanks']['delete']    = "Datensatz mit ID: %s löschen";
-$GLOBALS['TL_LANG']['tl_dc_tanks']['show']      = "Datensatz mit ID: %s ansehen";
-$GLOBALS['TL_LANG']['tl_dc_tanks']['toggle']    = "Datensatz mit ID: %s veröffentlichen";
+$GLOBALS['TL_LANG']['tl_dc_tanks']['edit'] = "Datensatz mit ID: %s bearbeiten";
+$GLOBALS['TL_LANG']['tl_dc_tanks']['copy'] = "Datensatz mit ID: %s kopieren";
+$GLOBALS['TL_LANG']['tl_dc_tanks']['delete'] = "Datensatz mit ID: %s löschen";
+$GLOBALS['TL_LANG']['tl_dc_tanks']['show'] = "Datensatz mit ID: %s ansehen";
+$GLOBALS['TL_LANG']['tl_dc_tanks']['toggle'] = "Datensatz mit ID: %s veröffentlichen";
 
 /**
  * Fields
  */
-$GLOBALS['TL_LANG']['tl_dc_tanks']['title']         = ["Inventarnummer", "Geben Sie die Inventarnummer ein"];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['alias']         = ["Alias", "Flaschen-Alias"];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['serialNumber']  = ["Seriennummer", "Geben Sie die Seriennummer ein."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['o2clean']       = ["O2 Clean", "Die Flasche ist für Sauerstoff und muss O2 clean sein."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['manufacturer']  = ["Hersteller", "Hersteller des Tauchgerätes."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['bazNumber']     = ["BAZ Nummer", "BAZ Nummer."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['checkId']     	= ["TÜV Termin", "Termin der letzten TÜV Prüfung."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['owner']     	= ["Eigentümer", "Eingentümer des Tauchgerätes."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['title'] = ["Inventarnummer", "Geben Sie die Inventarnummer ein"];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['alias'] = ['Alias', 'Der Alias ist eine eindeutige Referenz, die anstelle der numerischen ID aufgerufen werden kann.'];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['serialNumber'] = ["Seriennummer", "Geben Sie die Seriennummer ein."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['o2clean'] = ["O2 Clean", "Die Flasche ist für Sauerstoff und muss O2 clean sein."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['manufacturer'] = ["Hersteller", "Hersteller des Tauchgerätes."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['bazNumber'] = ["BAZ Nummer", "BAZ Nummer."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['checkId'] = ["TÜV Termin", "Termin der letzten TÜV Prüfung."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['owner'] = ["Eigentümer", "Eingentümer des Tauchgerätes."];
 $GLOBALS['TL_LANG']['tl_dc_tanks']['lastCheckDate'] = ["letzter TÜV", "Datum der letzten TÜV Prüfung."];
 $GLOBALS['TL_LANG']['tl_dc_tanks']['nextCheckDate'] = ["nächster TÜV", "Datum der nächsten TÜV Prüfung."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['pid']           = ["nächster TÜV-Termin", "Wähle den nächsten TÜV-Termin aus.."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['rentalFee']     = ['Leihgebühr', 'Leihgebühr für dieses Element.'];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['size']          = ["Größe", "Bitte die Flaschengröße auswählen."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['member']        = ["Eigentümer", "Eigentümer der Flasche."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['addNotes']      = ["Bemerkungen eingeben", "Bemerkungen zum Tauchgerät erfassen."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['published']     = ["Veröffentlichen", "Den Datensatz veröffentlichen."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['start']         = ["Anzeigen ab", "Ab wann soll der Datensatz angezeigt werden."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['stop']          = ["Anzeigen bis", "Bis wann soll der Datensatz angezeigt werden."];
-$GLOBALS['TL_LANG']['tl_dc_tanks']['status']    = ['Status','Status des Assets'];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['pid'] = ["nächster TÜV-Termin", "Wähle den nächsten TÜV-Termin aus.."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['rentalFee'] = ['Leihgebühr', 'Leihgebühr für dieses Element.'];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['size'] = ["Größe", "Bitte die Flaschengröße auswählen."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['member'] = ["Eigentümer", "Eigentümer der Flasche."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['addNotes'] = ["Bemerkungen eingeben", "Bemerkungen zum Tauchgerät erfassen."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['published'] = ["Veröffentlichen", "Den Datensatz veröffentlichen."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['start'] = ["Anzeigen ab", "Ab wann soll der Datensatz angezeigt werden."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['stop'] = ["Anzeigen bis", "Bis wann soll der Datensatz angezeigt werden."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['status'] = ['Status', 'Status des Assets'];
 
 /**
  * References
  */
 $GLOBALS['TL_LANG']['tl_dc_tanks']['sizes'] = [
-                                                '2' => '2 L',
-                                                '3' => '3 L',
-                                                '4' => '4 L',
-                                                '5' => '5 L',
-                                                '7' => '7 L',
-                                                '8' => '8 L',
-                                                '10' => '10 L',
-                                                '12' => '12 L',
-                                                '15' => '15 L',
-                                                '18' => '18 L',
-                                                '20' => '20 L',
-                                                '40' => '40 cft',
-                                                '80' => '80 cft'
+    '2' => '2 L',
+    '3' => '3 L',
+    '4' => '4 L',
+    '5' => '5 L',
+    '7' => '7 L',
+    '8' => '8 L',
+    '10' => '10 L',
+    '12' => '12 L',
+    '15' => '15 L',
+    '18' => '18 L',
+    '20' => '20 L',
+    '40' => '40 cft',
+    '80' => '80 cft'
 ];
 
 $GLOBALS['TL_LANG']['tl_dc_tanks']['itemStatus'] = [
-            'available' => 'verfügbar',
-            'reserved'  => 'reserviert',
-            'borrowed'  => 'ausgeliehen',
-            'returned'  => 'zurückgegeben',
-            'cancelled' => 'storniert',
-            'overdue'   => 'überfällig',
-            'lost'      => 'verloren',
-            'damaged'   => 'defekt',
-            'missing'   => 'vermisst',
+    'available' => 'verfügbar',
+    'reserved' => 'reserviert',
+    'borrowed' => 'ausgeliehen',
+    'returned' => 'zurückgegeben',
+    'cancelled' => 'storniert',
+    'overdue' => 'überfällig',
+    'lost' => 'verloren',
+    'damaged' => 'defekt',
+    'missing' => 'vermisst',
 ];
 
 

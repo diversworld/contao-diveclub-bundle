@@ -37,7 +37,7 @@ $GLOBALS['TL_LANG']['tl_dc_dive_course']['modules'] = ['Modulverwaltung', 'Verwa
  * Fields
  */
 $GLOBALS['TL_LANG']['tl_dc_dive_course']['title'] = ['Kurstitel', 'Titel des Tauchkurses'];
-$GLOBALS['TL_LANG']['tl_dc_dive_course']['alias'] = ["Alias", "Geben Sie den Alias ein"];
+$GLOBALS['TL_LANG']['tl_dc_course_modules']['alias'] = ['Alias', 'Der Alias ist eine eindeutige Referenz, die anstelle der numerischen ID aufgerufen werden kann.'];
 $GLOBALS['TL_LANG']['tl_dc_dive_course']['instructor'] = ['Tauchlehrer', 'Verantwortlicher Ausbilder'];
 $GLOBALS['TL_LANG']['tl_dc_dive_course']['course_type'] = ['Kurstyp', 'Art des Kurses (z. B. OWD, AOWD, Rescue)'];
 $GLOBALS['TL_LANG']['tl_dc_dive_course']['max_participants'] = ["Max. Teilnehmer", "Maximale Ánzahl der Teilnehmer"];

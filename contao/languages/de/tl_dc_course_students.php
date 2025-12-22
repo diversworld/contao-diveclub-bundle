@@ -11,6 +11,7 @@ $GLOBALS['TL_LANG']['tl_dc_course_students']['delete'] = ['Kurszuordnung lösche
 $GLOBALS['TL_LANG']['tl_dc_course_students']['show'] = ['Kurszuordnungsdetails', 'Details der Kurszuordnung ID %s anzeigen'];
 
 $GLOBALS['TL_LANG']['tl_dc_course_students']['course_id'] = ['Kurs', 'Zuordnung zum Kurs'];
+$GLOBALS['TL_LANG']['tl_dc_course_students']['alias'] = ['Alias', 'Der Alias ist eine eindeutige Referenz, die anstelle der numerischen ID aufgerufen werden kann.'];
 $GLOBALS['TL_LANG']['tl_dc_course_students']['status'] = ['Status', 'Status der Einschreibung'];
 $GLOBALS['TL_LANG']['tl_dc_course_students']['registered_on'] = ['Anmeldedatum', 'Datum der Amneldung des Schülers'];
 $GLOBALS['TL_LANG']['tl_dc_course_students']['payed'] = ['Bezahlt', 'Die Kursgebühr wurde bezahlt'];

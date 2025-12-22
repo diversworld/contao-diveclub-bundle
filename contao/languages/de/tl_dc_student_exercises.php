@@ -14,6 +14,7 @@ $GLOBALS['TL_LANG']['tl_dc_student_exercises']['show'] = ['Übungsergebnisse anz
 
 
 $GLOBALS['TL_LANG']['tl_dc_student_exercises']['exercise_id'] = ['Übung', 'Die absolvierte Übung'];
+$GLOBALS['TL_LANG']['tl_dc_student_exercises']['alias'] = ['Alias', 'Der Alias ist eine eindeutige Referenz, die anstelle der numerischen ID aufgerufen werden kann.'];
 $GLOBALS['TL_LANG']['tl_dc_student_exercises']['student_id'] = ['Schüler', 'Der teilnehmende Schüler'];
 $GLOBALS['TL_LANG']['tl_dc_student_exercises']['status'] = ['Status', 'Fortschritt der Übung'];
 $GLOBALS['TL_LANG']['tl_dc_student_exercises']['dateCompleted'] = ['Abgeschlossen am', 'Datum des Abschlusses'];

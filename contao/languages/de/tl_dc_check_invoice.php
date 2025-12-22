@@ -19,7 +19,7 @@ declare(strict_types=1);
 $GLOBALS['TL_LANG']['tl_dc_check_invoice']['title_legend'] = "Rechnungsdaten";
 $GLOBALS['TL_LANG']['tl_dc_check_invoice']['details_legend'] = "Details zur Rechnung";
 $GLOBALS['TL_LANG']['tl_dc_check_invoice']['notes_legend'] = "Bemerkungen zur Rechnung";
-$GLOBALS['TL_LANG']['tl_dc_check_invoice']['publish_legend'] ="Veröffentlichen";
+$GLOBALS['TL_LANG']['tl_dc_check_invoice']['publish_legend'] = "Veröffentlichen";
 
 /**
  * Fields
@@ -29,7 +29,7 @@ $GLOBALS['TL_LANG']['tl_dc_check_invoice']['addVendorInfo'] = ["Prüfungsunterne
 $GLOBALS['TL_LANG']['tl_dc_check_invoice']['addArticleInfo'] = ["Preisliste erstellen", "Preisliste für den TÜV-Termin erfassen"];
 
 $GLOBALS['TL_LANG']['tl_dc_check_invoice']['title'] = ["Rechnungstitel", "Geben Sie den Rechnungsnamen ein. Wird automatisch erstellt."];
-$GLOBALS['TL_LANG']['tl_dc_check_invoice']['alias'] = ["Alias", "Alias der Rechnung"];
+$GLOBALS['TL_LANG']['tl_dc_check_invoice']['alias'] = ['Alias', 'Der Alias ist eine eindeutige Referenz, die anstelle der numerischen ID aufgerufen werden kann.'];
 $GLOBALS['TL_LANG']['tl_dc_check_invoice']['member'] = ["Mitglied", "Name des Eigentümers"];
 
 $GLOBALS['TL_LANG']['tl_dc_check_invoice']['invoiceArticles'] = ["Preisliste", "Geben Sie die Preise für die Prüfung ein."];

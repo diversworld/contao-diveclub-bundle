@@ -29,18 +29,18 @@ $GLOBALS['TL_LANG']['tl_dc_check_proposal']['addVendorInfo'] = ["Prüfungsuntern
 $GLOBALS['TL_LANG']['tl_dc_check_proposal']['addArticleInfo'] = ["Preisliste erstellen", "Preisliste für den TÜV-Termin erfassen"];
 
 $GLOBALS['TL_LANG']['tl_dc_check_proposal']['title'] = ["Angebotsnummer", "Geben Sie die Angebotsnummer ein."];
-$GLOBALS['TL_LANG']['tl_dc_check_proposal']['alias'] = ["Alias", "Alias des Angebots. Wird automatisch erstellt."];
+$GLOBALS['TL_LANG']['tl_dc_course_modules']['alias'] = ['Alias', 'Der Alias ist eine eindeutige Referenz, die anstelle der numerischen ID aufgerufen werden kann.'];
 
-$GLOBALS['TL_LANG']['tl_dc_check_proposal']['checkId']          = ['Termin','Event mit dem der TÜV-Termin im Kalender eingetragen wurde.'];
-$GLOBALS['TL_LANG']['tl_dc_check_proposal']['proposalDate']     = ['Angebotsdatum','Datum des Angebots.'];
-$GLOBALS['TL_LANG']['tl_dc_check_proposal']['vendorName']       = ['Prüfungsunternhemen','Name der Firma oder des Unternehmens.'];
-$GLOBALS['TL_LANG']['tl_dc_check_proposal']['vendorWebsite']    = ['Website','Website der Firma oder des Unternehmens.'];
-$GLOBALS['TL_LANG']['tl_dc_check_proposal']['vendorStreet']     = ['Straße','Straße der Firma oder des Unternehmens.'];
-$GLOBALS['TL_LANG']['tl_dc_check_proposal']['vendorPostal']     = ['PLZ','Postleitzahl der Firma oder des Unternehmens.'];
-$GLOBALS['TL_LANG']['tl_dc_check_proposal']['vendorCity']       = ['Ort','Ort der Firma oder des Unternehmens.'];
-$GLOBALS['TL_LANG']['tl_dc_check_proposal']['vendorEmail']      = ['E-Mail','E-Mail der Firma oder des Unternehmens.'];
-$GLOBALS['TL_LANG']['tl_dc_check_proposal']['vendorPhone']      = ['Telekon','Telefonnummer der Firma oder des Unternehmens.'];
-$GLOBALS['TL_LANG']['tl_dc_check_proposal']['vendorMobile']     = ['Mobilnummer','Mobilnummer der Firma oder des Unternehmens.'];
+$GLOBALS['TL_LANG']['tl_dc_check_proposal']['checkId'] = ['Termin', 'Event mit dem der TÜV-Termin im Kalender eingetragen wurde.'];
+$GLOBALS['TL_LANG']['tl_dc_check_proposal']['proposalDate'] = ['Angebotsdatum', 'Datum des Angebots.'];
+$GLOBALS['TL_LANG']['tl_dc_check_proposal']['vendorName'] = ['Prüfungsunternhemen', 'Name der Firma oder des Unternehmens.'];
+$GLOBALS['TL_LANG']['tl_dc_check_proposal']['vendorWebsite'] = ['Website', 'Website der Firma oder des Unternehmens.'];
+$GLOBALS['TL_LANG']['tl_dc_check_proposal']['vendorStreet'] = ['Straße', 'Straße der Firma oder des Unternehmens.'];
+$GLOBALS['TL_LANG']['tl_dc_check_proposal']['vendorPostal'] = ['PLZ', 'Postleitzahl der Firma oder des Unternehmens.'];
+$GLOBALS['TL_LANG']['tl_dc_check_proposal']['vendorCity'] = ['Ort', 'Ort der Firma oder des Unternehmens.'];
+$GLOBALS['TL_LANG']['tl_dc_check_proposal']['vendorEmail'] = ['E-Mail', 'E-Mail der Firma oder des Unternehmens.'];
+$GLOBALS['TL_LANG']['tl_dc_check_proposal']['vendorPhone'] = ['Telekon', 'Telefonnummer der Firma oder des Unternehmens.'];
+$GLOBALS['TL_LANG']['tl_dc_check_proposal']['vendorMobile'] = ['Mobilnummer', 'Mobilnummer der Firma oder des Unternehmens.'];
 
 $GLOBALS['TL_LANG']['tl_dc_check_proposal']['priceTotal'] = ["Gesamtpreis", "Der gesamtpreis der rechnung wird automatisch berechnet."];
 $GLOBALS['TL_LANG']['tl_dc_check_proposal']['notes'] = ["Bemerkungen", "Geben Sie eine Bemerkung ein"];

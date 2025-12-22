@@ -11,6 +11,9 @@ $GLOBALS['TL_LANG']['tl_dc_course_exercises']['delete'] = ['Übung löschen', '�
 $GLOBALS['TL_LANG']['tl_dc_course_exercises']['show'] = ['Übungsdetails', 'Details der Übung ID %s anzeigen'];
 
 $GLOBALS['TL_LANG']['tl_dc_course_exercises']['title'] = ['Übung', 'Bezeichnung der Übung'];
+$GLOBALS['TL_LANG']['tl_dc_course_modules']['alias'] = ['Alias', 'Der Alias ist eine eindeutige Referenz, die anstelle der numerischen ID aufgerufen werden kann.'];
+$GLOBALS['TL_LANG']['tl_dc_course_exercises']['duration'] = ['Dauer', 'Dauer der Übung.'];
+$GLOBALS['TL_LANG']['tl_dc_course_exercises']['notes'] = ['Bemerkzúngen', 'Bemerkungen zur Übung.'];
 $GLOBALS['TL_LANG']['tl_dc_course_exercises']['description'] = ['Beschreibung', 'Beschreibung der Übung'];
 $GLOBALS['TL_LANG']['tl_dc_course_exercises']['required'] = ['Pflichtübung', 'Diese Übung muss bestanden werden'];
 $GLOBALS['TL_LANG']['tl_dc_course_exercises']['published'] = ['Veröffentlicht', 'Übung aktivieren'];

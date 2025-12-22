@@ -21,7 +21,7 @@ $GLOBALS['TL_LANG']['tl_dc_regulator_control']['publish_legend'] = 'Veröffentli
 
 // Fields
 $GLOBALS['TL_LANG']['tl_dc_regulator_control']['title'] = ['Titel', 'Geben Sie bitte den Titel des Equipments ein.'];
-$GLOBALS['TL_LANG']['tl_dc_regulator_control']['alias'] = ['Alias', 'Der Alias wird automatisch generiert, wenn kein Alias angegeben wird.'];
+$GLOBALS['TL_LANG']['tl_dc_regulator_control']['alias'] = ['Alias', 'Der Alias ist eine eindeutige Referenz, die anstelle der numerischen ID aufgerufen werden kann.'];
 $GLOBALS['TL_LANG']['tl_dc_regulator_control']['actualCheckDate'] = ['Datum', 'Datum der aktuellen Revision.'];
 $GLOBALS['TL_LANG']['tl_dc_regulator_control']['price'] = ['Kosten', 'Kosten der Revision.'];
 $GLOBALS['TL_LANG']['tl_dc_regulator_control']['midPreussurePre30'] = ['Mitteldruck 30bar', 'Mitteldruck vor der Revision.'];

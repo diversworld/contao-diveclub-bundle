@@ -13,6 +13,7 @@ $GLOBALS['TL_LANG']['tl_dc_students']['delete'] = ['Schüler löschen', 'Schüle
 $GLOBALS['TL_LANG']['tl_dc_students']['show'] = ['Schülerdetails', 'Details des Schülers ID %s anzeigen'];
 
 $GLOBALS['TL_LANG']['tl_dc_students']['firstname'] = ['Vorname', 'Vorname des Schülers'];
+$GLOBALS['TL_LANG']['tl_dc_course_modules']['alias'] = ['Alias', 'Der Alias ist eine eindeutige Referenz, die anstelle der numerischen ID aufgerufen werden kann.'];
 $GLOBALS['TL_LANG']['tl_dc_students']['lastname'] = ['Nachname', 'Nachname des Schülers'];
 $GLOBALS['TL_LANG']['tl_dc_students']['birthdate'] = ['Geburtsdatum', 'Geburtsdatum des Schülers'];
 $GLOBALS['TL_LANG']['tl_dc_students']['email'] = ['E-Mail', 'E-Mail-Adresse'];
