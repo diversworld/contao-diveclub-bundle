@@ -6,27 +6,36 @@
 
 ![Diversworld](docs/dw-logo-k.png "Diversworld Logo")
 
-
 # Welcome to ContaoDiveclubBundle
 
-This bundle provides several modules that allow dive clubs to manage equipment data. In a future version, booking and managing dive courses will also be added.
+This bundle provides several modules that allow dive clubs to manage equipment data. In a future version, booking and
+managing dive courses will also be added.
 
 ## Features
+
 - **Equipment**
-  - Manage additional equipment such as suits, ABC equipment, and similar items.
+    - Manage additional equipment such as suits, ABC equipment, and similar items.
 - **Regulators**
-  - Manage regulators, including their servicing history.
+    - Manage regulators, including their servicing history.
 - **Diving Equipment**
-  - Manage diving gear, including TÜV inspection dates. Options for adding offers from inspection companies are available. In a future version, it will also be possible to book a TÜV inspection directly.
+    - Manage diving gear, including TÜV inspection dates. Options for adding offers from inspection companies are
+      available. In a future version, it will also be possible to book a TÜV inspection directly.
 - **Dive Courses**
-  - Add information about dive courses, such as course content and requirements.
+    - Add information about dive courses, such as course content and requirements.
 - **TÜV Inspections**
-  - Manage offers for TÜV inspections. In the child table, individual items in a TÜV inspection can be added; for example, item name, cylinder size, price in net and gross amounts. The other price (net or gross) is automatically calculated based on the entered value. In a future version, it is planned to enable bookings for club members. Members can register their cylinders and book an inspection.
+    - Manage offers for TÜV inspections. In the child table, individual items in a TÜV inspection can be added; for
+      example, item name, cylinder size, price in net and gross amounts. The other price (net or gross) is automatically
+      calculated based on the entered value. In a future version, it is planned to enable bookings for club members.
+      Members can register their cylinders and book an inspection.
 
 ### The Regulator Module
-The data for the manufacturers and models of the regulators are entered in files, allowing flexible customization of the equipment used by a club.
-There is a file for regulators (`regulator_data`). In this file, data for manufacturers and the models of the first and second stages are stored.
-The template content defines the array that is read into the module. The array contains data per manufacturer for first and second stages:
+
+The data for the manufacturers and models of the regulators are entered in files, allowing flexible customization of the
+equipment used by a club.
+There is a file for regulators (`regulator_data`). In this file, data for manufacturers and the models of the first and
+second stages are stored.
+The template content defines the array that is read into the module. The array contains data per manufacturer for first
+and second stages:
 
 The manufacturers are defined in the template `equipment_manufacturer.txt` as follows:
 
@@ -39,7 +48,9 @@ The manufacturers are defined in the template `equipment_manufacturer.txt` as fo
 '5' => 'Cressi',
 ]
 ```
+
 The regulator models are defined in the file `regulator_data.txt`. The number corresponds to the manufacturer's index:
+
 ```
 [
 //Manufacturer 1
@@ -74,23 +85,35 @@ The regulator models are defined in the file `regulator_data.txt`. The number co
 ```
 
 ### The Dive Courses Module
-In the Dive Courses module, the data for a dive course can be entered. _(Development is ongoing and will be further enhanced in upcoming releases.)_
+
+In the Dive Courses module, the data for a dive course can be entered. _(Development is ongoing and will be further
+enhanced in upcoming releases.)_
 
 ### The TÜV Inspection Module
-In the TÜV Inspection module, offers from inspection companies can be managed. An offer can be assigned to an event. In the calendar, you'll need to specify that the calendar's events may include TÜV appointments.
+
+In the TÜV Inspection module, offers from inspection companies can be managed. An offer can be assigned to an event. In
+the calendar, you'll need to specify that the calendar's events may include TÜV appointments.
 Once this flag is set in the calendar, a TÜV offer can be assigned to an event.
-If an offer is assigned to an event, the corresponding offer will automatically be associated with the linked event, and vice versa.
-There is a frontend module that allows the data of the offer to be displayed on the frontend. To do this, the frontend module **Offer Details** must be included as a module on a page with the event reader.
+If an offer is assigned to an event, the corresponding offer will automatically be associated with the linked event, and
+vice versa.
+There is a frontend module that allows the data of the offer to be displayed on the frontend. To do this, the frontend
+module **Offer Details** must be included as a module on a page with the event reader.
 
 ### The Diving Equipment Module
-In the Diving Equipment module, the dive cylinders owned by the club can be recorded. In the child table of the diving equipment, individual inspection dates can be logged.
+
+In the Diving Equipment module, the dive cylinders owned by the club can be recorded. In the child table of the diving
+equipment, individual inspection dates can be logged.
 This makes it easier to track which cylinders need to be inspected and which still have a valid inspection.
-There is a frontend module that allows the data of the diving equipment to be displayed on the frontend. To do this, the frontend module **Diving Equipment List** must be added to a page.
-In a future version, it is planned to enable bookings of a dive cylinder for a TÜV inspection directly via this overview.
+There is a frontend module that allows the data of the diving equipment to be displayed on the frontend. To do this, the
+frontend module **Diving Equipment List** must be added to a page.
+In a future version, it is planned to enable bookings of a dive cylinder for a TÜV inspection directly via this
+overview.
 
 ## The Equipment reservation Module
+
 With the registration module, members of the diving clubs have the opportunity to reserve and borrow club equipment.
-Members can reserve equipment in the frontend, and once it is picked up, the reservation is processed by the admin responsible for issuing the equipment.
+Members can reserve equipment in the frontend, and once it is picked up, the reservation is processed by the admin
+responsible for issuing the equipment.
 Each piece of equipment is assigned a status, making it possible to track whether an item is available or borrowed.
 The following statuses can be assigned:
 
@@ -104,14 +127,54 @@ The following statuses can be assigned:
 `damaged`
 `missing`
 
-This allows the equipment manager to easily keep track of which equipment is available and which is not.
+## The Dive Course Module
+
+The diving course module can be used to manage diving courses. Diving courses can be created and the modules to be
+completed during training can be assigned to each diving course. The exercises to be completed can be attached to each
+module.
+The diving courses are defined once in this way.
+Diving students are managed in a second table. Each diving student can be assigned a course for which they have
+registered. When a course is assigned, the
+exercises to be completed are added automatically.
+Instructors can now document each student's progress in the course by marking each completed exercise as done. An
+exercise can also be marked as needing to be repeated or as failed.
+The courses and course types can be defined in a text file, as with the equipment. This allows different courses to be
+created depending on the association.
+
+The text files can be created by the user. The name is irrelevant. The respective text files can then be assigned in the
+settings.
+
+The manufacturers are defined in the template `dc_course_categories.txt` as follows:
+
+```
+return [
+'try' => 'Schnuppertauchen',
+'basic' => 'GDL Pool Diver (DTSA Grundtauchschein)',
+'gdlsd' => 'GDL* Sports Diver (DTSA*)',
+'gdlasd' => 'GDL** Advanced Sports Diver (DTSA**)',
+'gdldl' => 'GDL*** Dive Leader (DTSA***)',
+'gdldd' => 'GDL Deep Diver (SK Tiefer Tauchen)',
+];
+```
+
+The manufacturers are defined in the template `dc_course_types.txt` as follows:
+
+```
+return [
+'basic' => 'Grundkurs',
+'specialty' => 'Spezialkurse',
+'mixgas' => 'Mischgastauchen',
+'professional' => 'Professionell'
+];
+```
+
 ## Future Plans
+
 - Members will be able to record their own equipment.
 - Members will be able to book TÜV inspections for their equipment.
 - Club-owned rental equipment will be available for reservation by members.
 - Interested people will be able to register for dive courses.
 - Club instructors will be able to manage student data and course information related to students.
-
 
 ## Donation
 
