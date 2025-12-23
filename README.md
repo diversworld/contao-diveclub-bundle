@@ -40,7 +40,8 @@ and second stages:
 The manufacturers are defined in the template `equipment_manufacturer.txt` as follows:
 
 ```
-[
+<?php
+return [
 '1' => 'Scubapro',
 '2' => 'Aqualung',
 '3' => 'Mares',
@@ -52,7 +53,8 @@ The manufacturers are defined in the template `equipment_manufacturer.txt` as fo
 The regulator models are defined in the file `regulator_data.txt`. The number corresponds to the manufacturer's index:
 
 ```
-[
+<?php
+return [
 //Manufacturer 1
 '1' => [
   'regModel1st' => [
@@ -147,6 +149,7 @@ settings.
 The manufacturers are defined in the template `dc_course_categories.txt` as follows:
 
 ```
+<?php
 return [
 'try' => 'Schnuppertauchen',
 'basic' => 'GDL Pool Diver (DTSA Grundtauchschein)',
@@ -160,6 +163,7 @@ return [
 The manufacturers are defined in the template `dc_course_types.txt` as follows:
 
 ```
+<?php
 return [
 'basic' => 'Grundkurs',
 'specialty' => 'Spezialkurse',
