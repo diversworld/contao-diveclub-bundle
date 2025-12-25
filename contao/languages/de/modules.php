@@ -34,3 +34,19 @@ $GLOBALS['TL_LANG']['FMD']['dc_listing'] = ['Angebotsdetails', 'Diveclub Manager
 $GLOBALS['TL_LANG']['FMD']['dc_tanks_listing'] = ['Tauchgeräte', 'Liste der erfassten Tauchgeräte'];
 $GLOBALS['TL_LANG']['FMD']['dc_equipment_listing'] = ['Ausrüstung', 'Liste der erfassten Ausrüstung'];
 $GLOBALS['TL_LANG']['FMD']['dc_booking'] = ['Ausrüstungsverleih', 'Vereinsausrüstung ausleihen.'];
+
+// Diveclub FE: Tauchschüler-Kurse
+$GLOBALS['TL_LANG']['FMD']['dc_student_courses'] = ['Meine Tauchkurse', 'Zeigt dem angemeldeten Mitglied bzw. verknüpften Tauchschüler seine Tauchkurse an.'];
+$GLOBALS['TL_LANG']['FMD']['dc_student_courses_labels'] = [
+    'headline' => 'Meine Tauchkurse',
+    'noStudent' => 'Kein verknüpfter Tauchschüler gefunden.',
+    'noCourses' => 'Für Sie sind derzeit keine Tauchkurse gespeichert.',
+    'course' => 'Kurs',
+    'status' => 'Status',
+    'registered_on' => 'Angemeldet am',
+    'payed' => 'Bezahlt',
+    'brevet' => 'Brevet erteilt',
+    'dateBrevet' => 'Brevet am',
+    'dateStart' => 'Beginn',
+    'dateEnd' => 'Ende',
+];

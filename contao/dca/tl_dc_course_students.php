@@ -68,7 +68,8 @@ $GLOBALS['TL_DCA']['tl_dc_course_students'] = [
     ],
     'palettes' => [
         'default' => '{course_legend},course_id;
-                      {status_legend},status,registered_on,payed,notes;
+                      {status_legend},status,registered_on,payed,brevet,dateBrevet,
+                      {notes_legend},notes;
                       {publish_legend},published,start,stop',
     ],
     'fields' => [
@@ -89,7 +90,7 @@ $GLOBALS['TL_DCA']['tl_dc_course_students'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_students']['course_id'],
             'inputType' => 'select',
             'foreignKey' => 'tl_dc_dive_course.title',
-            'eval' => ['mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'],
+            'eval' => ['mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'w33'],
             'sql' => "int(10) unsigned NOT NULL default 0",
         ],
         'status' => [
@@ -97,20 +98,32 @@ $GLOBALS['TL_DCA']['tl_dc_course_students'] = [
             'inputType' => 'select',
             'reference' => &$GLOBALS['TL_LANG']['tl_dc_course_students']['itemStatus'],
             'options' => &$GLOBALS['TL_LANG']['tl_dc_course_students']['itemStatus'],
-            'eval' => ['tl_class' => 'w33'],
+            'eval' => ['tl_class' => 'w25'],
             'sql' => "varchar(16) NOT NULL default 'registered'",
         ],
         'registered_on' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_students']['registered_on'],
             'inputType' => 'text',
-            'eval' => ['rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
+            'eval' => ['rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w25 wizard'],
             'sql' => "varchar(16) NOT NULL default ''",
         ],
         'payed' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_students']['payed'],
             'inputType' => 'checkbox',
-            'eval' => ['tl_class' => 'w33'],
+            'eval' => ['tl_class' => 'w25'],
             'sql' => ['type' => 'boolean', 'default' => false],
+        ],
+        'brevet' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_students']['brevet'],
+            'inputType' => 'checkbox',
+            'eval' => ['tl_class' => 'w25 clr'],
+            'sql' => ['type' => 'boolean', 'default' => false],
+        ],
+        'dateBrevet' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_students']['dateBrevet'],
+            'inputType' => 'text',
+            'eval' => ['rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w25 wizard'],
+            'sql' => "varchar(16) NOT NULL default ''",
         ],
         'notes' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_students']['notes'],

@@ -26,6 +26,7 @@ use Diversworld\ContaoDiveclubBundle\Model\DcReservationItemsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcReservationModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcStudentExercisesModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcTanksModel;
+use Diversworld\ContaoDiveclubBundle\Module\ModuleDcStudentCourses;
 
 /**
  * Backend modules
@@ -96,6 +97,9 @@ $GLOBALS['TL_MODELS']['tl_dc_course_students'] = DcCourseStudentsModel::class;
 /**
  * Frontend Modules
  */
+
+// Frontend module group and module registration
+$GLOBALS['FE_MOD']['dc_modules']['dc_student_courses'] = ModuleDcStudentCourses::class;
 
 
 /**

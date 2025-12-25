@@ -2,6 +2,7 @@
 
 $GLOBALS['TL_LANG']['tl_dc_course_students']['course_legend'] = "Kurs";
 $GLOBALS['TL_LANG']['tl_dc_course_students']['status_legend'] = "Status";
+$GLOBALS['TL_LANG']['tl_dc_course_students']['notes_legend'] = "Bemerkungen";
 $GLOBALS['TL_LANG']['tl_dc_course_students']['publish_legend'] = "Veröffentlichen";
 
 $GLOBALS['TL_LANG']['tl_dc_course_students']['new'] = ['Neue Kurszuordnung', 'Neue Kurszuordnung erstellen'];
@@ -15,6 +16,9 @@ $GLOBALS['TL_LANG']['tl_dc_course_students']['alias'] = ['Alias', 'Der Alias ist
 $GLOBALS['TL_LANG']['tl_dc_course_students']['status'] = ['Status', 'Status der Einschreibung'];
 $GLOBALS['TL_LANG']['tl_dc_course_students']['registered_on'] = ['Anmeldedatum', 'Datum der Amneldung des Schülers'];
 $GLOBALS['TL_LANG']['tl_dc_course_students']['payed'] = ['Bezahlt', 'Die Kursgebühr wurde bezahlt'];
+$GLOBALS['TL_LANG']['tl_dc_course_students']['brevet'] = ['Brevetiert', 'Das brevet wurde beim verband angefordert.'];
+$GLOBALS['TL_LANG']['tl_dc_course_students']['notes'] = ['Bemerkungen', 'Bemerkungen zu diesem Kurs.'];
+$GLOBALS['TL_LANG']['tl_dc_course_students']['dateBrevet'] = ['Brevetiert am', 'Datum der Brevetierung.'];
 $GLOBALS['TL_LANG']['tl_dc_course_students']['published'] = ['Veröffentlicht', 'Markieren Sie das Equipment als veröffentlicht.'];
 $GLOBALS['TL_LANG']['tl_dc_course_students']['start'] = ['Startdatum', 'Geben Sie ein Startdatum an.'];
 $GLOBALS['TL_LANG']['tl_dc_course_students']['stop'] = ['Enddatum', 'Geben Sie ein Enddatum an.'];

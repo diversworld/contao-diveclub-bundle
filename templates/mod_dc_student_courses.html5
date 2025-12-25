@@ -1,0 +1,55 @@
+<?php
+/** @var array $this->courses */
+/** @var array $this->labels */
+?>
+
+<div class="mod_dc_student_courses">
+    <h2><?= $this->labels['headline']; ?></h2>
+
+    <?php if (!$this->isLoggedIn): ?>
+    <p class="message message--info">Bitte melden Sie sich an.</p>
+    <?php else: ?>
+    <?php if (!$this->studentFound): ?>
+    <p class="message message--warn"><?= $this->labels['noStudent']; ?></p>
+    <?php else: ?>
+    <?php if (!$this->hasCourses): ?>
+    <p class="message message--info"><?= $this->labels['noCourses']; ?></p>
+    <?php else: ?>
+    <ul class="course-list">
+        <?php foreach ($this->courses as $item): ?>
+        <li class="course-list__item">
+            <div class="course-list__title">
+                <?= $this->escapeHtml($item['course']['title']); ?>
+            </div>
+            <div class="course-list__meta">
+                <span class="meta__entry"><strong><?= $this->labels['status']; ?>:</strong> <?= $this->
+                    escapeHtml($item['status']); ?></span>
+                <?php if ($item['registered_on']): ?>
+                <span class="meta__entry"><strong><?= $this->labels['registered_on']; ?>:</strong> <?= $this->
+                    escapeHtml($item['registered_on']); ?></span>
+                <?php endif; ?>
+                <?php if ($item['course']['dateStart']): ?>
+                <span class="meta__entry"><strong><?= $this->labels['dateStart']; ?>:</strong> <?= $this->
+                    escapeHtml($item['course']['dateStart']); ?></span>
+                <?php endif; ?>
+                <?php if ($item['course']['dateEnd']): ?>
+                <span class="meta__entry"><strong><?= $this->labels['dateEnd']; ?>:</strong> <?= $this->
+                    escapeHtml($item['course']['dateEnd']); ?></span>
+                <?php endif; ?>
+                <span class="meta__entry"><strong><?= $this->
+                    labels['payed']; ?>:</strong> <?= $item['payed'] ? 'Ja' : 'Nein'; ?></span>
+                <?php if ($item['brevet']): ?>
+                <span class="meta__entry"><strong><?= $this->labels['brevet']; ?>:</strong> Ja</span>
+                <?php if ($item['dateBrevet']): ?>
+                <span class="meta__entry"><strong><?= $this->labels['dateBrevet']; ?>:</strong> <?= $this->
+                    escapeHtml($item['dateBrevet']); ?></span>
+                <?php endif; ?>
+                <?php endif; ?>
+            </div>
+        </li>
+        <?php endforeach; ?>
+    </ul>
+    <?php endif; ?>
+    <?php endif; ?>
+    <?php endif; ?>
+</div>

@@ -17,7 +17,6 @@ $GLOBALS['TL_DCA']['tl_dc_course_exercises'] = [
     'config' => [
         'dataContainer' => DC_Table::class,
         'ptable' => 'tl_dc_course_modules',
-        'ctable' => ['tl_dc_student_exercises'],
         'enableVersioning' => true,
         'markAsCopy' => 'headline',
         'sql' => [
