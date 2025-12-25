@@ -19,11 +19,11 @@
         <?php foreach ($this->courses as $item): ?>
         <li class="course-list__item">
             <div class="course-list__title">
-                <?= $this->escapeHtml($item['course']['title']); ?>
+                <?= $this->escapeHtml($item['course']['title']); ?>xxx
             </div>
             <div class="course-list__meta">
-                <span class="meta__entry"><strong><?= $this->labels['status']; ?>:</strong> <?= $this->
-                    escapeHtml($item['status']); ?></span>
+                    <span class="meta__entry"><strong><?= $this->labels['status']; ?>:</strong> <?= $this->
+                        escapeHtml($item['status']); ?></span>
                 <?php if ($item['registered_on']): ?>
                 <span class="meta__entry"><strong><?= $this->labels['registered_on']; ?>:</strong> <?= $this->
                     escapeHtml($item['registered_on']); ?></span>

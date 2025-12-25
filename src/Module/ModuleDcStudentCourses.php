@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Diversworld\ContaoDiveclubBundle\Module;
 
+use Contao\Config;
 use Contao\Database;
+use Contao\Date;
 use Contao\FrontendUser;
 use Contao\Module;
 
@@ -54,21 +56,50 @@ class ModuleDcStudentCourses extends Module
              WHERE cs.pid = ? AND cs.published = 1 AND (c.published = 1)'
         )->execute((int)$student->id);
 
+        // Systemweite Datums-/Zeitformate aus Contao-Konfiguration
+        $dateFormat = Config::get('dateFormat');
+        $datimFormat = Config::get('datimFormat');
+
+        $formatTs = static function ($value, string $format): string {
+            if ($value === null || $value === '') {
+                return '';
+            }
+
+            // numerischer Timestamp oder String
+            if (is_numeric($value)) {
+                $ts = (int)$value;
+            } else {
+                $parsed = strtotime((string)$value);
+                if ($parsed === false) {
+                    return (string)$value; // Fallback: Originalwert
+                }
+                $ts = $parsed;
+            }
+
+            return Date::parse($format, $ts);
+        };
+
         $courses = [];
         while ($assignments->next()) {
+            // Werte vorformatieren gemäß Systemformaten
+            $registeredOn = $formatTs($assignments->registered_on, $dateFormat);
+            $dateBrevet = $formatTs($assignments->dateBrevet, $dateFormat);
+            $dateStart = $formatTs($assignments->dateStart, $datimFormat);
+            $dateEnd = $formatTs($assignments->dateEnd, $datimFormat);
+
             $courses[] = [
                 'assignment_id' => (int)$assignments->assignment_id,
                 'status' => (string)$assignments->status,
-                'registered_on' => (string)$assignments->registered_on,
+                'registered_on' => $registeredOn,
                 'payed' => (bool)$assignments->payed,
                 'brevet' => (bool)$assignments->brevet,
-                'dateBrevet' => (string)$assignments->dateBrevet,
+                'dateBrevet' => $dateBrevet,
                 'course' => [
                     'id' => (int)$assignments->course_id,
                     'title' => (string)$assignments->course_title,
                     'type' => (string)$assignments->course_type,
-                    'dateStart' => (string)$assignments->dateStart,
-                    'dateEnd' => (string)$assignments->dateEnd,
+                    'dateStart' => $dateStart,
+                    'dateEnd' => $dateEnd,
                 ],
             ];
         }

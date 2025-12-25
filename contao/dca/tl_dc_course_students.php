@@ -11,6 +11,7 @@ use Contao\Backend;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseStudentLabelCallback;
 
 $GLOBALS['TL_DCA']['tl_dc_course_students'] = [
     'config' => [
@@ -39,8 +40,10 @@ $GLOBALS['TL_DCA']['tl_dc_course_students'] = [
         ],
         'label' => [
             'fields' => ['course_id', 'status', 'registered_on', 'payed'],
-            'format' => '%s — Status: <span style="color:#b3b3b3; padding-left:8px;">%s</span> (Angemeldet am: %s), Bezahlt: %s',
-            'label_callback' => null,
+            //'format' => '%s — Status: <span style="color:#b3b3b3; padding-left:8px;">%s</span> (Angemeldet am: %s), Bezahlt: %s',
+            //'label_callback' => null,
+            'showColumns' => true,
+            'label_callback' => [CourseStudentLabelCallback::class, '__invoke'],
         ],
         'global_operations' => [
             'all' => [
