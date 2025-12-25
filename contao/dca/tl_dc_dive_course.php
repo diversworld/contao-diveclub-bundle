@@ -84,10 +84,10 @@ $GLOBALS['TL_DCA']['tl_dc_dive_course'] = [
     'palettes' => [
         '__selector__' => ['addImage', 'overwriteMeta'],
         'default' => '{first_legend},title,alias;
-                           {course_legend},course_type,dateStart,dateEnd,instructor,max_participants,price;
-                           {details_section},category,description,requirements;
-                           {image_legend},addImage;
-                           {publish_legend},published,start,stop;'
+                      {course_legend},course_type,dateStart,dateEnd,instructor,max_participants,price;
+                      {details_section},category,description,requirements;
+                      {image_legend},addImage;
+                      {publish_legend},published,start,stop;'
     ],
     'subpalettes' => [
         'addImage' => 'singleSRC,fullsize,size,floating,overwriteMeta',
@@ -125,8 +125,6 @@ $GLOBALS['TL_DCA']['tl_dc_dive_course'] = [
         'course_type' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['course_type'],
             'inputType' => 'select',
-            //'options' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['itemCourseType'],
-            //'reference' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['itemCourseType'],
             'options_callback' => [CourseTypeOptionsCallback::class, '__invoke'],
             'eval' => ['mandatory' => true, 'tl_class' => 'w33'],
             'sql' => "varchar(32) NOT NULL default ''",
@@ -188,8 +186,6 @@ $GLOBALS['TL_DCA']['tl_dc_dive_course'] = [
             'filter' => true,
             'sorting' => true,
             'options_callback' => [CourseCategoryOptionsCallback::class, '__invoke'],
-//            'reference' => &$GLOBALS['TL_LANG']['tl_dc_courses']['itemCategory'],
-//            'options' => &$GLOBALS['TL_LANG']['tl_dc_courses']['itemCategory'],
             'eval' => ['includeBlankOption' => true, 'tl_class' => 'w33'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],

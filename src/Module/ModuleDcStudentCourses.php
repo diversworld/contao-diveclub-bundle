@@ -9,6 +9,7 @@ use Contao\Database;
 use Contao\Date;
 use Contao\FrontendUser;
 use Contao\Module;
+use Contao\System;
 
 class ModuleDcStudentCourses extends Module
 {
@@ -50,7 +51,7 @@ class ModuleDcStudentCourses extends Module
         // 2) Lade Kurszuweisungen inkl. Kursdetails
         $assignments = $db->prepare(
             'SELECT cs.id AS assignment_id, cs.status, cs.registered_on, cs.payed, cs.brevet, cs.dateBrevet,
-                    c.id AS course_id, c.title AS course_title, c.course_type, c.dateStart, c.dateEnd
+                    c.id AS course_id, c.title AS course_title, c.course_type,  c.category, c.dateStart, c.dateEnd
              FROM tl_dc_course_students cs
              INNER JOIN tl_dc_dive_course c ON c.id = cs.course_id
              WHERE cs.pid = ? AND cs.published = 1 AND (c.published = 1)'
@@ -79,6 +80,10 @@ class ModuleDcStudentCourses extends Module
             return Date::parse($format, $ts);
         };
 
+        // WICHTIG: Lade die Sprachdateien explizit für das Frontend
+        System::loadLanguageFile('tl_dc_course_students');
+        System::loadLanguageFile('tl_dc_dive_course');
+
         $courses = [];
         while ($assignments->next()) {
             // Werte vorformatieren gemäß Systemformaten
@@ -89,7 +94,9 @@ class ModuleDcStudentCourses extends Module
 
             $courses[] = [
                 'assignment_id' => (int)$assignments->assignment_id,
-                'status' => (string)$assignments->status,
+                // Status-Label aus Sprachdatei (ohne Referenzen), Fallback auf Rohwert
+                'status' => $GLOBALS['TL_LANG']['tl_dc_course_students']['itemStatus'][(string)$assignments->status]
+                    ?? (string)$assignments->status,
                 'registered_on' => $registeredOn,
                 'payed' => (bool)$assignments->payed,
                 'brevet' => (bool)$assignments->brevet,
@@ -97,11 +104,15 @@ class ModuleDcStudentCourses extends Module
                 'course' => [
                     'id' => (int)$assignments->course_id,
                     'title' => (string)$assignments->course_title,
-                    'type' => (string)$assignments->course_type,
+                    // Kurstyp: Korrekte Sprach-Namespace verwenden und Fallback auf Rohwert
+                    'type' => $GLOBALS['TL_LANG']['tl_dc_dive_course']['itemCourseType'][(string)$assignments->course_type]
+                        ?? (string)$assignments->course_type,
+                    'category' => $GLOBALS['TL_LANG']['tl_dc_dive_course']['itemCategory'][(string)$assignments->category] ?? (string)$assignments->category,
                     'dateStart' => $dateStart,
                     'dateEnd' => $dateEnd,
                 ],
             ];
+            dump($courses);
         }
 
         $this->Template->courses = $courses;

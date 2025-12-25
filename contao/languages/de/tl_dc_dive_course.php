@@ -59,14 +59,14 @@ $GLOBALS['TL_LANG']['tl_dc_dive_course']['stop'] = ['Enddatum', 'Geben Sie ein E
 /**
  * References
  */
-$GLOBALS['TL_LANG']['tl_dc_course_students']['itemCategory'] = [
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['itemCategory'] = [
     'basic' => 'Grundkurs',
     'specialty' => 'Spezialkurse',
     'mixgas' => 'Mischgastauchen',
     'professional' => 'Professionell'
 ];
 
-$GLOBALS['TL_LANG']['tl_dc_course_students']['itemCourseType'] = [
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['itemCourseType'] = [
     'try' => 'Schnuppertauchen',
     'basic' => 'GDL Pool Diver (DTSA Grundtauchschein)',
     'gdlsd' => 'GDL* Sports Diver (DTSA*)',

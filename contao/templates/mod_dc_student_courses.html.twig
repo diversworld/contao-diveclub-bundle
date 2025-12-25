@@ -36,10 +36,10 @@ Erwartete Template-Variablen (vom Modul gesetzt):
                             </div>
                             <div class="course-list__meta">
                                 <span class="meta__entry"><strong>{{ labels.status }}:</strong> {{ item.status }}</span>
-                                {% if item.registered_on %}
-                                    <span
-                                        class="meta__entry"><strong>{{ labels.registered_on }}:</strong> {{ item.registered_on }}</span>
-                                {% endif %}
+                                <span
+                                    class="meta__entry"><strong>{{ labels.registered_on }}:</strong> {{ item.registered_on|default('-') }}</span>
+                                <span
+                                    class="meta__entry"><strong>{{ labels.course.category|default('Kurstyp') }}:</strong> {{ item.course.category|default('-') }}</span>
                                 {% if item.course.dateStart %}
                                     <span
                                         class="meta__entry"><strong>{{ labels.dateStart }}:</strong> {{ item.course.dateStart }}</span>
