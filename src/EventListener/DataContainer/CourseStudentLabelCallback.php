@@ -38,8 +38,8 @@ class CourseStudentLabelCallback
         // 4. Bezahlt-Status (Checkbox) lesbar machen
         $payedLabel = !empty($row['payed']) ? 'ja' : 'nein';
 
-        // Falls der Callback mit 4. Parameter (Array der Spaltenwerte) aufgerufen wird,
-        // befüllen wir dieses Array wie bisher und geben es zurück (Kompatibilität zu showColumns=true).
+        // Falls der Callback mit 4. Parameter (Array der Spaltenwerte) aufgerufen wird, befüllen
+        // wir dieses Array wie bisher und geben es zurück (Kompatibilität zu showColumns=true).
         if (is_array($args)) {
             $args[0] = $courseTitle;      // course_id (als Titel angezeigt)
             $args[1] = $statusLabel;      // status
