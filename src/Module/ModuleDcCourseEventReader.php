@@ -9,7 +9,9 @@ use Contao\Database;
 use Contao\Date;
 use Contao\FrontendUser;
 use Contao\Input;
+use Contao\Message;
 use Contao\Module;
+use Contao\RequestToken;
 use Diversworld\ContaoDiveclubBundle\Model\DcCourseEventModel;
 
 class ModuleDcCourseEventReader extends Module
@@ -101,8 +103,14 @@ class ModuleDcCourseEventReader extends Module
         $this->Template->alreadyRegistered = $alreadyRegistered;
         $this->Template->assignmentId = $assignmentId;
 
-        // Verarbeitung der Anmeldung
+        // Verarbeitung der Anmeldung (mit CSRF-Validierung)
         if (Input::post('FORM_SUBMIT') === 'dc_event_signup' && $studentId && !$alreadyRegistered) {
+            // CSRF prüfen – bei ungültigem Token abbrechen und Meldung setzen
+            if (!RequestToken::validate(Input::post('REQUEST_TOKEN'))) {
+                // Optionale Fehlermeldung für die Ausgabe
+                Message::addError('Ungültiges Request-Token. Bitte Seite neu laden und erneut versuchen.');
+                return;
+            }
             // Anlegen der Zuweisung
             $db->prepare('INSERT INTO tl_dc_course_students (pid, tstamp, course_id, event_id, status, registered_on, published) VALUES (?, ?, ?, ?, ?, ?, ?)')
                 ->execute(
