@@ -147,7 +147,6 @@ class DcaTemplateHelper
 
     public function getCourseCategories(): array
     {
-        dump($this->getTemplateOptions('courseCategoriesFile'));
         return $this->getTemplateOptions('courseCategoriesFile');
     }
 

@@ -15,6 +15,8 @@ use Diversworld\ContaoDiveclubBundle\Model\DcCheckArticlesModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckInvoiceModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckProposalModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcConfigModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcCourseEventModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcCourseEventScheduleModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCourseExercisesModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCourseModulesModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCourseStudentsModel;
@@ -26,6 +28,8 @@ use Diversworld\ContaoDiveclubBundle\Model\DcReservationItemsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcReservationModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcStudentExercisesModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcTanksModel;
+use Diversworld\ContaoDiveclubBundle\Module\ModuleDcCourseEventReader;
+use Diversworld\ContaoDiveclubBundle\Module\ModuleDcCourseEventsList;
 use Diversworld\ContaoDiveclubBundle\Module\ModuleDcStudentCourses;
 
 /**
@@ -53,6 +57,12 @@ $GLOBALS['BE_MOD']['diveclub'] = [
             'tl_dc_dive_course',
             'tl_dc_course_modules',
             'tl_dc_course_exercises'
+        ],
+    ],
+    'dc_course_event_collection' => [
+        'tables' => [
+            'tl_dc_course_event',
+            'tl_dc_course_event_schedule'
         ],
     ],
     'dc_dive_student_collection' => [
@@ -93,6 +103,8 @@ $GLOBALS['TL_MODELS']['tl_dc_course_modules'] = DcCourseModulesModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_course_exercises'] = DcCourseExercisesModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_student_exercises'] = DcStudentExercisesModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_course_students'] = DcCourseStudentsModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_course_event'] = DcCourseEventModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_course_event_schedule'] = DcCourseEventScheduleModel::class;
 
 /**
  * Frontend Modules
@@ -100,6 +112,9 @@ $GLOBALS['TL_MODELS']['tl_dc_course_students'] = DcCourseStudentsModel::class;
 
 // Frontend module group and module registration
 $GLOBALS['FE_MOD']['dc_modules']['dc_student_courses'] = ModuleDcStudentCourses::class;
+// Neue FE-Module
+$GLOBALS['FE_MOD']['dc_modules']['dc_course_events_list'] = ModuleDcCourseEventsList::class;
+$GLOBALS['FE_MOD']['dc_modules']['dc_course_event_reader'] = ModuleDcCourseEventReader::class;
 
 
 /**

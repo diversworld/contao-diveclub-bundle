@@ -16,7 +16,7 @@ declare(strict_types=1);
  * Backend modules
  */
 
-//$GLOBALS['TL_LANG']['MOD']['diveclub']                  = ['Tauchclub Manager', 'Verwalten von Equipment, Tauchkursen, usw.'];
+//$GLOBALS['TL_LANG']['MOD']['diveclub'] = ['Tauchclub Manager', 'Verwalten von Equipment, Tauchkursen, usw.'];
 
 $GLOBALS['TL_LANG']['MOD']['dc_course_collection'] = ['Tauchkurse', 'Verwalten von Tauchkursen'];
 $GLOBALS['TL_LANG']['MOD']['dc_regulators_collection'] = ['Atemregler', 'Verwalten der Atemregler'];
@@ -27,7 +27,7 @@ $GLOBALS['TL_LANG']['MOD']['dc_config_collection'] = ['Einstellungen', 'Einstell
 $GLOBALS['TL_LANG']['MOD']['dc_reservation_collection'] = ['Reservierungen', 'Verwalten der Reservierungen für Ausrüstung'];
 $GLOBALS['TL_LANG']['MOD']['dc_dive_module_collection'] = ['Module', 'Verwalten der Kursmodule'];
 $GLOBALS['TL_LANG']['MOD']['dc_dive_student_collection'] = ['Tauchschüler', 'Verwalten der Tauchschüler'];
-$GLOBALS['TL_LANG']['MOD']['dc_old_equipment_collection'] = ['Alte Equipment Tabellen', 'Alte Tabellen'];
+$GLOBALS['TL_LANG']['MOD']['tl_dc_course_event_schedule'] = ['Kurstermine', 'Geplante Kurstermine für Tauchkurse'];
 
 $GLOBALS['TL_LANG']['FMD']['dc_modules'] = ['Tauchclubmanager', 'Module des Tauchclubmanagers'];
 $GLOBALS['TL_LANG']['FMD']['dc_listing'] = ['Angebotsdetails', 'Diveclub Manager'];

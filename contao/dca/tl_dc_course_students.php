@@ -26,7 +26,8 @@ $GLOBALS['TL_DCA']['tl_dc_course_students'] = [
         'sql' => [
             'keys' => [
                 'id' => 'primary',
-                'course_id' => 'index'
+                'course_id' => 'index',
+                'event_id' => 'index'
             ],
         ],
     ],
@@ -70,7 +71,7 @@ $GLOBALS['TL_DCA']['tl_dc_course_students'] = [
         ],
     ],
     'palettes' => [
-        'default' => '{course_legend},course_id;
+        'default' => '{course_legend},course_id,event_id;
                       {status_legend},status,registered_on,payed,brevet,dateBrevet,
                       {notes_legend},notes;
                       {publish_legend},published,start,stop',
@@ -94,6 +95,13 @@ $GLOBALS['TL_DCA']['tl_dc_course_students'] = [
             'inputType' => 'select',
             'foreignKey' => 'tl_dc_dive_course.title',
             'eval' => ['mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'w33'],
+            'sql' => "int(10) unsigned NOT NULL default 0",
+        ],
+        'event_id' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_students']['event_id'],
+            'inputType' => 'select',
+            'foreignKey' => 'tl_dc_course_event.title',
+            'eval' => ['includeBlankOption' => true, 'tl_class' => 'w33'],
             'sql' => "int(10) unsigned NOT NULL default 0",
         ],
         'status' => [
@@ -163,13 +171,26 @@ class tl_dc_course_students extends Backend
      */
     public function generateDefaultExercises(DataContainer $dc): void
     {
-        if (!$dc->activeRecord || !$dc->activeRecord->course_id) {
+        if (!$dc->activeRecord) {
             return;
         }
 
         $db = Database::getInstance();
         $assignmentId = $dc->id;
-        $courseTemplateId = $dc->activeRecord->course_id;
+        $courseTemplateId = (int)$dc->activeRecord->course_id;
+
+        // Wenn eine Veranstaltung gewählt wurde, nutze deren Kursvorlage
+        if ((int)$dc->activeRecord->event_id > 0) {
+            $event = $db->prepare("SELECT course_id FROM tl_dc_course_event WHERE id=?")
+                ->execute((int)$dc->activeRecord->event_id);
+            if ($event->numRows > 0) {
+                $courseTemplateId = (int)$event->course_id;
+            }
+        }
+
+        if ($courseTemplateId <= 0) {
+            return;
+        }
 
         // 1. Alle Übungen des Kurs-Templates finden (über die Module)
         $objExercises = $db->prepare("

@@ -1,26 +1,7 @@
 <?php
 
-declare(strict_types=1);
+// Frontend-Modul: Zusatzfeld für Kursveranstaltungen-Liste
+$GLOBALS['TL_LANG']['tl_module']['dc_reader_article'] = ['Ziel-Artikel (Event-Reader)', 'Wählen Sie den Artikel aus, auf dem der Event-Reader platziert ist.'];
 
-/*
- * This file is part of ContaoDiveclubBundle.
- *
- * (c) Diversworld 2024 <eckhard@diversworld.eu>
- * @license GPL-3.0-or-later
- * For the full copyright and license information,
- * please view the LICENSE file that was distributed with this source code.
- * @link https://github.com/diversworld/contao-diveclub-bundle
- */
-
-/**
- * Legends
- */
-$GLOBALS['TL_LANG']['tl_module']['equipment_legend'] = "Dive Manager Einstellungen";
-
-
-
-/**
- * Fields
- */
-$GLOBALS['TL_LANG']['tl_module']['dc_reservation'] = ["Ausrüstungsverleih", "Die Assets können von Mitgliedern ausgeliehen werden."];
-
+// Optional: Gruppen-/Legenden-Texte (falls nicht bereits durch Contao gesetzt)
+$GLOBALS['TL_LANG']['tl_module']['config_legend'] = 'Konfiguration';
