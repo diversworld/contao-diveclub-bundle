@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Diversworld\ContaoDiveclubBundle\Module;
 
 use Contao\Config;
-use Contao\Controller;
 use Contao\Date;
 use Contao\Module;
+use Contao\PageModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCourseEventModel;
 
 class ModuleDcCourseEventsList extends Module
@@ -22,23 +22,20 @@ class ModuleDcCourseEventsList extends Module
         $dateFormat = Config::get('datimFormat');
         $useAutoItem = (bool)Config::get('useAutoItem');
 
-        // Ziel-Artikel aus Modulkonfiguration
-        $articleId = (int)($this->dc_reader_article ?? 0);
-        $articleUrl = '';
-        if ($articleId > 0) {
-            // Insert-Tag nutzen, um die Artikel-URL zu generieren (sprach-/seitenabhängig korrekt)
-            $articleUrl = (string)Controller::replaceInsertTags('{{article_url::' . $articleId . '}}');
-        }
+        // Ziel-Seite (Reader) wie im Kalender über jumpTo auswählen
+        $jumpTo = (int)($this->jumpTo ?? 0);
+        $jumpToPage = $jumpTo > 0 ? PageModel::findByPk($jumpTo) : null;
 
         $list = [];
         if ($events) {
             foreach ($events as $event) {
-                // Wenn kein Ziel-Artikel gesetzt ist, kann keine Detail-URL erzeugt werden
+                // Wenn keine Ziel-Seite gesetzt ist, kann keine Detail-URL erzeugt werden
                 $detailUrl = '';
-                if ($articleUrl !== '') {
+                if (null !== $jumpToPage) {
                     $item = $event->alias ?: (string)$event->id;
-                    $detailUrl = rtrim($articleUrl, '/');
-                    $detailUrl .= '/' . ($useAutoItem ? '' : 'items/') . $item;
+                    $params = '/' . ($useAutoItem ? '' : 'items/') . $item;
+                    // Contao 5: generate URL via PageModel helper
+                    $detailUrl = $jumpToPage->getFrontendUrl($params);
                 }
                 $list[] = [
                     'id' => (int)$event->id,
@@ -54,6 +51,6 @@ class ModuleDcCourseEventsList extends Module
 
         $this->Template->events = $list;
         $this->Template->hasEvents = !empty($list);
-        $this->Template->hasReaderArticle = ($articleUrl !== '');
+        $this->Template->hasJumpTo = (null !== $jumpToPage);
     }
 }
