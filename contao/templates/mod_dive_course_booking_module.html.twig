@@ -1,0 +1,37 @@
+{#
+Twig-Template: Buchungsmodul (Migration von .html5)
+Erwartete Variablen: formAction (optional), items (optional)
+#}
+{% extends "@Contao/frontend_module/_base.html.twig" %}
+
+{% block content %}
+    <div class="dc-booking-module">
+        {% include '@Contao/messages.html.twig' %}
+
+        <form method="post" action="{{ formAction|default('') }}" enctype="application/x-www-form-urlencoded"
+              class="dc-booking-form">
+            <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
+            <input type="hidden" name="FORM_SUBMIT" value="dc_booking_submit">
+
+            {% block booking_fields %}
+                {# Platzhalter für Felder – kann im Child-Template überschrieben werden #}
+                {% if items is defined and items|length %}
+                    <ul class="dc-booking-items">
+                        {% for it in items %}
+                            <li>
+                                <label>
+                                    <input type="checkbox" name="items[]" value="{{ it.id }}">
+                                    {{ it.title|default(it.name|default('')) }}
+                                </label>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endblock %}
+
+            <div class="submit-container">
+                <button type="submit">Absenden</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

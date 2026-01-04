@@ -18,13 +18,13 @@ use Contao\Config;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Email;
 use Contao\FormCheckbox;
 use Contao\Message;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\System;
-use Contao\Template;
 use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
 use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorsModel;
@@ -42,8 +42,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
 
-#[AsFrontendModule(ModuleBooking::TYPE, category: 'dc_modules', template: 'mod_dc_booking')]
-class ModuleBooking extends AbstractFrontendModuleController
+#[AsFrontendModule(BookingController::TYPE, category: 'dc_manager', template: 'mod_dc_booking')]
+class BookingController extends AbstractFrontendModuleController
 {
     public const TYPE = 'dc_booking';
 
@@ -64,9 +64,12 @@ class ModuleBooking extends AbstractFrontendModuleController
     /**
      * Haupt-Methode, die die Logik des Moduls steuert.
      */
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
+    protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         System::loadLanguageFile('tl_dc_reservation_items');
+
+        // Request Token für Twig bereitstellen
+        $template->request_token = System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue();
 
         $sessionData = $this->getSessionData();
         $equipmentTypes = $this->helper->getEquipmentTypes(); // Typen/Subtypen laden
@@ -546,7 +549,7 @@ class ModuleBooking extends AbstractFrontendModuleController
     /**
      * POST-Anfrage verarbeiten.
      */
-    private function handlePostRequest(Request $request, Template $template, array $sessionData, int $selectedMember): RedirectResponse
+    private function handlePostRequest(Request $request, FragmentTemplate $template, array $sessionData, int $selectedMember): RedirectResponse
     {
         $formType = $request->request->get('FORM_SUBMIT', null);
         $action = $request->request->get('action', ''); // Der Wert des gedrückten Buttons
@@ -870,7 +873,7 @@ class ModuleBooking extends AbstractFrontendModuleController
     /**
      * Speichert Reservierungsdaten in der Session.
      */
-    private function saveSessionData(array $data, Template $template): void
+    private function saveSessionData(array $data, FragmentTemplate $template): void
     {
         try {
             $this->saveDataToSession($data);
@@ -992,7 +995,7 @@ class ModuleBooking extends AbstractFrontendModuleController
     /**
      * Erfolgsmeldung für gespeicherte Assets anzeigen.
      */
-    private function displaySuccessMessage(array $storedAssets, Template $template): void
+    private function displaySuccessMessage(array $storedAssets, FragmentTemplate $template): void
     {
         if (!empty($storedAssets)) {
             $message = sprintf(

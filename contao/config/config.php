@@ -28,9 +28,6 @@ use Diversworld\ContaoDiveclubBundle\Model\DcReservationItemsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcReservationModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcStudentExercisesModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcTanksModel;
-use Diversworld\ContaoDiveclubBundle\Module\ModuleDcCourseEventReader;
-use Diversworld\ContaoDiveclubBundle\Module\ModuleDcCourseEventsList;
-use Diversworld\ContaoDiveclubBundle\Module\ModuleDcStudentCourses;
 
 /**
  * Backend modules
@@ -111,10 +108,6 @@ $GLOBALS['TL_MODELS']['tl_dc_course_event_schedule'] = DcCourseEventScheduleMode
  */
 
 // Frontend module group and module registration
-$GLOBALS['FE_MOD']['dc_modules']['dc_student_courses'] = ModuleDcStudentCourses::class;
-// Neue FE-Module
-$GLOBALS['FE_MOD']['dc_modules']['dc_course_events_list'] = ModuleDcCourseEventsList::class;
-$GLOBALS['FE_MOD']['dc_modules']['dc_course_event_reader'] = ModuleDcCourseEventReader::class;
 
 
 /**

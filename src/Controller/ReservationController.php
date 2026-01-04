@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ReservationController extends AbstractController
 {
-    #[Route('/reservation', name: 'reservation_save')]
+    #[Route('/reservation', name: 'reservation_save', defaults: ['_scope' => 'frontend', '_token_check' => true])]
     public function saveReservation(Request $request): Response
     {
         // CSRF-Token überprüfen

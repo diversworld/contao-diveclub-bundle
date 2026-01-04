@@ -1,0 +1,26 @@
+{#
+Twig-Template: Buchung – Mitgliederliste (Migration von .html5)
+Erwartete Variablen: members (Array) oder items
+#}
+{% extends "@Contao/frontend_module/_base.html.twig" %}
+
+{% block content %}
+    <div class="dc-booking-member-list">
+        {% include '@Contao/messages.html.twig' %}
+        {% set list = members is defined ? members : (items is defined ? items : []) %}
+        {% if list|length %}
+            <ul class="dc-members">
+                {% for m in list %}
+                    <li class="dc-member">
+                        <strong>{{ m.name|default(m.title|default('')) }}</strong>
+                        {% if m.email is defined %}
+                            <span class="email">{{ m.email }}</span>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Keine Mitglieder gefunden.</p>
+        {% endif %}
+    </div>
+{% endblock %}

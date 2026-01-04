@@ -2,31 +2,35 @@
 
 declare(strict_types=1);
 
-namespace Diversworld\ContaoDiveclubBundle\Module;
+namespace Diversworld\ContaoDiveclubBundle\Controller\FrontendModule;
 
 use Contao\Config;
+use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
+use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Database;
 use Contao\Date;
 use Contao\FrontendUser;
-use Contao\Module;
+use Contao\ModuleModel;
 use Contao\System;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-class ModuleDcStudentCourses extends Module
+#[AsFrontendModule('dc_student_courses', category: 'dc_manager', template: 'mod_dc_student_courses')]
+class StudentCoursesController extends AbstractFrontendModuleController
 {
-    protected $strTemplate = 'mod_dc_student_courses';
-
-    protected function compile(): void
+    protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         /** @var FrontendUser|null $user */
-        $user = FrontendUser::getInstance();
+        $user = System::getContainer()->get('security.helper')->getUser();
 
-        if (!$user || !$user->id) {
-            $this->Template->isLoggedIn = false;
-            $this->Template->courses = [];
-            return;
+        if (!$user instanceof FrontendUser) {
+            $template->isLoggedIn = false;
+            $template->courses = [];
+            return $template->getResponse();
         }
 
-        $this->Template->isLoggedIn = true;
+        $template->isLoggedIn = true;
 
         $db = Database::getInstance();
 
@@ -36,13 +40,13 @@ class ModuleDcStudentCourses extends Module
             ->execute((int)$user->id);
 
         if ($student->numRows < 1) {
-            $this->Template->studentFound = false;
-            $this->Template->courses = [];
-            return;
+            $template->studentFound = false;
+            $template->courses = [];
+            return $template->getResponse();
         }
 
-        $this->Template->studentFound = true;
-        $this->Template->student = [
+        $template->studentFound = true;
+        $template->student = [
             'id' => (int)$student->id,
             'firstname' => (string)$student->firstname,
             'lastname' => (string)$student->lastname,
@@ -112,14 +116,14 @@ class ModuleDcStudentCourses extends Module
                     'dateEnd' => $dateEnd,
                 ],
             ];
-            dump($courses);
         }
 
-        $this->Template->courses = $courses;
-        $this->Template->hasCourses = !empty($courses);
+        $template->courses = $courses;
+        $template->hasCourses = !empty($courses);
 
-        // Sprachtexte verfügbar machen
-        $this->Template->labels = $GLOBALS['TL_LANG']['FMD']['dc_student_courses_labels'] ?? [
+        // Sprachtexte verfügbar machen (aus MSC)
+        $labels = $GLOBALS['TL_LANG']['MSC']['dc_student_courses'] ?? null;
+        $template->labels = $labels ?? [
             'headline' => 'Meine Tauchkurse',
             'noStudent' => 'Kein verknüpfter Tauchschüler gefunden.',
             'noCourses' => 'Für Sie sind derzeit keine Tauchkurse gespeichert.',
@@ -132,5 +136,7 @@ class ModuleDcStudentCourses extends Module
             'dateStart' => 'Beginn',
             'dateEnd' => 'Ende',
         ];
+
+        return $template->getResponse();
     }
 }

@@ -1,0 +1,25 @@
+{#
+Twig-Template: Buchung – Abmelden (Migration von .html5)
+Erwartete Variablen: formAction (optional), assignmentId (optional)
+#}
+{% extends "@Contao/frontend_module/_base.html.twig" %}
+
+{% block content %}
+    <div class="dc-booking-unsubscribe">
+        {% include '@Contao/messages.html.twig' %}
+
+        <form method="post" action="{{ formAction|default('') }}" enctype="application/x-www-form-urlencoded"
+              class="dc-unsubscribe-form">
+            <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
+            <input type="hidden" name="FORM_SUBMIT" value="dc_booking_unsubscribe">
+            {% if assignmentId is defined %}
+                <input type="hidden" name="assignment" value="{{ assignmentId }}">
+            {% endif %}
+
+            <p>Möchten Sie die Buchung wirklich stornieren?</p>
+            <div class="submit-container">
+                <button type="submit">Stornieren</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

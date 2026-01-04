@@ -2,19 +2,23 @@
 
 declare(strict_types=1);
 
-namespace Diversworld\ContaoDiveclubBundle\Module;
+namespace Diversworld\ContaoDiveclubBundle\Controller\FrontendModule;
 
 use Contao\Config;
+use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
+use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Date;
-use Contao\Module;
+use Contao\ModuleModel;
 use Contao\PageModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCourseEventModel;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-class ModuleDcCourseEventsList extends Module
+#[AsFrontendModule('dc_course_events_list', category: 'dc_manager', template: 'mod_dc_course_events_list')]
+class CourseEventsListController extends AbstractFrontendModuleController
 {
-    protected $strTemplate = 'mod_dc_course_events_list';
-
-    protected function compile(): void
+    protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         // Lade veröffentlichte Events
         $events = DcCourseEventModel::findBy(['published=?'], [1], ['order' => 'dateStart']);
@@ -23,7 +27,7 @@ class ModuleDcCourseEventsList extends Module
         $useAutoItem = (bool)Config::get('useAutoItem');
 
         // Ziel-Seite (Reader) wie im Kalender über jumpTo auswählen
-        $jumpTo = (int)($this->jumpTo ?? 0);
+        $jumpTo = (int)($model->jumpTo ?? 0);
         $jumpToPage = $jumpTo > 0 ? PageModel::findByPk($jumpTo) : null;
 
         $list = [];
@@ -49,8 +53,10 @@ class ModuleDcCourseEventsList extends Module
             }
         }
 
-        $this->Template->events = $list;
-        $this->Template->hasEvents = !empty($list);
-        $this->Template->hasJumpTo = (null !== $jumpToPage);
+        $template->events = $list;
+        $template->hasEvents = !empty($list);
+        $template->hasJumpTo = (null !== $jumpToPage);
+
+        return $template->getResponse();
     }
 }

@@ -1,0 +1,132 @@
+{#
+Contao 5 Twig-Template: Detailansicht einer Kursveranstaltung
+Erwartete Template-Variablen:
+- notFound: bool
+- event: { title, dateStart, dateEnd, price, instructor, description }
+- hasSchedule: bool
+- schedule: array of { planned_at, module, exercise, location, notes }
+- isLoggedIn: bool
+- hasStudent: bool
+- alreadyRegistered: bool
+- assignmentId: int
+#}
+
+{% extends "@Contao/frontend_module/_base.html.twig" %}
+
+{% block content %}
+    <div class="dc-event-reader">
+        {# include '@Contao/messages.html.twig' #}
+        {% if notFound %}
+            <p>Die gewünschte Kursveranstaltung wurde nicht gefunden.</p>
+        {% else %}
+            <h2>{{ event.title }}</h2>
+            <p>
+                {% if event.dateStart %}
+                    <strong>Beginn:</strong> {{ event.dateStart }}
+                {% endif %}
+                {% if event.dateEnd %}
+                    &nbsp;–&nbsp;<strong>Ende:</strong> {{ event.dateEnd }}
+                {% endif %}
+            </p>
+            {% if event.price %}
+                <p><strong>Preis:</strong> {{ event.price }}</p>
+            {% endif %}
+            {% if event.instructor %}
+                <p><strong>Instruktor:</strong> {{ event.instructor }}</p>
+            {% endif %}
+            {% if event.description %}
+                <div class="description">{{ event.description|raw }}</div>
+            {% endif %}
+
+            <h3>Zeitplan</h3>
+            {% if not hasSchedule %}
+                <p>Für diese Veranstaltung ist noch kein Zeitplan veröffentlicht.</p>
+            {% else %}
+                <table class="schedule">
+                    <thead>
+                    <tr>
+                        <th>Datum/Zeit</th>
+                        <th>Modul</th>
+                        <th>Übung</th>
+                        <th>Ort</th>
+                        <th>Hinweis</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in schedule %}
+                        <tr>
+                            <td>{{ row.planned_at }}</td>
+                            <td>{{ row.module }}</td>
+                            <td>{{ row.exercise }}</td>
+                            <td>{{ row.location }}</td>
+                            <td>{{ row.notes }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+
+            <h3>Anmeldung</h3>
+            {% if isLoggedIn and not hasStudent %}
+                <p>Für Ihr Mitgliedskonto ist kein Tauchschüler hinterlegt.</p>
+            {% elseif alreadyRegistered %}
+                <p>Sie sind für diese Veranstaltung bereits angemeldet. (Zuweisungs-ID: {{ assignmentId }})</p>
+            {% else %}
+                {% if not isLoggedIn %}
+                    {# Gast-Anmeldung mit Feldern #}
+                    <form method="post" enctype="application/x-www-form-urlencoded"
+                          class="dc-event-signup dc-event-signup--guest">
+                        <input type="hidden" name="FORM_SUBMIT" value="dc_event_signup">
+                        <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
+                        <input type="hidden" name="mode" value="guest">
+                        <label for="website">{{ 'Website' }}</label>
+                        <input type="text" name="website" value="" class="visually-hidden" tabindex="-1"
+                               autocomplete="off"
+                               aria-hidden="true">
+
+                        <div class="widget widget-text">
+                            <label for="firstname">{{ 'Vorname' }}</label>
+                            <input type="text" id="firstname" name="firstname"
+                                   value="{{ app.request.request.get('firstname')|default('') }}" required>
+                        </div>
+                        <div class="widget widget-text">
+                            <label for="lastname">{{ 'Nachname' }}</label>
+                            <input type="text" id="lastname" name="lastname"
+                                   value="{{ app.request.request.get('lastname')|default('') }}" required>
+                        </div>
+                        <div class="widget widget-text">
+                            <label for="email">{{ 'E-Mail' }}</label>
+                            <input type="email" id="email" name="email"
+                                   value="{{ app.request.request.get('email')|default('') }}" required>
+                        </div>
+                        <div class="widget widget-text">
+                            <label for="phone">{{ 'Telefon' }}</label>
+                            <input type="text" id="phone" name="phone"
+                                   value="{{ app.request.request.get('phone')|default('') }}">
+                        </div>
+                        <div class="widget widget-text">
+                            <label for="birthdate">{{ 'Geburtsdatum' }}</label>
+                            <input type="date" id="birthdate" name="birthdate"
+                                   value="{{ app.request.request.get('birthdate')|default('') }}">
+                        </div>
+                        <div class="widget widget-checkbox">
+                            <input type="checkbox" id="privacy" name="privacy" value="1" required>
+                            <label for="privacy">{{ 'Ich stimme der Verarbeitung meiner Daten zu.' }}</label>
+                        </div>
+                        <div class="submit-container">
+                            <button type="submit">Jetzt anmelden</button>
+                        </div>
+                    </form>
+                {% else %}
+                    {# Eingeloggt: kurzes Formular #}
+                    <form method="post" enctype="application/x-www-form-urlencoded"
+                          class="dc-event-signup dc-event-signup--member">
+                        <input type="hidden" name="FORM_SUBMIT" value="dc_event_signup">
+                        <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
+                        <button type="submit">Jetzt anmelden</button>
+                    </form>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+    </div>
+{% endblock %}

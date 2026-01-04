@@ -4,30 +4,28 @@ declare(strict_types=1);
 
 /*
  * This file is part of ContaoDiveclubBundle.
- *
- * (c) Diversworld 2024 <eckhard@diversworld.eu>
- * @license GPL-3.0-or-later
- * For the full copyright and license information,
- * please view the LICENSE file that was distributed with this source code.
- * @link https://github.com/diversworld/contao-diveclub-bundle
  */
 
-/**
- * Backend modules
- */
-//$GLOBALS['TL_LANG']['MOD']['diveclub']                  = ['Diveclub Manager', 'Manage equipment, dive courses, etc.'];
-
-$GLOBALS['TL_LANG']['MOD']['dc_course_collection'] = ['Dive Courses', 'Manage dive courses'];
-$GLOBALS['TL_LANG']['MOD']['dc_regulator_collection'] = ['Regulators', 'Manage regulators'];
-$GLOBALS['TL_LANG']['MOD']['dc_tanks_collection'] = ['Diving Equipment', 'Manage diving equipment'];
-$GLOBALS['TL_LANG']['MOD']['dc_check_collection'] = ['TÜV Offers', 'Manage offers for TÜV inspections'];
+// Backend modules
+$GLOBALS['TL_LANG']['MOD']['dc_course_collection'] = ['Dive courses', 'Manage dive courses'];
+$GLOBALS['TL_LANG']['MOD']['dc_regulators_collection'] = ['Regulators', 'Manage regulators'];
+$GLOBALS['TL_LANG']['MOD']['dc_tanks_collection'] = ['Tanks', 'Manage dive tanks'];
+$GLOBALS['TL_LANG']['MOD']['dc_check_collection'] = ['Inspection offers', 'Manage offers for inspections'];
 $GLOBALS['TL_LANG']['MOD']['dc_equipment_collection'] = ['Equipment', 'Manage equipment'];
-$GLOBALS['TL_LANG']['MOD']['dc_config_collection'] = ['Configuration', 'Config for the Diveclub Manager'];
-$GLOBALS['TL_LANG']['MOD']['dc_dive_module_collection'] = ['Modules', 'Manage the copurse modules'];
-$GLOBALS['TL_LANG']['MOD']['dc_dive_student_collection'] = ['Students', 'Manage the course students'];
-$GLOBALS['TL_LANG']['MOD']['dc_old_equipment_collection'] = ['Old Equipment Tables', 'Old Tables'];
+$GLOBALS['TL_LANG']['MOD']['dc_config_collection'] = ['Settings', 'Settings for the Diveclub Manager'];
+$GLOBALS['TL_LANG']['MOD']['dc_reservation_collection'] = ['Reservations', 'Manage equipment reservations'];
+$GLOBALS['TL_LANG']['MOD']['dc_dive_module_collection'] = ['Modules', 'Manage course modules'];
+$GLOBALS['TL_LANG']['MOD']['dc_dive_student_collection'] = ['Students', 'Manage dive students'];
+$GLOBALS['TL_LANG']['MOD']['dc_course_event_collection'] = ['Course events', 'Manage course events and their schedules'];
 
-$GLOBALS['TL_LANG']['FMD']['dc_modules'] = ['Dive Club Manager', 'Modules of the Dive Club Manager'];
-$GLOBALS['TL_LANG']['FMD']['dc_listing'] = ['Offer Details', 'Dive Club Manager'];
-$GLOBALS['TL_LANG']['FMD']['dc_tanks_listing'] = ['Dive Tanks', 'List of recorded Dive Tanks'];
-$GLOBALS['TL_LANG']['FMD']['dc_equipment_listing'] = ['Diving Equipment', 'List of recorded diving equipment'];
+// Frontend modules
+$GLOBALS['TL_LANG']['FMD']['dc_manager'] = ['Diveclub Manager', 'Modules of the Diveclub Manager'];
+$GLOBALS['TL_LANG']['FMD']['dc_listing'] = ['Offer details', 'Diveclub Manager'];
+$GLOBALS['TL_LANG']['FMD']['dc_tanks_listing'] = ['Tanks', 'List of recorded tanks'];
+$GLOBALS['TL_LANG']['FMD']['dc_equipment_listing'] = ['Equipment', 'List of recorded equipment'];
+$GLOBALS['TL_LANG']['FMD']['dc_booking'] = ['Equipment rental', 'Rent club equipment'];
+
+// Diveclub FE
+$GLOBALS['TL_LANG']['FMD']['dc_student_courses'] = ['My dive courses', 'Shows the logged-in member (linked student) his courses.'];
+$GLOBALS['TL_LANG']['FMD']['dc_course_events_list'] = ['Course events (list)', 'Lists published course events and links to the detail view.'];
+$GLOBALS['TL_LANG']['FMD']['dc_course_event_reader'] = ['Course event (reader)', 'Shows details and schedule of a course event and allows registration.'];

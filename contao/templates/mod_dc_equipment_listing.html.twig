@@ -1,0 +1,26 @@
+{#
+Twig-Template: Equipment-Liste (Migration von .html5)
+Erwartete Variablen: items (Array von Ausrüstungen) o.ä.
+Da die alte .html5-Version nicht bekannt ist, wird eine generische Ausgabe verwendet.
+#}
+{% extends "@Contao/frontend_module/_base.html.twig" %}
+
+{% block content %}
+    <div class="dc-equipment-listing">
+        {% include '@Contao/messages.html.twig' %}
+        {% if items is defined and items|length %}
+            <ul class="equipment-items">
+                {% for item in items %}
+                    <li class="equipment-item">
+                        <strong>{{ item.title|default(item.name|default('')) }}</strong>
+                        {% if item.description is defined and item.description %}
+                            <div class="description">{{ item.description|raw }}</div>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Keine Ausrüstung gefunden.</p>
+        {% endif %}
+    </div>
+{% endblock %}

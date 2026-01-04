@@ -24,30 +24,12 @@ use Doctrine\DBAL\Result;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-#[AsFrontendModule(ModuleTanksDetail::TYPE, category: 'dc_modules', template: 'mod_dc_tanks_listing')]
-class ModuleTanksDetail extends AbstractFrontendModuleController
+#[AsFrontendModule(TanksDetailController::TYPE, category: 'dc_manager', template: 'mod_dc_tanks_listing')]
+class TanksDetailController extends AbstractFrontendModuleController
 {
     public const TYPE = 'dc_tanks_listing';
 
     protected ?PageModel $page;
-
-    /**
-     * This method extends the parent __invoke method,
-     * its usage is usually not necessary.
-     */
-    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
-    {
-        // Get the page model
-        $this->page = $page;
-
-        $scopeMatcher = $this->container->get('contao.routing.scope_matcher');
-
-        if ($this->page instanceof PageModel && $scopeMatcher->isFrontendRequest($request)) {
-            $this->page->loadDetails();
-        }
-
-        return parent::__invoke($request, $model, $section, $classes);
-    }
 
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {

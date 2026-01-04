@@ -14,14 +14,13 @@ declare(strict_types=1);
 
 namespace Diversworld\ContaoDiveclubBundle\Controller\FrontendModule;
 
-use Contao\ContentModel;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Routing\ScopeMatcher;
+use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Input;
 use Contao\ModuleModel;
 use Contao\PageModel;
-use Contao\Template;
 use Diversworld\ContaoDiveclubBundle\Model\DcCalendarEventsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckArticlesModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckProposalModel;
@@ -29,7 +28,7 @@ use Doctrine\DBAL\Result;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-#[AsFrontendModule(DcListingController::TYPE, category: 'dc_modules', template: 'mod_dc_listing')]
+#[AsFrontendModule(DcListingController::TYPE, category: 'dc_manager', template: 'mod_dc_listing')]
 class DcListingController extends AbstractFrontendModuleController
 {
     public const TYPE = 'dc_listing';
@@ -40,20 +39,7 @@ class DcListingController extends AbstractFrontendModuleController
     {
     }
 
-    /**
-     * @param ContentModel $model
-     */
-    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null): Response
-    {
-        if ($this->scopeMatcher->isFrontendRequest($request)) {
-            // Frontend-spezifische Logik hier, falls nötig
-            $this->page->loadDetails();
-        }
-
-        return parent::__invoke($request, $model, $section, $classes);
-    }
-
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
+    protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         $eventAlias = Input::get('auto_item');
 

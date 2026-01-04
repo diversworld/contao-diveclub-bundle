@@ -16,52 +16,58 @@ Erwartete Template-Variablen (vom Modul gesetzt):
 - labels: array
 #}
 
-<div class="mod_dc_student_courses">
-    <h2>{{ labels.headline }}</h2>
+{% extends "@Contao/frontend_module/_base.html.twig" %}
 
-    {% if not isLoggedIn %}
-        <p class="message message--info">Bitte melden Sie sich an.</p>
-    {% else %}
-        {% if not studentFound %}
-            <p class="message message--warn">{{ labels.noStudent }}</p>
+{% block content %}
+    <div class="mod_dc_student_courses">
+        {% include '@Contao/messages.html.twig' %}
+        <h2>{{ labels.headline }}</h2>
+
+        {% if not isLoggedIn %}
+            <p class="message message--info">Bitte melden Sie sich an.</p>
         {% else %}
-            {% if not hasCourses %}
-                <p class="message message--info">{{ labels.noCourses }}</p>
+            {% if not studentFound %}
+                <p class="message message--warn">{{ labels.noStudent }}</p>
             {% else %}
-                <ul class="course-list">
-                    {% for item in courses %}
-                        <li class="course-list__item">
-                            <div class="course-list__title">
-                                {{ item.course.title }}
-                            </div>
-                            <div class="course-list__meta">
-                                <span class="meta__entry"><strong>{{ labels.status }}:</strong> {{ item.status }}</span>
-                                <span
-                                    class="meta__entry"><strong>{{ labels.registered_on }}:</strong> {{ item.registered_on|default('-') }}</span>
-                                <span
-                                    class="meta__entry"><strong>{{ labels.course.category|default('Kurstyp') }}:</strong> {{ item.course.category|default('-') }}</span>
-                                {% if item.course.dateStart %}
+                {% if not hasCourses %}
+                    <p class="message message--info">{{ labels.noCourses }}</p>
+                {% else %}
+                    <ul class="course-list">
+                        {% for item in courses %}
+                            <li class="course-list__item">
+                                <div class="course-list__title">
+                                    {{ item.course.title }}
+                                </div>
+                                <div class="course-list__meta">
                                     <span
-                                        class="meta__entry"><strong>{{ labels.dateStart }}:</strong> {{ item.course.dateStart }}</span>
-                                {% endif %}
-                                {% if item.course.dateEnd %}
+                                        class="meta__entry"><strong>{{ labels.status }}:</strong> {{ item.status }}</span>
                                     <span
-                                        class="meta__entry"><strong>{{ labels.dateEnd }}:</strong> {{ item.course.dateEnd }}</span>
-                                {% endif %}
-                                <span
-                                    class="meta__entry"><strong>{{ labels.payed }}:</strong> {{ item.payed ? 'Ja' : 'Nein' }}</span>
-                                {% if item.brevet %}
-                                    <span class="meta__entry"><strong>{{ labels.brevet }}:</strong> Ja</span>
-                                    {% if item.dateBrevet %}
+                                        class="meta__entry"><strong>{{ labels.registered_on }}:</strong> {{ item.registered_on|default('-') }}</span>
+                                    <span
+                                        class="meta__entry"><strong>{{ labels.course.category|default('Kurstyp') }}:</strong> {{ item.course.category|default('-') }}</span>
+                                    {% if item.course.dateStart %}
                                         <span
-                                            class="meta__entry"><strong>{{ labels.dateBrevet }}:</strong> {{ item.dateBrevet }}</span>
+                                            class="meta__entry"><strong>{{ labels.dateStart }}:</strong> {{ item.course.dateStart }}</span>
                                     {% endif %}
-                                {% endif %}
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
+                                    {% if item.course.dateEnd %}
+                                        <span
+                                            class="meta__entry"><strong>{{ labels.dateEnd }}:</strong> {{ item.course.dateEnd }}</span>
+                                    {% endif %}
+                                    <span
+                                        class="meta__entry"><strong>{{ labels.payed }}:</strong> {{ item.payed ? 'Ja' : 'Nein' }}</span>
+                                    {% if item.brevet %}
+                                        <span class="meta__entry"><strong>{{ labels.brevet }}:</strong> Ja</span>
+                                        {% if item.dateBrevet %}
+                                            <span
+                                                class="meta__entry"><strong>{{ labels.dateBrevet }}:</strong> {{ item.dateBrevet }}</span>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
             {% endif %}
         {% endif %}
-    {% endif %}
-</div>
+    </div>
+{% endblock %}
