@@ -87,6 +87,9 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
         'tstamp' => [
             'sql' => "int(10) unsigned NOT NULL default 0"
         ],
+        'sorting' => [
+            'sql' => "int(10) unsigned NOT NULL default 0"
+        ],
         'title' => [
             'inputType' => 'text',
             'label' => &$GLOBALS['TL_LANG']['tl_dc_reservation']['title'],
@@ -117,6 +120,13 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'save_callback' => [[ReservationStatusCallback::class, '__invoke']],
             'reference' => &$GLOBALS['TL_LANG']['tl_dc_reservation']['itemStatus'],
             'eval' => ['includeBlankOption' => true, 'submitOnChange' => false, 'chosen' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
+            'sql' => "varchar(255) NOT NULL default ''"
+        ],
+        'asset_type' => [
+            'label' => ['Asset Typ', 'Typ des reservierten Gegenstands (Kategorie)'],
+            'inputType' => 'text',
+            'exclude' => true,
+            'eval' => ['maxlength' => 255, 'tl_class' => 'w25'],
             'sql' => "varchar(255) NOT NULL default ''"
         ],
         'reserved_at' => [

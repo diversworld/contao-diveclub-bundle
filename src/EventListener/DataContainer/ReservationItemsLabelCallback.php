@@ -89,12 +89,14 @@ class ReservationItemsLabelCallback
                 break;
         }
 
+        $statusLabel = $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$row['reservation_status']] ?? $row['reservation_status'];
+
         // Format müssen wir entsprechend den Anforderungen anpassen
         return sprintf(
             '%s, %s - %s - %s - %s',
             $row['asset_type'],    // Typ des Assets
             $row['asset_id'],      // ID bzw. Titel des Assets
-            $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$row['reservation_status']], // Status der Reservierung
+            $statusLabel,          // Status der Reservierung
             $reservedAt,           // Zeitpunkt der Reservierung
             $createdAt,            // Zeitpunkt der Erstellung
         );

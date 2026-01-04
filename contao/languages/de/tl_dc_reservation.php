@@ -70,7 +70,7 @@ $GLOBALS['TL_LANG']['tl_dc_reservation']['tl_dc_regulators'] = 'Atemregler';
 $GLOBALS['TL_LANG']['tl_dc_reservation']['tl_dc_equipment'] = 'Ausrüstung';
 
 $GLOBALS['TL_LANG']['tl_dc_reservation']['itemStatus'] = [
-    'avaílable' => 'verfügbar',
+    'available' => 'verfügbar',
     'reserved' => 'reserviert',
     'borrowed' => 'ausgeliehen',
     'returned' => 'zurückgegeben',

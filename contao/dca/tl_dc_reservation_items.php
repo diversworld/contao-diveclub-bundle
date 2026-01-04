@@ -90,6 +90,9 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
         'tstamp' => [
             'sql' => "int(10) unsigned NOT NULL default 0"
         ],
+        'sorting' => [
+            'sql' => "int(10) unsigned NOT NULL default 0"
+        ],
         'pid' => [
             'foreignKey' => 'tl_dc_reservation.title',
             'sql' => "int(10) unsigned NOT NULL default 0",

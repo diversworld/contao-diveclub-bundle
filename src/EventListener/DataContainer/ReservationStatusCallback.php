@@ -25,9 +25,10 @@ class ReservationStatusCallback
 
         // Prüfen, ob sich der Status tatsächlich ändert
         $currentStatus = $dc->activeRecord->reservation_status;
-        if ($currentStatus === $value) {
+        if ($currentStatus === $value && $dc->field !== 'picked_up_at') {
             return $value; // Keine Änderung, daher nichts tun
         }
+
         if ($dc->field === 'picked_up_at' && $value) {
             // Setze Status basierend auf picked_up_at
             $value = 'borrowed';
