@@ -6,8 +6,6 @@ Erwartete Variablen: formAction (optional), items (optional)
 
 {% block content %}
     <div class="dc-booking-module">
-        {% include '@Contao/messages.html.twig' %}
-
         <form method="post" action="{{ formAction|default('') }}" enctype="application/x-www-form-urlencoded"
               class="dc-booking-form">
             <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">

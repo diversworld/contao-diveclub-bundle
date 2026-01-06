@@ -37,5 +37,6 @@ $GLOBALS['TL_LANG']['FMD']['dc_booking'] = ['Ausrüstungsverleih', 'Vereinsausr�
 
 // Diveclub FE: Tauchschüler-Kurse
 $GLOBALS['TL_LANG']['FMD']['dc_student_courses'] = ['Meine Tauchkurse', 'Zeigt dem angemeldeten Mitglied bzw. verknüpften Tauchschüler seine Tauchkurse an.'];
+$GLOBALS['TL_LANG']['FMD']['dc_course_progress'] = ['Kursfortschritt', 'Zeigt dem angemeldeten Mitglied bzw. verknüpften Tauchschüler den Fortschritt im aktuellen Kurs an.'];
 $GLOBALS['TL_LANG']['FMD']['dc_course_events_list'] = ['Kursveranstaltungen (Liste)', 'Listet veröffentlichte Kursveranstaltungen auf und verlinkt zur Detailansicht.'];
 $GLOBALS['TL_LANG']['FMD']['dc_course_event_reader'] = ['Kursveranstaltung (Reader)', 'Zeigt Details und Zeitplan einer Kursveranstaltung an und erlaubt die Anmeldung.'];

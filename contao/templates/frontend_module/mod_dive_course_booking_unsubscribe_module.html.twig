@@ -6,8 +6,6 @@ Erwartete Variablen: formAction (optional), assignmentId (optional)
 
 {% block content %}
     <div class="dc-booking-unsubscribe">
-        {% include '@Contao/messages.html.twig' %}
-
         <form method="post" action="{{ formAction|default('') }}" enctype="application/x-www-form-urlencoded"
               class="dc-unsubscribe-form">
             <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">

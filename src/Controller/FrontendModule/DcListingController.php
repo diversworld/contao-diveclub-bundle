@@ -28,7 +28,7 @@ use Doctrine\DBAL\Result;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-#[AsFrontendModule(DcListingController::TYPE, category: 'dc_manager', template: 'mod_dc_listing')]
+#[AsFrontendModule(DcListingController::TYPE, category: 'dc_manager', template: 'frontend_module/mod_dc_listing')]
 class DcListingController extends AbstractFrontendModuleController
 {
     public const TYPE = 'dc_listing';
@@ -41,6 +41,11 @@ class DcListingController extends AbstractFrontendModuleController
 
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
+        $template->element_html_id = 'mod_' . $model->id;
+        $template->element_css_classes = trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? ''));
+        $template->class = $template->element_css_classes;
+        $template->cssID = $model->cssID[0] ?? '';
+
         $eventAlias = Input::get('auto_item');
 
         /** @var Result $eventStmt */

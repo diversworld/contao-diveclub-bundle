@@ -87,12 +87,17 @@ class StudentSyncCallback
         // 4. Update oder Insert
         if ($exists) {
             // Mitglied aktualisieren
-            $db->prepare("UPDATE tl_member %s WHERE id=?")
-                ->set($set)
-                ->execute($memberId);
+            $params = array_values($set);
+            $params[] = $memberId;
+
+            $db->prepare("UPDATE tl_member SET " . implode('=?, ', array_keys($set)) . "=? WHERE id=?")
+                ->execute(...$params);
 
             // Falls die ID im Schüler-Datensatz noch nicht oder falsch war, jetzt korrigieren
             if ((int)$student->memberId !== $memberId) {
+                // Wir nutzen Database::getInstance()->prepare() direkt, um sicherzugehen, dass keine Records verloren gehen.
+                // Ein einfaches Update auf tl_dc_students sollte tl_dc_course_students (als ctable) nicht beeinflussen,
+                // solange kein DC_Table act=delete oder ähnliches getriggert wird.
                 $db->prepare("UPDATE tl_dc_students SET memberId=? WHERE id=?")
                     ->execute($memberId, $student->id);
             }
@@ -109,16 +114,16 @@ class StudentSyncCallback
             };
             $set['password'] = $this->passwordHasher->hashPassword($userContext, $password);
 
-            // Insert mit Platzhalter %s (zuverlässig in Contao)
-            $objInsert = $db->prepare("INSERT INTO tl_member %s")
-                ->set($set)
-                ->execute();
+            $db->prepare("INSERT INTO tl_member (" . implode(', ', array_keys($set)) . ") VALUES (" . implode(', ', array_fill(0, count($set), '?')) . ")")
+                ->execute(...array_values($set));
 
-            $newMemberId = (int)$objInsert->insertId;
+            $newMemberId = (int)$db->insertId;
 
             // ID im Schüler-Datensatz speichern
-            $db->prepare("UPDATE tl_dc_students SET memberId=? WHERE id=?")
-                ->execute($newMemberId, $student->id);
+            if ((int)$student->memberId !== $newMemberId) {
+                $db->prepare("UPDATE tl_dc_students SET memberId=? WHERE id=?")
+                    ->execute($newMemberId, $student->id);
+            }
 
             Message::addRaw('<div class="tl_info" style="border: 2px solid #86af35; padding: 20px; font-size: 1.2em;">
                 <strong>WICHTIG: Neues Mitglied angelegt!</strong><br>

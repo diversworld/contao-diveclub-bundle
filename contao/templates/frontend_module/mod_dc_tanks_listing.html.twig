@@ -6,7 +6,6 @@ Erwartete Variablen: tanks (Array) oder items
 
 {% block content %}
     <div class="dc-tanks-listing">
-        {% include '@Contao/messages.html.twig' %}
         {% set list = tanks is defined ? tanks : (items is defined ? items : []) %}
         {% if list|length %}
             <ul class="dc-tanks">

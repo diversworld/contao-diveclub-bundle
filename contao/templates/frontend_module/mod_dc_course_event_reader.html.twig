@@ -15,7 +15,6 @@ Erwartete Template-Variablen:
 
 {% block content %}
     <div class="dc-event-reader">
-        {# include '@Contao/messages.html.twig' #}
         {% if notFound %}
             <p>Die gewünschte Kursveranstaltung wurde nicht gefunden.</p>
         {% else %}
@@ -114,7 +113,7 @@ Erwartete Template-Variablen:
                             <label for="privacy">{{ 'Ich stimme der Verarbeitung meiner Daten zu.' }}</label>
                         </div>
                         <div class="submit-container">
-                            <button type="submit">Jetzt anmelden</button>
+                            <button type="submit">{{ signup.submit }}</button>
                         </div>
                     </form>
                 {% else %}

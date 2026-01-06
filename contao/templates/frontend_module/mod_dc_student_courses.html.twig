@@ -20,9 +20,7 @@ Erwartete Template-Variablen (vom Modul gesetzt):
 
 {% block content %}
     <div class="mod_dc_student_courses">
-        {% include '@Contao/messages.html.twig' %}
         <h2>{{ labels.headline }}</h2>
-
         {% if not isLoggedIn %}
             <p class="message message--info">Bitte melden Sie sich an.</p>
         {% else %}
@@ -63,6 +61,12 @@ Erwartete Template-Variablen (vom Modul gesetzt):
                                         {% endif %}
                                     {% endif %}
                                 </div>
+                                {% if item.progress_url %}
+                                    <div class="course-list__actions">
+                                        <a href="{{ item.progress_url }}"
+                                           class="btn btn-primary">{{ labels.view_progress }}</a>
+                                    </div>
+                                {% endif %}
                             </li>
                         {% endfor %}
                     </ul>

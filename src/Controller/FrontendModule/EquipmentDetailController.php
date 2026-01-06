@@ -24,7 +24,7 @@ use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-#[AsFrontendModule(EquipmentDetailController::TYPE, category: 'dc_manager', template: 'mod_dc_equipment_listing')]
+#[AsFrontendModule(EquipmentDetailController::TYPE, category: 'dc_manager', template: 'frontend_module/mod_dc_equipment_listing')]
 class EquipmentDetailController extends AbstractFrontendModuleController
 {
     public const TYPE = 'dc_equipment_listing';
@@ -40,6 +40,11 @@ class EquipmentDetailController extends AbstractFrontendModuleController
 
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
+        $template->element_html_id = 'mod_' . $model->id;
+        $template->element_css_classes = trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? ''));
+        $template->class = $template->element_css_classes;
+        $template->cssID = $model->cssID[0] ?? '';
+
         $equipmentTypes = $this->helper->getEquipmentTypes();
         $types = DcEquipmentModel::findAll(); // Alle Typ-Modelle laden
 

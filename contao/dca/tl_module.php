@@ -11,6 +11,14 @@ declare(strict_types=1);
 // Palette für das eigene Frontend-Modul registrieren, inkl. Template-Auswahl
 $GLOBALS['TL_DCA']['tl_module']['palettes']['dc_student_courses'] =
     '{title_legend},name,headline,type;' .
+    '{redirect_legend},jumpTo;' .
+    '{template_legend:hide},customTpl;' .
+    '{protected_legend:hide},protected;' .
+    '{expert_legend:hide},guests,cssID';
+
+// Fortschritt einer Kurs-Zuweisung
+$GLOBALS['TL_DCA']['tl_module']['palettes']['dc_course_progress'] =
+    '{title_legend},name,headline,type;' .
     '{template_legend:hide},customTpl;' .
     '{protected_legend:hide},protected;' .
     '{expert_legend:hide},guests,cssID';
@@ -26,6 +34,7 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['dc_course_events_list'] =
 // Reader einer Kursveranstaltung
 $GLOBALS['TL_DCA']['tl_module']['palettes']['dc_course_event_reader'] =
     '{title_legend},name,headline,type;' .
+    '{redirect_legend},jumpTo;' .
     '{template_legend:hide},customTpl;' .
     '{protected_legend:hide},protected;' .
     '{expert_legend:hide},guests,cssID';

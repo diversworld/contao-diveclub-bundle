@@ -12,15 +12,34 @@ use Contao\Database;
 use Contao\Date;
 use Contao\FrontendUser;
 use Contao\ModuleModel;
+use Contao\PageModel;
+use Contao\StringUtil;
 use Contao\System;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use function is_array;
 
-#[AsFrontendModule('dc_student_courses', category: 'dc_manager', template: 'mod_dc_student_courses')]
+#[AsFrontendModule('dc_student_courses', category: 'dc_manager', template: 'frontend_module/mod_dc_student_courses')]
 class StudentCoursesController extends AbstractFrontendModuleController
 {
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
+        $template->element_html_id = 'mod_' . $model->id;
+        $template->element_css_classes = trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? ''));
+        $template->class = $template->element_css_classes;
+        $template->cssID = $model->cssID[0] ?? '';
+
+        // Headline korrekt aufbereiten
+        $headline = StringUtil::deserialize($model->headline);
+        if (is_array($headline) && isset($headline['value']) && $headline['value'] !== '') {
+            $template->headline = [
+                'text' => $headline['value'],
+                'unit' => $headline['unit'] ?? 'h1'
+            ];
+        } else {
+            $template->headline = null;
+        }
+
         /** @var FrontendUser|null $user */
         $user = System::getContainer()->get('security.helper')->getUser();
 
@@ -52,14 +71,24 @@ class StudentCoursesController extends AbstractFrontendModuleController
             'lastname' => (string)$student->lastname,
         ];
 
-        // 2) Lade Kurszuweisungen inkl. Kursdetails
+        // 2) Lade Kurszuweisungen inkl. Kursdetails (nur aktive Kurse: Status nicht 'Absolviert' oder 'Nicht erreicht')
         $assignments = $db->prepare(
-            'SELECT cs.id AS assignment_id, cs.status, cs.registered_on, cs.payed, cs.brevet, cs.dateBrevet,
+            "SELECT cs.id AS assignment_id, cs.status, cs.registered_on, cs.payed, cs.brevet, cs.dateBrevet,
                     c.id AS course_id, c.title AS course_title, c.course_type,  c.category, c.dateStart, c.dateEnd
              FROM tl_dc_course_students cs
              INNER JOIN tl_dc_dive_course c ON c.id = cs.course_id
-             WHERE cs.pid = ? AND cs.published = 1 AND (c.published = 1)'
+             WHERE cs.pid = ?
+               AND cs.published = 1
+               AND c.published = 1
+               AND cs.status NOT IN ('completed', 'failed')
+             ORDER BY c.dateStart DESC"
         )->execute((int)$student->id);
+
+        // Fortschritt-Seite (Reader)
+        $jumpToPage = null;
+        if ($model->jumpTo > 0) {
+            $jumpToPage = PageModel::findByPk($model->jumpTo);
+        }
 
         // Systemweite Datums-/Zeitformate aus Contao-Konfiguration
         $dateFormat = Config::get('dateFormat');
@@ -105,6 +134,7 @@ class StudentCoursesController extends AbstractFrontendModuleController
                 'payed' => (bool)$assignments->payed,
                 'brevet' => (bool)$assignments->brevet,
                 'dateBrevet' => $dateBrevet,
+                'progress_url' => $jumpToPage ? $jumpToPage->getFrontendUrl() . '?assignment=' . $assignments->assignment_id : '',
                 'course' => [
                     'id' => (int)$assignments->course_id,
                     'title' => (string)$assignments->course_title,
@@ -135,6 +165,7 @@ class StudentCoursesController extends AbstractFrontendModuleController
             'dateBrevet' => 'Brevet am',
             'dateStart' => 'Beginn',
             'dateEnd' => 'Ende',
+            'view_progress' => 'Kursfortschritt anzeigen',
         ];
 
         return $template->getResponse();

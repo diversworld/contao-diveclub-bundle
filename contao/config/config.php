@@ -27,6 +27,7 @@ use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcReservationItemsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcReservationModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcStudentExercisesModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcStudentsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcTanksModel;
 
 /**
@@ -98,6 +99,7 @@ $GLOBALS['TL_MODELS']['tl_dc_reservation_items'] = DcReservationItemsModel::clas
 $GLOBALS['TL_MODELS']['tl_dc_dive_course'] = DcDiveCourseModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_course_modules'] = DcCourseModulesModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_course_exercises'] = DcCourseExercisesModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_students'] = DcStudentsModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_student_exercises'] = DcStudentExercisesModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_course_students'] = DcCourseStudentsModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_course_event'] = DcCourseEventModel::class;

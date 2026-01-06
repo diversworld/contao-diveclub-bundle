@@ -16,10 +16,9 @@ namespace Diversworld\ContaoDiveclubBundle\Model;
 
 use Contao\Model;
 
-class DcStudendsModel extends Model
+class DcStudentsModel extends Model
 {
-
-    protected static $strTable = 'tl_dc_studends';
+    protected static $strTable = 'tl_dc_students';
 
     public function getFullName(): string
     {

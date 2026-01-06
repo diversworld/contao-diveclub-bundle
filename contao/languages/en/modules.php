@@ -27,5 +27,6 @@ $GLOBALS['TL_LANG']['FMD']['dc_booking'] = ['Equipment rental', 'Rent club equip
 
 // Diveclub FE
 $GLOBALS['TL_LANG']['FMD']['dc_student_courses'] = ['My dive courses', 'Shows the logged-in member (linked student) his courses.'];
+$GLOBALS['TL_LANG']['FMD']['dc_course_progress'] = ['Courseprogress', 'Shows the logged-in member (linked student) the progress of the actual courses.'];
 $GLOBALS['TL_LANG']['FMD']['dc_course_events_list'] = ['Course events (list)', 'Lists published course events and links to the detail view.'];
 $GLOBALS['TL_LANG']['FMD']['dc_course_event_reader'] = ['Course event (reader)', 'Shows details and schedule of a course event and allows registration.'];

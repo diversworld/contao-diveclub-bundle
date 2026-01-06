@@ -24,7 +24,7 @@ use Doctrine\DBAL\Result;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-#[AsFrontendModule(TanksDetailController::TYPE, category: 'dc_manager', template: 'mod_dc_tanks_listing')]
+#[AsFrontendModule(TanksDetailController::TYPE, category: 'dc_manager', template: 'frontend_module/mod_dc_tanks_listing')]
 class TanksDetailController extends AbstractFrontendModuleController
 {
     public const TYPE = 'dc_tanks_listing';
@@ -33,6 +33,11 @@ class TanksDetailController extends AbstractFrontendModuleController
 
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
+        $template->element_html_id = 'mod_' . $model->id;
+        $template->element_css_classes = trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? ''));
+        $template->class = $template->element_css_classes;
+        $template->cssID = $model->cssID[0] ?? '';
+
         /** @var Result $eventStmt */
         $tanks = DcTanksModel::findAll();
 

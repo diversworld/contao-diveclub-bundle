@@ -1,0 +1,83 @@
+{% extends "@Contao/frontend_module/_base.html.twig" %}
+
+{% block content %}
+    <div class="mod_dc_course_progress">
+        {% if not isLoggedIn %}
+            <p class="message message--info">Bitte melden Sie sich an.</p>
+        {% elseif notFound %}
+            <p class="message message--error">Die gewünschte Kurs-Zuweisung wurde nicht gefunden oder Sie haben keine
+                Berechtigung diese einzusehen.</p>
+        {% else %}
+            <h2>{{ labels.headline }}</h2>
+
+            <div class="progress-section progress-section--exercises">
+                <h3>{{ labels.exercises }}</h3>
+                {% if exercises is empty %}
+                    <p class="message message--info">Für diesen Kurs sind noch keine Übungen hinterlegt.</p>
+                {% else %}
+                    <table class="table exercises-table">
+                        <thead>
+                        <tr>
+                            <th>Modul</th>
+                            <th>Übung</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for exercise in exercises %}
+                            <tr class="status--{{ exercise.status }}">
+                                <td>{{ exercise.module }}</td>
+                                <td>{{ exercise.title }}</td>
+                                <td>
+                                        <span class="status-label">
+                                            {% if exercise.status == 'completed' %}
+                                                {{ labels.status_completed }}
+                                            {% elseif exercise.status == 'failed' %}
+                                                {{ labels.status_failed }}
+                                            {% else %}
+                                                {{ labels.status_pending }}
+                                            {% endif %}
+                                        </span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+
+            {% if schedule is not empty %}
+                <div class="progress-section progress-section--schedule">
+                    <h3>{{ labels.schedule }}</h3>
+                    <table class="table schedule-table">
+                        <thead>
+                        <tr>
+                            <th>Datum/Zeit</th>
+                            <th>Modul / Übung</th>
+                            <th>Ort</th>
+                            <th>Hinweis</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in schedule %}
+                            <tr>
+                                <td>{{ item.planned_at }}</td>
+                                <td>
+                                    <strong>{{ item.module }}</strong><br>
+                                    {{ item.exercise }}
+                                </td>
+                                <td>{{ item.location }}</td>
+                                <td>{{ item.notes }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+
+            <div class="actions">
+                <a href="javascript:history.back()" class="btn btn-default">Zurück zur Übersicht</a>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

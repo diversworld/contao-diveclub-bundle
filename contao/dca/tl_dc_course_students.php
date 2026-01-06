@@ -183,8 +183,14 @@ class tl_dc_course_students extends Backend
         if ((int)$dc->activeRecord->event_id > 0) {
             $event = $db->prepare("SELECT course_id FROM tl_dc_course_event WHERE id=?")
                 ->execute((int)$dc->activeRecord->event_id);
-            if ($event->numRows > 0) {
+            if ($event->numRows > 0 && (int)$event->course_id > 0) {
                 $courseTemplateId = (int)$event->course_id;
+
+                // Falls course_id in der Zuweisung noch leer ist, jetzt setzen
+                if (!(int)$dc->activeRecord->course_id) {
+                    $db->prepare("UPDATE tl_dc_course_students SET course_id=? WHERE id=?")
+                        ->execute($courseTemplateId, $assignmentId);
+                }
             }
         }
 

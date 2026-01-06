@@ -6,7 +6,6 @@ Erwartete Variablen: members (Array) oder items
 
 {% block content %}
     <div class="dc-booking-member-list">
-        {% include '@Contao/messages.html.twig' %}
         {% set list = members is defined ? members : (items is defined ? items : []) %}
         {% if list|length %}
             <ul class="dc-members">

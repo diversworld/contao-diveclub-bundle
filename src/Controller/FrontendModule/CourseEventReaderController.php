@@ -8,23 +8,41 @@ use Contao\Config;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Twig\FragmentTemplate;
-use Contao\Database;
 use Contao\Date;
 use Contao\FrontendUser;
 use Contao\Input;
 use Contao\ModuleModel;
+use Contao\PageModel;
+use Contao\StringUtil;
 use Contao\System;
 use Diversworld\ContaoDiveclubBundle\Model\DcCourseEventModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcCourseStudentsModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcStudentsModel;
+use Exception;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Csrf\CsrfToken;
+use function is_array;
 
-#[AsFrontendModule('dc_course_event_reader', category: 'dc_manager', template: 'mod_dc_course_event_reader')]
+#[AsFrontendModule('dc_course_event_reader', category: 'dc_manager', template: 'frontend_module/mod_dc_course_event_reader')]
 class CourseEventReaderController extends AbstractFrontendModuleController
 {
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
-        $db = Database::getInstance();
+        $template->element_html_id = 'mod_' . $model->id;
+        $template->element_css_classes = trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? ''));
+        $template->class = $template->element_css_classes;
+        $template->cssID = $model->cssID[0] ?? '';
+
+        // Headline korrekt aufbereiten
+        $headline = StringUtil::deserialize($model->headline);
+        if (is_array($headline) && isset($headline['value']) && $headline['value'] !== '') {
+            $template->headline = [
+                'text' => $headline['value'],
+                'unit' => $headline['unit'] ?? 'h1'
+            ];
+        }
 
         $identifier = Input::get('event') ?: Input::get('items');
         if (!$identifier) {
@@ -60,23 +78,24 @@ class CourseEventReaderController extends AbstractFrontendModuleController
         $template->request_token = System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue();
 
         // Zeitplan laden (mit Modul- und Übungsnamen)
-        $schedule = $db->prepare(
+        $schedule = System::getContainer()->get('database_connection')->fetchAllAssociative(
             'SELECT s.id, s.planned_at, s.location, s.notes, m.title AS module_title, e.title AS exercise_title
              FROM tl_dc_course_event_schedule s
              INNER JOIN tl_dc_course_modules m ON m.id = s.module_id
              INNER JOIN tl_dc_course_exercises e ON e.id = s.exercise_id
              WHERE s.pid = ? AND s.published = 1
-             ORDER BY s.planned_at, m.sorting, e.sorting'
-        )->execute((int)$event->id);
+             ORDER BY s.planned_at, m.sorting, e.sorting',
+            [(int)$event->id]
+        );
 
         $rows = [];
-        while ($schedule->next()) {
+        foreach ($schedule as $row) {
             $rows[] = [
-                'planned_at' => $schedule->planned_at ? Date::parse($dateFormat, (int)strtotime((string)$schedule->planned_at)) : '',
-                'location' => (string)$schedule->location,
-                'notes' => (string)$schedule->notes,
-                'module' => (string)$schedule->module_title,
-                'exercise' => (string)$schedule->exercise_title,
+                'planned_at' => $row['planned_at'] ? Date::parse($dateFormat, (int)strtotime((string)$row['planned_at'])) : '',
+                'location' => (string)$row['location'],
+                'notes' => (string)$row['notes'],
+                'module' => (string)$row['module_title'],
+                'exercise' => (string)$row['exercise_title'],
             ];
         }
         $template->schedule = $rows;
@@ -102,8 +121,8 @@ class CourseEventReaderController extends AbstractFrontendModuleController
 
         $studentId = null;
         if ($template->isLoggedIn) {
-            $student = $db->prepare('SELECT id FROM tl_dc_students WHERE memberId=?')->execute((int)$user->id);
-            if ($student->numRows > 0) {
+            $student = DcStudentsModel::findOneByMemberId((int)$user->id);
+            if ($student !== null) {
                 $studentId = (int)$student->id;
             }
         }
@@ -113,9 +132,8 @@ class CourseEventReaderController extends AbstractFrontendModuleController
         $alreadyRegistered = false;
         $assignmentId = null;
         if ($studentId) {
-            $check = $db->prepare('SELECT id FROM tl_dc_course_students WHERE pid=? AND event_id=?')
-                ->execute($studentId, (int)$event->id);
-            if ($check->numRows > 0) {
+            $check = DcCourseStudentsModel::findOneBy(['pid=?', 'event_id=?'], [$studentId, (int)$event->id]);
+            if ($check !== null) {
                 $alreadyRegistered = true;
                 $assignmentId = (int)$check->id;
             }
@@ -123,10 +141,19 @@ class CourseEventReaderController extends AbstractFrontendModuleController
         $template->alreadyRegistered = $alreadyRegistered;
         $template->assignmentId = $assignmentId;
 
+        // Debug-Log
+        System::getContainer()->get('monolog.logger.contao.general')->info('CourseEventReaderController::getResponse called. Method: ' . $request->getMethod() . ', FORM_SUBMIT: ' . Input::post('FORM_SUBMIT'));
+
         // Verarbeitung der Anmeldung (mit CSRF-Validierung)
         if (Input::post('FORM_SUBMIT') === 'dc_event_signup' && !$alreadyRegistered) {
             // CSRF prüfen – bei ungültigem Token abbrechen und Meldung setzen
-            if (!System::getContainer()->get('contao.csrf.token_manager')->isTokenValid(new CsrfToken('contao_frontend', Input::post('REQUEST_TOKEN')))) {
+            $tokenValue = (string)Input::post('REQUEST_TOKEN');
+            $container = System::getContainer();
+            $tokenId = $container->getParameter('contao.csrf_token_name');
+            $isValidToken = $container->get('contao.csrf.token_manager')->isTokenValid(new CsrfToken($tokenId, $tokenValue));
+
+            if (!$isValidToken) {
+                System::getContainer()->get('monolog.logger.contao.general')->error('CSRF-Token Validierung fehlgeschlagen für dc_event_signup. Token: ' . substr($tokenValue, 0, 8) . '...');
                 $this->addHtml5Message('Ungültiges Request-Token. Bitte Seite neu laden und erneut versuchen.', 'error');
                 return $template->getResponse();
             }
@@ -171,69 +198,127 @@ class CourseEventReaderController extends AbstractFrontendModuleController
                 }
 
                 // Dublettenprüfung: existiert Schüler mit gleicher E‑Mail?
-                $stu = $db->prepare('SELECT id FROM tl_dc_students WHERE email=?')
-                    ->execute($email);
-                if ($stu->numRows > 0) {
-                    $currentStudentId = (int)$stu->id;
+                $existingStudent = DcStudentsModel::findOneByEmail($email);
+                if ($existingStudent !== null) {
+                    $currentStudentId = (int)$existingStudent->id;
+                    // Falls eingeloggt und Schüler hat noch keine memberId, jetzt verknüpfen
+                    if ($template->isLoggedIn && (int)$existingStudent->memberId === 0) {
+                        $existingStudent->memberId = (int)$user->id;
+                        $existingStudent->save();
+                    }
                 } else {
-                    // Schüler anlegen (ohne tl_member)
-                    $db->prepare('INSERT INTO tl_dc_students (tstamp, firstname, lastname, email, phone, dateOfBirth, published) VALUES (?, ?, ?, ?, ?, ?, ?)')
-                        ->execute(time(), $firstname, $lastname, $email, $phone, $birthdate, 1);
-                    $currentStudentId = (int)$db->insertId;
+                    // Schüler anlegen
+                    try {
+                        $birthdateTs = strtotime($birthdate);
+
+                        $newStudent = new DcStudentsModel();
+                        $newStudent->tstamp = time();
+                        $newStudent->firstname = $firstname;
+                        $newStudent->lastname = $lastname;
+                        $newStudent->email = $email;
+                        $newStudent->phone = $phone;
+                        $newStudent->dateOfBirth = $birthdateTs ? (string)$birthdateTs : '';
+                        $newStudent->memberId = $template->isLoggedIn ? (int)$user->id : 0;
+                        $newStudent->published = '1';
+                        $newStudent->save();
+
+                        $currentStudentId = (int)$newStudent->id;
+                        System::getContainer()->get('monolog.logger.contao.general')->info('Gast-Schüler erfolgreich angelegt: ID ' . $currentStudentId);
+                    } catch (Exception $e) {
+                        System::getContainer()->get('monolog.logger.contao.general')->error('Fehler beim Anlegen des Gast-Schülers: ' . $e->getMessage());
+                        $this->addHtml5Message('Fehler beim Speichern Ihrer Daten.', 'error');
+                        return $template->getResponse();
+                    }
                 }
             } else {
-                // Eingeloggt: es muss ein Student vorhanden sein
+                // Eingeloggt (Member-Modus): Es wurde kein Formular ausgefüllt, wir nutzen die Daten des Users
                 if ($currentStudentId === null) {
-                    $this->addHtml5Message('Für Ihr Konto ist kein Tauchschüler hinterlegt.', 'error');
-                    return $template->getResponse();
+                    // Automatisch einen Schüler-Datensatz anlegen
+                    try {
+                        $dob = (string)$user->dateOfBirth;
+                        if ($dob !== '' && !is_numeric($dob)) {
+                            $dobTs = strtotime($dob);
+                            $dob = $dobTs ? (string)$dobTs : '';
+                        }
+
+                        $newStudent = new DcStudentsModel();
+                        $newStudent->tstamp = time();
+                        $newStudent->firstname = (string)$user->firstname;
+                        $newStudent->lastname = (string)$user->lastname;
+                        $newStudent->email = (string)$user->email;
+                        $newStudent->phone = (string)$user->phone;
+                        $newStudent->dateOfBirth = $dob;
+                        $newStudent->memberId = (int)$user->id;
+                        $newStudent->published = '1';
+                        $newStudent->save();
+
+                        $currentStudentId = (int)$newStudent->id;
+                    } catch (Exception $e) {
+                        System::getContainer()->get('monolog.logger.contao.general')->error('Fehler beim automatischen Schüler-Insert: ' . $e->getMessage());
+                    }
                 }
             }
 
+            // WICHTIG: Prüfung, ob die ID jetzt gesetzt ist
+            if (!$currentStudentId) {
+                $this->addHtml5Message('Fehler beim Erstellen des Schüler-Profils.', 'error');
+                return $template->getResponse();
+            }
+
             // Falls bereits zugewiesen (Rennbedingungen), nochmal prüfen
-            $check2 = $db->prepare('SELECT id FROM tl_dc_course_students WHERE pid=? AND event_id=?')
-                ->execute((int)$currentStudentId, (int)$event->id);
-            if ($check2->numRows > 0) {
+            $check2 = DcCourseStudentsModel::findOneBy(['pid=?', 'event_id=?'], [(int)$currentStudentId, (int)$event->id]);
+            if ($check2 !== null) {
                 $template->alreadyRegistered = true;
                 $template->assignmentId = (int)$check2->id;
                 $this->addHtml5Message('Sie sind bereits für diese Veranstaltung angemeldet.', 'info');
                 return $template->getResponse();
             }
-
             // Zuweisung anlegen
-            $db->prepare('INSERT INTO tl_dc_course_students (pid, tstamp, course_id, event_id, status, registered_on, published) VALUES (?, ?, ?, ?, ?, ?, ?)')
-                ->execute(
-                    (int)$currentStudentId,
-                    time(),
-                    (int)$event->course_id,
-                    (int)$event->id,
-                    'registered',
-                    time(),
-                    1
-                );
+            try {
+                $db = System::getContainer()->get('database_connection');
+                $logger = System::getContainer()->get('monolog.logger.contao.general');
 
-            $newAssignmentId = (int)$db->insertId;
+                $logger->info('Starte Kurs-Zuweisung für Student ID ' . $currentStudentId . ', Event ID ' . $event->id . ', Course ID ' . $event->course_id);
 
-            // Übungen erzeugen (kopiert aus generateDefaultExercises-Logik)
-            $ex = $db->prepare(
-                'SELECT e.id FROM tl_dc_course_exercises e
-                 INNER JOIN tl_dc_course_modules m ON e.pid = m.id
-                 WHERE m.pid = ?'
-            )->execute((int)$event->course_id);
+                $db->insert('tl_dc_course_students', [
+                    'pid' => (int)$currentStudentId,
+                    'tstamp' => time(),
+                    'course_id' => (int)$event->course_id ?: (int)Input::post('course_id'),
+                    'event_id' => (int)$event->id,
+                    'status' => 'registered',
+                    'registered_on' => (string)time(),
+                    'published' => '1'
+                ]);
 
-            while ($ex->next()) {
-                $exists = $db->prepare('SELECT id FROM tl_dc_student_exercises WHERE pid=? AND exercise_id=?')
-                    ->execute($newAssignmentId, (int)$ex->id);
-                if ($exists->numRows < 1) {
-                    $db->prepare('INSERT INTO tl_dc_student_exercises (pid, tstamp, exercise_id, status, published) VALUES (?, ?, ?, ?, ?)')
-                        ->execute($newAssignmentId, time(), (int)$ex->id, 'pending', 1);
-                }
+                $newAssignmentId = (int)$db->lastInsertId();
+                $logger->info('Kurs-Zuweisung erfolgreich angelegt. Neue ID: ' . $newAssignmentId);
+            } catch (Exception $e) {
+                System::getContainer()->get('monolog.logger.contao.general')->error('Fehler beim Anlegen der Kurs-Zuweisung: ' . $e->getMessage());
+                $this->addHtml5Message('Fehler bei der Kursanmeldung.', 'error');
+                return $template->getResponse();
             }
 
+            // Debug-Log
+            System::getContainer()->get('monolog.logger.contao.general')->info('Kursanmeldung erfolgreich: Student ID ' . $currentStudentId . ', Assignment ID ' . $newAssignmentId);
+
+            // Übungen erzeugen
+            $this->generateExercises($newAssignmentId, (int)$event->course_id);
+
+            // Bestätigungs-Meldung setzen
             $this->addHtml5Message('Erfolgreich zur Veranstaltung angemeldet.', 'confirm');
 
-            // Refresh Status
+            // Weiterleitung zur Bestätigungsseite (jumpTo)
+            $jumpTo = (int)($model->jumpTo ?? 0);
+            if ($jumpTo > 0 && ($jumpToPage = PageModel::findByPk($jumpTo)) !== null) {
+                return new RedirectResponse($jumpToPage->getFrontendUrl());
+            }
+
+            // Refresh Status für das aktuelle Template (falls kein Redirect zu anderer Seite erfolgt)
             $template->alreadyRegistered = true;
             $template->assignmentId = $newAssignmentId;
+
+            // Redirect auf die aktuelle Seite um POST-Resubmission zu verhindern und Nachrichten anzuzeigen
+            return new RedirectResponse($request->getUri());
         }
 
         return $template->getResponse();
@@ -246,5 +331,45 @@ class CourseEventReaderController extends AbstractFrontendModuleController
         $flashBag = $session->getFlashBag();
 
         $flashBag->add('contao.FE.' . $type, $message);
+    }
+
+    private function generateExercises(int $assignmentId, int $courseId): void
+    {
+        $db = System::getContainer()->get('database_connection');
+        $logger = System::getContainer()->get('monolog.logger.contao.general');
+        $logger->info('Erzeuge Übungen für Assignment ID ' . $assignmentId . ' und Course ID ' . $courseId);
+
+        // 1. Alle Übungen des Kurs-Templates finden (über die Module)
+        $exercises = $db->fetchAllAssociative("
+            SELECT e.id
+            FROM tl_dc_course_exercises e
+            JOIN tl_dc_course_modules m ON e.pid = m.id
+            WHERE m.pid = ?
+        ", [$courseId]);
+
+        $logger->info('Gefundene Übungen für Kurs ' . $courseId . ': ' . count($exercises));
+
+        foreach ($exercises as $exercise) {
+            try {
+                // 2. Prüfen, ob die Übung für diese Zuweisung schon existiert (analog zum Backend)
+                $check = $db->fetchOne("SELECT id FROM tl_dc_student_exercises WHERE pid=? AND exercise_id=?", [$assignmentId, $exercise['id']]);
+
+                if (!$check) {
+                    // 3. Übung als 'pending' anlegen
+                    $db->insert('tl_dc_student_exercises', [
+                        'pid' => $assignmentId,
+                        'tstamp' => time(),
+                        'exercise_id' => $exercise['id'],
+                        'status' => 'pending',
+                        'published' => '1'
+                    ]);
+
+                    $newExId = $db->lastInsertId();
+                    $logger->info('Schüler-Übung angelegt: Assignment ' . $assignmentId . ', Exercise ' . $exercise['id'] . ', New ID ' . $newExId);
+                }
+            } catch (Exception $e) {
+                $logger->error('Fehler beim Erzeugen der Schüler-Übung: ' . $e->getMessage());
+            }
+        }
     }
 }

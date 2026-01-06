@@ -7,7 +7,6 @@ Da die alte .html5-Version nicht bekannt ist, wird eine generische Ausgabe verwe
 
 {% block content %}
     <div class="dc-equipment-listing">
-        {% include '@Contao/messages.html.twig' %}
         {% if items is defined and items|length %}
             <ul class="equipment-items">
                 {% for item in items %}

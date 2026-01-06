@@ -6,8 +6,6 @@ Erwartete Variablen: items (Array), optional headline, description.
 
 {% block content %}
     <div class="dc-generic-listing">
-        {% include '@Contao/messages.html.twig' %}
-
         {% if headline is defined and headline %}
             <h2>{{ headline }}</h2>
         {% endif %}

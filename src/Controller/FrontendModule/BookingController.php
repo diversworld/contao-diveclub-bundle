@@ -24,6 +24,7 @@ use Contao\FormCheckbox;
 use Contao\Message;
 use Contao\ModuleModel;
 use Contao\PageModel;
+use Contao\StringUtil;
 use Contao\System;
 use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
 use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentModel;
@@ -39,9 +40,10 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use function is_array;
 
 
-#[AsFrontendModule(BookingController::TYPE, category: 'dc_manager', template: 'mod_dc_booking')]
+#[AsFrontendModule(BookingController::TYPE, category: 'dc_manager', template: 'frontend_module/mod_dc_booking')]
 class BookingController extends AbstractFrontendModuleController
 {
     public const TYPE = 'dc_booking';
@@ -65,6 +67,20 @@ class BookingController extends AbstractFrontendModuleController
      */
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
+        $template->element_html_id = 'mod_' . $model->id;
+        $template->element_css_classes = trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? ''));
+        $template->class = $template->element_css_classes;
+        $template->cssID = $model->cssID[0] ?? '';
+
+        // Headline korrekt aufbereiten
+        $headline = StringUtil::deserialize($model->headline);
+        if (is_array($headline) && isset($headline['value']) && $headline['value'] !== '') {
+            $template->headline = [
+                'text' => $headline['value'],
+                'unit' => $headline['unit'] ?? 'h1'
+            ];
+        }
+
         System::loadLanguageFile('tl_dc_reservation_items');
 
         // Request Token für Twig bereitstellen
