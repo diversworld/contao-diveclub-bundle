@@ -1,6 +1,7 @@
 {% extends "@Contao/frontend_module/_base.html.twig" %}
 
 {% block content %}
+    <!-- DEBUG: mod_dc_course_progress.html.twig loaded -->
     <div class="mod_dc_course_progress">
         {% if not isLoggedIn %}
             <p class="message message--info">Bitte melden Sie sich an.</p>
@@ -30,13 +31,7 @@
                                 <td>{{ exercise.title }}</td>
                                 <td>
                                         <span class="status-label">
-                                            {% if exercise.status == 'completed' %}
-                                                {{ labels.status_completed }}
-                                            {% elseif exercise.status == 'failed' %}
-                                                {{ labels.status_failed }}
-                                            {% else %}
-                                                {{ labels.status_pending }}
-                                            {% endif %}
+                                            {{ exercise.status_label }}
                                         </span>
                                 </td>
                             </tr>

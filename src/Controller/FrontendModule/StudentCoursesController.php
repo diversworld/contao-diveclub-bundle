@@ -24,6 +24,7 @@ class StudentCoursesController extends AbstractFrontendModuleController
 {
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
+        System::getContainer()->get('monolog.logger.contao.general')->info('StudentCoursesController::getResponse start. REQUEST_URI: ' . $request->getUri());
         $template->element_html_id = 'mod_' . $model->id;
         $template->element_css_classes = trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? ''));
         $template->class = $template->element_css_classes;
