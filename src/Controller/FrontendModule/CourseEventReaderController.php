@@ -30,6 +30,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
 {
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
+        $template->notFound = false;
         $template->element_html_id = 'mod_' . $model->id;
         $template->element_css_classes = trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? ''));
         $template->class = $template->element_css_classes;
@@ -105,8 +106,12 @@ class CourseEventReaderController extends AbstractFrontendModuleController
         $signupLabels = $GLOBALS['TL_LANG']['MSC']['dc_event_signup'] ?? null;
         $template->signup = $signupLabels ?: [
             'headline' => 'Anmeldung zur Kursveranstaltung',
+            'gender' => 'Anrede',
             'firstname' => 'Vorname',
             'lastname' => 'Nachname',
+            'street' => 'Straße',
+            'postal' => 'PLZ',
+            'city' => 'Wohnort',
             'email' => 'E-Mail',
             'phone' => 'Telefon',
             'birthdate' => 'Geburtsdatum',
@@ -169,8 +174,12 @@ class CourseEventReaderController extends AbstractFrontendModuleController
 
             if ($isGuest) {
                 // Gastfelder einlesen und validieren
+                $gender = trim((string)Input::post('gender'));
                 $firstname = trim((string)Input::post('firstname'));
                 $lastname = trim((string)Input::post('lastname'));
+                $street = trim((string)Input::post('street'));
+                $postal = trim((string)Input::post('postal'));
+                $city = trim((string)Input::post('city'));
                 $email = trim((string)Input::post('email'));
                 $phone = trim((string)Input::post('phone'));
                 $birthdate = trim((string)Input::post('birthdate'));
@@ -182,6 +191,15 @@ class CourseEventReaderController extends AbstractFrontendModuleController
                 }
                 if ($lastname === '') {
                     $errors[] = 'Bitte geben Sie Ihren Nachnamen ein.';
+                }
+                if ($street === '') {
+                    $errors[] = 'Bitte geben Sie Ihre Straße ein.';
+                }
+                if ($postal === '') {
+                    $errors[] = 'Bitte geben Sie Ihre PLZ ein.';
+                }
+                if ($city === '') {
+                    $errors[] = 'Bitte geben Sie Ihren Wohnort ein.';
                 }
                 if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
                     $errors[] = 'Bitte geben Sie eine gültige E‑Mail ein.';
@@ -213,8 +231,12 @@ class CourseEventReaderController extends AbstractFrontendModuleController
 
                         $newStudent = new DcStudentsModel();
                         $newStudent->tstamp = time();
+                        $newStudent->gender = $gender;
                         $newStudent->firstname = $firstname;
                         $newStudent->lastname = $lastname;
+                        $newStudent->street = $street;
+                        $newStudent->postal = $postal;
+                        $newStudent->city = $city;
                         $newStudent->email = $email;
                         $newStudent->phone = $phone;
                         $newStudent->dateOfBirth = $birthdateTs ? (string)$birthdateTs : '';
@@ -243,8 +265,12 @@ class CourseEventReaderController extends AbstractFrontendModuleController
 
                         $newStudent = new DcStudentsModel();
                         $newStudent->tstamp = time();
+                        $newStudent->gender = (string)$user->gender;
                         $newStudent->firstname = (string)$user->firstname;
                         $newStudent->lastname = (string)$user->lastname;
+                        $newStudent->street = (string)$user->street;
+                        $newStudent->postal = (string)$user->postal;
+                        $newStudent->city = (string)$user->city;
                         $newStudent->email = (string)$user->email;
                         $newStudent->phone = (string)$user->phone;
                         $newStudent->dateOfBirth = $dob;

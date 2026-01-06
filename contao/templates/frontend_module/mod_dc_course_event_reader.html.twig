@@ -15,7 +15,7 @@ Erwartete Template-Variablen:
 
 {% block content %}
     <div class="dc-event-reader">
-        {% if notFound %}
+        {% if notFound|default(false) %}
             <p>Die gewünschte Kursveranstaltung wurde nicht gefunden.</p>
         {% else %}
             <h2>{{ event.title }}</h2>
@@ -78,20 +78,39 @@ Erwartete Template-Variablen:
                         <input type="hidden" name="FORM_SUBMIT" value="dc_event_signup">
                         <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
                         <input type="hidden" name="mode" value="guest">
-                        <label for="website">{{ 'Website' }}</label>
-                        <input type="text" name="website" value="" class="visually-hidden" tabindex="-1"
-                               autocomplete="off"
-                               aria-hidden="true">
-
+                        <div class="widget widget-select">
+                            <label for="ctrl_gender">{{ 'Anrede' }}</label>
+                            <select name="gender" id="ctrl_gender" class="select" required>
+                                <option value="">-</option>
+                                <option value="male" {{ app.request.request.get('gender') == 'male' ? 'selected' : '' }}>Herr</option>
+                                <option value="female" {{ app.request.request.get('gender') == 'female' ? 'selected' : '' }}>Frau</option>
+                                <option value="other" {{ app.request.request.get('gender') == 'other' ? 'selected' : '' }}>Divers</option>
+                            </select>
+                        </div>
                         <div class="widget widget-text">
-                            <label for="firstname">{{ 'Vorname' }}</label>
-                            <input type="text" id="firstname" name="firstname"
+                            <label for="ctrl_firstname">{{ 'Vorname' }}</label>
+                            <input type="text" id="ctrl_firstname" name="firstname"
                                    value="{{ app.request.request.get('firstname')|default('') }}" required>
                         </div>
                         <div class="widget widget-text">
-                            <label for="lastname">{{ 'Nachname' }}</label>
-                            <input type="text" id="lastname" name="lastname"
+                            <label for="ctrl_lastname">{{ 'Nachname' }}</label>
+                            <input type="text" id="ctrl_lastname" name="lastname"
                                    value="{{ app.request.request.get('lastname')|default('') }}" required>
+                        </div>
+                        <div class="widget widget-text">
+                            <label for="ctrl_street">{{ 'Straße' }}</label>
+                            <input type="text" id="ctrl_street" name="street"
+                                   value="{{ app.request.request.get('street')|default('') }}" required>
+                        </div>
+                        <div class="widget widget-text">
+                            <label for="ctrl_postal">{{ 'PLZ' }}</label>
+                            <input type="text" id="ctrl_postal" name="postal"
+                                   value="{{ app.request.request.get('postal')|default('') }}" required>
+                        </div>
+                        <div class="widget widget-text">
+                            <label for="ctrl_city">{{ 'Wohnort' }}</label>
+                            <input type="text" id="ctrl_city" name="city"
+                                   value="{{ app.request.request.get('city')|default('') }}" required>
                         </div>
                         <div class="widget widget-text">
                             <label for="email">{{ 'E-Mail' }}</label>
@@ -99,18 +118,18 @@ Erwartete Template-Variablen:
                                    value="{{ app.request.request.get('email')|default('') }}" required>
                         </div>
                         <div class="widget widget-text">
-                            <label for="phone">{{ 'Telefon' }}</label>
-                            <input type="text" id="phone" name="phone"
+                            <label for="ctrl_phone">{{ 'Telefon' }}</label>
+                            <input type="text" id="ctrl_phone" name="phone"
                                    value="{{ app.request.request.get('phone')|default('') }}">
                         </div>
                         <div class="widget widget-text">
-                            <label for="birthdate">{{ 'Geburtsdatum' }}</label>
-                            <input type="date" id="birthdate" name="birthdate"
+                            <label for="ctrl_birthdate">{{ 'Geburtsdatum' }}</label>
+                            <input type="date" id="ctrl_birthdate" name="birthdate"
                                    value="{{ app.request.request.get('birthdate')|default('') }}">
                         </div>
                         <div class="widget widget-checkbox">
-                            <input type="checkbox" id="privacy" name="privacy" value="1" required>
-                            <label for="privacy">{{ 'Ich stimme der Verarbeitung meiner Daten zu.' }}</label>
+                            <input type="checkbox" id="ctrl_privacy" name="privacy" value="1" required>
+                            <label for="ctrl_privacy">{{ 'Ich stimme der Verarbeitung meiner Daten zu.' }}</label>
                         </div>
                         <div class="submit-container">
                             <button type="submit">{{ signup.submit }}</button>
