@@ -50,8 +50,6 @@ class CourseProgressController extends AbstractFrontendModuleController
                 'text' => $headline['value'],
                 'unit' => $headline['unit'] ?? 'h1'
             ];
-        } else {
-            $template->headline = null;
         }
 
         if (!$user instanceof FrontendUser) {

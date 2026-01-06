@@ -36,8 +36,6 @@ class StudentCoursesController extends AbstractFrontendModuleController
                 'text' => $headline['value'],
                 'unit' => $headline['unit'] ?? 'h1'
             ];
-        } else {
-            $template->headline = null;
         }
 
         /** @var FrontendUser|null $user */

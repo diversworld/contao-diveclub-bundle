@@ -19,6 +19,7 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\ModuleModel;
 use Contao\PageModel;
+use Contao\StringUtil;
 use Diversworld\ContaoDiveclubBundle\Model\DcTanksModel;
 use Doctrine\DBAL\Result;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,6 +38,15 @@ class TanksDetailController extends AbstractFrontendModuleController
         $template->element_css_classes = trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? ''));
         $template->class = $template->element_css_classes;
         $template->cssID = $model->cssID[0] ?? '';
+
+        // Headline korrekt aufbereiten
+        $headline = StringUtil::deserialize($model->headline);
+        if (is_array($headline) && isset($headline['value']) && $headline['value'] !== '') {
+            $template->headline = [
+                'text' => $headline['value'],
+                'unit' => $headline['unit'] ?? 'h1'
+            ];
+        }
 
         /** @var Result $eventStmt */
         $tanks = DcTanksModel::findAll();
