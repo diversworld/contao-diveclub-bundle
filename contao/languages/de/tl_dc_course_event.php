@@ -15,11 +15,12 @@ $GLOBALS['TL_LANG']['tl_dc_course_event'] = [
     'stop' => ['Anzeigen bis', 'Die Veranstaltung nur bis zu diesem Zeitpunkt anzeigen.'],
 
     // Legenden
-    'first_legend' => 'Titel',
-    'course_legend' => 'Veranstaltungsdaten',
+    'title_legend' => 'Titel',
+    'time_legend' => 'Veranstaltungsdaten',
     'details_legend' => 'Details',
     'publish_legend' => 'Veröffentlichung',
 
     // Buttons/Operationen (optional)
     'schedule' => ['Zeitplan', 'Zeitplan der Veranstaltung bearbeiten'],
 ];
+

@@ -26,4 +26,5 @@ $GLOBALS['TL_LANG']['MSC']['dc_student_courses'] = [
     'dateBrevet' => 'Brevet on',
     'dateStart' => 'Start',
     'dateEnd' => 'End',
+    'view_progress' => 'Show progress',
 ];

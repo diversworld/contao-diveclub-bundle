@@ -1,8 +1,9 @@
 <?php
 
-$GLOBALS['TL_LANG']['tl_dc_course_students']['course_legend'] = "Kurs";
-$GLOBALS['TL_LANG']['tl_dc_course_students']['status_legend'] = "Status";
-$GLOBALS['TL_LANG']['tl_dc_course_students']['publish_legend'] = "Veröffentlichen";
+$GLOBALS['TL_LANG']['tl_dc_course_modules']['title_legend'] = "Modul";
+$GLOBALS['TL_LANG']['tl_dc_course_modules']['details_legend'] = "Details";
+$GLOBALS['TL_LANG']['tl_dc_course_modules']['prerequisite_legend'] = "Voraussetzungen";
+$GLOBALS['TL_LANG']['tl_dc_course_modules']['publish_legend'] = "Veröffentlichen";
 
 $GLOBALS['TL_LANG']['tl_dc_course_modules']['exercises'] = ['Übungen', 'Übungen, die im Kursmodul enthalten sind'];
 
@@ -25,3 +26,4 @@ $GLOBALS['TL_LANG']['tl_dc_course_modules']['stop'] = ['Enddatum', 'Geben Sie ei
 
 $GLOBALS['TL_LANG']['tl_dc_course_modules']['prerequisites'] = ['Voraussetzungen', 'Gebe an, welche Voraussetzungen für die Absolvierung des Moduls erfüllt sein müssen.'];
 $GLOBALS['TL_LANG']['tl_dc_course_modules']['preModule'] = ['Vorbedingung (Modul)', 'Wähle die Übung aus, die vor diesem Modul erfolgreich abgeschlossen sein muss.'];
+

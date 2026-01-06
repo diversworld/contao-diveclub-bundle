@@ -17,6 +17,7 @@ declare(strict_types=1);
  */
 $GLOBALS['TL_LANG']['tl_dc_divecourse']['first_legend'] = "Basis Einstellungen";
 $GLOBALS['TL_LANG']['tl_dc_divecourse']['details_section'] = "Kursdetails";
+$GLOBALS['TL_LANG']['tl_dc_divecourse']['requirenment_section'] = "Requirements";
 $GLOBALS['TL_LANG']['tl_dc_divecourse']['image_legend'] = "Bild Einstellungen";
 $GLOBALS['TL_LANG']['tl_dc_divecourse']['publish_legend'] = "Veröffentlichen";
 /**

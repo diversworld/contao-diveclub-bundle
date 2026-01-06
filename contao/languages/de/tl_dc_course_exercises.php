@@ -2,6 +2,7 @@
 
 $GLOBALS['TL_LANG']['tl_dc_course_exercises']['title_legend'] = "Übumg";
 $GLOBALS['TL_LANG']['tl_dc_course_exercises']['detail_legend'] = "Details";
+$GLOBALS['TL_LANG']['tl_dc_course_exercises']['notes_legend'] = "Bemerkungen";
 $GLOBALS['TL_LANG']['tl_dc_course_exercises']['publish_legend'] = "Veröffentlichen";
 
 $GLOBALS['TL_LANG']['tl_dc_course_exercises']['student_exercises'] = ['Übungen', 'Übungen, die der Schüler für diesen Kurs bearbeitet hat'];

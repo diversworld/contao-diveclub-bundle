@@ -60,7 +60,8 @@ $GLOBALS['TL_DCA']['tl_dc_course_exercises'] = [
 
     'palettes' => [
         'default' => '{title_legend},title,alias;
-                      {detail_legend},description,required,duration,notes;
+                      {detail_legend},description,required,duration;
+                      {notes_legend},notes;
                       {publish_legend},published,start,stop'
     ],
 

@@ -84,8 +84,9 @@ $GLOBALS['TL_DCA']['tl_dc_dive_course'] = [
     'palettes' => [
         '__selector__' => ['addImage', 'overwriteMeta'],
         'default' => '{first_legend},title,alias;
-                      {course_legend},course_type,dateStart,dateEnd,instructor,max_participants,price;
-                      {details_section},category,description,requirements;
+                      {course_legend},course_type;
+                      {details_section},category,description;
+                      {requirenment_section},requirements;
                       {image_legend},addImage;
                       {publish_legend},published,start,stop;'
     ],

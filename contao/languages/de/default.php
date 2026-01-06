@@ -41,6 +41,7 @@ $GLOBALS['TL_LANG']['MSC']['dc_student_courses'] = [
     'dateBrevet' => 'Brevet am',
     'dateStart' => 'Beginn',
     'dateEnd' => 'Ende',
+    'view_progress' => 'Kursfortschritt anzeigen',
 ];
 
 // Frontend-Labels: Anmeldung Kursveranstaltung (Gast-Formular)

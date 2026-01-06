@@ -67,7 +67,8 @@ $GLOBALS['TL_DCA']['tl_dc_course_modules'] = [
     'palettes' => [
         '__selector__' => [],
         'default' => '{title_legend},title,alias;
-                      {details_legend},shortcode,mandatory,preModule,description,prerequisites;
+                      {details_legend},shortcode,mandatory,preModule,description;
+                      {prerequisite_legend},prerequisites;
                       {publish_legend},published,start,stop'
     ],
     'fields' => [
@@ -125,7 +126,7 @@ $GLOBALS['TL_DCA']['tl_dc_course_modules'] = [
             'sql' => "text NULL",
         ],
         'prerequisites' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['description'],
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['prerequisites'],
             'inputType' => 'textarea',
             'eval' => ['rte' => 'tinyMCE', 'tl_class' => 'clr'],
             'sql' => "text NULL",

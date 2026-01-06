@@ -1,6 +1,7 @@
 <?php
 
 $GLOBALS['TL_LANG']['tl_dc_course_event_schedule'] = [
+    //Felder
     'module_id' => ['Modul', 'Zugehöriges Kursmodul.'],
     'exercise_id' => ['Übung', 'Zugehörige Übung innerhalb des Moduls.'],
     'planned_at' => ['Geplant am/um', 'Datum und Uhrzeit, wann die Übung stattfinden soll.'],
@@ -11,7 +12,7 @@ $GLOBALS['TL_LANG']['tl_dc_course_event_schedule'] = [
     'stop' => ['Anzeigen bis', 'Den Termin nur bis zu diesem Zeitpunkt anzeigen.'],
 
     // Legenden
-    'title_legend' => 'Zuweisungen',
-    'details_legend' => 'Details',
+    'plan_legend' => 'Planung',
+    'notes_legend' => 'Details',
     'publish_legend' => 'Veröffentlichung',
 ];
