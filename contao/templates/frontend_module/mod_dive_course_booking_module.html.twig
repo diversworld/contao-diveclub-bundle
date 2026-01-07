@@ -5,31 +5,39 @@ Erwartete Variablen: formAction (optional), items (optional)
 {% extends "@Contao/frontend_module/_base.html.twig" %}
 
 {% block content %}
-    <div class="dc-booking-module">
-        <form method="post" action="{{ formAction|default('') }}" enctype="application/x-www-form-urlencoded"
-              class="dc-booking-form">
-            <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
-            <input type="hidden" name="FORM_SUBMIT" value="dc_booking_submit">
+    {% set container_attributes = attrs().addClass('dc-booking-module').mergeWith(container_attributes|default) %}
+    <div{{ container_attributes }}>
+        {% block booking_form %}
+            {% set form_attributes = attrs().addClass('dc-booking-form').mergeWith(form_attributes|default) %}
+            <form method="post" action="{{ formAction|default('') }}" enctype="application/x-www-form-urlencoded"{{ form_attributes }}>
+                <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
+                <input type="hidden" name="FORM_SUBMIT" value="dc_booking_submit">
 
-            {% block booking_fields %}
-                {# Platzhalter für Felder – kann im Child-Template überschrieben werden #}
-                {% if items is defined and items|length %}
-                    <ul class="dc-booking-items">
-                        {% for it in items %}
-                            <li>
-                                <label>
-                                    <input type="checkbox" name="items[]" value="{{ it.id }}">
-                                    {{ it.title|default(it.name|default('')) }}
-                                </label>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            {% endblock %}
+                {% block booking_fields %}
+                    {# Platzhalter für Felder – kann im Child-Template überschrieben werden #}
+                    {% if items is defined and items|length %}
+                        {% set list_attributes = attrs().addClass('dc-booking-items').mergeWith(list_attributes|default) %}
+                        <ul{{ list_attributes }}>
+                            {% for it in items %}
+                                {% block booking_item %}
+                                    <li>
+                                        <label>
+                                            <input type="checkbox" name="items[]" value="{{ it.id }}">
+                                            {{ it.title|default(it.name|default('')) }}
+                                        </label>
+                                    </li>
+                                {% endblock %}
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endblock %}
 
-            <div class="submit-container">
-                <button type="submit">Absenden</button>
-            </div>
-        </form>
+                {% block booking_submit %}
+                    <div class="submit-container">
+                        <button type="submit">Absenden</button>
+                    </div>
+                {% endblock %}
+            </form>
+        {% endblock %}
     </div>
 {% endblock %}

@@ -5,19 +5,27 @@ Erwartete Variablen: formAction (optional), assignmentId (optional)
 {% extends "@Contao/frontend_module/_base.html.twig" %}
 
 {% block content %}
-    <div class="dc-booking-unsubscribe">
-        <form method="post" action="{{ formAction|default('') }}" enctype="application/x-www-form-urlencoded"
-              class="dc-unsubscribe-form">
-            <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
-            <input type="hidden" name="FORM_SUBMIT" value="dc_booking_unsubscribe">
-            {% if assignmentId is defined %}
-                <input type="hidden" name="assignment" value="{{ assignmentId }}">
-            {% endif %}
+    {% set container_attributes = attrs().addClass('dc-booking-unsubscribe').mergeWith(container_attributes|default) %}
+    <div{{ container_attributes }}>
+        {% block unsubscribe_form %}
+            {% set form_attributes = attrs().addClass('dc-unsubscribe-form').mergeWith(form_attributes|default) %}
+            <form method="post" action="{{ formAction|default('') }}" enctype="application/x-www-form-urlencoded"{{ form_attributes }}>
+                <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
+                <input type="hidden" name="FORM_SUBMIT" value="dc_booking_unsubscribe">
+                {% if assignmentId is defined %}
+                    <input type="hidden" name="assignment" value="{{ assignmentId }}">
+                {% endif %}
 
-            <p>Möchten Sie die Buchung wirklich stornieren?</p>
-            <div class="submit-container">
-                <button type="submit">Stornieren</button>
-            </div>
-        </form>
+                {% block unsubscribe_message %}
+                    <p>Möchten Sie die Buchung wirklich stornieren?</p>
+                {% endblock %}
+
+                {% block unsubscribe_submit %}
+                    <div class="submit-container">
+                        <button type="submit">Stornieren</button>
+                    </div>
+                {% endblock %}
+            </form>
+        {% endblock %}
     </div>
 {% endblock %}

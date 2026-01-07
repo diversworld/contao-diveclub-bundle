@@ -5,30 +5,45 @@ Erwartete Variablen: items (Array), optional headline, description.
 {% extends "@Contao/frontend_module/_base.html.twig" %}
 
 {% block content %}
-    <div class="dc-generic-listing">
-        {% if headline is defined and headline %}
-            <h2>{{ headline }}</h2>
-        {% endif %}
+    {% set container_attributes = attrs().addClass('dc-generic-listing').mergeWith(container_attributes|default) %}
+    <div{{ container_attributes }}>
+        {% block listing_header %}
+            {% if headline is defined and headline %}
+                <h2>{{ headline }}</h2>
+            {% endif %}
 
-        {% if description is defined and description %}
-            <div class="listing-description">{{ description|raw }}</div>
-        {% endif %}
+            {% if description is defined and description %}
+                <div class="listing-description">{{ description|raw }}</div>
+            {% endif %}
+        {% endblock %}
 
-        {% if items is defined and items|length %}
-            <ul class="dc-items">
-                {% for it in items %}
-                    <li class="dc-item">
-                        <strong>{{ it.title|default(it.name|default('')) }}</strong>
-                        {% if it.teaser is defined and it.teaser %}
-                            <div class="teaser">{{ it.teaser|raw }}</div>
-                        {% elseif it.description is defined and it.description %}
-                            <div class="description">{{ it.description|raw }}</div>
-                        {% endif %}
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>Keine Einträge vorhanden.</p>
-        {% endif %}
+        {% block listing_items %}
+            {% if items is defined and items|length %}
+                {% set list_attributes = attrs().addClass('dc-items').mergeWith(list_attributes|default) %}
+                <ul{{ list_attributes }}>
+                    {% for it in items %}
+                        {% block listing_item %}
+                            {% set item_attributes = attrs().addClass('dc-item').mergeWith(item_attributes|default) %}
+                            <li{{ item_attributes }}>
+                                {% block item_title %}
+                                    <strong>{{ it.title|default(it.name|default('')) }}</strong>
+                                {% endblock %}
+                                {% block item_content %}
+                                    {% if it.teaser is defined and it.teaser %}
+                                        <div class="teaser">{{ it.teaser|raw }}</div>
+                                    {% elseif it.description is defined and it.description %}
+                                        <div class="description">{{ it.description|raw }}</div>
+                                    {% endif %}
+                                {% endblock %}
+                            </li>
+                        {% endblock %}
+                    {% endfor %}
+                </ul>
+            {% else %}
+                {% block no_items %}
+                    <p>Keine Einträge vorhanden.</p>
+                {% endblock %}
+            {% endif %}
+        {% endblock %}
     </div>
 {% endblock %}

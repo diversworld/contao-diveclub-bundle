@@ -6,20 +6,33 @@ Da die alte .html5-Version nicht bekannt ist, wird eine generische Ausgabe verwe
 {% extends "@Contao/frontend_module/_base.html.twig" %}
 
 {% block content %}
-    <div class="dc-equipment-listing">
-        {% if items is defined and items|length %}
-            <ul class="equipment-items">
-                {% for item in items %}
-                    <li class="equipment-item">
-                        <strong>{{ item.title|default(item.name|default('')) }}</strong>
-                        {% if item.description is defined and item.description %}
-                            <div class="description">{{ item.description|raw }}</div>
-                        {% endif %}
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>Keine Ausrüstung gefunden.</p>
-        {% endif %}
+    {% set container_attributes = attrs().addClass('dc-equipment-listing').mergeWith(container_attributes|default) %}
+    <div{{ container_attributes }}>
+        {% block listing_items %}
+            {% if items is defined and items|length %}
+                {% set list_attributes = attrs().addClass('equipment-items').mergeWith(list_attributes|default) %}
+                <ul{{ list_attributes }}>
+                    {% for item in items %}
+                        {% block listing_item %}
+                            {% set item_attributes = attrs().addClass('equipment-item').mergeWith(item_attributes|default) %}
+                            <li{{ item_attributes }}>
+                                {% block item_title %}
+                                    <strong>{{ item.title|default(item.name|default('')) }}</strong>
+                                {% endblock %}
+                                {% block item_description %}
+                                    {% if item.description is defined and item.description %}
+                                        <div class="description">{{ item.description|raw }}</div>
+                                    {% endif %}
+                                {% endblock %}
+                            </li>
+                        {% endblock %}
+                    {% endfor %}
+                </ul>
+            {% else %}
+                {% block no_items %}
+                    <p>Keine Ausrüstung gefunden.</p>
+                {% endblock %}
+            {% endif %}
+        {% endblock %}
     </div>
 {% endblock %}

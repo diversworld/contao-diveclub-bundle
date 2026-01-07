@@ -5,24 +5,37 @@ Erwartete Variablen: tanks (Array) oder items
 {% extends "@Contao/frontend_module/_base.html.twig" %}
 
 {% block content %}
-    <div class="dc-tanks-listing">
+    {% set container_attributes = attrs().addClass('dc-tanks-listing').mergeWith(container_attributes|default) %}
+    <div{{ container_attributes }}>
         {% set list = tanks is defined ? tanks : (items is defined ? items : []) %}
-        {% if list|length %}
-            <ul class="dc-tanks">
-                {% for t in list %}
-                    <li class="dc-tank">
-                        <strong>{{ t.title|default(t.name|default('')) }}</strong>
-                        {% if t.volume is defined %}
-                            <span class="volume">{{ t.volume }}</span>
-                        {% endif %}
-                        {% if t.description is defined and t.description %}
-                            <div class="description">{{ t.description|raw }}</div>
-                        {% endif %}
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>Keine Tauchgeräte gefunden.</p>
-        {% endif %}
+        {% block tanks_list %}
+            {% if list|length %}
+                {% set list_attributes = attrs().addClass('dc-tanks').mergeWith(list_attributes|default) %}
+                <ul{{ list_attributes }}>
+                    {% for t in list %}
+                        {% block tank_item %}
+                            {% set item_attributes = attrs().addClass('dc-tank').mergeWith(item_attributes|default) %}
+                            <li{{ item_attributes }}>
+                                {% block tank_title %}
+                                    <strong>{{ t.title|default(t.name|default('')) }}</strong>
+                                {% endblock %}
+                                {% block tank_details %}
+                                    {% if t.volume is defined %}
+                                        <span class="volume">{{ t.volume }}</span>
+                                    {% endif %}
+                                    {% if t.description is defined and t.description %}
+                                        <div class="description">{{ t.description|raw }}</div>
+                                    {% endif %}
+                                {% endblock %}
+                            </li>
+                        {% endblock %}
+                    {% endfor %}
+                </ul>
+            {% else %}
+                {% block no_tanks %}
+                    <p>Keine Tauchgeräte gefunden.</p>
+                {% endblock %}
+            {% endif %}
+        {% endblock %}
     </div>
 {% endblock %}

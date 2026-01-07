@@ -9,40 +9,60 @@ Erwartete Template-Variablen:
 {% extends "@Contao/frontend_module/_base.html.twig" %}
 
 {% block content %}
-    <div class="dc-events-list">
+    {% set container_attributes = attrs().addClass('dc-events-list').mergeWith(container_attributes|default) %}
+    <div{{ container_attributes }}>
         {% if not hasEvents %}
-            <p>Aktuell sind keine Kursveranstaltungen veröffentlicht.</p>
+            {% block no_events %}
+                <p>Aktuell sind keine Kursveranstaltungen veröffentlicht.</p>
+            {% endblock %}
         {% else %}
-            {% if not hasJumpTo %}
-                <p class="error">Hinweis: In der Modulkonfiguration ist keine Ziel-Seite (Event-Reader) ausgewählt.
-                    Links
-                    können nicht erzeugt werden.</p>
-            {% endif %}
-            <ul class="events">
-                {% for ev in events %}
-                    <li class="event">
-                        <h3>{{ ev.title }}</h3>
-                        <p>
-                            {% if ev.dateStart %}
-                                <strong>Beginn:</strong> {{ ev.dateStart }}
-                            {% endif %}
-                            {% if ev.dateEnd %}
-                                &nbsp;–&nbsp;<strong>Ende:</strong> {{ ev.dateEnd }}
-                            {% endif %}
-                        </p>
-                        {% if ev.price %}
-                            <p><strong>Preis:</strong> {{ ev.price }}</p>
-                        {% endif %}
-                        <p>
-                            {% if ev.url %}
-                                <a href="{{ ev.url }}">Details &amp; Anmeldung</a>
-                            {% else %}
-                                <span class="muted">Details &amp; Anmeldung (nicht verfügbar)</span>
-                            {% endif %}
-                        </p>
-                    </li>
-                {% endfor %}
-            </ul>
+            {% block events_warning %}
+                {% if not hasJumpTo %}
+                    <p class="error">Hinweis: In der Modulkonfiguration ist keine Ziel-Seite (Event-Reader) ausgewählt.
+                        Links
+                        können nicht erzeugt werden.</p>
+                {% endif %}
+            {% endblock %}
+
+            {% block events_list %}
+                {% set list_attributes = attrs().addClass('events').mergeWith(list_attributes|default) %}
+                <ul{{ list_attributes }}>
+                    {% for ev in events %}
+                        {% block event_item %}
+                            {% set item_attributes = attrs().addClass('event').mergeWith(item_attributes|default) %}
+                            <li{{ item_attributes }}>
+                                {% block event_title %}
+                                    <h3>{{ ev.title }}</h3>
+                                {% endblock %}
+
+                                {% block event_details %}
+                                    <p>
+                                        {% if ev.dateStart %}
+                                            <strong>Beginn:</strong> {{ ev.dateStart }}
+                                        {% endif %}
+                                        {% if ev.dateEnd %}
+                                            &nbsp;–&nbsp;<strong>Ende:</strong> {{ ev.dateEnd }}
+                                        {% endif %}
+                                    </p>
+                                    {% if ev.price %}
+                                        <p><strong>Preis:</strong> {{ ev.price }}</p>
+                                    {% endif %}
+                                {% endblock %}
+
+                                {% block event_link %}
+                                    <p>
+                                        {% if ev.url %}
+                                            <a href="{{ ev.url }}">Details &amp; Anmeldung</a>
+                                        {% else %}
+                                            <span class="muted">Details &amp; Anmeldung (nicht verfügbar)</span>
+                                        {% endif %}
+                                    </p>
+                                {% endblock %}
+                            </li>
+                        {% endblock %}
+                    {% endfor %}
+                </ul>
+            {% endblock %}
         {% endif %}
     </div>
 {% endblock %}
