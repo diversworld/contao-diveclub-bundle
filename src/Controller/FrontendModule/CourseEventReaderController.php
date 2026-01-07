@@ -68,8 +68,8 @@ class CourseEventReaderController extends AbstractFrontendModuleController
             'id' => (int)$event->id,
             'title' => (string)$event->title,
             'alias' => (string)$event->alias,
-            'dateStart' => $event->dateStart ? Date::parse($dateFormat, (int)strtotime((string)$event->dateStart)) : '',
-            'dateEnd' => $event->dateEnd ? Date::parse($dateFormat, (int)strtotime((string)$event->dateEnd)) : '',
+            'dateStart' => $event->dateStart ? Date::parse($dateFormat, (int)$event->dateStart) : '',
+            'dateEnd' => $event->dateEnd ? Date::parse($dateFormat, (int)$event->dateEnd) : '',
             'price' => (string)$event->price,
             'instructor' => (string)$event->instructor,
             'description' => (string)$event->description,
@@ -92,7 +92,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
         $rows = [];
         foreach ($schedule as $row) {
             $rows[] = [
-                'planned_at' => $row['planned_at'] ? Date::parse($dateFormat, (int)strtotime((string)$row['planned_at'])) : '',
+                'planned_at' => $row['planned_at'] ? Date::parse($dateFormat, (int)$row['planned_at']) : '',
                 'location' => (string)$row['location'],
                 'notes' => (string)$row['notes'],
                 'module' => (string)$row['module_title'],

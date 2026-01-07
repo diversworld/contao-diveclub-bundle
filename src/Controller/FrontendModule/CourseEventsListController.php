@@ -61,8 +61,8 @@ class CourseEventsListController extends AbstractFrontendModuleController
                     'id' => (int)$event->id,
                     'title' => (string)$event->title,
                     'alias' => (string)$event->alias,
-                    'dateStart' => $event->dateStart ? Date::parse($dateFormat, (int)strtotime((string)$event->dateStart)) : '',
-                    'dateEnd' => $event->dateEnd ? Date::parse($dateFormat, (int)strtotime((string)$event->dateEnd)) : '',
+                    'dateStart' => $event->dateStart ? Date::parse($dateFormat, (int)$event->dateStart) : '',
+                    'dateEnd' => $event->dateEnd ? Date::parse($dateFormat, (int)$event->dateEnd) : '',
                     'price' => (string)$event->price,
                     'url' => $detailUrl,
                 ];

@@ -10,7 +10,9 @@ declare(strict_types=1);
 use Contao\Backend;
 use Contao\Database;
 use Contao\DataContainer;
+use Contao\Date;
 use Contao\DC_Table;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseEventLabelListener;
 
 $GLOBALS['TL_DCA']['tl_dc_course_event'] = [
     'config' => [
@@ -38,8 +40,9 @@ $GLOBALS['TL_DCA']['tl_dc_course_event'] = [
             'panelLayout' => 'sort,filter;search,limit',
         ],
         'label' => [
-            'fields' => ['title', 'course_id'],
-            'format' => '%s <span style="color:#999;">[Kurs‑Vorlage: %s]</span>',
+            'fields' => ['title', 'dateStart', 'course_id'],
+            'format' => '%s <span style="color:#999;">(%s) [Kurs‑Vorlage: %s]</span>',
+            'label_callback' => [CourseEventLabelListener::class, '__invoke']
         ],
         'global_operations' => [
             'all' => [

@@ -7,8 +7,11 @@ declare(strict_types=1);
  * Zeitplan‑Einträge (geplante Übungen) pro Kursveranstaltung
  */
 
+use Contao\Config;
 use Contao\DataContainer;
+use Contao\Date;
 use Contao\DC_Table;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ScheduleLabelListener;
 
 $GLOBALS['TL_DCA']['tl_dc_course_event_schedule'] = [
     'config' => [
@@ -32,12 +35,14 @@ $GLOBALS['TL_DCA']['tl_dc_course_event_schedule'] = [
             'mode' => DataContainer::MODE_PARENT,
             'fields' => ['planned_at', 'module_id', 'exercise_id'],
             'headerFields' => ['title', 'dateStart', 'dateEnd'],
-            'flag' => DataContainer::SORT_DAY_ASC,
+            'flag' => DataContainer::SORT_MONTH_ASC,
             'panelLayout' => 'sort,filter;search,limit',
+            'disableGrouping' => true,
         ],
         'label' => [
             'fields' => ['planned_at', 'module_id', 'exercise_id'],
             'format' => '%s — Modul: %s — Übung: %s',
+            'label_callback' => [ScheduleLabelListener::class, '__invoke']
         ],
         'global_operations' => [
             'all' => [
@@ -120,3 +125,4 @@ $GLOBALS['TL_DCA']['tl_dc_course_event_schedule'] = [
         ],
     ],
 ];
+

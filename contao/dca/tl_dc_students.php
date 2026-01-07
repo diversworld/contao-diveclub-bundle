@@ -9,8 +9,10 @@ declare(strict_types=1);
 
 use Contao\Backend;
 use Contao\DataContainer;
+use Contao\Date;
 use Contao\DC_Table;
 use Contao\System;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\StudentLabelListener;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\StudentSyncCallback;
 
 $GLOBALS['TL_DCA']['tl_dc_students'] = [
@@ -42,6 +44,7 @@ $GLOBALS['TL_DCA']['tl_dc_students'] = [
         'label' => [
             'fields' => ['lastname', 'firstname', 'dateOfBirth', 'phone', 'email'],
             'format' => '%s, %s <span style="color:#b3b3b3; padding-left:8px;">%s</span>, %s, %s',
+            'label_callback' => [StudentLabelListener::class, '__invoke']
         ],
         'global_operations' => [
             'all' => [
@@ -233,7 +236,3 @@ $GLOBALS['TL_DCA']['tl_dc_students'] = [
     ],
 ];
 
-class tl_dc_students extends Backend
-{
-
-}

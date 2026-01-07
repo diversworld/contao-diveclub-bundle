@@ -124,9 +124,9 @@ class CourseProgressController extends AbstractFrontendModuleController
                 $logger->info('CourseProgressController: Fixed missing course_id from event. New Course ID: ' . $assignmentRow['course_id']);
 
                 // Titel auch aktualisieren für die Anzeige
-                $courseTitle = $db->prepare("SELECT title FROM tl_dc_dive_course WHERE id=?")->execute($assignmentRow['course_id'])->fetchOne();
-                if ($courseTitle) {
-                    $assignmentRow['course_title'] = $courseTitle;
+                $courseTitleResult = $db->prepare("SELECT title FROM tl_dc_dive_course WHERE id=?")->execute($assignmentRow['course_id']);
+                if ($courseTitleResult->numRows > 0) {
+                    $assignmentRow['course_title'] = $courseTitleResult->title;
                 }
             } else {
                 $logger->warning('CourseProgressController: Event ID ' . $assignmentRow['event_id'] . ' not found for fixing course_id.');
@@ -248,7 +248,7 @@ class CourseProgressController extends AbstractFrontendModuleController
 
             while ($rows->next()) {
                 $schedule[] = [
-                    'planned_at' => $rows->planned_at ? Date::parse($dateFormat, (int)strtotime((string)$rows->planned_at)) : '',
+                    'planned_at' => $rows->planned_at ? Date::parse($dateFormat, (int)$rows->planned_at) : '',
                     'location' => (string)$rows->location,
                     'notes' => (string)$rows->notes,
                     'module' => (string)$rows->module_title,

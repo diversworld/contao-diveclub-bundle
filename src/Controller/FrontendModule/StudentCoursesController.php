@@ -94,7 +94,7 @@ class StudentCoursesController extends AbstractFrontendModuleController
         $datimFormat = Config::get('datimFormat');
 
         $formatTs = static function ($value, string $format): string {
-            if ($value === null || $value === '') {
+            if ($value === null || $value === '' || $value === 0 || $value === '0') {
                 return '';
             }
 
@@ -103,10 +103,14 @@ class StudentCoursesController extends AbstractFrontendModuleController
                 $ts = (int)$value;
             } else {
                 $parsed = strtotime((string)$value);
-                if ($parsed === false) {
+                if ($parsed === false || $parsed <= 0) {
                     return (string)$value; // Fallback: Originalwert
                 }
                 $ts = $parsed;
+            }
+
+            if ($ts <= 0) {
+                return '';
             }
 
             return Date::parse($format, $ts);
