@@ -14,6 +14,7 @@ $GLOBALS['TL_LANG']['tl_dc_students']['copy'] = ['Schüler duplizieren', 'Schül
 $GLOBALS['TL_LANG']['tl_dc_students']['delete'] = ['Schüler löschen', 'Schüler ID %s löschen'];
 $GLOBALS['TL_LANG']['tl_dc_students']['show'] = ['Schülerdetails', 'Details des Schülers ID %s anzeigen'];
 
+$GLOBALS['TL_LANG']['tl_dc_students']['memberId'] = ['Bestehendes Mitglied', 'Wählen Sie ein bestehendes Mitglied aus, um dessen Daten zu übernehmen.'];
 $GLOBALS['TL_LANG']['tl_dc_students']['firstname'] = ['Vorname', 'Vorname des Schülers'];
 $GLOBALS['TL_LANG']['tl_dc_course_modules']['alias'] = ['Alias', 'Der Alias ist eine eindeutige Referenz, die anstelle der numerischen ID aufgerufen werden kann.'];
 $GLOBALS['TL_LANG']['tl_dc_students']['lastname'] = ['Nachname', 'Nachname des Schülers'];

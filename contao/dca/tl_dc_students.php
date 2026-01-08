@@ -13,6 +13,7 @@ use Contao\Date;
 use Contao\DC_Table;
 use Contao\System;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\StudentLabelListener;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\StudentLoadMemberDataCallback;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\StudentSyncCallback;
 
 $GLOBALS['TL_DCA']['tl_dc_students'] = [
@@ -20,6 +21,9 @@ $GLOBALS['TL_DCA']['tl_dc_students'] = [
         'dataContainer' => DC_Table::class,
         'ctable' => ['tl_dc_course_students'],
         'enableVersioning' => true,
+        'onload_callback' => [
+            [StudentLoadMemberDataCallback::class, '__invoke']
+        ],
         'onsubmit_callback' => [
             [StudentSyncCallback::class, '__invoke']
         ],
@@ -72,7 +76,7 @@ $GLOBALS['TL_DCA']['tl_dc_students'] = [
     ],
     'palettes' => [
         '__selector__' => ['allowLogin'],
-        'default' => '{personal_legend},firstname,lastname,dateOfBirth,gender,language;
+        'default' => '{personal_legend},memberId,firstname,lastname,dateOfBirth,gender,language;
                       {contact_legend},street,postal,city,state,country,email,phone,mobile;
                       {medical_legend},medical_ok,notes;
                       {login_legend},allowLogin;
@@ -209,6 +213,12 @@ $GLOBALS['TL_DCA']['tl_dc_students'] = [
             'sql' => "blob NULL"
         ],
         'memberId' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_students']['memberId'],
+            'exclude' => true,
+            'search' => true,
+            'inputType' => 'select',
+            'foreignKey' => "tl_member.CONCAT(firstname, ' ', lastname)",
+            'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50', 'submitOnChange' => true],
             'sql' => "int(10) unsigned NOT NULL default 0"
         ],
         'notes' => [

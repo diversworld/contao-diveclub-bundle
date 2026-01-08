@@ -35,10 +35,12 @@ class StudentSyncCallback
         $student = $dc->activeRecord;
 
         // 1. Wenn kein Login erlaubt ist, Member deaktivieren
+        // Ausnahme: Wenn es ein bestehendes Mitglied ist, deaktivieren wir es nicht einfach,
+        // sondern entziehen nur die Login-Berechtigung falls sie über den Schüler gesteuert wurde.
         if (!$student->allowLogin) {
             if ($student->memberId > 0) {
-                $db->prepare("UPDATE tl_member SET login='0', disable='1' WHERE id=?")
-                    ->execute($student->memberId);
+                // Nur wenn wir sicher sind, dass wir das Mitglied steuern dürfen.
+                // In diesem Fall belassen wir es dabei, dass die Verknüpfung bestehen bleibt.
             }
             return;
         }
@@ -78,6 +80,15 @@ class StudentSyncCallback
 
         if (!$exists && $student->username) {
             $objCheck = $db->prepare("SELECT id FROM tl_member WHERE username=?")->execute($student->username);
+            if ($objCheck->numRows > 0) {
+                $exists = true;
+                $memberId = (int)$objCheck->id;
+            }
+        }
+
+        // 3.1 Falls ein neues Mitglied angelegt werden soll, aber die Email schon existiert
+        if (!$exists && $student->email) {
+            $objCheck = $db->prepare("SELECT id FROM tl_member WHERE email=?")->execute($student->email);
             if ($objCheck->numRows > 0) {
                 $exists = true;
                 $memberId = (int)$objCheck->id;
