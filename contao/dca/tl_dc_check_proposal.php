@@ -27,7 +27,7 @@ use Diversworld\ContaoDiveclubBundle\DataContainer\DcCheckProposal;
 $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
     'config' => [
         'dataContainer' => DC_Table::class,
-        'ctable' => ['tl_dc_check_articles'],
+        'ctable' => ['tl_dc_check_articles', 'tl_dc_check_order'],
         'enableVersioning' => true,
         'sql' => [
             'keys' => [
@@ -59,6 +59,11 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
         'operations' => [
             'edit',
             'children',
+            'orders' => [
+                'href' => 'table=tl_dc_check_order',
+                'icon' => 'bundles/diversworldcontaodiveclub/icons/order.svg', // Icon muss ggf. noch erstellt werden
+                'label' => &$GLOBALS['TL_LANG']['tl_dc_check_proposal']['orders'],
+            ],
             'copy',
             'delete',
             'show',

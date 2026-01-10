@@ -8,10 +8,6 @@ Erwartete Variablen: items (Array), optional headline, description.
     {% set container_attributes = attrs().addClass('dc-generic-listing').mergeWith(container_attributes|default) %}
     <div{{ container_attributes }}>
         {% block listing_header %}
-            {% if headline is defined and headline %}
-                <h2>{{ headline }}</h2>
-            {% endif %}
-
             {% if description is defined and description %}
                 <div class="listing-description">{{ description|raw }}</div>
             {% endif %}

@@ -63,3 +63,35 @@ $GLOBALS['TL_LANG']['MSC']['dc_event_signup'] = [
     'err_privacy' => 'Bitte akzeptieren Sie die Datenschutzbestimmungen.',
     'err_general' => 'Ihre Anmeldung konnte nicht verarbeitet werden.'
 ];
+
+// Frontend-Labels: Tank Check
+$GLOBALS['TL_LANG']['MSC']['dc_tank_check'] = [
+    'booking_headline' => 'Prüfung buchen für Angebot: %s',
+    'contact_data' => 'Ihre Kontaktdaten',
+    'logged_in_member' => 'Angemeldetes Mitglied:',
+    'firstname' => 'Vorname',
+    'lastname' => 'Nachname',
+    'email' => 'E-Mail',
+    'phone' => 'Telefon',
+    'tank_details' => 'Angaben zur Flasche',
+    'select_tank' => 'Ihre Flasche wählen',
+    'please_select' => '-- Bitte wählen --',
+    'serial_number' => 'Seriennummer',
+    'manufacturer' => 'Hersteller',
+    'baz_number' => 'BAZ-Nummer',
+    'tank_size' => 'Flaschengröße (für Preisberechnung)',
+    'other_tank_data' => 'Sonstige Angaben zur Flasche',
+    'o2_clean' => 'O2-clean',
+    'additional_articles' => 'Zusätzliche Artikel/Leistungen',
+    'notes' => 'Anmerkungen',
+    'total_price' => 'Gesamtpreis',
+    'submit_booking' => 'Jetzt verbindlich buchen',
+    'success_msg' => 'Vielen Dank! Ihre Buchung für <strong>%s €</strong> wurde erfolgreich gespeichert.',
+    'back_to_list' => 'Zurück zur Übersicht',
+    'cancel' => 'Abbrechen',
+    'no_proposals' => 'Keine aktuellen Prüfungstermine verfügbar.',
+    'event_date' => 'Termin: %s',
+    'proposal_date' => 'Datum: %s',
+    'vendor' => 'Prüfer',
+    'book_now' => 'Prüfung jetzt buchen'
+];

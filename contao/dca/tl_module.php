@@ -26,15 +26,32 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['dc_course_progress'] =
 // Liste der Kursveranstaltungen
 $GLOBALS['TL_DCA']['tl_module']['palettes']['dc_course_events_list'] =
     '{title_legend},name,headline,type;' .
-    '{redirect_legend},jumpTo;' .
+    '{config_legend},jumpTo,tankCheckJumpTo,showTankChecks;' .
     '{template_legend:hide},customTpl;' .
     '{protected_legend:hide},protected;' .
     '{expert_legend:hide},guests,cssID';
 
+// Felder für die Kursliste
+$GLOBALS['TL_DCA']['tl_module']['fields']['showTankChecks'] = [
+    'exclude'   => true,
+    'inputType' => 'checkbox',
+    'eval'      => ['tl_class' => 'w50 m12'],
+    'sql'       => "char(1) NOT NULL default ''"
+];
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['tankCheckJumpTo'] = [
+    'exclude'                 => true,
+    'inputType'               => 'pageTree',
+    'foreignKey'              => 'tl_page.title',
+    'eval'                    => ['mandatory' => false, 'fieldType' => 'radio', 'tl_class' => 'clr'],
+    'sql'                     => "int(10) unsigned NOT NULL default 0",
+    'relation'                => ['type' => 'hasOne', 'load' => 'lazy']
+];
+
 // Reader einer Kursveranstaltung
 $GLOBALS['TL_DCA']['tl_module']['palettes']['dc_course_event_reader'] =
     '{title_legend},name,headline,type;' .
-    '{redirect_legend},jumpTo;' .
+    '{config_legend},jumpTo,tankCheckJumpTo,showTankChecks;' .
     '{template_legend:hide},customTpl;' .
     '{protected_legend:hide},protected;' .
     '{expert_legend:hide},guests,cssID';
@@ -44,6 +61,7 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['dc_booking'] =
     '{template_legend:hide},customTpl;' .
     '{protected_legend:hide},protected;' .
     '{expert_legend:hide},guests,cssID';
+
 $GLOBALS['TL_DCA']['tl_module']['palettes']['dc_listing'] =
     '{title_legend},name,headline,type;' .
     '{template_legend:hide},customTpl;' .
@@ -62,6 +80,34 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['dc_tanks_listing'] =
     '{protected_legend:hide},protected;' .
     '{expert_legend:hide},guests,cssID';
 
+$GLOBALS['TL_DCA']['tl_module']['palettes']['dc_tank_check'] =
+    '{title_legend},name,headline,type;' .
+    '{config_legend},jumpTo,reg_notification,reg_subject,reg_text;' .
+    '{template_legend:hide},customTpl;' .
+    '{protected_legend:hide},protected;' .
+    '{expert_legend:hide},guests,cssID';
+
+// Felder für die Tank-Check E-Mail-Konfiguration (analog zu anderen Modulen falls vorhanden)
+$GLOBALS['TL_DCA']['tl_module']['fields']['reg_notification'] = [
+    'exclude'   => true,
+    'inputType' => 'text',
+    'eval'      => ['rgxp' => 'emails', 'tl_class' => 'w50'],
+    'sql'       => "varchar(255) NOT NULL default ''"
+];
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['reg_subject'] = [
+    'exclude'   => true,
+    'inputType' => 'text',
+    'eval'      => ['decodeEntities' => true, 'tl_class' => 'w50'],
+    'sql'       => "varchar(255) NOT NULL default ''"
+];
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['reg_text'] = [
+    'exclude'   => true,
+    'inputType' => 'textarea',
+    'eval'      => ['decodeEntities' => true, 'tl_class' => 'clr'],
+    'sql'       => "text NULL"
+];
 
 // Hinweis: Das Feld "jumpTo" ist ein Standardfeld von tl_module (Seitenauswahl)
 // und muss hier nicht erneut definiert werden. Die Palette oben bindet es ein.

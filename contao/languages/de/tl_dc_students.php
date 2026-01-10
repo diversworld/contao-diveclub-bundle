@@ -29,7 +29,7 @@ $GLOBALS['TL_LANG']['tl_dc_students']['street'] = ['Straße', 'Bitte geben Sie d
 $GLOBALS['TL_LANG']['tl_dc_students']['postal'] = ['PLZ', 'Bitte geben sie die Postleitzahl ein.'];
 $GLOBALS['TL_LANG']['tl_dc_students']['city'] = ['Wohnort', 'Bitte geben Sie den Namen des Wohnortes ein.'];
 $GLOBALS['TL_LANG']['tl_dc_students']['state'] = ['Land / Region', 'Bitte wählen Sie das Land / die Region aus.'];
-$GLOBALS['TL_LANG']['tl_dc_students']['coubtry'] = ['Saat', 'Bitt wählen sie den Staat aus.'];
+$GLOBALS['TL_LANG']['tl_dc_students']['coubtry'] = ['Staat', 'Bitt wählen sie den Staat aus.'];
 $GLOBALS['TL_LANG']['tl_dc_students']['language'] = ['Sprache', 'Bitte wählen Sie die Sprache.'];
 $GLOBALS['TL_LANG']['tl_dc_students']['mobile'] = ['Mobil', 'Geben sie hier die Mobilnummer ein.'];
 

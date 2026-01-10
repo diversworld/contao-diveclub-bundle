@@ -28,3 +28,35 @@ $GLOBALS['TL_LANG']['MSC']['dc_student_courses'] = [
     'dateEnd' => 'End',
     'view_progress' => 'Show progress',
 ];
+
+// Frontend-Labels: Tank Check
+$GLOBALS['TL_LANG']['MSC']['dc_tank_check'] = [
+    'booking_headline' => 'Book check for offer: %s',
+    'contact_data' => 'Your contact details',
+    'logged_in_member' => 'Logged in member:',
+    'firstname' => 'First name',
+    'lastname' => 'Last name',
+    'email' => 'E-mail',
+    'phone' => 'Phone',
+    'tank_details' => 'Tank details',
+    'select_tank' => 'Select your tank',
+    'please_select' => '-- Please select --',
+    'serial_number' => 'Serial number',
+    'manufacturer' => 'Manufacturer',
+    'baz_number' => 'BAZ number',
+    'tank_size' => 'Tank size (for price calculation)',
+    'other_tank_data' => 'Other tank data',
+    'o2_clean' => 'O2-clean',
+    'additional_articles' => 'Additional articles/services',
+    'notes' => 'Notes',
+    'total_price' => 'Total price',
+    'submit_booking' => 'Book now (binding)',
+    'success_msg' => 'Thank you! Your booking for <strong>%s €</strong> has been successfully saved.',
+    'back_to_list' => 'Back to overview',
+    'cancel' => 'Cancel',
+    'no_proposals' => 'No current check dates available.',
+    'event_date' => 'Date: %s',
+    'proposal_date' => 'Date: %s',
+    'vendor' => 'Checker',
+    'book_now' => 'Book check now'
+];

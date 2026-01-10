@@ -52,32 +52,30 @@ class DcListingController extends AbstractFrontendModuleController
         if (is_array($headline) && isset($headline['value']) && $headline['value'] !== '') {
             $template->headline = [
                 'text' => $headline['value'],
-                'unit' => $headline['unit'] ?? 'h1'
+                'tag_name' => $headline['unit'] ?? 'h1'
             ];
         }
 
         $eventAlias = Input::get('auto_item');
 
-        /** @var Result $eventStmt */
         $event = DcCalendarEventsModel::findByAlias($eventAlias);
 
-        $proposal = DcCheckProposalModel::findBy('checkId', $event->id);
+        if (null !== $event) {
+            $proposal = DcCheckProposalModel::findBy('checkId', $event->id);
 
-        if ($proposal !== false) {
-            $articles = DcCheckArticlesModel::findBy('pid', $proposal->id);
-        } else {
-            $articles = [];
-        }
+            if ($proposal !== null) {
+                $articles = DcCheckArticlesModel::findBy('pid', $proposal->id);
+            } else {
+                $articles = [];
+            }
 
-        // Prüfen, ob ein Event gefunden wurde
-        if ($event !== false) {
             // Daten vorbereiten und ans Template übergeben
-            $template->event = $event ?: [];
-            $template->proposal = $proposal ?: [];
-            $template->articles = $articles ?: [];
+            $template->event = $event;
+            $template->proposal = $proposal;
+            $template->articles = $articles;
         } else {
-            $template->event = null; // Falls kein Event gefunden wurde
-            $template->proposal = [];
+            $template->event = null;
+            $template->proposal = null;
             $template->articles = [];
         }
 

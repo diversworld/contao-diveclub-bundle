@@ -19,4 +19,21 @@ use Contao\Model;
 class DcCheckProposalModel extends Model
 {
     protected static $strTable = 'tl_dc_check_proposal';
+
+    /**
+     * Find a proposal by its ID or alias
+     *
+     * @param mixed $varId
+     * @param array $arrOptions
+     *
+     * @return static|null
+     */
+    public static function findByIdOrAlias(mixed $varId, array $arrOptions = []): ?static
+    {
+        if (is_numeric($varId)) {
+            return static::findByPk($varId, $arrOptions);
+        }
+
+        return static::findOneByAlias($varId, $arrOptions);
+    }
 }
