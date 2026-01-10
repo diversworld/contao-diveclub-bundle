@@ -55,6 +55,10 @@ class CourseProgressController extends AbstractFrontendModuleController
         $template->element_css_classes = trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? ''));
         $template->class = $template->element_css_classes;
         $template->cssID = $model->cssID[0] ?? '';
+        $template->notFound = false;
+        $template->exercises = [];
+        $template->schedule = [];
+        $template->labels = [];
 
         // Headline korrekt aufbereiten
         $headline = StringUtil::deserialize($model->headline);
