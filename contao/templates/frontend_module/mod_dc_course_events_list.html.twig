@@ -37,16 +37,42 @@ Erwartete Template-Variablen:
 
                                 {% block event_details %}
                                     <p>
+                                    <ul>
                                         {% if ev.dateStart %}
-                                            <strong>Beginn:</strong> {{ ev.dateStart }}
+                                            <li><strong>Beginn:</strong> {{ ev.dateStart }}</li>
                                         {% endif %}
                                         {% if ev.dateEnd %}
-                                            &nbsp;–&nbsp;<strong>Ende:</strong> {{ ev.dateEnd }}
+                                            <li>
+                                                <strong>Ende:</strong> {{ ev.dateEnd }}
+                                            </li>
                                         {% endif %}
-                                    </p>
-                                    {% if ev.price %}
-                                        <p><strong>Preis:</strong> {{ ev.price }}</p>
+                                        {% if ev.instructor %}
+                                            <li>
+                                                <strong>Tauchlehrer:</strong> {{ ev.instructor }}
+                                            </li>
+                                        {% endif %}
+                                        {% if ev.location %}
+                                            <li>
+                                                <strong>Ort:</strong> {{ ev.location }}
+                                            </li>
+                                        {% endif %}
+                                        {% if ev.maxParticipants %}
+                                            <li>
+                                                <strong>Max. Teilnehmer:</strong> {{ ev.maxParticipants }}
+                                            </li>
+                                        {% endif %}
+                                        {% if ev.price %}
+                                            <li>
+                                                <strong>Preis:</strong> {{ ev.price }}
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                    {% if ev.description %}
+                                        <div><br>
+                                            <strong>Beschreibung:</strong><br> {{ ev.description|raw }}
+                                        </div>
                                     {% endif %}
+                                    </p>
                                 {% endblock %}
 
                                 {% block event_link %}

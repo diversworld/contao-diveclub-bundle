@@ -70,7 +70,7 @@ $GLOBALS['TL_DCA']['tl_dc_course_event'] = [
     ],
     'palettes' => [
         'default' => '{title_legend},title,alias,course_id;
-                      {time_legend},dateStart,dateEnd;
+                      {time_legend},dateStart,dateEnd,location;
                       {details_legend},instructor,max_participants,price,description;
                       {publish_legend},published,start,stop'
     ],
@@ -100,32 +100,37 @@ $GLOBALS['TL_DCA']['tl_dc_course_event'] = [
             'label' => ['Kurs‑Vorlage', 'Referenz auf tl_dc_dive_course'],
             'inputType' => 'select',
             'foreignKey' => 'tl_dc_dive_course.title',
-            'eval' => ['mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50 clr'],
+            'eval' => ['mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w33 clr'],
             'sql' => "int(10) unsigned NOT NULL default 0",
         ],
         'dateStart' => [
             'inputType' => 'text',
-            'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
+            'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 clr wizard'],
             'sql' => "varchar(16) NOT NULL default ''",
         ],
         'dateEnd' => [
             'inputType' => 'text',
-            'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
+            'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
             'sql' => "varchar(16) NOT NULL default ''",
+        ],
+        'location' => [
+            'inputType' => 'text',
+            'eval' => ['maxlength' => 128, 'tl_class' => 'w25 clr'],
+            'sql' => "varchar(128) NOT NULL default ''",
         ],
         'instructor' => [
             'inputType' => 'text',
-            'eval' => ['maxlength' => 128, 'tl_class' => 'w50'],
+            'eval' => ['maxlength' => 128, 'tl_class' => 'w25'],
             'sql' => "varchar(128) NOT NULL default ''",
         ],
         'max_participants' => [
             'inputType' => 'text',
-            'eval' => ['rgxp' => 'natural', 'tl_class' => 'w50'],
+            'eval' => ['rgxp' => 'natural', 'tl_class' => 'w25'],
             'sql' => "int(10) unsigned NOT NULL default 0",
         ],
         'price' => [
             'inputType' => 'text',
-            'eval' => ['rgxp' => 'price', 'tl_class' => 'w50'],
+            'eval' => ['rgxp' => 'price', 'tl_class' => 'w25'],
             'sql' => "varchar(16) NOT NULL default ''",
         ],
         'description' => [

@@ -1,3 +1,7 @@
-#config/listener.yaml
-services:
 
+
+
+services:
+    Diversworld\ContaoDiveclubBundle\EventListener\InsertTagsListener:
+        tags:
+            - { name: contao.hook, hook: replaceInsertTags, method: onReplaceInsertTags }

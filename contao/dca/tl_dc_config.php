@@ -47,13 +47,13 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
         ],
     ],
     'palettes' => [
-        '__selector__' => ['addManufacturer', 'addRegulators', 'addEquipment', 'addSizes',],
+        '__selector__' => ['addManufacturer', 'addRegulators', 'addEquipment', 'addSizes', 'addCourses', 'addReservations', 'addChecks'],
         'default' => '{title_legend},title,alias;
                                 {manufacturer_legend},addManufacturer;
                                 {equipment_legend},addEquipment;
                                 {sizes_legend},addSizes;
                                 {types_legend},addTypes;
-                                {course_legend},courseTypesFile,courseCategoriesFile;
+                                {course_legend},addCourses;
                                 {regulator_legend},addRegulators;
                                 {reservation_legend},reservationMessage,reservationInfo,reservationInfoText;
                                 {conditions_legend},rentalConditions;
@@ -64,6 +64,7 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
         'addEquipment' => 'typesFile,subTypesFile',
         'addSizes' => 'sizesFile',
         'addRegulators' => 'regulatorsFile',
+        'addCourses' => 'courseTypesFile,courseCategoriesFile'
     ],
     'fields' => [
         'id' => [
@@ -144,6 +145,13 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
             'eval' => array('fieldType' => 'radio', 'files' => true, 'tl_class' => 'w33clr'),
             'sql' => "binary(16) NULL"
         ),
+        'addCourses' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_config']['addCourses'],
+            'exclude' => true,
+            'inputType' => 'checkbox',
+            'eval' => ['submitOnChange' => true],
+            'sql' => ['type' => 'boolean', 'default' => false]
+        ],
         'courseTypesFile' => [
             'inputType' => 'fileTree',
             'eval' => ['fieldType' => 'radio', 'files' => true, 'tl_class' => 'w33clr'],

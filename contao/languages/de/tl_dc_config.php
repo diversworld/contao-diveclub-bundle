@@ -13,6 +13,7 @@ $GLOBALS['TL_LANG']['tl_dc_config']['regulator_legend'] = "Template mit Atemregl
 $GLOBALS['TL_LANG']['tl_dc_config']['template_legend'] = "Templates Konfiguration";
 $GLOBALS['TL_LANG']['tl_dc_config']['publish_legend'] = 'Veröffentlichung';
 $GLOBALS['TL_LANG']['tl_dc_config']['reservation_legend'] = 'Reservierung';
+$GLOBALS['TL_LANG']['tl_dc_config']['check_legend'] = 'Prüfungen';
 $GLOBALS['TL_LANG']['tl_dc_config']['conditions_legend'] = 'Bedingungen';
 
 /**
@@ -47,5 +48,13 @@ $GLOBALS['TL_LANG']['tl_dc_config']['addManufacturer'] = ['Hersteller hinzufüge
 $GLOBALS['TL_LANG']['tl_dc_config']['addEquipment'] = ['Ausrüstung hinzufügen', 'Ausrüstung im Template hinzufügen'];
 $GLOBALS['TL_LANG']['tl_dc_config']['addSizes'] = ['Größen hinzufügen', 'Größen im Template hinzufügen'];
 $GLOBALS['TL_LANG']['tl_dc_config']['addTypes'] = ['Typen hinzufügen', 'Typen im Template hinzufügen'];
+$GLOBALS['TL_LANG']['tl_dc_config']['addCourses'] = ['Kurse hinzufügen', 'Kurse im Template hinzufügen'];
 $GLOBALS['TL_LANG']['tl_dc_config']['addRegulators'] = ['Atemregler hinzufügen', 'Atemregler im Template hinzufügen'];
+$GLOBALS['TL_LANG']['tl_dc_config']['addReservations'] = ['Reservierungen hinzufügen', 'Das Modul Reservierungen im Backend anzeigen'];
+$GLOBALS['TL_LANG']['tl_dc_config']['addChecks'] = ['Prüfungen hinzufügen', 'Das Modul Prüfungen im Backend anzeigen'];
 $GLOBALS['TL_LANG']['tl_dc_config']['default'] = ['Default-Template', 'Eine neue Template-Konfiguration anlegen'];
+
+/**
+ * Errors
+ */
+$GLOBALS['TL_LANG']['ERR']['noConfigFound'] = 'Es wurde keine Konfiguration gefunden. Bitte erstellen Sie zuerst eine Konfiguration in den Einstellungen.';

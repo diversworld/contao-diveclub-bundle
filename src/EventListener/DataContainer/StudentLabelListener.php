@@ -12,9 +12,9 @@ use Contao\Date;
 #[AsCallback(table: 'tl_dc_students', target: 'list.label.label')]
 class StudentLabelListener
 {
-    public function __invoke(array $row, string $label, DataContainer $dc, array $args): array|string
+    public function __invoke(array $row, string $label, DataContainer $dc, ?array $args = null): array|string
     {
-        if (is_array($args)) {
+        if (null !== $args) {
             if ($args[2]) {
                 $args[2] = Date::parse(Config::get('dateFormat'), (int)$args[2]);
             }

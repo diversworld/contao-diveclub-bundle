@@ -49,6 +49,7 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['dc_listing'] =
     '{template_legend:hide},customTpl;' .
     '{protected_legend:hide},protected;' .
     '{expert_legend:hide},guests,cssID';
+
 $GLOBALS['TL_DCA']['tl_module']['palettes']['dc_equipment_listing'] =
     '{title_legend},name,headline,type;' .
     '{template_legend:hide},customTpl;' .

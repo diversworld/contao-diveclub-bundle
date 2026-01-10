@@ -24,8 +24,24 @@ class ReservationItemsLabelCallback
         $this->helper = $helper;
     }
 
-    public function __invoke(array $row, string $label, DataContainer $dc): string
+    public function __invoke(array $row, string $label, DataContainer $dc, ?array $args = null): array|string
     {
+        if (null !== $args) {
+            // If it's a column view, we might want to return $args,
+            // but the original code was returning a string regardless of showColumns.
+            // Contao says: "If the DCA uses showColumns then the return value must be an array of strings. Otherwise just the label as a string."
+            // Since tl_dc_reservation_items HAS showColumns => true, it SHOULD return an array.
+
+            // Let's adapt it to return an array if $args is provided.
+            $labels = $args;
+            $labels[0] = $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes'][$row['item_type']] ?? $row['item_type'];
+            $labels[1] = $row['item_id']; // This is a bit simplified compared to the string version
+            $labels[4] = $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$row['reservation_status']] ?? $row['reservation_status'];
+            $labels[5] = !empty($row['created_at']) ? date($GLOBALS['TL_CONFIG']['datimFormat'], (int)$row['created_at']) : '-';
+            $labels[6] = !empty($row['updated_at']) ? date($GLOBALS['TL_CONFIG']['datimFormat'], (int)$row['updated_at']) : '-';
+
+            return $labels;
+        }
         // Fallback-Werte definieren
         $typeLabel = $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes'][$row['item_type']] ?? 'Unbekannter Typ';
         $reservedAt = !empty($row['reserved_at']) ? date($GLOBALS['TL_CONFIG']['datimFormat'], (int)$row['reserved_at']) : 'Unbekannt';

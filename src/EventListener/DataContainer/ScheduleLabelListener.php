@@ -17,9 +17,9 @@ class ScheduleLabelListener
     {
     }
 
-    public function __invoke(array $row, string $label, DataContainer $dc, array $args): array|string
+    public function __invoke(array $row, string $label, DataContainer $dc, ?array $args = null): array|string
     {
-        if (is_array($args)) {
+        if (null !== $args) {
             if ($args[0]) {
                 $args[0] = Date::parse(Config::get('datimFormat'), (int)$args[0]);
             }

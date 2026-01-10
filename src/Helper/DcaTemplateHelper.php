@@ -27,7 +27,12 @@ class DcaTemplateHelper
 
         // Überprüfen, ob der Pfad leer ist oder die Datei nicht existiert
         if (empty($templatePath) || !file_exists($templatePath)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['templateNotFound'], $templatePath));
+            // Im Backend eine Fehlermeldung anzeigen, wenn nichts konfiguriert ist
+            if (System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest(System::getContainer()->get('request_stack')->getCurrentRequest())) {
+                $message = $GLOBALS['TL_LANG']['ERR']['noConfigFound'] ?? 'Es wurde keine Konfiguration gefunden. Bitte erstellen Sie zuerst eine Konfiguration in den Einstellungen.';
+                \Contao\Message::addError($message);
+            }
+
             // Wenn nichts konfiguriert ist, geben wir ein leeres Array zurück statt abzustürzen
             return [];
         }
@@ -41,17 +46,21 @@ class DcaTemplateHelper
         return $options;
     }
 
-    private function getTemplateFromConfig($templateName): string
+    private function getTemplateFromConfig($templateName): ?string
     {
         $rootDir = System::getContainer()->getParameter('kernel.project_dir');
         $configArray = [];
 
         // Lade die erforderlichen Felder aus der Tabelle tl_dc_config
-        $result = Database::getInstance()->execute("
-            SELECT manufacturersFile, typesFile, regulatorsFile, sizesFile, courseTypesFile, courseCategoriesFile
-            FROM tl_dc_config
-            LIMIT 1"
-        );
+        try {
+            $result = Database::getInstance()->execute("
+                SELECT manufacturersFile, typesFile, regulatorsFile, sizesFile, courseTypesFile, courseCategoriesFile
+                FROM tl_dc_config
+                LIMIT 1"
+            );
+        } catch (\Exception $e) {
+            return null;
+        }
 
         if ($result->numRows > 0) {
             // Für jedes Feld die UUID verarbeiten
@@ -80,7 +89,12 @@ class DcaTemplateHelper
                 }
             }
         } else {
-            throw new RuntimeException('Keine Einträge in der Tabelle tl_dc_config gefunden.');
+            // Im Backend eine Fehlermeldung anzeigen, wenn keine Einträge in der Tabelle vorhanden sind
+            if (System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest(System::getContainer()->get('request_stack')->getCurrentRequest())) {
+                $message = $GLOBALS['TL_LANG']['ERR']['noConfigFound'] ?? 'Es wurde keine Konfiguration gefunden. Bitte erstellen Sie zuerst eine Konfiguration in den Einstellungen.';
+                \Contao\Message::addError($message);
+            }
+            return null;
         }
 
         switch ($templateName) {

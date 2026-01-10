@@ -13,9 +13,9 @@ use Doctrine\DBAL\Connection;
 #[AsCallback(table: 'tl_dc_course_event', target: 'list.label.label')]
 class CourseEventLabelListener
 {
-    public function __invoke(array $row, string $label, DataContainer $dc, array $args): array|string
+    public function __invoke(array $row, string $label, DataContainer $dc, ?array $args = null): array|string
     {
-        if (is_array($args)) {
+        if (null !== $args) {
             if ($args[1]) {
                 $args[1] = Date::parse(Config::get('datimFormat'), (int)$args[1]);
             } else {

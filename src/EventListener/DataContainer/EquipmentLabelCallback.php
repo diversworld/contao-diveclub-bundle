@@ -20,8 +20,17 @@ class EquipmentLabelCallback
         $this->templateHelper = $templateHelper;
     }
 
-    public function __invoke(array $row, string $label, DataContainer $dc, array $labels): array
+    public function __invoke(array $row, string $label, DataContainer $dc, ?array $args = null): array|string
     {
+        if (null === $args) {
+            // Fallback for non-column view (if ever used that way)
+            $types = $this->templateHelper->getEquipmentFlatTypes();
+            $typeName = $types[$row['type']] ?? '-';
+            return sprintf('%s — %s', $typeName, $row['title']);
+        }
+
+        $labels = $args;
+
         // Typ und Untertyp-Name abrufen
         $types = $this->templateHelper->getEquipmentFlatTypes();
         $labels[0] = $types[$row['type']] ?? '-';
