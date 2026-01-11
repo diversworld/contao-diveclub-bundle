@@ -26,12 +26,19 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['dc_course_progress'] =
 // Liste der Kursveranstaltungen
 $GLOBALS['TL_DCA']['tl_module']['palettes']['dc_course_events_list'] =
     '{title_legend},name,headline,type;' .
-    '{config_legend},jumpTo,tankCheckJumpTo,showTankChecks;' .
+    '{config_legend},jumpTo,tankCheckJumpTo,showCourseEvents,showTankChecks;' .
     '{template_legend:hide},customTpl;' .
     '{protected_legend:hide},protected;' .
     '{expert_legend:hide},guests,cssID';
 
 // Felder für die Kursliste
+$GLOBALS['TL_DCA']['tl_module']['fields']['showCourseEvents'] = [
+    'exclude'   => true,
+    'inputType' => 'checkbox',
+    'eval'      => ['tl_class' => 'w50 m12'],
+    'sql'       => "char(1) NOT NULL default '1'"
+];
+
 $GLOBALS['TL_DCA']['tl_module']['fields']['showTankChecks'] = [
     'exclude'   => true,
     'inputType' => 'checkbox',

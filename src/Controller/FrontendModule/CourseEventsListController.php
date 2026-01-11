@@ -42,9 +42,6 @@ class CourseEventsListController extends AbstractFrontendModuleController
             $template->headline = ['text' => '', 'tag_name' => 'h1'];
         }
 
-        // Lade veröffentlichte Events
-        $events = DcCourseEventModel::findBy(['published=?'], [1], ['order' => 'dateStart']);
-
         $dateFormat = Config::get('datimFormat');
         $useAutoItem = (bool)Config::get('useAutoItem');
 
@@ -53,29 +50,35 @@ class CourseEventsListController extends AbstractFrontendModuleController
         $jumpToPage = $jumpTo > 0 ? PageModel::findByPk($jumpTo) : null;
 
         $list = [];
-        if ($events) {
-            foreach ($events as $event) {
-                // Wenn keine Ziel-Seite gesetzt ist, kann keine Detail-URL erzeugt werden
-                $detailUrl = '';
-                if (null !== $jumpToPage) {
-                    $item = $event->alias ?: (string)$event->id;
-                    $params = '/' . ($useAutoItem ? '' : 'items/') . $item;
-                    // Contao 5: generate URL via PageModel helper
-                    $detailUrl = $jumpToPage->getFrontendUrl($params);
+
+        // Lade veröffentlichte Events (Tauchkurse)
+        if ($model->showCourseEvents) {
+            $events = DcCourseEventModel::findBy(['published=?'], [1], ['order' => 'dateStart']);
+
+            if ($events) {
+                foreach ($events as $event) {
+                    // Wenn keine Ziel-Seite gesetzt ist, kann keine Detail-URL erzeugt werden
+                    $detailUrl = '';
+                    if (null !== $jumpToPage) {
+                        $item = $event->alias ?: (string)$event->id;
+                        $params = '/' . ($useAutoItem ? '' : 'items/') . $item;
+                        // Contao 5: generate URL via PageModel helper
+                        $detailUrl = $jumpToPage->getFrontendUrl($params);
+                    }
+                    $list[] = [
+                        'id' => (int)$event->id,
+                        'title' => (string)$event->title,
+                        'alias' => (string)$event->alias,
+                        'dateStart' => $event->dateStart ? Date::parse($dateFormat, (int)$event->dateStart) : '',
+                        'dateEnd' => $event->dateEnd ? Date::parse($dateFormat, (int)$event->dateEnd) : '',
+                        'instructor' => (string)$event->instructor,
+                        'description' => (string)$event->description,
+                        'location' => (string)$event->location,
+                        'maxParticipants' => (int)$event->maxParticipants,
+                        'price' => (string)$event->price,
+                        'url' => $detailUrl,
+                    ];
                 }
-                $list[] = [
-                    'id' => (int)$event->id,
-                    'title' => (string)$event->title,
-                    'alias' => (string)$event->alias,
-                    'dateStart' => $event->dateStart ? Date::parse($dateFormat, (int)$event->dateStart) : '',
-                    'dateEnd' => $event->dateEnd ? Date::parse($dateFormat, (int)$event->dateEnd) : '',
-                    'instructor' => (string)$event->instructor,
-                    'description' => (string)$event->description,
-                    'location' => (string)$event->location,
-                    'maxParticipants' => (int)$event->maxParticipants,
-                    'price' => (string)$event->price,
-                    'url' => $detailUrl,
-                ];
             }
         }
 
@@ -142,7 +145,7 @@ class CourseEventsListController extends AbstractFrontendModuleController
                 });
 
                 $template->events = $list;
-                $template->hasEvents = true;
+                $template->hasEvents = !empty($list);
             }
         }
 
