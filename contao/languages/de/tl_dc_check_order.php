@@ -53,6 +53,8 @@ $GLOBALS['TL_LANG']['tl_dc_check_order']['sizes'] = [
 $GLOBALS['TL_LANG']['tl_dc_check_order']['status_reference'] = [
     'ordered'   => 'Bestellt',
     'delivered' => 'Abgegeben',
+    'inspection' => 'In Prüfung',
     'checked'   => 'Geprüft',
-    'canceled'  => 'Storniert'
+    'canceled'  => 'Storniert',
+    'pickedup'  => 'Abgeholt'
 ];

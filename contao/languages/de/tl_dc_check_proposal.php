@@ -49,5 +49,4 @@ $GLOBALS['TL_LANG']['tl_dc_check_proposal']['published'] = ["Veröffentlichen", 
 $GLOBALS['TL_LANG']['tl_dc_check_proposal']['start'] = ["Anzeigen ab", "Ab wann soll der Datensatz angezeigt werden."];
 $GLOBALS['TL_LANG']['tl_dc_check_proposal']['stop'] = ["Anzeigen bis", "Bis wann soll der Datensatz angezeigt werden."];
 
-$GLOBALS['TL_LANG']['tl_dc_check_proposal']['orders'] = ["Bestellungen", "Bestellungen für diesen Prüfungstermin anzeigen"];
-
+$GLOBALS['TL_LANG']['tl_dc_check_proposal']['orders'] = ['Bestellungen', 'Buchungen für dieses Angebot anzeigen'];

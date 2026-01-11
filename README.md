@@ -171,19 +171,22 @@ return [
 'professional' => 'Professionell'
 ];
 ```
+## Tank Installation
+In the backend, an existing offer can be created with the prices for an inspection. The individual items with the prices are stored as child elements of the offer. There are optional items and default items that are always included in the booking.
+In the frontend, the planned TÜV dates are displayed in a list with the diving courses.
+Members can register their equipment for inspection. It is possible to register several pieces of diving equipment for inspection.
+The member's booking can then be managed in the backend.
+
 
 ## Future Plans
 
 - Members will be able to record their own equipment.
-- Members will be able to book TÜV inspections for their equipment.
-- Club-owned rental equipment will be available for reservation by members.
-- Interested people will be able to register for dive courses.
-- Club instructors will be able to manage student data and course information related to students.
+
 
 ## Donation
 
 If you like this extension and think it's worth a little donation: You can support me via Paypal.Me:
 
-[Donation for Diversworld CalendarEditor](https://paypal.me/EckhardBecker615)
+[Donation for Diversworld DiveClubManager](https://paypal.me/EckhardBecker615)
 
 Thank You!

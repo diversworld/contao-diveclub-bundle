@@ -21,7 +21,6 @@ use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\StringUtil;
 use Diversworld\ContaoDiveclubBundle\Model\DcTanksModel;
-use Doctrine\DBAL\Result;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -48,16 +47,17 @@ class TanksDetailController extends AbstractFrontendModuleController
             ];
         }
 
-        /** @var Result $eventStmt */
         $tanks = DcTanksModel::findAll();
 
-        // Prüfen, ob ein Event gefunden wurde
-        if ($tanks !== false) {
-            // Daten vorbereiten und ans Template übergeben
-            $template->tanks = $tanks ?: []; // Falls keine Tanks gefunden wurden
-        } else {
-            $template->tanks = [];
+        // Daten vorbereiten und ans Template übergeben
+        $tankList = [];
+        if ($tanks) {
+            foreach ($tanks as $tank) {
+                $tankList[] = $tank->row();
+            }
         }
+        $template->tanks = $tankList;
+        $template->items = $tankList;
 
         return $template->getResponse();
     }

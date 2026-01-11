@@ -74,7 +74,7 @@ $GLOBALS['BE_MOD']['diveclub'] = [
         'tables' => ['tl_dc_reservation', 'tl_dc_reservation_items'],
     ],
     'dc_check_collection' => [
-        'tables' => ['tl_dc_check_proposal', 'tl_dc_check_articles', 'tl_dc_check_order'],
+        'tables' => ['tl_dc_check_proposal', 'tl_dc_check_articles', 'tl_dc_check_order', 'tl_dc_check_booking'],
     ],
     'dc_config_collection' => [
         'tables' => ['tl_dc_config'],

@@ -27,13 +27,15 @@ use Contao\StringUtil;
 use Contao\FrontendUser;
 use Contao\Database;
 use Contao\Email;
-use Contao\Controller;
 use Contao\System;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckProposalModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcCheckBookingModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckOrderModel;
 use Diversworld\ContaoDiveclubBundle\Helper\TankCheckHelper;
+use Diversworld\ContaoDiveclubBundle\Session\Attribute\ArrayAttributeBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use function is_array;
 
 #[AsFrontendModule('dc_tank_check', category: 'dc_manager', template: 'frontend_module/mod_dc_tank_check')]
@@ -119,6 +121,10 @@ class TankCheckController extends AbstractFrontendModuleController
 
         $template->proposals = $proposalList;
 
+        // Sprachdatei laden und Labels an das Template für die Liste übergeben
+        System::loadLanguageFile('default');
+        $template->labels = $GLOBALS['TL_LANG']['MSC']['dc_tank_check'] ?? [];
+
         return $template->getResponse();
     }
 
@@ -129,6 +135,10 @@ class TankCheckController extends AbstractFrontendModuleController
         $template->user = $user;
         // Request Token für Twig bereitstellen
         $template->request_token = System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue();
+
+        $session = $request->getSession();
+        $bag = $session->getBag(ArrayAttributeBag::ATTRIBUTE_NAME);
+        $sessionTanks = $bag->get('tank_check_items', []);
 
         if ($user) {
             $template->tanks = TankCheckHelper::getMemberTanks((int)$user->id);
@@ -143,16 +153,20 @@ class TankCheckController extends AbstractFrontendModuleController
 
         // Artikel aus dem Angebot laden
         $db = Database::getInstance();
-        $articles = $db->prepare("SELECT id, title, articlePriceBrutto, articleSize FROM tl_dc_check_articles WHERE pid=? AND published='1'")
+        $articles = $db->prepare("SELECT id, title, articlePriceBrutto, articleSize, `default` FROM tl_dc_check_articles WHERE pid=? AND published='1'")
             ->execute($proposal->id);
 
         $articleList = [];
         $basePrices = [];
         while ($articles->next()) {
-            if ($articles->articleSize) {
+            $articleData = $articles->row();
+            // Sicherstellen, dass default ein boolean ist für Twig
+            $articleData['default'] = (bool)$articleData['default'];
+
+            if ($articles->articleSize && $articles->articleSize !== '') {
                 $basePrices[$articles->articleSize] = (float)$articles->articlePriceBrutto;
             } else {
-                $articleList[] = $articles->row();
+                $articleList[] = $articleData;
             }
         }
         $template->articles = $articleList;
@@ -162,83 +176,190 @@ class TankCheckController extends AbstractFrontendModuleController
         System::loadLanguageFile('tl_dc_tanks');
         $template->tankSizes = $GLOBALS['TL_LANG']['tl_dc_tanks']['sizes'] ?? [];
 
-        // Sicherstellen, dass die MSC-Labels geladen sind
+        // Sprachdatei laden und Labels an das Template übergeben
         System::loadLanguageFile('default');
+        $template->labels = $GLOBALS['TL_LANG']['MSC']['dc_tank_check'] ?? [];
 
-        if ($request->isMethod('POST') && $request->request->get('FORM_SUBMIT') === 'dc_tank_check_booking') {
-            // Buchung speichern
-            $order = new DcCheckOrderModel();
-            $order->pid = $proposal->id;
-            $order->tstamp = time();
-
-            if ($user) {
-                $order->memberId = $user->id;
-                $order->firstname = $user->firstname;
-                $order->lastname = $user->lastname;
-                $order->email = $user->email;
-                $order->phone = $user->phone ?: ($user->mobile ?: '');
-            } else {
-                $order->memberId = 0;
-                $order->firstname = $request->request->get('firstname');
-                $order->lastname = $request->request->get('lastname');
-                $order->email = $request->request->get('email');
-                $order->phone = $request->request->get('phone');
+        // Aktion: Flasche entfernen
+        if ($request->get('act') === 'remove' && $request->get('idx') !== null) {
+            $idx = (int)$request->get('idx');
+            if (isset($sessionTanks[$idx])) {
+                unset($sessionTanks[$idx]);
+                $sessionTanks = array_values($sessionTanks);
+                $bag->set('tank_check_items', $sessionTanks);
             }
-
-            $order->tankId = $request->request->get('tankId') ?: 0;
-
-            // Wenn keine tankId (Gast), dann tankData speichern (falls im Formular vorgesehen)
-            if (!$order->tankId) {
-                $order->tankData = $request->request->get('tankData');
-                $order->serialNumber = $request->request->get('serialNumber');
-                $order->manufacturer = $request->request->get('manufacturer');
-                $order->bazNumber = $request->request->get('bazNumber');
-                $order->size = $request->request->get('tankSize');
-            }
-
-            $order->o2clean = $request->request->get('o2clean') ? '1' : '';
-            $order->notes = $request->request->get('notes');
-
-            $order->selectedArticles = serialize($request->request->all('articles'));
-
-            // Preis berechnen
-            $tankSize = $request->request->get('tankSize') ?: "12";
-            if ($order->tankId) {
-                $tank = $db->prepare("SELECT size FROM tl_dc_tanks WHERE id=?")->execute($order->tankId);
-                if ($tank->numRows) {
-                    $tankSize = (string)$tank->size;
-                }
-            }
-
-            $selectedArticles = $request->request->all('articles');
-            $order->totalPrice = TankCheckHelper::calculateTotalPrice((int)$proposal->id, $tankSize, $selectedArticles);
-            $order->status = 'ordered';
-            $order->save();
-
-            // E-Mail-Versand
-            $this->sendConfirmationEmail($order, $proposal, $model);
-
-            // Weiterleitung oder Erfolgsmeldung
-            if ($model->jumpTo) {
-                $page = PageModel::findByPk($model->jumpTo);
-                if ($page) {
-                    // Order ID in Session speichern für Insert-Tags auf der Zielseite
-                    $request->getSession()->set('last_tank_check_order', $order->id);
-                    return new Response('', 303, ['Location' => $page->getFrontendUrl()]);
-                }
-            }
-
-            $template->success = true;
-            $template->order = $order;
+            return new RedirectResponse($request->getPathInfo());
         }
+
+        if ($request->isMethod('POST')) {
+            // Aktion: Flasche vormerken
+            if ($request->request->get('FORM_SUBMIT') === 'dc_tank_check_add') {
+                $tankData = $request->request->all('tank');
+                $selectedArticles = $request->request->all('articles');
+
+                // Sicherstellen, dass alle Default-Artikel enthalten sind
+                foreach ($template->articles as $art) {
+                    if ($art['default'] && !in_array((string)$art['id'], array_map('strval', $selectedArticles), true)) {
+                        $selectedArticles[] = (string)$art['id'];
+                    }
+                }
+
+                $tankData['articles'] = $selectedArticles;
+                $sessionTanks[] = $tankData;
+                $bag->set('tank_check_items', $sessionTanks);
+
+                return new RedirectResponse($request->getPathInfo());
+            }
+
+            // Aktion: Verbindlich buchen
+            if ($request->request->get('FORM_SUBMIT') === 'dc_tank_check_booking') {
+                if (empty($sessionTanks)) {
+                    return new RedirectResponse($request->getPathInfo());
+                }
+
+                $db = Database::getInstance();
+                $bookingDate = time();
+                $bookingNumber = 'TC-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -4));
+
+                // Buchungskopf erstellen
+                $booking = new DcCheckBookingModel();
+                $booking->pid = $proposal->id;
+                $booking->tstamp = time();
+                $booking->bookingDate = $bookingDate;
+                $booking->bookingNumber = $bookingNumber;
+                $booking->status = 'ordered';
+                $booking->notes = $request->request->get('notes');
+
+                if ($user) {
+                    $booking->memberId = $user->id;
+                    $booking->firstname = $user->firstname;
+                    $booking->lastname = $user->lastname;
+                    $booking->email = $user->email;
+                    $booking->phone = $user->phone ?: ($user->mobile ?: '');
+                } else {
+                    $booking->memberId = 0;
+                    $booking->firstname = $request->request->get('firstname');
+                    $booking->lastname = $request->request->get('lastname');
+                    $booking->email = $request->request->get('email');
+                    $booking->phone = $request->request->get('phone');
+                }
+
+                $booking->save();
+
+                $totalOrderPrice = 0.0;
+                $orders = [];
+
+                foreach ($sessionTanks as $tankData) {
+                    $order = new DcCheckOrderModel();
+                    $order->pid = $booking->id;
+                    $order->tstamp = time();
+
+                    // Wir behalten die bookingId für Rückwärtskompatibilität oder interne Referenz, falls gewünscht
+                    $order->bookingId = $bookingNumber;
+
+                    $order->tankId = $tankData['tankId'] ?? 0;
+                    $tankSize = $tankData['tankSize'] ?? "12";
+
+                    if ($order->tankId) {
+                        $tank = $db->prepare("SELECT * FROM tl_dc_tanks WHERE id=?")->execute($order->tankId);
+                        if ($tank->numRows) {
+                            $tankSize = (string)$tank->size;
+                            $order->serialNumber = $tank->serialNumber;
+                            $order->manufacturer = $tank->manufacturer;
+                            $order->bazNumber = $tank->bazNumber;
+                            $order->size = $tank->size;
+                        }
+                    } else {
+                        $order->serialNumber = $tankData['serialNumber'] ?? '';
+                        $order->manufacturer = $tankData['manufacturer'] ?? '';
+                        $order->bazNumber = $tankData['bazNumber'] ?? '';
+                        $order->size = $tankSize;
+                        $order->tankData = $tankData['tankData'] ?? '';
+                    }
+
+                    $order->o2clean = isset($tankData['o2clean']) ? '1' : '0';
+                    $order->notes = $booking->notes;
+
+                    $selectedArticles = $tankData['articles'] ?? [];
+                    $order->selectedArticles = serialize($selectedArticles);
+
+                    $order->totalPrice = TankCheckHelper::calculateTotalPrice((int)$proposal->id, $tankSize, $selectedArticles);
+                    $order->status = 'ordered';
+                    $order->save();
+
+                    $totalOrderPrice += (float)$order->totalPrice;
+                    $orders[] = $order;
+                }
+
+                // Gesamtpreis im Buchungskopf aktualisieren
+                $booking->totalPrice = $totalOrderPrice;
+                $booking->save();
+
+                // E-Mail-Versand
+                $this->sendConfirmationEmail($orders, $proposal, $model);
+
+                // Session leeren
+                $bag->remove('tank_check_items');
+
+                // Weiterleitung oder Erfolgsmeldung
+                if ($model->jumpTo) {
+                    $page = PageModel::findByPk($model->jumpTo);
+                    if ($page) {
+                        $request->getSession()->set('last_tank_check_order', $orders[0]->id);
+                        return new Response('', 303, ['Location' => $page->getFrontendUrl()]);
+                    }
+                }
+
+                $template->success = true;
+                $template->totalPrice = $totalOrderPrice;
+                $template->orders = $orders;
+                $template->order = $orders[0];
+            }
+        }
+
+        // Session-Tanks für Anzeige aufbereiten
+        $displayTanks = [];
+        foreach ($sessionTanks as $index => $st) {
+            $st['index'] = $index;
+            $tankId = $st['tankId'] ?? 0;
+            $st['price'] = TankCheckHelper::calculateTotalPrice((int)$proposal->id, $tankId ? $this->getTankSizeFromId($tankId) : ($st['tankSize'] ?? "12"), $st['articles'] ?? []);
+
+            if ($tankId) {
+                $tank = $db->prepare("SELECT title, serialNumber FROM tl_dc_tanks WHERE id=?")->execute($tankId);
+                $st['displayName'] = $tank->numRows ? $tank->title . ' (' . $tank->serialNumber . ')' : 'Unbekannt';
+            } else {
+                $st['displayName'] = ($st['serialNumber'] ?: 'Unbekannte Flasche') . ' (' . ($st['tankSize'] ?? '12') . 'L)';
+            }
+            $displayTanks[] = $st;
+        }
+        $template->sessionTanks = $displayTanks;
 
         return $template->getResponse();
     }
 
-    private function sendConfirmationEmail(DcCheckOrderModel $order, DcCheckProposalModel $proposal, ModuleModel $model): void
+    private function getTankSizeFromId($tankId): string
+    {
+        $db = Database::getInstance();
+        $size = $db->prepare("SELECT size FROM tl_dc_tanks WHERE id=?")->execute($tankId)->size;
+        return (string)($size ?: "12");
+    }
+
+    /**
+     * @param DcCheckOrderModel[] $orders
+     */
+    private function sendConfirmationEmail(array $orders, DcCheckProposalModel $proposal, ModuleModel $model): void
     {
         if (!$model->reg_notification) {
             return;
+        }
+
+        $firstOrder = $orders[0];
+        $totalPrice = 0;
+        $tankDetails = "";
+
+        foreach ($orders as $order) {
+            $totalPrice += (float)$order->totalPrice;
+            $tankDetails .= "- " . ($order->serialNumber ?: 'Unbekannt') . " (" . $order->size . "L): " . number_format((float)$order->totalPrice, 2, ',', '.') . " €\n";
         }
 
         $email = new Email();
@@ -247,12 +368,10 @@ class TankCheckController extends AbstractFrontendModuleController
         $parser = System::getContainer()->get('contao.insert_tag.parser');
         $email->subject = $parser->replace($model->reg_subject ?: 'Bestätigung Ihrer TÜV-Prüfung');
 
-        $text = $model->reg_text ?: "Vielen Dank für Ihre Buchung.\n\nGesamtpreis: {{tank_check_order::totalPrice}} €";
+        $text = $model->reg_text ?: "Vielen Dank für Ihre Buchung.\n\nFlaschen:\n" . $tankDetails . "\nGesamtpreis: " . number_format($totalPrice, 2, ',', '.') . " €";
 
-        // Wir müssen hier die Insert-Tags manuell ersetzen, da wir uns im Backend-Kontext des Mailversands befinden könnten
-        // oder die Order-ID übergeben müssen.
-        // Einfacher: Wir setzen die Order-ID in die Session und nutzen den Parser
-        System::getContainer()->get('request_stack')->getCurrentRequest()->getSession()->set('last_tank_check_order', $order->id);
+        // Wir setzen die Order-ID der ersten Flasche in die Session für Kompatibilität mit Insert-Tags
+        System::getContainer()->get('request_stack')->getCurrentRequest()->getSession()->set('last_tank_check_order', $firstOrder->id);
 
         $email->text = $parser->replace($text);
 
@@ -260,8 +379,8 @@ class TankCheckController extends AbstractFrontendModuleController
         $email->sendTo($recipients);
 
         // Kopie an den Nutzer
-        if ($order->email) {
-            $email->sendTo($order->email);
+        if ($firstOrder->email) {
+            $email->sendTo($firstOrder->email);
         }
     }
 }

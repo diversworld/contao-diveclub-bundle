@@ -2,158 +2,183 @@
 
 {% block content %}
     {% if success %}
-        <p class="success">{{ 'MSC.dc_tank_check.success_msg'|trans([order.totalPrice|number_format(2, ',', '.')])|raw }}</p>
-        <p><a href="{{ app.request.pathInfo }}">{{ 'MSC.dc_tank_check.back_to_list'|trans }}</a></p>
+        <p class="success">{{ labels.success_msg|format(totalPrice|number_format(2, ',', '.'))|raw }}</p>
+        <ul>
+            {% for order in orders %}
+                <li>{{ order.serialNumber }} ({{ order.size }}L) - {{ order.totalPrice|number_format(2, ',', '.') }} €</li>
+            {% endfor %}
+        </ul>
+        <p><a href="{{ app.request.pathInfo }}">{{ labels.back_to_list }}</a></p>
     {% elseif isBooking %}
-        <h3>{{ 'MSC.dc_tank_check.booking_headline'|trans([proposal.title]) }}</h3>
+        <h3>{{ labels.booking_headline|format(proposal.title) }}</h3>
 
-        <form method="post">
-            <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
-            <input type="hidden" name="FORM_SUBMIT" value="dc_tank_check_booking">
+        {# Zusammenfassung der vorgemerkten Flaschen #}
+        <div class="tank_summary mb-4">
+            <h4>{{ labels.summary_headline }}</h4>
+            {% if sessionTanks|length > 0 %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>{{ labels.tank_nr|format('') }}</th>
+                            <th>{{ labels.tank_details }}</th>
+                            <th>{{ labels.total_price }}</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set totalSum = 0 %}
+                        {% for tank in sessionTanks %}
+                            {% set totalSum = totalSum + tank.price %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ tank.displayName }}</td>
+                                <td>{{ tank.price|number_format(2, ',', '.') }} €</td>
+                                <td>
+                                    <a href="{{ app.request.pathInfo }}?act=remove&idx={{ tank.index }}" class="btn btn-danger btn-sm" onclick="return confirm('{{ labels.remove_tank }}?')">{{ labels.remove_tank }}</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="2">{{ labels.total_price_label }}</th>
+                            <th colspan="2">{{ totalSum|number_format(2, ',', '.') }} €</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            {% else %}
+                <p>{{ labels.empty_session }}</p>
+            {% endif %}
+        </div>
 
-            <div class="member_details">
-                <h4>{{ 'MSC.dc_tank_check.contact_data'|trans }}</h4>
-                {% if user %}
-                    <p><strong>{{ 'MSC.dc_tank_check.logged_in_member'|trans }}</strong> {{ user.firstname }} {{ user.lastname }}</p>
-                    <p><strong>{{ 'MSC.dc_tank_check.email'|trans }}:</strong> {{ user.email }}</p>
-                {% else %}
-                    <div class="widget">
-                        <label for="firstname">{{ 'MSC.dc_tank_check.firstname'|trans }}:</label>
-                        <input type="text" name="firstname" id="firstname" required class="text">
-                    </div>
-                    <div class="widget">
-                        <label for="lastname">{{ 'MSC.dc_tank_check.lastname'|trans }}:</label>
-                        <input type="text" name="lastname" id="lastname" required class="text">
-                    </div>
-                    <div class="widget">
-                        <label for="email">{{ 'MSC.dc_tank_check.email'|trans }}:</label>
-                        <input type="email" name="email" id="email" required class="text">
-                    </div>
-                    <div class="widget">
-                        <label for="phone">{{ 'MSC.dc_tank_check.phone'|trans }}:</label>
-                        <input type="text" name="phone" id="phone" class="text">
-                    </div>
-                {% endif %}
-            </div>
+        {# Formular zum Vormerken einer weiteren Flasche #}
+        <div class="add_tank_form border p-3 mb-4">
+            <h4>{{ labels.add_tank }}</h4>
+            <form method="post" id="tank_add_form">
+                <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
+                <input type="hidden" name="FORM_SUBMIT" value="dc_tank_check_add">
 
-            <div class="tank_details">
-                <h4>{{ 'MSC.dc_tank_check.tank_details'|trans }}</h4>
-                {% if user and tanks|length > 0 %}
+                <div class="tank_details">
+                    {% if user and tanks|length > 0 %}
+                        <div class="widget">
+                            <label for="tankId">{{ labels.select_tank }}:</label>
+                            <select name="tank[tankId]" id="tankId" class="tank-select" required>
+                                <option value="">{{ labels.please_select }}</option>
+                                {% for id, label in tanks %}
+                                    <option value="{{ id }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    {% else %}
+                        <div class="widget">
+                            <label for="serialNumber">{{ labels.serial_number_label }}:</label>
+                            <input type="text" name="tank[serialNumber]" id="serialNumber" required class="text">
+                        </div>
+                        <div class="widget">
+                            <label for="manufacturer">{{ labels.manufacturer_label }}:</label>
+                            <input type="text" name="tank[manufacturer]" id="manufacturer" class="text">
+                        </div>
+                        <div class="widget">
+                            <label for="bazNumber">{{ labels.baz_number_label }}:</label>
+                            <input type="text" name="tank[bazNumber]" id="bazNumber" class="text">
+                        </div>
+                        <div class="widget">
+                            <label for="tankSize">{{ labels.tank_size_label }}:</label>
+                            <select name="tank[tankSize]" id="tankSize" class="size-select" required>
+                                {% for val, label in tankSizes %}
+                                    <option value="{{ val }}"{% if val == '12' %} selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="widget">
+                            <label for="tankData">{{ labels.tank_info_label }}:</label>
+                            <textarea name="tank[tankData]" id="tankData" class="textarea"></textarea>
+                        </div>
+                    {% endif %}
                     <div class="widget">
-                        <label for="tankId">{{ 'MSC.dc_tank_check.select_tank'|trans }}:</label>
-                        <select name="tankId" id="tankId" required>
-                            <option value="">{{ 'MSC.dc_tank_check.please_select'|trans }}</option>
-                            {% for id, label in tanks %}
-                                <option value="{{ id }}">{{ label }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                {% else %}
-                    <div class="widget">
-                        <label for="serialNumber">{{ 'MSC.dc_tank_check.serial_number'|trans }}:</label>
-                        <input type="text" name="serialNumber" id="serialNumber" required class="text">
-                    </div>
-                    <div class="widget">
-                        <label for="manufacturer">{{ 'MSC.dc_tank_check.manufacturer'|trans }}:</label>
-                        <input type="text" name="manufacturer" id="manufacturer" class="text">
-                    </div>
-                    <div class="widget">
-                        <label for="bazNumber">{{ 'MSC.dc_tank_check.baz_number'|trans }}:</label>
-                        <input type="text" name="bazNumber" id="bazNumber" class="text">
-                    </div>
-                    <div class="widget">
-                        <label for="tankSize">{{ 'MSC.dc_tank_check.tank_size'|trans }}:</label>
-                        <select name="tankSize" id="tankSize" required>
-                            {% for val, label in tankSizes %}
-                                <option value="{{ val }}"{% if val == '12' %} selected{% endif %}>{{ label }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="widget">
-                        <label for="tankData">{{ 'MSC.dc_tank_check.other_tank_data'|trans }}:</label>
-                        <textarea name="tankData" id="tankData" class="textarea"></textarea>
-                    </div>
-                {% endif %}
-                <div class="widget">
-                    <div class="checkbox_container">
-                        <input type="checkbox" name="o2clean" id="o2clean" value="1">
-                        <label for="o2clean">{{ 'MSC.dc_tank_check.o2_clean'|trans }}</label>
+                        <div class="form-check">
+                            <input class="form-check-input o2-checkbox" type="checkbox" name="tank[o2clean]" id="o2clean" value="1">
+                            <label class="form-check-label" for="o2clean">
+                                {{ labels.o2_clean_label }}
+                            </label>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="widget">
-                <h4>{{ 'MSC.dc_tank_check.additional_articles'|trans }}</h4>
-                {% for article in articles %}
-                    <div class="checkbox_container">
-                        <input type="checkbox" name="articles[]" id="art_{{ article.id }}" value="{{ article.id }}">
-                        <label for="art_{{ article.id }}">{{ article.title }} ({{ article.articlePriceBrutto|number_format(2, ',', '.') }} €)</label>
-                    </div>
-                {% endfor %}
-            </div>
-
-            <div class="widget">
-                <label for="notes">{{ 'MSC.dc_tank_check.notes'|trans }}:</label>
-                <textarea name="notes" id="notes" class="textarea"></textarea>
-            </div>
-
-            <div class="submit_container">
-                <div class="total_price_preview" style="margin-bottom: 20px; font-size: 1.2em; font-weight: bold;">
-                    {{ 'MSC.dc_tank_check.total_price'|trans }}: <span id="total_price_display">0,00</span> €
+                <div class="widget articles-section">
+                    <h5>{{ labels.other_articles_label }}</h5>
+                    {% for article in articles %}
+                        <div class="form-check article-item">
+                            <input class="form-check-input article-checkbox" type="checkbox" name="articles[]" id="art_{{ article.id }}" value="{{ article.id }}"{% if article.default %} checked disabled{% endif %}>
+                            {% if article.default %}
+                                <input type="hidden" name="articles[]" value="{{ article.id }}">
+                            {% endif %}
+                            <label class="form-check-label" for="art_{{ article.id }}">
+                                {{ article.title }} ({{ article.articlePriceBrutto|number_format(2, ',', '.') }} €)
+                            </label>
+                        </div>
+                    {% else %}
+                        <p><small>{{ labels.no_articles_available|default('Keine optionalen Artikel vorhanden.') }}</small></p>
+                    {% endfor %}
                 </div>
-                <button type="submit" class="submit btn btn-primary">{{ 'MSC.dc_tank_check.submit_booking'|trans }}</button>
+
+                <div class="submit_container mt-3">
+                    <button type="submit" class="submit btn btn-secondary">{{ labels.add_tank }}</button>
+                </div>
+            </form>
+        </div>
+
+        {# Finales Buchungsformular #}
+        {% if sessionTanks|length > 0 %}
+            <div class="final_booking_form border p-3">
+                <h4>{{ labels.submit_booking }}</h4>
+                <form method="post" id="tank_check_form">
+                    <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
+                    <input type="hidden" name="FORM_SUBMIT" value="dc_tank_check_booking">
+
+                    <div class="member_details">
+                        {% if user %}
+                            <p><strong>{{ labels.logged_in_member }}</strong> {{ user.firstname }} {{ user.lastname }}</p>
+                            <p><strong>{{ labels.email }}:</strong> {{ user.email }}</p>
+                        {% else %}
+                            <div class="widget">
+                                <label for="firstname">{{ labels.firstname }}:</label>
+                                <input type="text" name="firstname" id="firstname" required class="text">
+                            </div>
+                            <div class="widget">
+                                <label for="lastname">{{ labels.lastname }}:</label>
+                                <input type="text" name="lastname" id="lastname" required class="text">
+                            </div>
+                            <div class="widget">
+                                <label for="email">{{ labels.email }}:</label>
+                                <input type="email" name="email" id="email" required class="text">
+                            </div>
+                            <div class="widget">
+                                <label for="phone">{{ labels.phone }}:</label>
+                                <input type="text" name="phone" id="phone" class="text">
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="widget">
+                        <label for="notes">{{ labels.notes_label }}:</label>
+                        <textarea name="notes" id="notes" class="textarea"></textarea>
+                    </div>
+
+                    <div class="submit_container mt-3">
+                        <button type="submit" class="submit btn btn-primary">{{ labels.submit_booking }}</button>
+                    </div>
+                </form>
             </div>
-        </form>
+        {% endif %}
 
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                const basePrices = {{ basePricesJson|raw }};
-                const userTanks = {{ userTanksJson|raw }};
-                const articles = {{ articles|json_encode|raw }};
-
-                const tankSelect = document.getElementById('tankId');
-                const tankSizeSelect = document.getElementById('tankSize');
-                const articleCheckboxes = document.querySelectorAll('input[name="articles[]"]');
-                const priceDisplay = document.getElementById('total_price_display');
-
-                function calculatePrice() {
-                    let total = 0;
-                    let size = "12";
-
-                    if (tankSelect) {
-                        const tankId = tankSelect.value;
-                        const tank = userTanks.find(t => t.id == tankId);
-                        if (tank) {
-                            size = tank.size;
-                        }
-                    } else if (tankSizeSelect) {
-                        size = tankSizeSelect.value;
-                    }
-
-                    if (basePrices[size]) {
-                        total += parseFloat(basePrices[size]);
-                    }
-
-                    articleCheckboxes.forEach(cb => {
-                        if (cb.checked) {
-                            const article = articles.find(a => a.id == cb.value);
-                            if (article) {
-                                total += parseFloat(article.articlePriceBrutto);
-                            }
-                        }
-                    });
-
-                    priceDisplay.textContent = total.toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                }
-
-                if (tankSelect) tankSelect.addEventListener('change', calculatePrice);
-                if (tankSizeSelect) tankSizeSelect.addEventListener('change', calculatePrice);
-                articleCheckboxes.forEach(cb => cb.addEventListener('change', calculatePrice));
-
-                calculatePrice();
+                // Hier könnten wir noch eine JS-Preisberechnung für die aktuelle Flasche einbauen,
+                // falls gewünscht, aber die Session-Zusammenfassung zeigt die bereits fixierten Preise.
             });
         </script>
-        <p><a href="{{ app.request.pathInfo }}">{{ 'MSC.dc_tank_check.cancel'|trans }}</a></p>
+        <p><a href="{{ app.request.pathInfo }}">{{ labels.cancel }}</a></p>
     {% else %}
         <div class="tank-check-list">
             {% for proposal in proposals %}
@@ -162,23 +187,23 @@
                         <h4>{{ proposal.title }}</h4>
                         <p>
                             {% if proposal.eventDate %}
-                                <strong>{{ 'MSC.dc_tank_check.event_date'|trans([proposal.eventDate]) }}</strong><br>
+                                <strong>{{ labels.event_date }}</strong><br>
                                 <small>{{ proposal.eventTitle }}</small>
                             {% else %}
-                                <strong>{{ 'MSC.dc_tank_check.proposal_date'|trans([proposal.proposalDate|date('d.m.Y')]) }}</strong>
+                                <strong>{{ labels.proposal_date }}:</strong>
                             {% endif %}
                         </p>
-                        <p><strong>{{ 'MSC.dc_tank_check.vendor'|trans }}:</strong> {{ proposal.vendorName }}</p>
+                        <p><strong>{{ labels.vendor }}:</strong> {{ proposal.vendorName }}</p>
                         {% if proposal.notes %}
                             <div class="notes">{{ proposal.notes|raw }}</div>
                         {% endif %}
                     </div>
                     <div class="action">
-                        <a href="{{ proposal.url }}" class="btn btn-primary">{{ 'MSC.dc_tank_check.book_now'|trans }}</a>
+                        <a href="{{ proposal.url }}" class="btn btn-primary">{{ labels.book_now }}</a>
                     </div>
                 </div>
             {% else %}
-                <p>{{ 'MSC.dc_tank_check.no_proposals'|trans }}</p>
+                <p>{{ labels.no_proposals }}</p>
             {% endfor %}
         </div>
     {% endif %}

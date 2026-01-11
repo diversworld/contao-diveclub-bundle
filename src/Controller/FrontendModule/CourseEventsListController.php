@@ -104,7 +104,7 @@ class CourseEventsListController extends AbstractFrontendModuleController
                     $detailUrl = '';
                     if (null !== $tankCheckJumpToPage) {
                         $item = $proposal->alias ?: (string)$proposal->id;
-                        $params = '/' . ($useAutoItem ? '' : 'items/') . $item;
+                        $params = '/' . ($useAutoItem ? '' : '/') . $item;
                         $detailUrl = $tankCheckJumpToPage->getFrontendUrl($params);
                     } else {
                         // Fallback-Suche (alt), falls kein Sprungziel definiert ist

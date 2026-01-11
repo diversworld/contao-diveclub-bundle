@@ -17,6 +17,8 @@ use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\OrderArticleOptionsListener;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\OrderLabelListener;
 
 /**
  * Table tl_dc_check_order
@@ -24,28 +26,28 @@ use Contao\System;
 $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
     'config' => [
         'dataContainer' => DC_Table::class,
-        'ptable' => 'tl_dc_check_proposal',
+        'ptable' => 'tl_dc_check_booking',
         'enableVersioning' => true,
         'sql' => [
             'keys' => [
                 'id' => 'primary',
                 'pid' => 'index',
                 'tstamp' => 'index',
-                'memberId' => 'index',
             ]
         ],
     ],
     'list' => [
         'sorting' => [
             'mode' => DataContainer::MODE_PARENT,
-            'fields' => ['memberId'],
-            'headerFields' => ['title', 'vendorName', 'proposalDate'],
+            'fields' => ['id'],
+            'headerFields' => ['bookingNumber', 'lastname', 'firstname', 'bookingDate'],
             'flag' => DataContainer::SORT_ASC,
             'panelLayout' => 'filter;sort,search,limit'
         ],
         'label' => [
-            'fields' => ['memberId', 'tankId', 'totalPrice', 'status'],
-            'label_callback' => ['tl_dc_check_order', 'listOrders'],
+            'fields' => ['serialNumber', 'size', 'totalPrice', 'status'],
+            'format' => '%s (%sL) - %s € [%s]',
+            'label_callback' => [OrderLabelListener::class, '__invoke'],
         ],
         'global_operations' => [
             'all' => [
@@ -75,67 +77,29 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
         ]
     ],
     'palettes' => [
-        'default' => '{member_legend},memberId,firstname,lastname,email,phone;{tank_legend},tankId,tankData;{order_legend},selectedArticles,totalPrice,status;{notes_legend},notes;'
+        'default' => '{booking_legend},bookingId;
+                      {tank_legend},tankData,serialNumber,manufacturer,bazNumber,size,o2clean;
+                      {order_legend},selectedArticles,totalPrice,status;{notes_legend},notes;'
     ],
     'fields' => [
         'id' => [
             'sql' => "int(10) unsigned NOT NULL auto_increment"
         ],
         'pid' => [
-            'foreignKey' => 'tl_dc_check_proposal.title',
+            'foreignKey' => 'tl_dc_check_booking.bookingNumber',
             'sql' => "int(10) unsigned NOT NULL default 0",
             'relation' => ['type' => 'belongsTo', 'load' => 'lazy']
         ],
         'tstamp' => [
             'sql' => "int(10) unsigned NOT NULL default 0"
         ],
-        'memberId' => [
-            'exclude' => true,
-            'filter' => true,
-            'inputType' => 'select',
-            'foreignKey' => 'tl_member.CONCAT(firstname, " ", lastname)',
-            'eval' => ['chosen' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'],
-            'sql' => "int(10) unsigned NOT NULL default 0",
-            'relation' => ['type' => 'hasOne', 'load' => 'lazy']
-        ],
-        'firstname' => [
+        'bookingId' => [
             'exclude' => true,
             'search' => true,
             'inputType' => 'text',
-            'eval' => ['maxlength' => 255, 'tl_class' => 'w50'],
-            'sql' => "varchar(255) NOT NULL default ''"
-        ],
-        'lastname' => [
-            'exclude' => true,
-            'search' => true,
-            'inputType' => 'text',
-            'eval' => ['maxlength' => 255, 'tl_class' => 'w50'],
-            'sql' => "varchar(255) NOT NULL default ''"
-        ],
-        'email' => [
-            'exclude' => true,
-            'search' => true,
-            'inputType' => 'text',
-            'eval' => ['maxlength' => 255, 'rgxp' => 'email', 'tl_class' => 'w50'],
-            'sql' => "varchar(255) NOT NULL default ''"
-        ],
-        'phone' => [
-            'exclude' => true,
-            'search' => true,
-            'inputType' => 'text',
-            'eval' => ['maxlength' => 64, 'rgxp' => 'phone', 'tl_class' => 'w50'],
+            'eval' => ['maxlength' => 64, 'tl_class' => 'w50'],
             'sql' => "varchar(64) NOT NULL default ''"
         ],
-        'tankId' => [
-            'exclude' => true,
-            'filter' => true,
-            'inputType' => 'select',
-            'foreignKey' => 'tl_dc_tanks.title',
-            'eval' => ['chosen' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'],
-            'sql' => "int(10) unsigned NOT NULL default 0",
-            'relation' => ['type' => 'hasOne', 'load' => 'lazy']
-        ],
-
         'serialNumber'      => [
             'inputType'         => 'text',
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_check_order']['serialNumber'],
@@ -198,7 +162,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
         'selectedArticles' => [
             'exclude' => true,
             'inputType' => 'checkbox',
-            'options_callback' => ['tl_dc_check_order', 'getArticleOptions'],
+            'options_callback' => [OrderArticleOptionsListener::class, '__invoke'],
             'eval' => ['multiple' => true],
             'sql' => "blob NULL"
         ],
@@ -212,7 +176,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
             'exclude' => true,
             'filter' => true,
             'inputType' => 'select',
-            'options' => ['ordered', 'delivered', 'checked', 'canceled'],
+            'options' => ['ordered', 'delivered', 'checked', 'canceled', 'pickedup'],
             'reference' => &$GLOBALS['TL_LANG']['tl_dc_check_order']['status_reference'],
             'eval' => ['tl_class' => 'w50'],
             'sql' => "varchar(32) NOT NULL default 'ordered'"
@@ -225,33 +189,3 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
         ]
     ]
 ];
-
-class tl_dc_check_order extends Backend
-{
-    public function listOrders($row): string
-    {
-        $member = Database::getInstance()->prepare("SELECT firstname, lastname FROM tl_member WHERE id=?")->execute($row['memberId']);
-        $tank = Database::getInstance()->prepare("SELECT title, serialNumber FROM tl_dc_tanks WHERE id=?")->execute($row['tankId']);
-
-        $memberName = $member->numRows ? $member->firstname . ' ' . $member->lastname : 'Unbekannt';
-        $tankName = $tank->numRows ? $tank->title . ' (' . $tank->serialNumber . ')' : 'Manuelle Eingabe';
-
-        return sprintf(
-            '<div class="tl_content_left">%s <span style="color:#999;padding-left:3px">(%s)</span></div><div class="tl_content_right">%s € - %s</div>',
-            $memberName,
-            $tankName,
-            number_format((float)$row['totalPrice'], 2, ',', '.'),
-            $row['status']
-        );
-    }
-
-    public function getArticleOptions(DataContainer $dc): array
-    {
-        $options = [];
-        $articles = Database::getInstance()->prepare("SELECT id, title, articlePriceBrutto FROM tl_dc_check_articles WHERE pid=?")->execute($dc->activeRecord->pid);
-        while ($articles->next()) {
-            $options[$articles->id] = $articles->title . ' (' . $articles->articlePriceBrutto . ' €)';
-        }
-        return $options;
-    }
-}
