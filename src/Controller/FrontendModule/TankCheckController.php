@@ -112,7 +112,12 @@ class TankCheckController extends AbstractFrontendModuleController
 
                 // URL generieren
                 $item = $proposal->alias ?: (string)$proposal->id;
-                $params = '/' . ($useAutoItem ? '' : '/') . $item;
+                // Korrektur: Wir nutzen die Contao-Logik für Auto-Items sauberer
+                if ($useAutoItem) {
+                    $params = '/' . $item;
+                } else {
+                    $params = '/items/' . $item; // Oder was auch immer als Schlüssel definiert ist
+                }
                 $data['url'] = $currentPage ? $currentPage->getFrontendUrl($params) : '';
 
                 $proposalList[] = $data;
