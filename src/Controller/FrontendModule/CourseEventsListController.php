@@ -65,6 +65,7 @@ class CourseEventsListController extends AbstractFrontendModuleController
                         // Contao 5: generate URL via PageModel helper
                         $detailUrl = $jumpToPage->getFrontendUrl($params);
                     }
+
                     $list[] = [
                         'id' => (int)$event->id,
                         'title' => (string)$event->title,
@@ -113,7 +114,6 @@ class CourseEventsListController extends AbstractFrontendModuleController
                             $params = '/' . $item;
                         }
 
-
                         $detailUrl = $tankCheckJumpToPage->getFrontendUrl($params);
                     } else {
                         // Fallback-Suche (alt), falls kein Sprungziel definiert ist
@@ -129,6 +129,7 @@ class CourseEventsListController extends AbstractFrontendModuleController
                             }
                         }
                     }
+
                     $list[] = [
                         'id' => (int)$proposal->id,
                         'title' => '[TÜV] ' . (string)$proposal->title,

@@ -16,48 +16,6 @@
             {% block booking_headline %}
                 <h3>{{ labels.booking_headline|format(proposal.title) }}</h3>
             {% endblock %}
-
-            {% block reserved_tanks %}
-                {# Zusammenfassung der vorgemerkten Flaschen #}
-                <div class="tank_summary mb-4">
-                    <h4>{{ labels.summary_headline }}</h4>
-                    {% if sessionTanks|length > 0 %}
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>{{ labels.tank_nr|format('') }}</th>
-                                    <th>{{ labels.tank_details }}</th>
-                                    <th>{{ labels.total_price }}</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% set totalSum = 0 %}
-                                {% for tank in sessionTanks %}
-                                    {% set totalSum = totalSum + tank.price %}
-                                    <tr>
-                                        <td>{{ loop.index }}</td>
-                                        <td>{{ tank.displayName }}</td>
-                                        <td>{{ tank.price|number_format(2, ',', '.') }} €</td>
-                                        <td>
-                                            <a href="{{ app.request.pathInfo }}?act=remove&idx={{ tank.index }}" class="btn btn-danger btn-sm" onclick="return confirm('{{ labels.remove_tank }}?')">{{ labels.remove_tank }}</a>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th colspan="2">{{ labels.total_price_label }}</th>
-                                    <th colspan="2">{{ totalSum|number_format(2, ',', '.') }} €</th>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    {% else %}
-                        <p>{{ labels.empty_session }}</p>
-                    {% endif %}
-                </div>
-            {% endblock %}
-
             {% block form_add_tank %}
                 {# Formular zum Vormerken einer weiteren Flasche #}
                 <div class="add_tank_form border p-3 mb-4">
@@ -144,6 +102,47 @@
                             <button type="submit" class="submit btn btn-secondary">{{ labels.add_tank }}</button>
                         </div>
                     </form>
+                </div>
+            {% endblock %}
+
+            {% block reserved_tanks %}
+                {# Zusammenfassung der vorgemerkten Flaschen #}
+                <div class="tank_summary mb-4">
+                    <h4>{{ labels.summary_headline }}</h4>
+                    {% if sessionTanks|length > 0 %}
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>{{ labels.tank_nr|format('') }}</th>
+                                <th>{{ labels.tank_details }}</th>
+                                <th>{{ labels.total_price }}</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% set totalSum = 0 %}
+                            {% for tank in sessionTanks %}
+                                {% set totalSum = totalSum + tank.price %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td>{{ tank.displayName }}</td>
+                                    <td>{{ tank.price|number_format(2, ',', '.') }} €</td>
+                                    <td>
+                                        <a href="{{ app.request.pathInfo }}?act=remove&idx={{ tank.index }}" class="btn btn-danger btn-sm" onclick="return confirm('{{ labels.remove_tank }}?')">{{ labels.remove_tank }}</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <th colspan="2">{{ labels.total_price_label }}</th>
+                                <th colspan="2">{{ totalSum|number_format(2, ',', '.') }} €</th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    {% else %}
+                        <p>{{ labels.empty_session }}</p>
+                    {% endif %}
                 </div>
             {% endblock %}
 
