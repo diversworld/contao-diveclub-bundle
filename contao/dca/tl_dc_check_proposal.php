@@ -65,9 +65,16 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
                 'label' => &$GLOBALS['TL_LANG']['tl_dc_check_proposal']['orders'],
             ],
             'copy',
+            'cut',
             'delete',
+            'toggle',
             'show',
-            'toggle'
+            'new_after' => [
+                'label' => ['Neu danach', 'Neue Zuordnung hinzufügen'],
+                'href' => 'act=create&amp;mode=1',
+                'icon' => 'new.svg', // Das Plus-Icon
+                'attributes' => 'onclick="Backend.getScrollOffset()"'
+            ],
         ]
     ],
     'palettes' => [
