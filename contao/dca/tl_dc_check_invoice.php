@@ -59,9 +59,16 @@ $GLOBALS['TL_DCA']['tl_dc_check_invoice'] = array(
             'edit',
             'children',
             'copy',
+            'cut',
             'delete',
+            'toggle',
             'show',
-            'toggle'
+            'new_after' => [
+                'label' => ['Neu danach', 'Neue Zuordnung hinzufügen'],
+                'href' => 'act=create&amp;mode=1',
+                'icon' => 'new.svg', // Das Plus-Icon
+                'attributes' => 'onclick="Backend.getScrollOffset()"'
+            ],
         )
     ),
     'palettes' => array(
