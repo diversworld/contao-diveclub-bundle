@@ -57,23 +57,11 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
             ]
         ],
         'operations' => [
-            'edit' => [
-                'href' => 'act=edit',
-                'icon' => 'edit.svg'
-            ],
-            'copy' => [
-                'href' => 'act=copy',
-                'icon' => 'copy.svg'
-            ],
-            'delete' => [
-                'href' => 'act=delete',
-                'icon' => 'delete.svg',
-                'attributes' => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? 'Löschen?') . '\'))return false;Backend.getScrollOffset()"'
-            ],
-            'show' => [
-                'href' => 'act=show',
-                'icon' => 'show.svg'
-            ]
+            'edit',
+            'copy',
+            'delete',
+            'show',
+            'toggle'
         ]
     ],
     'palettes' => [
@@ -89,6 +77,9 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
             'foreignKey' => 'tl_dc_check_booking.bookingNumber',
             'sql' => "int(10) unsigned NOT NULL default 0",
             'relation' => ['type' => 'belongsTo', 'load' => 'lazy']
+        ],
+        'sorting' => [
+            'sql' => "int(10) unsigned NOT NULL default 0"
         ],
         'tstamp' => [
             'sql' => "int(10) unsigned NOT NULL default 0"
