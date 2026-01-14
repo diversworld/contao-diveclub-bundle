@@ -61,7 +61,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
             'children',
             'orders' => [
                 'href' => 'table=tl_dc_check_booking',
-                'icon' => 'bundles/diversworldcontaodiveclub/icons/order.svg', // Icon muss ggf. noch erstellt werden
+                'icon' => 'forward.svg', //'bundles/diversworldcontaodiveclub/icons/order.svg', // Icon muss ggf. noch erstellt werden
                 'label' => &$GLOBALS['TL_LANG']['tl_dc_check_proposal']['orders'],
             ],
             'copy',
@@ -84,6 +84,9 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
         'id' => [
             'sql' => "int(10) unsigned NOT NULL auto_increment"
         ],
+        'sorting' => [
+            'sql' => "int(10) unsigned NOT NULL default 0"
+        ],    
         'tstamp' => [
             'sql' => "int(10) unsigned NOT NULL default 0"
         ],
