@@ -81,6 +81,9 @@ $GLOBALS['TL_DCA']['tl_dc_check_articles'] = [
             'sql'               => "int(10) unsigned NOT NULL default 0",
             'relation'          => ['type' => 'belongsTo', 'load' => 'lazy'], // Typ anpassen, falls notwendig
         ],
+        'sorting' => [
+            'sql' => "int(10) unsigned NOT NULL default 0"
+        ],
         'tstamp'            => [
             'sql'               => "int(10) unsigned NOT NULL default 0"
         ],
