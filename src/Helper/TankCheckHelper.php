@@ -32,9 +32,23 @@ class TankCheckHelper
         $db = Database::getInstance();
 
         // 1. Grundpreis für die Flaschengröße finden
-        $baseArticle = $db->prepare("SELECT articlePriceBrutto FROM tl_dc_check_articles WHERE pid=? AND articleSize=? AND published='1'")
+        $baseArticle = $db->prepare("SELECT articlePriceBrutto From tl_dc_check_articles
+										WHERE (
+											(`articleSize` = '8' AND ? <= 8) OR
+											(`articleSize` = '10' AND ? <= 10) OR
+											(`articleSize` = '80' AND ? > 10)
+										)
+										AND published = 1
+										AND pid = ?
+										ORDER BY 
+											CASE 
+												WHEN `articleSize` = '8' THEN 1
+												WHEN `articleSize` = '10' THEN 2
+												WHEN `articleSize` = '80' THEN 3
+												ELSE 4
+										  	END")
             ->limit(1)
-            ->execute($proposalId, (string)$tankSize);
+            ->execute((string)$tankSize,(string)$tankSize,(string)$tankSize,$proposalId);
 
         if ($baseArticle->numRows) {
             $totalPrice += (float)$baseArticle->articlePriceBrutto;

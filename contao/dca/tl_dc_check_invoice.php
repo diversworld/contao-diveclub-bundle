@@ -59,9 +59,16 @@ $GLOBALS['TL_DCA']['tl_dc_check_invoice'] = array(
             'edit',
             'children',
             'copy',
+            'cut',
             'delete',
+            'toggle',
             'show',
-            'toggle'
+            'new_after' => [
+                'label' => ['Neu danach', 'Neue Zuordnung hinzufügen'],
+                'href' => 'act=create&amp;mode=1',
+                'icon' => 'new.svg', // Das Plus-Icon
+                'attributes' => 'onclick="Backend.getScrollOffset()"'
+            ],
         )
     ),
     'palettes' => array(
@@ -82,6 +89,9 @@ $GLOBALS['TL_DCA']['tl_dc_check_invoice'] = array(
             'sql' => "int(10) unsigned NOT NULL default 0",
             'relation' => ['type' => 'belongsTo', 'load' => 'lazy'], // Typ anpassen, falls notwendig
         ],
+        'sorting' => [
+            'sql' => "int(10) unsigned NOT NULL default 0"
+        ],        
         'tstamp' => array(
             'sql' => "int(10) unsigned NOT NULL default 0"
         ),

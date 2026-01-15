@@ -56,10 +56,18 @@ $GLOBALS['TL_DCA']['tl_dc_check_articles'] = [
         ],
         'operations'        => [
             'edit',
+            'children',
             'copy',
+            'cut',
             'delete',
+            'toggle',
             'show',
-            'toggle'
+            'new_after' => [
+                'label' => ['Neu danach', 'Neue Zuordnung hinzufügen'],
+                'href' => 'act=create&amp;mode=1',
+                'icon' => 'new.svg', // Das Plus-Icon
+                'attributes' => 'onclick="Backend.getScrollOffset()"'
+            ],
         ]
     ],
     'palettes'      => [
@@ -80,6 +88,9 @@ $GLOBALS['TL_DCA']['tl_dc_check_articles'] = [
             'foreignKey'        => 'tl_dc_check_proposal.title',
             'sql'               => "int(10) unsigned NOT NULL default 0",
             'relation'          => ['type' => 'belongsTo', 'load' => 'lazy'], // Typ anpassen, falls notwendig
+        ],
+        'sorting' => [
+            'sql' => "int(10) unsigned NOT NULL default 0"
         ],
         'tstamp'            => [
             'sql'               => "int(10) unsigned NOT NULL default 0"
