@@ -177,6 +177,27 @@ In the frontend, the planned TÜV dates are displayed in a list with the diving 
 Members can register their equipment for inspection. It is possible to register several pieces of diving equipment for inspection.
 The member's booking can then be managed in the backend.
 
+## Verfügbare Insert-Tags
+### A) Für TÜV-Prüfungen (tank_check_order)
+Diese beziehen sich auf die Daten aus dem Buchungskopf (tl_dc_check_booking), basierend auf der ID in der Session-Variable last_tank_check_order.
+
+- {{tank_check_order::bookingNumber}}: - Die Buchungsnummer (z.B. TC-2024...).
+- {{tank_check_order::totalPrice}}: - Der Gesamtpreis aller Flaschen dieser Buchung (formatiert in €).
+- {{tank_check_order::firstname}}: - Vorname des Buchenden.
+- {{tank_check_order::lastname}}: - Nachname des Buchenden.
+- {{tank_check_order::email}}: - E-Mail-Adresse des Buchenden.
+- {{tank_check_order::notes}}: - Bemerkungen zur Buchung.
+- {{tank_check_order::id}}: - Die interne ID des Buchungsdatensatzes.
+
+### B) Für Kurs-Anmeldungen (course_order)
+Diese beziehen sich auf die Kurszuweisung (tl_dc_course_students), den Schüler und das Event, basierend auf last_course_order.
+
+- {{course_order::title}}: - Name des Kurses/Events.
+- {{course_order::firstname}}: - Vorname des Schülers.
+- {{course_order::lastname}}: - Nachname des Schülers.
+- {{course_order::price}}: - Preis des Kurses.
+- {{course_order::dateStart}}: - Startdatum (formatiert nach Contao-Einstellung).
+- {{course_order::dateEnd}}: - Enddatum.
 
 ## Future Plans
 

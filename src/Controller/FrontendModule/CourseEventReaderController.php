@@ -330,6 +330,9 @@ class CourseEventReaderController extends AbstractFrontendModuleController
             // Übungen erzeugen
             $this->generateExercises($newAssignmentId, (int)$event->course_id);
 
+            // Speichere die ID in der Session für Insert-Tags
+            $request->getSession()->set('last_course_order', $newAssignmentId);
+
             // Bestätigungs-Meldung setzen
             $this->addHtml5Message('Erfolgreich zur Veranstaltung angemeldet.', 'confirm');
 

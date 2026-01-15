@@ -201,16 +201,60 @@ class TankCheckController extends AbstractFrontendModuleController
             if ($request->request->get('FORM_SUBMIT') === 'dc_tank_check_add') {
                 $tankData = $request->request->all('tank');
                 $selectedArticles = $request->request->all('articles');
+                $tankIds = $request->request->all('tankIds');
 
-                // Sicherstellen, dass alle Default-Artikel enthalten sind
-                foreach ($template->articles as $art) {
-                    if ($art['default'] && !in_array((string)$art['id'], array_map('strval', $selectedArticles), true)) {
-                        $selectedArticles[] = (string)$art['id'];
+                // Hilfsfunktion zum Hinzufügen zur Session
+                $addToSession = function($data) use (&$sessionTanks, $template) {
+                    $selectedArticles = $data['articles'] ?? [];
+                    // Sicherstellen, dass alle Default-Artikel enthalten sind
+                    foreach ($template->articles as $art) {
+                        if ($art['default'] && !in_array((string)$art['id'], array_map('strval', $selectedArticles), true)) {
+                            $selectedArticles[] = (string)$art['id'];
+                        }
+                    }
+                    $data['articles'] = $selectedArticles;
+                    $sessionTanks[] = $data;
+                };
+
+                // 1. Vorhandene Flaschen verarbeiten
+                if (!empty($tankIds)) {
+                    foreach ($tankIds as $tId) {
+                        $addToSession(['tankId' => $tId, 'articles' => $selectedArticles]);
                     }
                 }
 
-                $tankData['articles'] = $selectedArticles;
-                $sessionTanks[] = $tankData;
+                // 2. Neue Flasche verarbeiten (falls Seriennummer angegeben)
+                if (!empty($tankData['serialNumber'])) {
+                    // Wenn ein User eingeloggt ist, speichern wir diese in tl_dc_tanks
+                    if ($user) {
+                        $db = Database::getInstance();
+                        $set = [
+                            'tstamp' => time(),
+                            'title' => 'Flasche ' . $tankData['serialNumber'],
+                            'serialNumber' => $tankData['serialNumber'],
+                            'manufacturer' => $tankData['manufacturer'] ?? '',
+                            'bazNumber' => $tankData['bazNumber'] ?? '',
+                            'size' => $tankData['tankSize'] ?? '12',
+                            'o2clean' => isset($tankData['o2clean']) ? '1' : '0',
+                            'owner' => $user->id,
+                            'published' => '1',
+                            'status' => 'active'
+                        ];
+
+                        $res = $db->prepare("INSERT INTO tl_dc_tanks " . $db->set($set))->execute();
+                        $tankData['tankId'] = $res->insertId;
+
+                        // Alias generieren
+                        $alias = System::getContainer()->get('contao.slug')->generate($set['title'], [], function ($alias) use ($tankData) {
+                            return Database::getInstance()->prepare("SELECT id FROM tl_dc_tanks WHERE alias=? AND id!=?")->execute($alias, $tankData['tankId'])->numRows > 0;
+                        });
+                        $db->prepare("UPDATE tl_dc_tanks SET alias=? WHERE id=?")->execute($alias, $tankData['tankId']);
+                    }
+
+                    $tankData['articles'] = $selectedArticles;
+                    $addToSession($tankData);
+                }
+
                 $bag->set('tank_check_items', $sessionTanks);
 
                 return new RedirectResponse($request->getPathInfo());
@@ -273,6 +317,11 @@ class TankCheckController extends AbstractFrontendModuleController
                             $order->manufacturer = $tank->manufacturer;
                             $order->bazNumber = $tank->bazNumber;
                             $order->size = $tank->size;
+
+                            // Flasche als "Mitgliederflasche" markieren und verknüpfen (falls noch nicht geschehen)
+                            if ($user && (int)$tank->owner !== (int)$user->id) {
+                                $db->prepare("UPDATE tl_dc_tanks SET owner=? WHERE id=?")->execute($user->id, $order->tankId);
+                            }
                         }
                     } else {
                         $order->serialNumber = $tankData['serialNumber'] ?? '';

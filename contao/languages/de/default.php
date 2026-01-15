@@ -104,6 +104,7 @@ $GLOBALS['TL_LANG']['MSC']['dc_tank_check'] = [
     'vendor' => 'Prüfungsunternehmen',
     'book_now' => 'Jetzt buchen',
     'add_tank' => 'Flasche vormerken',
+    'or_add_new_tank' => 'Oder eine neue Flasche erfassen:',
     'remove_tank' => 'Entfernen',
     'tank_nr' => 'Flasche Nr. %s',
     'added_to_session' => 'Flasche wurde vorgemerkt.',
