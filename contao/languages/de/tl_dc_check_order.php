@@ -46,8 +46,8 @@ $GLOBALS['TL_LANG']['tl_dc_check_order']['sizes'] = [
     '15' => '15 L',
     '18' => '18 L',
     '20' => '20 L',
-    '40' => '40 cft',
-    '80' => '80 cft'
+    '11' => '40 cft',
+    '22' => '80 cft'
 ];
 
 $GLOBALS['TL_LANG']['tl_dc_check_order']['status_reference'] = [

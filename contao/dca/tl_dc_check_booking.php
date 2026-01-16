@@ -64,13 +64,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_booking'] = [
             'cut',
             'delete',
             'toggle',
-            'show',
-            'new_after' => [
-                'label' => ['Neu danach', 'Neue Zuordnung hinzufügen'],
-                'href' => 'act=create&amp;mode=1',
-                'icon' => 'new.svg', // Das Plus-Icon
-                'attributes' => 'onclick="Backend.getScrollOffset()"'
-            ],
+            'show'
         ]
     ],
     'palettes' => [
@@ -87,7 +81,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_booking'] = [
         ],
         'sorting' => [
             'sql' => "int(10) unsigned NOT NULL default 0"
-        ],    
+        ],
         'tstamp' => [
             'sql' => "int(10) unsigned NOT NULL default 0"
         ],

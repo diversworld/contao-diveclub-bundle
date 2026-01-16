@@ -59,10 +59,12 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
         'operations' => [
             'edit',
             'children',
-            'orders' => [
+            '!orders' => [
                 'href' => 'table=tl_dc_check_booking',
                 'icon' => 'forward.svg', //'bundles/diversworldcontaodiveclub/icons/order.svg', // Icon muss ggf. noch erstellt werden
                 'label' => &$GLOBALS['TL_LANG']['tl_dc_check_proposal']['orders'],
+                'primary' => true,
+                'showInHeader' => true
             ],
             'copy',
             'cut',
@@ -93,7 +95,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
         ],
         'sorting' => [
             'sql' => "int(10) unsigned NOT NULL default 0"
-        ],    
+        ],
         'tstamp' => [
             'sql' => "int(10) unsigned NOT NULL default 0"
         ],

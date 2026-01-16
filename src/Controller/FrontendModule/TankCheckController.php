@@ -158,7 +158,7 @@ class TankCheckController extends AbstractFrontendModuleController
 
         // Artikel aus dem Angebot laden
         $db = Database::getInstance();
-        $articles = $db->prepare("SELECT id, title, articlePriceBrutto, articleSize, `default` FROM tl_dc_check_articles WHERE pid=? AND published='1'")
+        $articles = $db->prepare("SELECT id, title, articlePriceBrutto, articleSize, `default` FROM tl_dc_check_articles WHERE pid=? AND published='1' ORDER BY CAST(articleSize AS UNSIGNED) ASC")
             ->execute($proposal->id);
 
         $articleList = [];
@@ -169,7 +169,10 @@ class TankCheckController extends AbstractFrontendModuleController
             $articleData['default'] = (bool)$articleData['default'];
 
             if ($articles->articleSize && $articles->articleSize !== '') {
-                $basePrices[$articles->articleSize] = (float)$articles->articlePriceBrutto;
+                $basePrices[] = [
+                    'size' => (float)$articles->articleSize,
+                    'price' => (float)$articles->articlePriceBrutto
+                ];
             } else {
                 $articleList[] = $articleData;
             }

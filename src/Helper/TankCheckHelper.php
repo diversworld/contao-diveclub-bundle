@@ -32,26 +32,34 @@ class TankCheckHelper
         $db = Database::getInstance();
 
         // 1. Grundpreis für die Flaschengröße finden
-        $baseArticle = $db->prepare("SELECT articlePriceBrutto From tl_dc_check_articles
-										WHERE (
-											(`articleSize` = '8' AND ? <= 8) OR
-											(`articleSize` = '10' AND ? <= 10) OR
-											(`articleSize` = '80' AND ? > 10)
-										)
+        $baseArticles = $db->prepare("SELECT articlePriceBrutto, articleSize From tl_dc_check_articles
+										WHERE pid = ?
+										AND articleSize != ''
 										AND published = 1
-										AND pid = ?
-										ORDER BY 
-											CASE 
-												WHEN `articleSize` = '8' THEN 1
-												WHEN `articleSize` = '10' THEN 2
-												WHEN `articleSize` = '80' THEN 3
-												ELSE 4
-										  	END")
-            ->limit(1)
-            ->execute((string)$tankSize,(string)$tankSize,(string)$tankSize,$proposalId);
+										ORDER BY CAST(articleSize AS UNSIGNED) ASC")
+            ->execute($proposalId);
 
-        if ($baseArticle->numRows) {
-            $totalPrice += (float)$baseArticle->articlePriceBrutto;
+        if ($baseArticles->numRows) {
+            $foundPrice = null;
+            $maxSizeArticle = null;
+
+            while ($baseArticles->next()) {
+                $maxSizeArticle = $baseArticles->row();
+                if ((float)$tankSize <= (float)$baseArticles->articleSize) {
+                    $foundPrice = (float)$baseArticles->articlePriceBrutto;
+                    break;
+                }
+            }
+
+            // Wenn keine passende Größe gefunden wurde (Flasche ist größer als alle Staffeln),
+            // wird der Preis der größten Staffel genommen
+            if ($foundPrice === null && $maxSizeArticle !== null) {
+                $foundPrice = (float)$maxSizeArticle['articlePriceBrutto'];
+            }
+
+            if ($foundPrice !== null) {
+                $totalPrice += $foundPrice;
+            }
         }
 
         // 2. Preise für Zusatzartikel addieren
