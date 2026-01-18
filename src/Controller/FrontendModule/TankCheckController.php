@@ -230,6 +230,7 @@ class TankCheckController extends AbstractFrontendModuleController
                 // 2. Neue Flasche verarbeiten (falls Seriennummer angegeben)
                 if (!empty($tankData['serialNumber'])) {
                     $tankData['articles'] = $selectedArticles;
+                    $tankData['tankId'] = 0; // Sicherstellen, dass tankId für Twig vorhanden ist
                     $addToSession($tankData);
                 }
 

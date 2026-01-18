@@ -65,6 +65,7 @@
                                     <label for="tankData">{{ labels.tank_info_label }}:</label>
                                     <textarea name="tank[tankData]" id="tankData" class="textarea"></textarea>
                                 </div>
+                            </div>
                             <div class="widget tanks_o2">
                                 <p><strong>Verwendung mit Sauerstoff:</strong></p>
                                 <div class="widget widget-checkbox">
@@ -187,21 +188,10 @@
                             {% if user %}
                                 {% set hasNewTanks = false %}
                                 {% for tank in sessionTanks %}
-                                    {% if not tank.tankId %}
+                                    {% if tank.tankId is not defined or not tank.tankId %}
                                         {% set hasNewTanks = true %}
                                     {% endif %}
                                 {% endfor %}
-
-                                {% if hasNewTanks %}
-                                    <div class="widget widget-checkbox mb-3">
-                                        <span>
-                                            <label for="savePermanent">
-                                                <input type="checkbox" name="savePermanent" id="savePermanent" class="checkbox" value="1">
-                                                <span class="ms-2">{{ labels.save_tank_label }}</span>
-                                            </label>
-                                        </span>
-                                    </div>
-                                {% endif %}
                             {% endif %}
 
                             <div class="submit_container mt-3">
