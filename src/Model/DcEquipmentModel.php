@@ -15,9 +15,11 @@ declare(strict_types=1);
 
 namespace Diversworld\ContaoDiveclubBundle\Model;
 
+use Contao\CoreBundle\DependencyInjection\Attribute\AsModel;
 use Contao\Model;
 use Contao\Model\Collection;
 
+#[AsModel(table: 'tl_dc_equipment')]
 class DcEquipmentModel extends Model
 {
     protected static $strTable = 'tl_dc_equipment';
@@ -31,7 +33,7 @@ class DcEquipmentModel extends Model
     {
         return self::findBy('published', 1);
     }
-	
+
 	public static function findByTypeAndSubType($type, $subType, array $arrOptions = [])
     {
         $t = static::$strTable;

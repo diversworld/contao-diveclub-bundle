@@ -1,0 +1,46 @@
+{% extends "@Contao/frontend_module/_base.html.twig" %}
+
+{% block content %}
+    <div class="dc_check_confirmation">
+        {% block message %}
+            {% if confirmation_text %}
+                <div class="confirmation_message">
+                    {{ confirmation_text|raw }}
+                </div>
+            {% endif %}
+        {% endblock %}
+        {% block orders %}
+            {% if orders %}
+                {% block table %}
+                    <h3>Flaschen in dieser Buchung</h3>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Seriennummer</th>
+                                <th>Größe</th>
+                                <th>Preis</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                                <tr>
+                                    <td>{{ order.serialNumber }}</td>
+                                    <td>{{ order.size }}L</td>
+                                    <td>{{ order.totalPrice|number_format(2, ',', '.') }} €</td>
+                                    <td>{{ ('tl_dc_check_order.status_reference.' ~ order.status)|trans }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="2"><strong>Gesamtpreis</strong></td>
+                                <td colspan="2"><strong>{{ booking.totalPrice|number_format(2, ',', '.') }} €</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                {% endblock %}
+            {% endif %}
+        {% endblock %}
+    </div>
+{% endblock %}

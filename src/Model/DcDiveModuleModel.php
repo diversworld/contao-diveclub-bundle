@@ -14,8 +14,10 @@ declare(strict_types=1);
 
 namespace Diversworld\ContaoDiveclubBundle\Model;
 
+use Contao\CoreBundle\DependencyInjection\Attribute\AsModel;
 use Contao\Model;
 
+#[AsModel(table: 'tl_dc_dive_module')]
 class DcDiveModuleModel extends Model
 {
     protected static $strTable = 'tl_dc_dive_module';

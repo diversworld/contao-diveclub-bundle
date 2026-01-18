@@ -48,7 +48,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'panelLayout'       => 'filter;sort,search,limit',
         ],
         'label'             => [
-            'fields'            => ['title','serialNumber','manufacturer','size','o2clean','lastCheckDate','nextCheckDate','status'],
+            'fields'            => ['title','owner','serialNumber','manufacturer','size','o2clean','lastCheckDate','nextCheckDate','status'],
             'showColumns'       => true,
             'format'            => '%s',
             'label_callback'    => ['tl_dc_tanks', 'formatCheckDates'],
@@ -213,6 +213,10 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'inputType'         => 'select',                                        // Typ ist "select"
             'foreignKey'        => 'tl_member.CONCAT(firstname, " ", lastname)',    // Zeigt Vor- und Nachnamen als Titel
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_tanks']['owner'],
+            'exclude'           => true,
+            'search'            => true,
+            'filter'            => true,
+            'sorting'           => true,
             'relation'          => ['type' => 'belongsTo', 'load' => 'lazy'],       // Relationstyp
             'eval'              => [
                 'includeBlankOption'=> true,                                        // Option "Bitte wählen" hinzufügen

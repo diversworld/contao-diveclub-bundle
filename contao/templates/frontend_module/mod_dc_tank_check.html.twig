@@ -28,7 +28,7 @@
                             {% if user and tanks|length > 0 %}
                                 <div class="widget member_tanks mb-3">
                                     <label><strong>{{ labels.select_tank }}:</strong></label>
-                                    <div class="checkbox_container">
+                                    <div class="widget widget-checkbox">
                                         {% for id, label in tanks %}
                                             <div class="checkbox_item">
                                                 <input type="checkbox" name="tankIds[]" id="tank_{{ id }}" value="{{ id }}" class="checkbox member-tank-checkbox">
@@ -65,43 +65,38 @@
                                     <label for="tankData">{{ labels.tank_info_label }}:</label>
                                     <textarea name="tank[tankData]" id="tankData" class="textarea"></textarea>
                                 </div>
+                            <div class="widget tanks_o2">
+                                <p><strong>Verwendung mit Sauerstoff:</strong></p>
                                 <div class="widget widget-checkbox">
-                                    <fieldset id="ctrl_31" class="checkbox_container">
-                                        <legend>Verwendung mit Sauerstoff</legend>
-                                        <div>
-                                            <span>
-                                                <label for="o2clean" >
-                                                    <input class="checkbox" type="checkbox" name="tank[o2clean]" id="o2clean" value="1">
-                                                    <span class="ms-2">{{ labels.o2_clean_label }}</span>
-                                                </label>
-                                            </span>
-                                        </div>
-                                    </fieldset>
+                                    <div class="checkbox_item">
+                                        <label for="o2clean" >
+                                            <input class="checkbox tank-ox" type="checkbox" name="tank[o2clean]" id="o2clean" value="1">
+                                            <span>{{ labels.o2_clean_label }}</span>
+                                        </label>
+
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="widget widget-checkbox">
-                            <fieldset id="ctrl_31" class="checkbox_container">
-                                <legend>{{ labels.other_articles_label }}</legend>
+                        <div class="widget tanks_sectiom">
+                            <div class="widget widget-checkbox">
+                                <label><strong>{{ labels.other_articles_label }}</strong></label>
                                 {% for article in articles %}
-                                    <div>
-                                        <span>
+                                    <div class="checkbox_item">
                                         <label for="art_{{ article.id }}" >
                                             <input type="checkbox" name="articles[]" id="art_{{ article.id }}" class="checkbox" value="{{ article.id }}"{% if article.default %} checked disabled{% endif %}>
                                             {% if article.default %}
-                                                <input type="hidden" name="articles[]" value="{{ article.id }}">
+                                                <span><input type="hidden" name="articles[]" value="{{ article.id }}"></span>
                                             {% endif %}
-
-                                            <span class="ms-2">{{ article.title }} ({{ article.articlePriceBrutto|number_format(2, ',', '.') }} €)</span>
+                                            <span>{{ article.title }} ({{ article.articlePriceBrutto|number_format(2, ',', '.') }} €)</span>
                                         </label>
-                                            </span>
                                     </div>
                                 {% else %}
                                     <div class="widget articles-section">
                                         <p><small>{{ labels.no_articles_available|default('Keine optionalen Artikel vorhanden.') }}</small></p>
                                     </div>
                                 {% endfor %}
-                            </fieldset>
+                            </div>
                         </div>
                         <div class="submit_container mt-3">
                             <button type="submit" class="submit btn btn-secondary">{{ labels.add_tank }}</button>
@@ -188,6 +183,26 @@
                                 <label for="notes">{{ labels.notes_label }}:</label>
                                 <textarea name="notes" id="notes" class="textarea"></textarea>
                             </div>
+
+                            {% if user %}
+                                {% set hasNewTanks = false %}
+                                {% for tank in sessionTanks %}
+                                    {% if not tank.tankId %}
+                                        {% set hasNewTanks = true %}
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if hasNewTanks %}
+                                    <div class="widget widget-checkbox mb-3">
+                                        <span>
+                                            <label for="savePermanent">
+                                                <input type="checkbox" name="savePermanent" id="savePermanent" class="checkbox" value="1">
+                                                <span class="ms-2">{{ labels.save_tank_label }}</span>
+                                            </label>
+                                        </span>
+                                    </div>
+                                {% endif %}
+                            {% endif %}
 
                             <div class="submit_container mt-3">
                                 <button type="submit" class="submit btn btn-primary">{{ labels.submit_booking }}</button>

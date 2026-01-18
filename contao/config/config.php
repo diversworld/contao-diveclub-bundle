@@ -12,15 +12,20 @@
 
 use Diversworld\ContaoDiveclubBundle\Model\DcCalendarEventsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckArticlesModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcCheckBookingModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckInvoiceModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcCheckOrderModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckProposalModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcConfigModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcControlCardModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCourseEventModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCourseEventScheduleModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCourseExercisesModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCourseModulesModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCourseStudentsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcDiveCourseModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcDiveModuleModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcDiveProgressModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorControlModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorsModel;
@@ -48,7 +53,10 @@ $GLOBALS['BE_MOD']['diveclub'] = [
         'tables' => ['tl_dc_regulators', 'tl_dc_regulator_control'],
     ],
     'dc_tanks_collection' => [
-        'tables' => ['tl_dc_tanks', 'tl_dc_check_invoice'],
+        'tables' => ['tl_dc_tanks'],
+    ],
+    'dc_invoice_collection' => [
+        'tables' => ['tl_dc_check_invoice'],
     ],
     'dc_course_collection' => [
         'tables' => [
@@ -104,6 +112,11 @@ $GLOBALS['TL_MODELS']['tl_dc_student_exercises'] = DcStudentExercisesModel::clas
 $GLOBALS['TL_MODELS']['tl_dc_course_students'] = DcCourseStudentsModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_course_event'] = DcCourseEventModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_course_event_schedule'] = DcCourseEventScheduleModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_check_booking'] = DcCheckBookingModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_check_order'] = DcCheckOrderModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_control_card'] = DcControlCardModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_dive_module'] = DcDiveModuleModel::class;
+$GLOBALS['TL_MODELS']['tl_dc_dive_progress'] = DcDiveProgressModel::class;
 
 /**
  * Frontend Modules

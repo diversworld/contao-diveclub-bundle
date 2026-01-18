@@ -12,8 +12,10 @@ declare(strict_types=1);
 
 namespace Diversworld\ContaoDiveclubBundle\Model;
 
+use Contao\CoreBundle\DependencyInjection\Attribute\AsModel;
 use Contao\Model;
 
+#[AsModel(table: 'tl_dc_course_event_schedule')]
 class DcCourseEventScheduleModel extends Model
 {
     protected static $strTable = 'tl_dc_course_event_schedule';

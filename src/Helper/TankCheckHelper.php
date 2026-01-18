@@ -36,7 +36,7 @@ class TankCheckHelper
 										WHERE pid = ?
 										AND articleSize != ''
 										AND published = 1
-										ORDER BY CAST(articleSize AS UNSIGNED) ASC")
+										ORDER BY CAST(articleSize AS UNSIGNED)")
             ->execute($proposalId);
 
         if ($baseArticles->numRows) {

@@ -31,6 +31,7 @@ use Contao\System;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckProposalModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckBookingModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckOrderModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcTanksModel;
 use Diversworld\ContaoDiveclubBundle\Helper\TankCheckHelper;
 use Diversworld\ContaoDiveclubBundle\Session\Attribute\ArrayAttributeBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -158,7 +159,7 @@ class TankCheckController extends AbstractFrontendModuleController
 
         // Artikel aus dem Angebot laden
         $db = Database::getInstance();
-        $articles = $db->prepare("SELECT id, title, articlePriceBrutto, articleSize, `default` FROM tl_dc_check_articles WHERE pid=? AND published='1' ORDER BY CAST(articleSize AS UNSIGNED) ASC")
+        $articles = $db->prepare("SELECT id, title, articlePriceBrutto, articleSize, `default` FROM tl_dc_check_articles WHERE pid=? AND published='1' ORDER BY CAST(articleSize AS UNSIGNED)")
             ->execute($proposal->id);
 
         $articleList = [];
@@ -228,32 +229,6 @@ class TankCheckController extends AbstractFrontendModuleController
 
                 // 2. Neue Flasche verarbeiten (falls Seriennummer angegeben)
                 if (!empty($tankData['serialNumber'])) {
-                    // Wenn ein User eingeloggt ist, speichern wir diese in tl_dc_tanks
-                    if ($user) {
-                        $db = Database::getInstance();
-                        $set = [
-                            'tstamp' => time(),
-                            'title' => 'Flasche ' . $tankData['serialNumber'],
-                            'serialNumber' => $tankData['serialNumber'],
-                            'manufacturer' => $tankData['manufacturer'] ?? '',
-                            'bazNumber' => $tankData['bazNumber'] ?? '',
-                            'size' => $tankData['tankSize'] ?? '12',
-                            'o2clean' => isset($tankData['o2clean']) ? '1' : '0',
-                            'owner' => $user->id,
-                            'published' => '1',
-                            'status' => 'active'
-                        ];
-
-                        $res = $db->prepare("INSERT INTO tl_dc_tanks " . $db->set($set))->execute();
-                        $tankData['tankId'] = $res->insertId;
-
-                        // Alias generieren
-                        $alias = System::getContainer()->get('contao.slug')->generate($set['title'], [], function ($alias) use ($tankData) {
-                            return Database::getInstance()->prepare("SELECT id FROM tl_dc_tanks WHERE alias=? AND id!=?")->execute($alias, $tankData['tankId'])->numRows > 0;
-                        });
-                        $db->prepare("UPDATE tl_dc_tanks SET alias=? WHERE id=?")->execute($alias, $tankData['tankId']);
-                    }
-
                     $tankData['articles'] = $selectedArticles;
                     $addToSession($tankData);
                 }
@@ -300,6 +275,7 @@ class TankCheckController extends AbstractFrontendModuleController
 
                 $totalOrderPrice = 0.0;
                 $orders = [];
+                $savePermanent = $user && $request->request->get('savePermanent');
 
                 foreach ($sessionTanks as $tankData) {
                     $order = new DcCheckOrderModel();
@@ -311,6 +287,31 @@ class TankCheckController extends AbstractFrontendModuleController
 
                     $order->tankId = $tankData['tankId'] ?? 0;
                     $tankSize = $tankData['tankSize'] ?? "12";
+
+                    // Wenn es eine neue Flasche ist und das Mitglied sie dauerhaft speichern möchte
+                    if (!$order->tankId && $savePermanent && !empty($tankData['serialNumber'])) {
+                        $tank = new DcTanksModel();
+                        $tank->tstamp = time();
+                        $tank->title = 'Flasche ' . $tankData['serialNumber'];
+                        $tank->serialNumber = $tankData['serialNumber'];
+                        $tank->manufacturer = $tankData['manufacturer'] ?? '';
+                        $tank->bazNumber = $tankData['bazNumber'] ?? '';
+                        $tank->size = $tankData['tankSize'] ?? '12';
+                        $tank->o2clean = isset($tankData['o2clean']) ? '1' : '0';
+                        $tank->owner = $user->id;
+                        $tank->published = '1';
+                        $tank->status = 'active';
+                        $tank->save();
+
+                        $order->tankId = $tank->id;
+
+                        // Alias generieren
+                        $alias = System::getContainer()->get('contao.slug')->generate($tank->title, [], function ($alias) use ($tank) {
+                            return Database::getInstance()->prepare("SELECT id FROM tl_dc_tanks WHERE alias=? AND id!=?")->execute($alias, $tank->id)->numRows > 0;
+                        });
+                        $tank->alias = $alias;
+                        $tank->save();
+                    }
 
                     if ($order->tankId) {
                         $tank = $db->prepare("SELECT * FROM tl_dc_tanks WHERE id=?")->execute($order->tankId);
@@ -428,7 +429,10 @@ class TankCheckController extends AbstractFrontendModuleController
         $text = $model->reg_text ?: "Vielen Dank für Ihre Buchung.\n\nFlaschen:\n" . $tankDetails . "\nGesamtpreis: " . number_format($totalPrice, 2, ',', '.') . " €";
 
         // Wir setzen die Order-ID der ersten Flasche in die Session für Kompatibilität mit Insert-Tags
-        System::getContainer()->get('request_stack')->getCurrentRequest()->getSession()->set('last_tank_check_order', $firstOrder->id);
+        $request = System::getContainer()->get('request_stack')->getCurrentRequest();
+        if ($request) {
+            $request->getSession()->set('last_tank_check_order', $firstOrder->id);
+        }
 
         $email->text = $parser->replace($text);
 

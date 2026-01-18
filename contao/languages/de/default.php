@@ -112,4 +112,5 @@ $GLOBALS['TL_LANG']['MSC']['dc_tank_check'] = [
     'empty_session' => 'Noch keine Flaschen vorgemerkt.',
     'summary_headline' => 'Vorgemerkte Flaschen',
     'no_articles_available' => 'Keine optionalen Artikel vorhanden.',
+    'save_tank_label' => 'Flasche dauerhaft in meinem Profil speichern',
 ];

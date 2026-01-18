@@ -94,6 +94,13 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['dc_tank_check'] =
     '{protected_legend:hide},protected;' .
     '{expert_legend:hide},guests,cssID';
 
+$GLOBALS['TL_DCA']['tl_module']['palettes']['dc_check_confirmation'] =
+    '{title_legend},name,headline,type;' .
+    '{config_legend},confirmation_text;' .
+    '{template_legend:hide},customTpl;' .
+    '{protected_legend:hide},protected;' .
+    '{expert_legend:hide},guests,cssID';
+
 // Felder für die Tank-Check E-Mail-Konfiguration (analog zu anderen Modulen falls vorhanden)
 $GLOBALS['TL_DCA']['tl_module']['fields']['reg_notification'] = [
     'exclude'   => true,
@@ -111,8 +118,15 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['reg_subject'] = [
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['reg_text'] = [
     'exclude'   => true,
-    'inputType' => 'textarea',
+    'inputType' => 'text',
     'eval'      => ['decodeEntities' => true, 'tl_class' => 'clr'],
+    'sql'       => "text NULL"
+];
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['confirmation_text'] = [
+    'exclude'   => true,
+    'inputType' => 'textarea',
+    'eval'      => ['rte' => 'tinyMCE', 'tl_class' => 'clr'],
     'sql'       => "text NULL"
 ];
 
