@@ -1,6 +1,7 @@
 {
     "require": {
-        "phpunit/phpunit": "^9.5",
-        "contao/test-case": "^5.0"
-    }
+        "phpstan/phpstan": "^1.7",
+        "phpstan/phpstan-phpunit": "^1.1",
+        "phpstan/phpstan-symfony": "^1.2"
+  }
 }

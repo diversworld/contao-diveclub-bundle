@@ -20,12 +20,12 @@ return static function (ECSConfig $ecsConfig): void {
 
     $contaoConfig = null;
 
-    if (is_file(__DIR__.'/vendor/contao/easy-coding-standard/config/set/contao.php')) {
-        $contaoConfig = __DIR__.'/vendor/contao/easy-coding-standard/config/set/contao.php';
-    } elseif (is_file(__DIR__.'/../../vendor/contao/easy-coding-standard/config/set/contao.php')) {
-        $contaoConfig = __DIR__.'/../../vendor/contao/easy-coding-standard/config/set/contao.php';
-    } elseif (is_file(__DIR__.'/../../../../vendor/contao/easy-coding-standard/config/set/contao.php')) {
-        $contaoConfig = __DIR__.'/../../../../vendor/contao/easy-coding-standard/config/set/contao.php';
+    if (is_file(__DIR__.'/vendor/contao/easy-coding-standard/config/contao.php')) {
+        $contaoConfig = __DIR__.'/vendor/contao/easy-coding-standard/config/contao.php';
+    } elseif (is_file(__DIR__.'/../../vendor/contao/easy-coding-standard/config/contao.php')) {
+        $contaoConfig = __DIR__.'/../../vendor/contao/easy-coding-standard/config/contao.php';
+    } elseif (is_file(__DIR__.'/../../../../vendor/contao/easy-coding-standard/config/contao.php')) {
+        $contaoConfig = __DIR__.'/../../../../vendor/contao/easy-coding-standard/config/contao.php';
     }
 
     if ($contaoConfig) {
