@@ -177,32 +177,63 @@ In the frontend, the planned TÜV dates are displayed in a list with the diving 
 Members can register their equipment for inspection. It is possible to register several pieces of diving equipment for inspection.
 The member's booking can then be managed in the backend.
 
-## Verfügbare Insert-Tags
-### A) Für TÜV-Prüfungen (tank_check_order)
-Diese beziehen sich auf die Daten aus dem Buchungskopf (tl_dc_check_booking), basierend auf der ID in der Session-Variable last_tank_check_order.
+## Eigene Insert-Tags (Diveclub Bundle)
+Das Bundle stellt zwei Haupt-Insert-Tags zur Verfügung, um dynamische Daten aus der aktuellen Benutzer-Session (z. B. nach einer Buchung oder Anmeldung) anzuzeigen.
+Wichtig: Diese Tags funktionieren nur unmittelbar nach einer Aktion (Buchung/Anmeldung), solange die entsprechende ID in der Session gespeichert ist.
 
-- {{tank_check_order::bookingNumber}}: - Die Buchungsnummer (z.B. TC-2024...).
-- {{tank_check_order::totalPrice}}: - Der Gesamtpreis aller Flaschen dieser Buchung (formatiert in €).
-- {{tank_check_order::firstname}}: - Vorname des Buchenden.
-- {{tank_check_order::lastname}}: - Nachname des Buchenden.
-- {{tank_check_order::email}}: - E-Mail-Adresse des Buchenden.
-- {{tank_check_order::notes}}: - Bemerkungen zur Buchung.
-- {{tank_check_order::id}}: - Die interne ID des Buchungsdatensatzes.
+## Custom Insert Tags (Diveclub Bundle)
+The bundle provides two main insert tags to display dynamic data from the current user session (e.g., after a booking or registration).
+**Important:** These tags only work immediately after an action (booking/registration), as long as the corresponding ID is stored in the session.
 
-### B) Für Kurs-Anmeldungen (course_order)
-Diese beziehen sich auf die Kurszuweisung (tl_dc_course_students), den Schüler und das Event, basierend auf last_course_order.
+### A) For Tank Checks (tank_check_order)
+Accesses data from the `tl_dc_check_order` (tank) and `tl_dc_check_booking` (booking header) tables.
+These tags refer to the data from the booking header, based on the ID in the session variable `last_tank_check_order`.
 
-- {{course_order::title}}: - Name des Kurses/Events.
-- {{course_order::firstname}}: - Vorname des Schülers.
-- {{course_order::lastname}}: - Nachname des Schülers.
-- {{course_order::price}}: - Preis des Kurses.
-- {{course_order::dateStart}}: - Startdatum (formatiert nach Contao-Einstellung).
-- {{course_order::dateEnd}}: - Enddatum.
+**Syntax:** `{{dc_check::property}}`
+
+| Tag | Description |
+| :--- | :--- |
+| `{{dc_check::bookingNumber}}` | The generated booking number (e.g., TC-2026...). |
+| `{{dc_check::totalPrice}}` | The total price of the booking. |
+| `{{dc_check::serialNumber}}` | The serial number of the (first) tank. |
+| `{{dc_check::firstname}}` | First name of the person booking. |
+| `{{dc_check::lastname}}` | Last name of the person booking. |
+| `{{dc_check::email}}` | Email address of the person booking. |
+| `{{dc_check::bookingDate}}` | Date of the booking (formatted according to system settings). |
+| `{{dc_check::notes}}` | Booking notes/remarks. |
+
+### B) For Course Registrations (course_order)
+Accesses data from the `tl_dc_course_students` (assignment), `tl_dc_students` (student), and `tl_dc_course_event` (course) tables.
+These tags refer to the course assignment, the student, and the event, based on `last_course_order`.
+
+**Syntax:** `{{course::property}}`
+
+| Tag | Description |
+| :--- | :--- |
+| `{{course::title}}` | Name of the diving course / event. |
+| `{{course::firstname}}` | First name of the student. |
+| `{{course::lastname}}` | Last name of the student. |
+| `{{course::email}}` | Email address of the student. |
+| `{{course::price}}` | Course fee / price. |
+| `{{course::dateStart}}` | Start date of the course (formatted). |
+| `{{course::dateEnd}}` | End date of the course (formatted). |
+| `{{course::registered_on}}` | Date of registration. |
+| `{{course::status}}` | Current status of the course assignment (raw value). |
+
+### Usage & Formatting
+These insert tags can be used in all Contao text fields (content elements, email subjects, confirmation texts).
+
+#### Date Values
+Fields such as `bookingDate`, `dateStart`, `dateEnd`, or `registered_on` are automatically formatted based on the date format (`datimFormat`) defined in the Contao system settings.
+
+#### Standard Flags
+Since these tags utilize the modern Contao 5 system, they can be combined with standard flags:
+- `{{dc_check::totalPrice|number_format:2}}`
+- `{{course::title|strtoupper}}`
 
 ## Future Plans
 
 - Members will be able to record their own equipment.
-
 
 ## Donation
 
