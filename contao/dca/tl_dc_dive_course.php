@@ -165,8 +165,6 @@ $GLOBALS['TL_DCA']['tl_dc_dive_course'] = [
             'inputType' => 'textarea',
             'exclude' => true,
             'search' => true,
-            'filter' => true,
-            'sorting' => true,
             'eval' => ['rte' => 'tinyMCE', 'tl_class' => 'clr'],
             'sql' => 'text NULL'
         ],
@@ -175,8 +173,6 @@ $GLOBALS['TL_DCA']['tl_dc_dive_course'] = [
             'inputType' => 'textarea',
             'exclude' => true,
             'search' => true,
-            'filter' => true,
-            'sorting' => true,
             'eval' => ['rte' => 'tinyMCE', 'tl_class' => 'clr'],
             'sql' => 'text NULL'
         ],

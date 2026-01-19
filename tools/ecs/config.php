@@ -2,32 +2,44 @@
 
 declare(strict_types=1);
 
+// Lade den Composer-Autoloader
+if (is_file(__DIR__ . '/vendor/autoload.php')) {
+    require_once __DIR__ . '/vendor/autoload.php';
+} elseif (is_file(__DIR__ . '/../../vendor/autoload.php')) {
+    require_once __DIR__ . '/../../vendor/autoload.php';
+} elseif (is_file(__DIR__ . '/../../../../vendor/autoload.php')) {
+    // Wenn das Bundle in vendor/diversworld/contao-diveclub-bundle liegt
+    require_once __DIR__ . '/../../../../vendor/autoload.php';
+}
+
 use Symplify\EasyCodingStandard\Config\ECSConfig;
-use Symplify\EasyCodingStandard\ValueObject\Option;
 use PhpCsFixer\Fixer\Comment\HeaderCommentFixer;
 use PhpCsFixer\Fixer\Whitespace\MethodChainingIndentationFixer;
 
 return static function (ECSConfig $ecsConfig): void {
 
-    if (is_file(__DIR__.'/vendor/contao/easy-coding-standard/config/contao.php')) {
-        //.github/workflows/ci.yaml
-        $ecsConfig->sets([__DIR__.'/vendor/contao/easy-coding-standard/config/contao.php']);
-    } else {
-        // local development
-        $ecsConfig->sets([__DIR__.'/../../../../../vendor/contao/easy-coding-standard/config/contao.php']);
+    $contaoConfig = null;
+
+    if (is_file(__DIR__.'/vendor/contao/easy-coding-standard/config/set/contao.php')) {
+        $contaoConfig = __DIR__.'/vendor/contao/easy-coding-standard/config/set/contao.php';
+    } elseif (is_file(__DIR__.'/../../vendor/contao/easy-coding-standard/config/set/contao.php')) {
+        $contaoConfig = __DIR__.'/../../vendor/contao/easy-coding-standard/config/set/contao.php';
+    } elseif (is_file(__DIR__.'/../../../../vendor/contao/easy-coding-standard/config/set/contao.php')) {
+        $contaoConfig = __DIR__.'/../../../../vendor/contao/easy-coding-standard/config/set/contao.php';
     }
 
-    $services = $ecsConfig->services();
-    $services
-        ->set(HeaderCommentFixer::class)
-        ->call('configure', [
-            [
-                'header' => "This file is part of Diveclub App.\n\n(c) Eckhard Becker ".date('Y')." <info@diversworld.eu>\n@license GPL-3.0-or-later\nFor the full copyright and license information,\nplease view the LICENSE file that was distributed with this source code.\n@link https://github.com/diversworld/contao-diveclub-bundle",
-            ],
-        ]);
+    if ($contaoConfig) {
+        $ecsConfig->sets([$contaoConfig]);
+    }
+
+    $ecsConfig->ruleWithConfiguration(HeaderCommentFixer::class, [
+        'header' => "This file is part of Contao Diveclub Bundle.\n\n(c) Eckhard Becker " . date('Y') . " <info@diversworld.eu>\n@license GPL-3.0-or-later\nFor the full copyright and license information,\nplease view the LICENSE file that was distributed with this source code.\n@link https://github.com/diversworld/contao-diveclub-bundle",
+        'location' => 'after_declare_strict',
+    ]);
 
     $ecsConfig->skip([
         '*/contao/dca*',
+        '*/contao/languages*',
         MethodChainingIndentationFixer::class => [
             'DependencyInjection/Configuration.php',
         ],
@@ -35,7 +47,5 @@ return static function (ECSConfig $ecsConfig): void {
 
     $ecsConfig->parallel();
     $ecsConfig->lineEnding("\n");
-
-    $parameters = $ecsConfig->parameters();
-    $parameters->set(Option::CACHE_DIRECTORY, sys_get_temp_dir().'/ecs_default_cache');
+    $ecsConfig->cacheDirectory(sys_get_temp_dir().'/ecs_default_cache');
 };

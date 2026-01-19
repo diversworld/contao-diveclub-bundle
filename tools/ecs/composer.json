@@ -1,6 +1,7 @@
 {
     "require": {
-        "contao/easy-coding-standard": "^5.4"
+        "contao/easy-coding-standard": "^6.0",
+        "symplify/easy-coding-standard": "^13.0"
     },
     "config": {
         "allow-plugins": {
