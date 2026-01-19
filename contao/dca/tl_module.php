@@ -31,34 +31,10 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['dc_course_events_list'] =
     '{protected_legend:hide},protected;' .
     '{expert_legend:hide},guests,cssID';
 
-// Felder für die Kursliste
-$GLOBALS['TL_DCA']['tl_module']['fields']['showCourseEvents'] = [
-    'exclude'   => true,
-    'inputType' => 'checkbox',
-    'eval'      => ['tl_class' => 'w50 m12'],
-    'sql'       => "char(1) NOT NULL default '1'"
-];
-
-$GLOBALS['TL_DCA']['tl_module']['fields']['showTankChecks'] = [
-    'exclude'   => true,
-    'inputType' => 'checkbox',
-    'eval'      => ['tl_class' => 'w50 m12'],
-    'sql'       => "char(1) NOT NULL default ''"
-];
-
-$GLOBALS['TL_DCA']['tl_module']['fields']['tankCheckJumpTo'] = [
-    'exclude'                 => true,
-    'inputType'               => 'pageTree',
-    'foreignKey'              => 'tl_page.title',
-    'eval'                    => ['mandatory' => false, 'fieldType' => 'radio', 'tl_class' => 'clr'],
-    'sql'                     => "int(10) unsigned NOT NULL default 0",
-    'relation'                => ['type' => 'hasOne', 'load' => 'lazy']
-];
-
 // Reader einer Kursveranstaltung
 $GLOBALS['TL_DCA']['tl_module']['palettes']['dc_course_event_reader'] =
     '{title_legend},name,headline,type;' .
-    '{config_legend},jumpTo,tankCheckJumpTo,showTankChecks;' .
+    '{redirect_legend},jumpTo;' .
     '{template_legend:hide},customTpl;' .
     '{protected_legend:hide},protected;' .
     '{expert_legend:hide},guests,cssID';
@@ -101,8 +77,37 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['dc_check_confirmation'] =
     '{protected_legend:hide},protected;' .
     '{expert_legend:hide},guests,cssID';
 
+
+// Felder für die Kursliste
+$GLOBALS['TL_DCA']['tl_module']['fields']['showCourseEvents'] = [
+    'label' => &$GLOBALS['TL_LANG']['tl_module']['showCourseEvents'],
+    'exclude'   => true,
+    'inputType' => 'checkbox',
+    'eval'      => ['tl_class' => 'w50 m12'],
+    'sql'       => "char(1) NOT NULL default '1'"
+];
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['showTankChecks'] = [
+    'label' => &$GLOBALS['TL_LANG']['tl_module']['showTankChecks'],
+    'exclude'   => true,
+    'inputType' => 'checkbox',
+    'eval'      => ['tl_class' => 'w50 m12'],
+    'sql'       => "char(1) NOT NULL default ''"
+];
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['tankCheckJumpTo'] = [
+    'label' => &$GLOBALS['TL_LANG']['tl_module']['tankCheckJumpTo'],
+    'exclude'                 => true,
+    'inputType'               => 'pageTree',
+    'foreignKey'              => 'tl_page.title',
+    'eval'                    => ['mandatory' => false, 'fieldType' => 'radio', 'tl_class' => 'clr'],
+    'sql'                     => "int(10) unsigned NOT NULL default 0",
+    'relation'                => ['type' => 'hasOne', 'load' => 'lazy']
+];
+
 // Felder für die Tank-Check E-Mail-Konfiguration (analog zu anderen Modulen falls vorhanden)
 $GLOBALS['TL_DCA']['tl_module']['fields']['reg_notification'] = [
+    'label' => &$GLOBALS['TL_LANG']['tl_module']['reg_notification'],
     'exclude'   => true,
     'inputType' => 'text',
     'eval'      => ['rgxp' => 'emails', 'tl_class' => 'w50'],
@@ -110,6 +115,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['reg_notification'] = [
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['reg_subject'] = [
+    'label' => &$GLOBALS['TL_LANG']['tl_module']['reg_subject'],
     'exclude'   => true,
     'inputType' => 'text',
     'eval'      => ['decodeEntities' => true, 'tl_class' => 'w50'],
@@ -117,6 +123,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['reg_subject'] = [
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['reg_text'] = [
+    'label'     => &$GLOBALS['TL_LANG']['tl_module']['reg_text'],
     'exclude'   => true,
     'inputType' => 'text',
     'eval'      => ['decodeEntities' => true, 'tl_class' => 'clr'],
@@ -124,6 +131,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['reg_text'] = [
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['confirmation_text'] = [
+    'label'     => &$GLOBALS['TL_LANG']['tl_module']['confirmation_text'],
     'exclude'   => true,
     'inputType' => 'textarea',
     'eval'      => ['rte' => 'tinyMCE', 'tl_class' => 'clr'],

@@ -15,13 +15,17 @@ declare(strict_types=1);
 /**
  * Legends
  */
-$GLOBALS['TL_LANG']['tl_module']['equipment_legend'] = "Dive Manager Equipment settings";
 
+// Frontend module: Additional field for course events list
+$GLOBALS['TL_LANG']['tl_module']['dc_reader_article'] = ['Target article (Event reader)', 'Please select the article where the event reader is placed.'];
 
-/**
- * Fields
- */
-$GLOBALS['TL_LANG']['tl_module']['dc_reservation'] = ["Equipment Rental", "The assets can be rented by members."];
-$GLOBALS['TL_LANG']['tl_module']['showCourseEvents'] = ['Show course events', 'Select this option to show course events in the list.'];
+// Optional: Group/Legend texts
+$GLOBALS['TL_LANG']['tl_module']['config_legend'] = 'Configuration';
+
+$GLOBALS['TL_LANG']['tl_module']['reg_notification'] = ['Notification to', 'Please enter one or more email addresses for the booking confirmation.'];
+$GLOBALS['TL_LANG']['tl_module']['reg_subject']      = ['Email subject', 'Please enter the subject for the confirmation email.'];
+$GLOBALS['TL_LANG']['tl_module']['reg_text']         = ['Email text', 'Please enter the text for the confirmation email. You can use insert tags.'];
+$GLOBALS['TL_LANG']['tl_module']['confirmation_text'] = ['Confirmation text', 'Please enter the text to be displayed on the confirmation page. You can use insert tags.'];
+$GLOBALS['TL_LANG']['tl_module']['showCourseEvents']  = ['Show course events', 'Select this option to show course events in the list.'];
 $GLOBALS['TL_LANG']['tl_module']['showTankChecks']   = ['Show tank checks', 'Select this option to show tank checks (TÜV) in the list.'];
-$GLOBALS['TL_LANG']['tl_module']['tankCheckJumpTo']  = ['Tank check reader page', 'Please select the page to which visitors will be redirected when clicking a tank check.'];
+$GLOBALS['TL_LANG']['tl_module']['tankCheckJumpTo']  = ['Tank check reader page', 'Please select the page on which the tank check (TÜV) module is integrated.'];
