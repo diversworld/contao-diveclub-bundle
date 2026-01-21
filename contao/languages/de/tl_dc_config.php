@@ -36,6 +36,7 @@ $GLOBALS['TL_LANG']['tl_dc_config']['manufacturersFile'] = ['Hersteller-Template
 $GLOBALS['TL_LANG']['tl_dc_config']['courseTypesFile'] = ['Kurs-Template', 'Eine neue Template-Konfiguration anlegen'];
 $GLOBALS['TL_LANG']['tl_dc_config']['courseCategoriesFile'] = ['Kurskategorie-Template', 'Eine neue Template-Konfiguration anlegen'];
 $GLOBALS['TL_LANG']['tl_dc_config']['invoiceTemplate'] = ['PDF-Rechnungsvorlage', 'Bitte wählen Sie eine PDF-Datei aus, die als Briefpapier für die Rechnung verwendet werden soll.'];
+$GLOBALS['TL_LANG']['tl_dc_config']['invoiceText'] = ['Zusatztext Rechnung', 'Dieser Text wird der generierten PDF-Rechnung hinzugefügt. Insert-Tags können verwendet werden.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['pdfFolder'] = ['Speicherort PDF-Dateien', 'Bitte wählen Sie den Ordner aus, in dem die generierten PDF-Dateien gespeichert werden sollen. Wird kein Ordner ausgewählt, werden sie unter "files" gespeichert.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['sizesFile'] = ['Größen-Template', 'Eine neue Template-Konfiguration anlegen'];
 $GLOBALS['TL_LANG']['tl_dc_config']['typesFile'] = ['Ausrüstungs-Template', 'Eine neue Template-Konfiguration anlegen'];

@@ -55,7 +55,7 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
                                 {types_legend},addTypes;
                                 {course_legend},addCourses;
                                 {regulator_legend},addRegulators;
-                                {invoice_legend},invoiceTemplate,pdfFolder;
+                                {invoice_legend},invoiceTemplate,invoiceText,pdfFolder;
                                 {reservation_legend},reservationMessage,reservationInfo,reservationInfoText;
                                 {conditions_legend},rentalConditions;
                                 {publish_legend},published,start,stop;'
@@ -169,6 +169,13 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
             'inputType' => 'fileTree',
             'eval' => ['fieldType' => 'radio', 'files' => true, 'extensions' => 'pdf', 'tl_class' => 'clr'],
             'sql' => "binary(16) NULL"
+        ],
+        'invoiceText' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_config']['invoiceText'],
+            'exclude' => true,
+            'inputType' => 'textarea',
+            'eval' => ['style' => 'height:60px', 'decodeEntities' => true, 'rte' => 'tinyMCE', 'basicEntities' => true, 'tl_class' => 'clr'],
+            'sql' => "text NULL"
         ],
         'pdfFolder' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_config']['pdfFolder'],

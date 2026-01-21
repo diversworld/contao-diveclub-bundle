@@ -8,6 +8,7 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\FilesModel;
 use Contao\System;
 use Contao\StringUtil;
+use Contao\Controller;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckArticlesModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckBookingModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckOrderModel;
@@ -136,6 +137,18 @@ class TankCheckPdfGenerator
                     <td colspan="4" align="right"><strong>Gesamtpreis:</strong></td>
                     <td align="right"><strong>' . number_format($total, 2, ',', '.') . ' &euro;</strong></td>
                   </tr></tfoot></table>';
+
+        if ($config && $config->invoiceText) {
+            //Nutze den Insert-Tag Parser von Contao
+            $parser = System::getContainer()->get('contao.insert_tag.parser');
+
+            // Stelle sicher, dass die aktuelle Buchungs-ID in der Session bekannt ist,
+            // damit deine Insert-Tags (DcCheckInsertTag) darauf zugreifen können.
+            System::getContainer()->get('request_stack')->getCurrentRequest()?->getSession()->set('last_tank_check_order', $booking->id);
+
+            $invoiceText = $parser->replace($config->invoiceText);
+            $html .= '<div style="margin-top: 20px;">' . $invoiceText . '</div>';
+        }
 
         $pdf->writeHTML($html, true, false, true, false, '');
 

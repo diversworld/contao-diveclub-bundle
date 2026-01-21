@@ -1,6 +1,7 @@
 {
   "require": {
-    "contao/easy-coding-standard": "^6.0"
+    "contao/easy-coding-standard": "^6.0",
+    "squizlabs/php_codesniffer": "^3.10"
   },
   "config": {
     "allow-plugins": {

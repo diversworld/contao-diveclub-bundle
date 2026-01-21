@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a648c67089f94a551ea97f1b07747786",
+    "content-hash": "229b14ea7fda7d2cfbdbe241413c2b08",
     "packages": [
         {
             "name": "clue/ndjson-react",
@@ -294,26 +294,23 @@
         },
         {
             "name": "contao/easy-coding-standard",
-            "version": "6.13.5",
+            "version": "6.13.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/contao/easy-coding-standard.git",
-                "reference": "0d6594e1eefafd44c169744d11fd66c5beb1f7fa"
+                "reference": "6e589aee080496b1b2c12402b5d666a91297d8b7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/contao/easy-coding-standard/zipball/0d6594e1eefafd44c169744d11fd66c5beb1f7fa",
-                "reference": "0d6594e1eefafd44c169744d11fd66c5beb1f7fa",
+                "url": "https://api.github.com/repos/contao/easy-coding-standard/zipball/6e589aee080496b1b2c12402b5d666a91297d8b7",
+                "reference": "6e589aee080496b1b2c12402b5d666a91297d8b7",
                 "shasum": ""
             },
             "require": {
                 "kubawerlos/php-cs-fixer-custom-fixers": "^3.14",
                 "php": "^8.1",
                 "slevomat/coding-standard": "^8.0",
-                "symplify/easy-coding-standard": "^12.1"
-            },
-            "conflict": {
-                "squizlabs/php_codesniffer": ">=4.0.0"
+                "symplify/easy-coding-standard": "^13.0"
             },
             "require-dev": {
                 "contao/rector": "^1.2",
@@ -338,7 +335,7 @@
             "description": "EasyCodingStandard configurations for Contao",
             "support": {
                 "issues": "https://github.com/contao/easy-coding-standard/issues",
-                "source": "https://github.com/contao/easy-coding-standard/tree/6.13.5"
+                "source": "https://github.com/contao/easy-coding-standard/tree/6.13.8"
             },
             "funding": [
                 {
@@ -346,7 +343,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2025-09-26T11:49:51+00:00"
+            "time": "2025-12-10T16:50:25+00:00"
         },
         {
             "name": "dealerdirect/phpcodesniffer-composer-installer",
@@ -3070,24 +3067,24 @@
         },
         {
             "name": "symplify/easy-coding-standard",
-            "version": "12.6.2",
+            "version": "13.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/easy-coding-standard/easy-coding-standard.git",
-                "reference": "7a6798aa424f0ecafb1542b6f5207c5a99704d3d"
+                "reference": "5c7e7a07e5d6a98b9dd2e6fc0a9155efb7c166c8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/easy-coding-standard/easy-coding-standard/zipball/7a6798aa424f0ecafb1542b6f5207c5a99704d3d",
-                "reference": "7a6798aa424f0ecafb1542b6f5207c5a99704d3d",
+                "url": "https://api.github.com/repos/easy-coding-standard/easy-coding-standard/zipball/5c7e7a07e5d6a98b9dd2e6fc0a9155efb7c166c8",
+                "reference": "5c7e7a07e5d6a98b9dd2e6fc0a9155efb7c166c8",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.2"
             },
             "conflict": {
-                "friendsofphp/php-cs-fixer": "<3.46",
-                "phpcsstandards/php_codesniffer": "<3.8",
+                "friendsofphp/php-cs-fixer": "<3.92.4",
+                "phpcsstandards/php_codesniffer": "<4.0.1",
                 "symplify/coding-standard": "<12.1"
             },
             "suggest": {
@@ -3115,7 +3112,7 @@
             ],
             "support": {
                 "issues": "https://github.com/easy-coding-standard/easy-coding-standard/issues",
-                "source": "https://github.com/easy-coding-standard/easy-coding-standard/tree/12.6.2"
+                "source": "https://github.com/easy-coding-standard/easy-coding-standard/tree/13.0.4"
             },
             "funding": [
                 {
@@ -3127,7 +3124,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-10-29T08:51:50+00:00"
+            "time": "2026-01-05T09:10:04+00:00"
         }
     ],
     "packages-dev": [],
