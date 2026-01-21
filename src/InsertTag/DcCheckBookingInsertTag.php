@@ -82,9 +82,16 @@ class DcCheckBookingInsertTag implements InsertTagResolverNestedResolvedInterfac
             $value = number_format((float) $value, 2, ',', '.') . ' €';
         }
 
+        if (in_array($property, ['paid', 'status'], true)) {
+            Controller::loadLanguageFile('tl_dc_check_booking');
+        }
+
+        if ($property === 'paid') {
+            $value = $GLOBALS['TL_LANG']['tl_dc_check_booking']['paid_reference'][$value ? '1' : '0'] ?? ($value ? 'Ja' : 'Nein');
+        }
+
         // Handle status field
         if ($property === 'status') {
-            Controller::loadLanguageFile('tl_dc_check_booking');
             $value = $GLOBALS['TL_LANG']['tl_dc_check_booking']['status_reference'][$value] ?? $value;
         }
 

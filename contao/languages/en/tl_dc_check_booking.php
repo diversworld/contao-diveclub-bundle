@@ -36,4 +36,9 @@ $GLOBALS['TL_LANG']['tl_dc_check_booking']['status_reference'] = [
     'pickedup'  => 'Picked up'
 ];
 
+$GLOBALS['TL_LANG']['tl_dc_check_booking']['paid_reference'] = [
+    '0' => 'No',
+    '1' => 'Yes'
+];
+
 $GLOBALS['TL_LANG']['tl_dc_check_booking']['pdfButton'] = 'Generate PDF';

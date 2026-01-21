@@ -36,6 +36,10 @@ $GLOBALS['TL_LANG']['tl_dc_check_booking']['status_reference'] = [
     'pickedup'  => 'Abgeholt'
 ];
 
-$GLOBALS['TL_LANG']['tl_dc_check_booking']['pdfButton'] = 'PDF generieren';
+$GLOBALS['TL_LANG']['tl_dc_check_booking']['paid_reference'] = [
+    '0' => 'Nein',
+    '1' => 'Ja'
+];
 
+$GLOBALS['TL_LANG']['tl_dc_check_booking']['pdfButton'] = 'PDF generieren';
 $GLOBALS['TL_LANG']['tl_dc_check_order']['pdf'] = ['Rechnung erstellen', 'Rechnung für Order ID %s als PDF erstellen'];
