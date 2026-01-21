@@ -15,6 +15,7 @@ $GLOBALS['TL_LANG']['tl_dc_config']['publish_legend'] = 'Veröffentlichung';
 $GLOBALS['TL_LANG']['tl_dc_config']['reservation_legend'] = 'Reservierung';
 $GLOBALS['TL_LANG']['tl_dc_config']['check_legend'] = 'Prüfungen';
 $GLOBALS['TL_LANG']['tl_dc_config']['invoice_legend'] = 'Rechnungseinstellungen';
+$GLOBALS['TL_LANG']['tl_dc_config']['tuv_legend'] = 'TÜV-Einstellungen';
 $GLOBALS['TL_LANG']['tl_dc_config']['conditions_legend'] = 'Bedingungen';
 
 /**
@@ -38,6 +39,8 @@ $GLOBALS['TL_LANG']['tl_dc_config']['courseCategoriesFile'] = ['Kurskategorie-Te
 $GLOBALS['TL_LANG']['tl_dc_config']['invoiceTemplate'] = ['PDF-Rechnungsvorlage', 'Bitte wählen Sie eine PDF-Datei aus, die als Briefpapier für die Rechnung verwendet werden soll.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['invoiceText'] = ['Zusatztext Rechnung', 'Dieser Text wird der generierten PDF-Rechnung hinzugefügt. Insert-Tags können verwendet werden.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['pdfFolder'] = ['Speicherort PDF-Dateien', 'Bitte wählen Sie den Ordner aus, in dem die generierten PDF-Dateien gespeichert werden sollen. Wird kein Ordner ausgewählt, werden sie unter "files" gespeichert.'];
+$GLOBALS['TL_LANG']['tl_dc_config']['tuvListFormat'] = ['TÜV-Listenformat', 'Bitte wählen Sie das Format für die TÜV-Geräteliste aus.'];
+$GLOBALS['TL_LANG']['tl_dc_config']['tuvListFolder'] = ['Speicherort TÜV-Liste', 'Bitte wählen Sie den Ordner aus, in dem die TÜV-Liste gespeichert werden soll. Wird kein Ordner ausgewählt, wird sie unter "files" gespeichert.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['sizesFile'] = ['Größen-Template', 'Eine neue Template-Konfiguration anlegen'];
 $GLOBALS['TL_LANG']['tl_dc_config']['typesFile'] = ['Ausrüstungs-Template', 'Eine neue Template-Konfiguration anlegen'];
 $GLOBALS['TL_LANG']['tl_dc_config']['regulatorsFile'] = ['Atemregler-Template', 'Eine neue Template-Konfiguration anlegen'];

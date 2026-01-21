@@ -18,6 +18,8 @@ use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
+use Contao\Image;
+use Contao\StringUtil;
 use Contao\System;
 use Diversworld\ContaoDiveclubBundle\DataContainer\DcCheckProposal;
 
@@ -71,6 +73,15 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
             'delete',
             'toggle',
             'show',
+            '!tuv_list' => [
+                'label' => &$GLOBALS['TL_LANG']['tl_dc_check_proposal']['tuv_list'],
+                'href' => 'key=tuv_list',
+                'icon' => 'bundles/diversworldcontaodiveclub/icons/pdf.svg',
+                'attributes' => 'onclick="Backend.getScrollOffset()"',
+                'button_callback' => [tl_dc_check_proposal::class, 'generateTuvListButton'],
+                'primary' => true,
+                'showInHeader' => true
+            ],
             'new_after' => [
                 'label' => ['Neu danach', 'Neue Zuordnung hinzufügen'],
                 'href' => 'act=create&amp;mode=1',
@@ -296,19 +307,6 @@ class tl_dc_check_proposal extends Backend
         return $varValue;
     }
 
-    function getCalenarOptions(): array
-    {
-        $options = [];
-        $db = Database::getInstance();
-        $result = $db->execute("SELECT id, title FROM tl_calendar_events WHERE addCheckInfo = '1'");
-
-        if ($result->numRows > 0) {
-            $data = $result->fetchAllAssoc();
-            $options = array_column($data, 'title', 'id');
-        }
-        return $options; // Rückgabe eines sauberen Arrays
-    }
-
     /**
      * Funktion, um die Vendor-Info in das zugehörige Event zu schreiben
      *
@@ -348,5 +346,12 @@ class tl_dc_check_proposal extends Backend
         }
         // Rückgabe des gespeicherten Wertes
         return $varValue;
+    }
+
+    public function generateTuvListButton($row, $href, $label, $title, $icon, $attributes)
+    {
+        $url = System::getContainer()->get('router')->generate('dc_tuv_list_export', ['id' => $row['id']]);
+
+        return '<a href="' . $url . '" title="' . StringUtil::specialchars($title) . '" ' . $attributes . ' target="_blank">' . Image::getHtml($icon, $label) . '</a> ';
     }
 }

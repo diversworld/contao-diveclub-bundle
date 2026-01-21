@@ -32,6 +32,7 @@ $GLOBALS['TL_LANG']['tl_dc_check_proposal']['title'] = ["Angebotsnummer", "Geben
 $GLOBALS['TL_LANG']['tl_dc_course_modules']['alias'] = ['Alias', 'Der Alias ist eine eindeutige Referenz, die anstelle der numerischen ID aufgerufen werden kann.'];
 
 $GLOBALS['TL_LANG']['tl_dc_check_proposal']['checkId'] = ['Termin', 'Event mit dem der TÜV-Termin im Kalender eingetragen wurde.'];
+$GLOBALS['TL_LANG']['tl_dc_check_proposal']['tuv_list'] = ['TÜV-Liste erstellen', 'Erstellt eine PDF-Liste aller gebuchten Tauchgeräte für diesen Termin.'];
 $GLOBALS['TL_LANG']['tl_dc_check_proposal']['proposalDate'] = ['Angebotsdatum', 'Datum des Angebots.'];
 $GLOBALS['TL_LANG']['tl_dc_check_proposal']['vendorName'] = ['Prüfungsunternhemen', 'Name der Firma oder des Unternehmens.'];
 $GLOBALS['TL_LANG']['tl_dc_check_proposal']['vendorWebsite'] = ['Website', 'Website der Firma oder des Unternehmens.'];

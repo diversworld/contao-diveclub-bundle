@@ -15,6 +15,7 @@ $GLOBALS['TL_LANG']['tl_dc_config']['publish_legend'] = 'Publishing';
 $GLOBALS['TL_LANG']['tl_dc_config']['reservation_legend'] = 'Reservation';
 $GLOBALS['TL_LANG']['tl_dc_config']['check_legend'] = 'Checks';
 $GLOBALS['TL_LANG']['tl_dc_config']['invoice_legend'] = 'Invoice settings';
+$GLOBALS['TL_LANG']['tl_dc_config']['tuv_legend'] = 'TÜV settings';
 $GLOBALS['TL_LANG']['tl_dc_config']['conditions_legend'] = 'Conditions';
 
 /**
@@ -38,6 +39,8 @@ $GLOBALS['TL_LANG']['tl_dc_config']['courseCategoriesFile'] = ['Course category 
 $GLOBALS['TL_LANG']['tl_dc_config']['invoiceTemplate'] = ['PDF invoice template', 'Please select a PDF file to be used as stationery for the invoice.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['invoiceText'] = ['Additional invoice text', 'This text will be added to the generated PDF invoice. Insert tags can be used.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['pdfFolder'] = ['PDF storage location', 'Please select the folder where the generated PDF files should be saved. If no folder is selected, they will be saved under "files".'];
+$GLOBALS['TL_LANG']['tl_dc_config']['tuvListFormat'] = ['TÜV list format', 'Please select the format for the TÜV equipment list.'];
+$GLOBALS['TL_LANG']['tl_dc_config']['tuvListFolder'] = ['TÜV list storage location', 'Please select the folder where the TÜV list should be saved. If no folder is selected, it will be saved under "files".'];
 $GLOBALS['TL_LANG']['tl_dc_config']['sizesFile'] = ['Sizes template', 'Select the template for sizes.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['typesFile'] = ['Equipment template', 'Select the template for equipment.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['regulatorsFile'] = ['Regulator template', 'Select the template for regulators.'];

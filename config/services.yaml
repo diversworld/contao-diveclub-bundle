@@ -24,6 +24,11 @@ services:
         autowire: true
         tags: ['controller.service_arguments']
 
+    Diversworld\ContaoDiveclubBundle\Controller\Backend\TuvListExportController:
+        public: true
+        autowire: true
+        tags: ['controller.service_arguments']
+
     # Add a session bag
     diversworld.contao_diveclub_bundle.session.factory:
         class: Diversworld\ContaoDiveclubBundle\Session\SessionFactory

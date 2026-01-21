@@ -31,6 +31,7 @@ $GLOBALS['TL_LANG']['tl_dc_check_proposal']['title'] = ["Offer Number", "Enter t
 $GLOBALS['TL_LANG']['tl_dc_check_proposal']['alias'] = ["Alias", "Offer alias. Will be generated automatically."];
 
 $GLOBALS['TL_LANG']['tl_dc_check_proposal']['checkId']          = ['Appointment','Event in the calendar where the TÜV appointment was registered.'];
+$GLOBALS['TL_LANG']['tl_dc_check_proposal']['tuv_list'] = ['Create TÜV list', 'Creates a PDF list of all booked diving equipment for this appointment.'];
 $GLOBALS['TL_LANG']['tl_dc_check_proposal']['proposalDate']     = ['Offer Date','The date of the offer.'];
 $GLOBALS['TL_LANG']['tl_dc_check_proposal']['vendorName']       = ['Inspection Company','Name of the company or service provider.'];
 $GLOBALS['TL_LANG']['tl_dc_check_proposal']['vendorWebsite']    = ['Website','Website of the company or service provider.'];
