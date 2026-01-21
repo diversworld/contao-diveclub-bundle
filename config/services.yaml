@@ -9,7 +9,7 @@ services:
 
     Diversworld\ContaoDiveclubBundle\:
         resource: ../src/
-        exclude: ../src/{DependencyInjection,Model,Session}
+        exclude: ../src/{DependencyInjection,Model,Session,Controller/Backend/TankCheckPdfController.php}
 
     diversworld.template.helper:
         class: Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper
@@ -18,6 +18,11 @@ services:
     # Make the FQCN service explicitly public to allow fetching via container by class name
     Diversworld\ContaoDiveclubBundle\Helper\CourseProgressHelper:
         public: true
+
+    Diversworld\ContaoDiveclubBundle\Controller\Backend\TankCheckPdfController:
+        public: true
+        autowire: true
+        tags: ['controller.service_arguments']
 
     # Add a session bag
     diversworld.contao_diveclub_bundle.session.factory:
