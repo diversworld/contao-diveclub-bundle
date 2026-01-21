@@ -47,6 +47,7 @@ $GLOBALS['TL_LANG']['tl_dc_tanks']['checkId'] = ["TÜV Termin", "Termin der letz
 $GLOBALS['TL_LANG']['tl_dc_tanks']['owner'] = ["Eigentümer", "Eingentümer des Tauchgerätes."];
 $GLOBALS['TL_LANG']['tl_dc_tanks']['lastCheckDate'] = ["letzter TÜV", "Datum der letzten TÜV Prüfung."];
 $GLOBALS['TL_LANG']['tl_dc_tanks']['nextCheckDate'] = ["nächster TÜV", "Datum der nächsten TÜV Prüfung."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['lastOrder'] = ["Letzte Order", "Die jeweils aktuelle Order."];
 $GLOBALS['TL_LANG']['tl_dc_tanks']['pid'] = ["nächster TÜV-Termin", "Wähle den nächsten TÜV-Termin aus.."];
 $GLOBALS['TL_LANG']['tl_dc_tanks']['rentalFee'] = ['Leihgebühr', 'Leihgebühr für dieses Element.'];
 $GLOBALS['TL_LANG']['tl_dc_tanks']['size'] = ["Größe", "Bitte die Flaschengröße auswählen."];

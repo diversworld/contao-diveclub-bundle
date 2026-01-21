@@ -22,7 +22,7 @@ use Contao\System;
 use Diversworld\ContaoDiveclubBundle\DataContainer\DcCheckProposal;
 
 /**
- * Table tl_dc_check_invoice
+ * Table tl_dc_check_proposal
  */
 $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
     'config' => [

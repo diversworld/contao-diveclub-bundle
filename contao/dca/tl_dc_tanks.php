@@ -27,7 +27,6 @@ use Diversworld\ContaoDiveclubBundle\DataContainer\DcTanks;
 $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
     'config'            => [
         'dataContainer'     => DC_Table::class,
-        'ctable'            => ['tl_dc_check_invoice'],
         'enableVersioning'  => true,
         'ondelete_callback' => [],
         'sql'               => [
@@ -63,7 +62,6 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
         ],
         'operations'        => [
             'edit',
-            'children',
             'copy',
             'delete',
             'toggle',
@@ -73,7 +71,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
     'palettes'          => [
         '__selector__'      => ['addNotes'],
         'default'           => '{title_legend},title,alias,status,rentalFee;
-                                {details_legend},serialNumber,manufacturer,bazNumber,size,o2clean,owner,checkId,lastCheckDate,nextCheckDate;
+                                {details_legend},serialNumber,manufacturer,bazNumber,size,o2clean,owner,checkId,lastCheckDate,nextCheckDate,lastOrder;
                                 {notes_legend},addNotes;
                                 {publish_legend},published,start,stop;'
     ],
@@ -197,6 +195,15 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'flag'              => DataContainer::SORT_YEAR_DESC,
             'eval'              => ['submitOnChange' => true,'rgxp'=>'date', 'doNotCopy'=>false, 'datepicker'=>true, 'tl_class'=>'w33 wizard'],
             'sql'               => "bigint(20) NULL"
+        ],
+        'lastOrder'         => [
+            'inputType'         => 'text',
+            'label'             => &$GLOBALS['TL_LANG']['tl_dc_tanks']['lastOrder'],
+            'exclude'           => true,
+            'search'            => true,
+            'filter'            => true,
+            'eval'              => ['maxlength' => 255, 'tl_class' => 'w33 clr'],
+            'sql'               => "varchar(255) NOT NULL default ''"
         ],
         'rentalFee'             => [
             'inputType'         => 'text',
@@ -329,8 +336,6 @@ class tl_dc_tanks extends Backend
         $serialnumber = $row['serialNumber'] ?? '';
         $size = $row['size'] ?? '';
         $manufacturer = $row['manufacturer'] ?? '';
-        $invoices = $this->listChildren($row);
-        $lastTotal = $this->getLastInvoiceTotal($row);
 
         if($row['o2clean'] == 1){
             $o2CleanValue = 'ja';
@@ -346,57 +351,20 @@ class tl_dc_tanks extends Backend
             ? date('d.m.Y', $row['nextCheckDate'])
             : 'N/A';
 
-        if($invoices == 1) {
-            return sprintf(' %s - %s - %s L - %s - O2: %s - %s - letzter TÜV %s - nächster TÜV %s <span style="color:#b3b3b3; padding-left:4px;">[%s Rechnung] [letzte Rechnung: %s €]</span>',
-                $title,
-                $serialnumber,
-                $size,
-                $manufacturer,
-                $o2CleanValue,
-                $ownerName,
-                $lastCheckDate,
-                $nextCheckDate,
-                $invoices,
-                $lastTotal
-            );
-        }elseif ($invoices >= 2) {
-            return sprintf('%s - %s - %s L - %s -  O2: %s - %s - letzter TÜV %s - nächster TÜV %s <span style="color:#b3b3b3; padding-left:4px;">[%s Rechnungen] [letzte Rechnung: %s €]</span>',
-                $title,
-                $serialnumber,
-                $size,
-                $manufacturer,
-                $o2CleanValue,
-                $ownerName,
-                $lastCheckDate,
-                $nextCheckDate,
-                $invoices,
-                $lastTotal
-            );
-        } else {
-            return sprintf('%s - %s - %s L - %s - O2: %s - %s - letzter TÜV %s - nächster TÜV %s',
-                $title,
-                $serialnumber,
-                $size,
-                $manufacturer,
-                $o2CleanValue,
-                $ownerName,
-                $lastCheckDate,
-                $nextCheckDate
-            );
-        }
+        return sprintf('%s - %s - %s L - %s - O2: %s - %s - letzter TÜV %s - nächster TÜV %s',
+            $title,
+            $serialnumber,
+            $size,
+            $manufacturer,
+            $o2CleanValue,
+            $ownerName,
+            $lastCheckDate,
+            $nextCheckDate
+        );
     }
 
     function formatGroupHeader($group, $field, $row): string
     {
-        if ($field === 'owner') { // Check if field is 'owner'
-            $db = Database::getInstance();
-            $result = $db->prepare("SELECT SUM(priceTotal) as total FROM tl_dc_check_invoice WHERE $field = ?")
-                ->execute($row[$field]);
-
-            $lastTotal =  $result->total;
-            return $group . ' (Rechnung: ' . $lastTotal . ' €)';
-        }
-
         return $group; // default return
     }
 
@@ -466,35 +434,6 @@ class tl_dc_tanks extends Backend
         }
 
         return $options;
-    }
-
-    public function getLastInvoiceTotal($arrRow)
-    {
-        $tankId = $arrRow['id'];
-
-        $result = Database::getInstance()
-            ->prepare("SELECT priceTotal AS total FROM tl_dc_check_invoice WHERE pid = ? ORDER BY id DESC LIMIT 1")
-            ->execute($tankId)
-            ->fetchAssoc();
-
-        // Prüfen, ob das Abfrageergebnis nicht leer ist
-        if ($result){
-            return $result['total'];
-        }
-        return null;  // Oder einen anderen Standardwert zurückgeben
-    }
-
-    public function listChildren($arrRow)
-    {
-        // Get the ID of the current tank
-        $tankId = $arrRow['id'];
-
-        // Query the database to find the number of invoices related to this tank
-        // Return the count of invoices
-        return Database::getInstance()
-            ->prepare("SELECT COUNT(*) AS count FROM tl_dc_check_invoice WHERE pid = ?")
-            ->execute($tankId)
-            ->fetchAssoc()['count'];
     }
 
     public function filterTanksByEventId(DataContainer $dc): void

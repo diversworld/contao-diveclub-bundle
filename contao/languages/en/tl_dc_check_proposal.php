@@ -47,3 +47,5 @@ $GLOBALS['TL_LANG']['tl_dc_check_proposal']['notes'] = ["Notes", "Add a note."];
 $GLOBALS['TL_LANG']['tl_dc_check_proposal']['published'] = ["Publish", "Publish the record."];
 $GLOBALS['TL_LANG']['tl_dc_check_proposal']['start'] = ["Show From", "Date from when the record should be visible."];
 $GLOBALS['TL_LANG']['tl_dc_check_proposal']['stop'] = ["Show Until", "Date until when the record should be visible."];
+
+$GLOBALS['TL_LANG']['tl_dc_check_proposal']['orders'] = ['Orders', 'View bookings for this offer'];

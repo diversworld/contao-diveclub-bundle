@@ -14,6 +14,7 @@ $GLOBALS['TL_LANG']['tl_dc_config']['template_legend'] = "Templates Konfiguratio
 $GLOBALS['TL_LANG']['tl_dc_config']['publish_legend'] = 'Veröffentlichung';
 $GLOBALS['TL_LANG']['tl_dc_config']['reservation_legend'] = 'Reservierung';
 $GLOBALS['TL_LANG']['tl_dc_config']['check_legend'] = 'Prüfungen';
+$GLOBALS['TL_LANG']['tl_dc_config']['invoice_legend'] = 'Rechnungseinstellungen';
 $GLOBALS['TL_LANG']['tl_dc_config']['conditions_legend'] = 'Bedingungen';
 
 /**
@@ -34,6 +35,8 @@ $GLOBALS['TL_LANG']['tl_dc_config']['templatePath'] = ['Templatepfad', 'Bitte de
 $GLOBALS['TL_LANG']['tl_dc_config']['manufacturersFile'] = ['Hersteller-Template', 'Eine neue Template-Konfiguration anlegen'];
 $GLOBALS['TL_LANG']['tl_dc_config']['courseTypesFile'] = ['Kurs-Template', 'Eine neue Template-Konfiguration anlegen'];
 $GLOBALS['TL_LANG']['tl_dc_config']['courseCategoriesFile'] = ['Kurskategorie-Template', 'Eine neue Template-Konfiguration anlegen'];
+$GLOBALS['TL_LANG']['tl_dc_config']['invoiceTemplate'] = ['PDF-Rechnungsvorlage', 'Bitte wählen Sie eine PDF-Datei aus, die als Briefpapier für die Rechnung verwendet werden soll.'];
+$GLOBALS['TL_LANG']['tl_dc_config']['pdfFolder'] = ['Speicherort PDF-Dateien', 'Bitte wählen Sie den Ordner aus, in dem die generierten PDF-Dateien gespeichert werden sollen. Wird kein Ordner ausgewählt, werden sie unter "files" gespeichert.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['sizesFile'] = ['Größen-Template', 'Eine neue Template-Konfiguration anlegen'];
 $GLOBALS['TL_LANG']['tl_dc_config']['typesFile'] = ['Ausrüstungs-Template', 'Eine neue Template-Konfiguration anlegen'];
 $GLOBALS['TL_LANG']['tl_dc_config']['regulatorsFile'] = ['Atemregler-Template', 'Eine neue Template-Konfiguration anlegen'];

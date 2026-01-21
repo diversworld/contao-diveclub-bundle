@@ -13,7 +13,6 @@
 use Diversworld\ContaoDiveclubBundle\Model\DcCalendarEventsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckArticlesModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckBookingModel;
-use Diversworld\ContaoDiveclubBundle\Model\DcCheckInvoiceModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckOrderModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckProposalModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcConfigModel;
@@ -55,9 +54,6 @@ $GLOBALS['BE_MOD']['diveclub'] = [
     'dc_tanks_collection' => [
         'tables' => ['tl_dc_tanks'],
     ],
-    'dc_invoice_collection' => [
-        'tables' => ['tl_dc_check_invoice'],
-    ],
     'dc_course_collection' => [
         'tables' => [
             'tl_dc_dive_course',
@@ -82,7 +78,11 @@ $GLOBALS['BE_MOD']['diveclub'] = [
         'tables' => ['tl_dc_reservation', 'tl_dc_reservation_items'],
     ],
     'dc_check_collection' => [
-        'tables' => ['tl_dc_check_proposal', 'tl_dc_check_articles', 'tl_dc_check_order', 'tl_dc_check_booking'],
+        'tables' => [
+            'tl_dc_check_proposal',
+            'tl_dc_check_articles',
+            'tl_dc_check_order',
+            'tl_dc_check_booking'],
     ],
     'dc_config_collection' => [
         'tables' => ['tl_dc_config'],
@@ -94,7 +94,6 @@ $GLOBALS['BE_MOD']['diveclub'] = [
  */
 
 $GLOBALS['TL_MODELS']['tl_dc_tanks'] = DcTanksModel::class;
-$GLOBALS['TL_MODELS']['tl_dc_check_invoice'] = DcCheckInvoiceModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_check_proposal'] = DcCheckProposalModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_check_articles'] = DcCheckArticlesModel::class;
 $GLOBALS['TL_MODELS']['tl_dc_equipment'] = DcEquipmentModel::class;

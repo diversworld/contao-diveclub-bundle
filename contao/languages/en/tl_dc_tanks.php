@@ -55,6 +55,7 @@ $GLOBALS['TL_LANG']['tl_dc_tanks']['addNotes']          = ["Enter Notes", "Recor
 $GLOBALS['TL_LANG']['tl_dc_tanks']['published']         = ["Publish", "Publish the record."];
 $GLOBALS['TL_LANG']['tl_dc_tanks']['start']             = ["Show from", "From when should the record be displayed."];
 $GLOBALS['TL_LANG']['tl_dc_tanks']['stop']              = ["Show until", "Until when should the record be displayed."];
+$GLOBALS['TL_LANG']['tl_dc_tanks']['status']            = ['Status', 'Asset status'];
 
 /**
  * References
@@ -73,6 +74,18 @@ $GLOBALS['TL_LANG']['tl_dc_tanks']['sizes'] = [
     '20' => '20 L',
     '40' => '40 cft',
     '80' => '80 cft'
+];
+
+$GLOBALS['TL_LANG']['tl_dc_tanks']['itemStatus'] = [
+    'available' => 'available',
+    'reserved' => 'reserved',
+    'borrowed' => 'borrowed',
+    'returned' => 'returned',
+    'cancelled' => 'cancelled',
+    'overdue' => 'overdue',
+    'lost' => 'lost',
+    'damaged' => 'damaged',
+    'missing' => 'missing',
 ];
 
 /**

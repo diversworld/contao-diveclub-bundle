@@ -16,6 +16,8 @@ use Contao\Backend;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
+use Contao\Image;
+use Contao\StringUtil;
 use Contao\System;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\OrderArticleOptionsListener;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\OrderLabelListener;
@@ -187,3 +189,14 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
         ]
     ]
 ];
+
+class tl_dc_check_order extends Backend
+{
+    public function generatePdfButton($row, $href, $label, $title, $icon, $attributes)
+    {
+        // For orders, we use the parent booking ID to generate the full PDF
+        $url = System::getContainer()->get('router')->generate('dc_check_order_pdf', ['id' => $row['pid']]);
+
+        return '<a href="' . $url . '" title="' . StringUtil::specialchars($title) . '" ' . $attributes . ' target="_blank">' . Image::getHtml($icon, $label) . '</a> ';
+    }
+}
