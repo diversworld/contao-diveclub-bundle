@@ -262,7 +262,10 @@ Since these tags utilize the modern Contao 5 system, they can be combined with s
 
 ## Future Plans
 
+- Automatic notification when course status changes
+- Automatic notification when equipment checks are needed
 - Members will be able to record their own equipment.
+
 
 ## Donation
 
