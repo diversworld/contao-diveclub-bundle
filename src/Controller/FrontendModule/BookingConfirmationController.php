@@ -20,6 +20,7 @@ use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\ModuleModel;
 use Contao\StringUtil;
 use Contao\System;
+use Contao\Controller;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckBookingModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckOrderModel;
 use Symfony\Component\HttpFoundation\Request;
@@ -52,8 +53,19 @@ class BookingConfirmationController extends AbstractFrontendModuleController
         // Get all orders for this booking
         $orders = DcCheckOrderModel::findBy('pid', $booking->id);
 
-        $template->booking = $booking;
-        $template->orders = $orders;
+        // Load language file for orders to ensure translations are available
+        Controller::loadLanguageFile('tl_dc_check_order');
+
+        $orderData = [];
+        if (null !== $orders) {
+            foreach ($orders as $order) {
+                $data = $order->row();
+                $data['status_label'] = $GLOBALS['TL_LANG']['tl_dc_check_order']['status_reference'][$order->status] ?? $order->status;
+                $orderData[] = $data;
+            }
+        }
+        $template->booking = $booking->row();
+        $template->orders = $orderData;
 
         // Parse confirmation text with insert tags
         $parser = System::getContainer()->get('contao.insert_tag.parser');

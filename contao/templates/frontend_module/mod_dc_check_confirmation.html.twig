@@ -12,7 +12,6 @@
         {% block orders %}
             {% if orders %}
                 {% block table %}
-                    <h3>Flaschen in dieser Buchung</h3>
                     <table class="table">
                         <thead>
                             <tr>
@@ -28,7 +27,7 @@
                                     <td>{{ order.serialNumber }}</td>
                                     <td>{{ order.size }}L</td>
                                     <td>{{ order.totalPrice|number_format(2, ',', '.') }} €</td>
-                                    <td>{{ ('tl_dc_check_order.status_reference.' ~ order.status)|trans }}</td>
+                                    <td>{{ order.status_label }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
