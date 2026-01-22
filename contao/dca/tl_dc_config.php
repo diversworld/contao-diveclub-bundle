@@ -8,47 +8,47 @@ use Contao\System;
 use Psr\Log\LoggerInterface;
 
 $GLOBALS['TL_DCA']['tl_dc_config'] = [
-    'config' => [
-        'dataContainer' => DC_Table::class,
-        'enableVersioning' => true,
-        'sql' => [
-            'keys' => [
-                'id' => 'primary',
-                'tstamp' => 'index',
-                'alias' => 'index',
+    'config' => [ // Konfiguration des Data Containers
+        'dataContainer' => DC_Table::class, // Verwendung der Standard-Tabellen-Klasse
+        'enableVersioning' => true, // Aktivierung der Versionierung für Datensätze
+        'sql' => [ // SQL-Definitionen
+            'keys' => [ // Index-Definitionen
+                'id' => 'primary', // Primärschlüssel
+                'tstamp' => 'index', // Zeitstempel-Index
+                'alias' => 'index', // Alias-Index
             ],
         ],
     ],
-    'list' => [
-        'sorting' => [
+    'list' => [ // Konfiguration der Listenansicht im Backend
+        'sorting' => [ // Sortierungseinstellungen
             'mode' => DataContainer::MODE_SORTED, // Sortieren nach einem Feld
-            'fields' => ['title', 'alias'], // Sortierfeld: Template-Name
+            'fields' => ['title', 'alias'], // Sortierfelder: Titel und Alias
             'flag' => DataContainer::SORT_ASC, // Sortierung aufsteigend
-            'panelLayout' => 'filter;sort,search,limit', // Filter, Suche etc.
+            'panelLayout' => 'filter;sort,search,limit', // Layout des Filter-Panels (Filter, Sortierung, Suche, Limit)
         ],
-        'label' => [
-            'fields' => ['title', 'alias'], // Zeigt diese Felder in der Liste an
-            'showColumns' => true,
-            'format' => '%s (%s)', // Ausgabeformat: Template-Name (Ordner)
+        'label' => [ // Label-Einstellungen für die Liste
+            'fields' => ['title', 'alias'], // Anzeigefelder in der Liste
+            'showColumns' => true, // Felder in Spalten anzeigen
+            'format' => '%s (%s)', // Formatierung der Label-Ausgabe
         ],
-        'global_operations' => [
-            'all' => [
-                'href' => 'act=select',
-                'class' => 'header_edit_all',
-                'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
+        'global_operations' => [ // Globale Operationen (für die ganze Tabelle)
+            'all' => [ // Bearbeiten mehrerer Datensätze
+                'href' => 'act=select', // Link-Aktion
+                'class' => 'header_edit_all', // CSS-Klasse
+                'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"', // HTML-Attribute
             ],
         ],
-        'operations' => [
-            'edit',
-            'copy',
-            'delete',
-            'toggle',
-            'show',
+        'operations' => [ // Operationen pro Datensatz
+            'edit', // Bearbeiten
+            'copy', // Kopieren
+            'delete', // Löschen
+            'toggle', // Sichtbarkeit umschalten
+            'show', // Details anzeigen
         ],
     ],
-    'palettes' => [
-        '__selector__' => ['addManufacturer', 'addRegulators', 'addEquipment', 'addSizes', 'addCourses', 'addReservations', 'addChecks'],
-        'default' => '{title_legend},title,alias;
+    'palettes' => [ // Definition der Eingabemasken (Paletten)
+        '__selector__' => ['addManufacturer', 'addRegulators', 'addEquipment', 'addSizes', 'addCourses', 'addReservations', 'addChecks'], // Selektoren für Subpaletten
+        'default' => '{title_legend},title,alias; // Standardpalette mit verschiedenen Legenden und Feldern
                                 {manufacturer_legend},addManufacturer;
                                 {equipment_legend},addEquipment;
                                 {sizes_legend},addSizes;
@@ -61,46 +61,46 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
                                 {conditions_legend},rentalConditions;
                                 {publish_legend},published,start,stop;'
     ],
-    'subpalettes' => [
-        'addManufacturer' => 'manufacturersFile',
-        'addEquipment' => 'typesFile,subTypesFile',
-        'addSizes' => 'sizesFile',
-        'addRegulators' => 'regulatorsFile',
-        'addCourses' => 'courseTypesFile,courseCategoriesFile'
+    'subpalettes' => [ // Definition der Subpaletten (eingeblendet bei Checkbox-Aktivierung)
+        'addManufacturer' => 'manufacturersFile', // Erscheint wenn addManufacturer aktiv ist
+        'addEquipment' => 'typesFile,subTypesFile', // Erscheint wenn addEquipment aktiv ist
+        'addSizes' => 'sizesFile', // Erscheint wenn addSizes aktiv ist
+        'addRegulators' => 'regulatorsFile', // Erscheint wenn addRegulators aktiv ist
+        'addCourses' => 'courseTypesFile,courseCategoriesFile' // Erscheint wenn addCourses aktiv ist
     ],
-    'fields' => [
-        'id' => [
-            'sql' => "int(10) unsigned NOT NULL auto_increment",
+    'fields' => [ // Definition der einzelnen Datenbankfelder
+        'id' => [ // ID-Feld
+            'sql' => "int(10) unsigned NOT NULL auto_increment", // SQL-Typ
         ],
-        'tstamp' => [
-            'sql' => "int(10) unsigned NOT NULL default 0",
+        'tstamp' => [ // Zeitstempel-Feld
+            'sql' => "int(10) unsigned NOT NULL default 0", // SQL-Typ
         ],
-        'title' => [
-            'inputType' => 'text',
-            'label' => &$GLOBALS['TL_LANG']['tl_dc_equipment']['title'],
-            'exclude' => true,
-            'search' => true,
-            'filter' => true,
-            'sorting' => true,
-            'flag' => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
-            'sql' => "varchar(255) NOT NULL default ''"
+        'title' => [ // Titel-Feld
+            'inputType' => 'text', // Eingabetyp Text
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_equipment']['title'], // Sprachlabel
+            'exclude' => true, // Für Nicht-Admins ausschließbar
+            'search' => true, // In der Suche berücksichtigen
+            'filter' => true, // Filterbar in der Liste
+            'sorting' => true, // Sortierbar in der Liste
+            'flag' => DataContainer::SORT_INITIAL_LETTER_ASC, // Sortierung nach Anfangsbuchstabe
+            'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'], // Evaluierungseinstellungen
+            'sql' => "varchar(255) NOT NULL default ''" // SQL-Typ
         ],
-        'alias' => [
-            'search' => true,
-            'inputType' => 'text',
-            'eval' => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
-            'save_callback' => [
-                ['tl_dc_config', 'generateAlias']
+        'alias' => [ // Alias-Feld (URL-Fragment)
+            'search' => true, // Suchbar
+            'inputType' => 'text', // Text-Eingabe
+            'eval' => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w50'], // Validierung als Alias
+            'save_callback' => [ // Callback-Funktion vor dem Speichern
+                ['tl_dc_config', 'generateAlias'] // Generiert den Alias automatisch
             ],
-            'sql' => "varchar(255) BINARY NOT NULL default ''"
+            'sql' => "varchar(255) BINARY NOT NULL default ''" // SQL-Typ
         ],
-        'addManufacturer' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_dc_config']['addManufacturer'],
-            'exclude' => true,
-            'inputType' => 'checkbox',
-            'eval' => ['submitOnChange' => true],
-            'sql' => ['type' => 'boolean', 'default' => false]
+        'addManufacturer' => [ // Checkbox zum Aktivieren von Herstellern
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_config']['addManufacturer'], // Label
+            'exclude' => true, // Ausschließbar
+            'inputType' => 'checkbox', // Checkbox-Eingabe
+            'eval' => ['submitOnChange' => true], // Seite bei Änderung neu laden
+            'sql' => ['type' => 'boolean', 'default' => false] // SQL-Typ Boolean
         ],
         'addEquipment' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_config']['addEquipment'],

@@ -34,62 +34,62 @@ class DcCourseInsertTag implements InsertTagResolverNestedResolvedInterface
     ) {
     }
 
-    public function __invoke(ResolvedInsertTag $insertTag): InsertTagResult
+    public function __invoke(ResolvedInsertTag $insertTag): InsertTagResult // Hauptmethode des Insert-Tag-Resolvers
     {
-        $request = $this->requestStack->getCurrentRequest();
+        $request = $this->requestStack->getCurrentRequest(); // Hole den aktuellen Request aus dem RequestStack
 
-        if (null === $request) {
-            return new InsertTagResult('', OutputType::text);
+        if (null === $request) { // Falls kein Request vorhanden ist
+            return new InsertTagResult('', OutputType::text); // Gib leeres Ergebnis zurück
         }
 
-        $assignmentId = $request->getSession()->get('last_course_order');
+        $assignmentId = $request->getSession()->get('last_course_order'); // Hole die ID der letzten Kurs-Zuweisung aus der Session
 
-        if (!$assignmentId) {
-            return new InsertTagResult('', OutputType::text);
+        if (!$assignmentId) { // Falls keine Zuweisungs-ID vorhanden ist
+            return new InsertTagResult('', OutputType::text); // Gib leeres Ergebnis zurück
         }
 
-        $assignment = DcCourseStudentsModel::findByPk($assignmentId);
+        $assignment = DcCourseStudentsModel::findByPk($assignmentId); // Lade das Zuweisungs-Modell (Student zu Kurs)
 
-        if (null === $assignment) {
-            return new InsertTagResult('', OutputType::text);
+        if (null === $assignment) { // Falls die Zuweisung nicht gefunden wurde
+            return new InsertTagResult('', OutputType::text); // Gib leeres Ergebnis zurück
         }
 
-        $property = $insertTag->getParameters()->get(0);
+        $property = $insertTag->getParameters()->get(0); // Hole den gewünschten Eigenschaftsnamen aus dem Insert-Tag
 
-        if (!$property) {
-            return new InsertTagResult('', OutputType::text);
+        if (!$property) { // Falls keine Eigenschaft angegeben wurde
+            return new InsertTagResult('', OutputType::text); // Gib leeres Ergebnis zurück
         }
 
-        $value = null;
+        $value = null; // Initialisiere den Wert
 
         // Check assignment properties first
-        if (isset($assignment->$property) && $assignment->$property !== null) {
-            $value = $assignment->$property;
+        if (isset($assignment->$property) && $assignment->$property !== null) { // Prüfe zuerst Eigenschaften der Zuweisung
+            $value = $assignment->$property; // Setze den Wert
         } else {
             // Check student (parent) properties
-            $student = DcStudentsModel::findByPk($assignment->pid);
+            $student = DcStudentsModel::findByPk($assignment->pid); // Lade den zugehörigen Studenten (Eltern-Datensatz)
 
-            if (null !== $student && isset($student->$property) && $student->$property !== null) {
-                $value = $student->$property;
+            if (null !== $student && isset($student->$property) && $student->$property !== null) { // Prüfe Eigenschaften des Studenten
+                $value = $student->$property; // Setze den Wert
             } else {
                 // Check event properties
-                $event = DcCourseEventModel::findByPk($assignment->event_id);
+                $event = DcCourseEventModel::findByPk($assignment->event_id); // Lade das zugehörige Kurs-Event
 
-                if (null !== $event && isset($event->$property) && $event->$property !== null) {
-                    $value = $event->$property;
+                if (null !== $event && isset($event->$property) && $event->$property !== null) { // Prüfe Eigenschaften des Events
+                    $value = $event->$property; // Setze den Wert
                 }
             }
         }
 
-        if (null === $value) {
-            return new InsertTagResult('', OutputType::text);
+        if (null === $value) { // Falls kein Wert gefunden wurde
+            return new InsertTagResult('', OutputType::text); // Gib leeres Ergebnis zurück
         }
 
         // Handle date fields
-        if (in_array($property, ['tstamp', 'dateStart', 'dateEnd', 'registered_on', 'dateOfBirth'], true)) {
-            $value = Date::parse(Config::get('datimFormat'), (int) $value);
+        if (in_array($property, ['tstamp', 'dateStart', 'dateEnd', 'registered_on', 'dateOfBirth'], true)) { // Prüfe auf Datumsfelder
+            $value = Date::parse(Config::get('datimFormat'), (int) $value); // Formatiere den Zeitstempel
         }
 
-        return new InsertTagResult((string) $value, OutputType::text);
+        return new InsertTagResult((string) $value, OutputType::text); // Gib den finalen Wert zurück
     }
 }

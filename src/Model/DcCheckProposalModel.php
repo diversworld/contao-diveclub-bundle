@@ -17,10 +17,10 @@ namespace Diversworld\ContaoDiveclubBundle\Model;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsModel;
 use Contao\Model;
 
-#[AsModel(table: 'tl_dc_check_proposal')]
-class DcCheckProposalModel extends Model
+#[AsModel(table: 'tl_dc_check_proposal')] // Registriert die Klasse als Modell für die Prüfvorschlagstabelle
+class DcCheckProposalModel extends Model // Modell-Klasse für den Zugriff auf Prüftermine/Vorschläge
 {
-    protected static $strTable = 'tl_dc_check_proposal';
+    protected static $strTable = 'tl_dc_check_proposal'; // Name der zugrunde liegenden Tabelle in der Datenbank
 
     /**
      * Find a proposal by its ID or alias

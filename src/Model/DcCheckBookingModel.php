@@ -35,12 +35,12 @@ use Contao\Model;
  * @property string $phone
  * @property string $notes
  */
-#[AsModel(table: 'tl_dc_check_booking')]
-class DcCheckBookingModel extends Model
+#[AsModel(table: 'tl_dc_check_booking')] // Attribut zur Registrierung als Contao-Modell für die Tabelle tl_dc_check_booking
+class DcCheckBookingModel extends Model // Modell-Klasse für Buchungs-Datensätze
 {
     /**
      * Table name
      * @var string
      */
-    protected static $strTable = 'tl_dc_check_booking';
+    protected static $strTable = 'tl_dc_check_booking'; // Verknüpfung des Modells mit der Datenbanktabelle
 }

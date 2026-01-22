@@ -16,13 +16,13 @@ namespace Diversworld\ContaoDiveclubBundle\DataContainer;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
 
-class DcCheckProposal
+class DcCheckProposal // DataContainer-Klasse für Prüfvorschläge
 {
-    private ContaoFramework $framework;
+    private ContaoFramework $framework; // Variable für das Contao Framework
 
-    public function __construct(ContaoFramework $framework)
+    public function __construct(ContaoFramework $framework) // Konstruktor mit Dependency Injection des Frameworks
     {
-        $this->framework = $framework;
+        $this->framework = $framework; // Zuweisung des Frameworks zur internen Variable
     }
 
 }

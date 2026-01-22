@@ -22,38 +22,38 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class BackendAssetSubscriber implements EventSubscriberInterface
+class BackendAssetSubscriber implements EventSubscriberInterface // Subscriber zum Laden von Assets im Backend
 {
-    private string $moduleTitle;
-    private string $moduleDescription;
+    private string $moduleTitle; // Variable für den Modultitel
+    private string $moduleDescription; // Variable für die Modulbeschreibung
 
-    public function __construct(private readonly ScopeMatcher $scopeMatcher, ParameterBagInterface $parameterBag)
+    public function __construct(private readonly ScopeMatcher $scopeMatcher, ParameterBagInterface $parameterBag) // Konstruktor mit Dependency Injection
     {
-        $this->moduleTitle = $parameterBag->get('diversworld_contao_diveclub.module_title');
-        $this->moduleDescription = $parameterBag->get('diversworld_contao_diveclub.module_description');
+        $this->moduleTitle = $parameterBag->get('diversworld_contao_diveclub.module_title'); // Lade Modultitel aus den Parametern
+        $this->moduleDescription = $parameterBag->get('diversworld_contao_diveclub.module_description'); // Lade Beschreibung aus den Parametern
     }
 
-    public static function getSubscribedEvents(): array
+    public static function getSubscribedEvents(): array // Definiert die abonnierten Events
     {
-        return [KernelEvents::REQUEST => 'onKernelRequest'];
+        return [KernelEvents::REQUEST => 'onKernelRequest']; // Reagiere auf das REQUEST Event des Kernels
     }
 
-    public function onKernelRequest(RequestEvent $e): void
+    public function onKernelRequest(RequestEvent $e): void // Methode die beim Request Event ausgeführt wird
     {
-        $request = $e->getRequest();
+        $request = $e->getRequest(); // Hole den aktuellen Request aus dem Event
 
-        if ($this->scopeMatcher->isBackendRequest($request)) {
-            $GLOBALS['TL_CSS'][] = 'bundles/diversworldcontaodiveclub/css/backend.css';
+        if ($this->scopeMatcher->isBackendRequest($request)) { // Prüfe ob es sich um einen Backend-Request handelt
+            $GLOBALS['TL_CSS'][] = 'bundles/diversworldcontaodiveclub/css/backend.css'; // Füge das bundle-eigene CSS zum Backend hinzu
 
             // Setze den Sprachschlüssel nur, wenn er nicht korrekt gesetzt ist
             if (
                 !isset($GLOBALS['TL_LANG']['MOD']['diveclub']) ||
                 $GLOBALS['TL_LANG']['MOD']['diveclub'][0] !== $this->moduleTitle ||
                 $GLOBALS['TL_LANG']['MOD']['diveclub'][1] !== $this->moduleDescription
-            ) {
-                $GLOBALS['TL_LANG']['MOD']['diveclub'] = [
-                    $this->moduleTitle,
-                    $this->moduleDescription,
+            ) { // Falls die Modulübersetzung fehlt oder veraltet ist
+                $GLOBALS['TL_LANG']['MOD']['diveclub'] = [ // Setze die Übersetzung im globalen Sprach-Array
+                    $this->moduleTitle, // Titel aus Bundle-Konfiguration
+                    $this->moduleDescription, // Beschreibung aus Bundle-Konfiguration
                 ];
             }
         }

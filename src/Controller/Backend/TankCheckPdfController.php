@@ -18,18 +18,18 @@ class TankCheckPdfController
     {
     }
 
-    public function __invoke(Request $request, string $id): Response
+    public function __invoke(Request $request, string $id): Response // Hauptmethode des Controllers zur PDF-Generierung für einen Tank-Check
     {
-        try {
-            $pdfContent = $this->pdfGenerator->generateForBooking($id);
-            $booking = DcCheckBookingModel::findByPk($id);
+        try { // Versuche das PDF zu generieren
+            $pdfContent = $this->pdfGenerator->generateForBooking($id); // Rufe den Generator auf, um den PDF-Inhalt für die Buchung zu erstellen
+            $booking = DcCheckBookingModel::findByPk($id); // Lade das Buchungsmodell anhand der ID für den Dateinamen
 
-            return new Response($pdfContent, 200, [
-                'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'inline; filename="' . $booking->bookingNumber . '.pdf"'
+            return new Response($pdfContent, 200, [ // Gib eine erfolgreiche HTTP-Response mit dem PDF zurück
+                'Content-Type' => 'application/pdf', // Setze den Content-Type auf PDF
+                'Content-Disposition' => 'inline; filename="' . $booking->bookingNumber . '.pdf"' // Zeige PDF im Browser an mit der Buchungsnummer als Dateiname
             ]);
-        } catch (RuntimeException $e) {
-            return new Response($e->getMessage(), 404);
+        } catch (RuntimeException $e) { // Fange Fehler während der Generierung ab
+            return new Response($e->getMessage(), 404); // Gib die Fehlermeldung mit Status 404 zurück
         }
     }
 }

@@ -23,34 +23,34 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\RouterInterface;
 
 #[AsCallback(table: 'tl_dc_check_booking', target: 'edit.buttons', priority: 100)]
-class DcCheckBooking
+class DcCheckBooking // DataContainer-Klasse für die Verwaltung von Buchungs-Callbacks
 {
-    private ContaoFramework $framework;
-    private RouterInterface $router;
+    private ContaoFramework $framework; // Variable für das Contao Framework
+    private RouterInterface $router; // Variable für den Symfony Router
 
-    public function __construct(ContaoFramework $framework, RouterInterface $router)
+    public function __construct(ContaoFramework $framework, RouterInterface $router) // Konstruktor mit Dependency Injection
     {
-        $this->framework = $framework;
-        $this->router = $router;
+        $this->framework = $framework; // Zuweisung des Frameworks
+        $this->router = $router; // Zuweisung des Routers
     }
 
-    public function __invoke(array $arrButtons, DataContainer $dc): array
+    public function __invoke(array $arrButtons, DataContainer $dc): array // Invoke-Methode zur Manipulation der Backend-Buttons
     {
-        $inputAdapter = $this->framework->getAdapter(Input::class);
-        $systemAdapter = $this->framework->getAdapter(System::class);
+        $inputAdapter = $this->framework->getAdapter(Input::class); // Hole den Adapter für Input-Operationen
+        $systemAdapter = $this->framework->getAdapter(System::class); // Hole den Adapter für System-Operationen
 
-        $systemAdapter->loadLanguageFile('tl_dc_check_booking');
+        $systemAdapter->loadLanguageFile('tl_dc_check_booking'); // Lade die Sprachdatei für die Buchungsverwaltung
 
-        if ('edit' === $inputAdapter->get('act') && $inputAdapter->post('pdfButton')) {
-            $url = $this->router->generate('dc_check_order_pdf', ['id' => $dc->id]);
-            (new RedirectResponse($url))->send();
-            exit;
+        if ('edit' === $inputAdapter->get('act') && $inputAdapter->post('pdfButton')) { // Falls im Bearbeitungsmodus und der PDF-Button geklickt wurde
+            $url = $this->router->generate('dc_check_order_pdf', ['id' => $dc->id]); // Generiere die URL für den PDF-Export
+            (new RedirectResponse($url))->send(); // Führe eine Weiterleitung zur PDF-Generierung aus
+            exit; // Beende die Skriptausführung nach der Weiterleitung
         }
 
-        if ('edit' === $inputAdapter->get('act')) {
-            $arrButtons['customButton'] = '<button type="submit" name="pdfButton" id="pdfButton" class="tl_submit pdfButton" accesskey="p">' . $GLOBALS['TL_LANG']['tl_dc_check_booking']['pdfButton'] . '</button>';
+        if ('edit' === $inputAdapter->get('act')) { // Falls im Bearbeitungsmodus (Initialanzeige)
+            $arrButtons['customButton'] = '<button type="submit" name="pdfButton" id="pdfButton" class="tl_submit pdfButton" accesskey="p">' . $GLOBALS['TL_LANG']['tl_dc_check_booking']['pdfButton'] . '</button>'; // Füge den benutzerdefinierten PDF-Button zum Button-Array hinzu
         }
 
-        return $arrButtons;
+        return $arrButtons; // Gib das aktualisierte Button-Array zurück
     }
 }
