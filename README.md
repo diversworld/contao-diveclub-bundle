@@ -144,7 +144,16 @@ The courses and course types can be defined in a text file, as with the equipmen
 created depending on the association.
 
 The text files can be created by the user. The name is irrelevant. The respective text files can then be assigned in the
-settings.
+settings (Configuration).
+
+### Global Configuration
+The bundle uses a central configuration table (`tl_dc_config`) where you can define:
+- **Templates:** Assign your custom PHP files for manufacturers, equipment types, sizes, regulators, and courses.
+- **Invoices:** Select a PDF template (stationery) and define an additional text for generated invoices.
+- **Storage Locations:** Choose specific folders in the Contao file system for generated PDF invoices and TÜV lists. If no folder is selected, they will be saved in the `files/` directory.
+- **TÜV List Export:** Choose the default export format (PDF, CSV, or XLSX).
+- **Reservations:** Configure confirmation messages and email notification addresses for equipment reservations.
+- **Rental Conditions:** Define the terms and conditions for equipment rental.
 
 The manufacturers are defined in the template `dc_course_categories.txt` as follows:
 
@@ -171,21 +180,24 @@ return [
 'professional' => 'Professionell'
 ];
 ```
-## Tank Installation
+## Tank Installation & TÜV List Export
 In the backend, an existing offer can be created with the prices for an inspection. The individual items with the prices are stored as child elements of the offer. There are optional items and default items that are always included in the booking.
+
+### TÜV List Export
+The bundle allows exporting the list of equipment registered for a TÜV inspection.
+- **Formats:** You can choose between PDF, CSV, and XLSX (Excel) in the global configuration.
+- **Storage:** The generated lists are automatically saved in the configured folder (or `files/` by default).
+- **Manual Export:** In the backend, you can trigger the export for a specific TÜV proposal.
+
 In the frontend, the planned TÜV dates are displayed in a list with the diving courses.
 Members can register their equipment for inspection. It is possible to register several pieces of diving equipment for inspection.
-The member's booking can then be managed in the backend.
+The member's booking can then be managed in the backend. Invoices can be generated as PDF and are automatically saved to the configured storage location.
 
-## Eigene Insert-Tags (Diveclub Bundle)
-Das Bundle stellt zwei Haupt-Insert-Tags zur Verfügung, um dynamische Daten aus der aktuellen Benutzer-Session (z. B. nach einer Buchung oder Anmeldung) anzuzeigen.
-Wichtig: Diese Tags funktionieren nur unmittelbar nach einer Aktion (Buchung/Anmeldung), solange die entsprechende ID in der Session gespeichert ist.
-
-## Custom Insert Tags (Diveclub Bundle)
-The bundle provides two main insert tags to display dynamic data from the current user session (e.g., after a booking or registration).
+## Own Insert Tags (Diveclub Bundle)
+The bundle provides three main insert tags to display dynamic data from the current user session (e.g., after a booking or registration).
 **Important:** These tags only work immediately after an action (booking/registration), as long as the corresponding ID is stored in the session.
 
-### A) For Tank Checks (tank_check_order)
+### A) For Tank Checks (dc_check)
 Accesses data from the `tl_dc_check_order` (tank) and `tl_dc_check_booking` (booking header) tables.
 These tags refer to the data from the booking header, based on the ID in the session variable `last_tank_check_order`.
 
@@ -202,7 +214,24 @@ These tags refer to the data from the booking header, based on the ID in the ses
 | `{{dc_check::bookingDate}}` | Date of the booking (formatted according to system settings). |
 | `{{dc_check::notes}}` | Booking notes/remarks. |
 
-### B) For Course Registrations (course_order)
+### B) For Booking Details (booking)
+Accesses data from the `tl_dc_check_booking` table.
+These tags refer to the booking header, based on the ID in the session variable `last_tank_check_order` or from the request attributes.
+
+**Syntax:** `{{booking::property}}`
+
+| Tag | Description |
+| :--- | :--- |
+| `{{booking::bookingNumber}}` | The generated booking number. |
+| `{{booking::totalPrice}}` | The total price of the booking (formatted with €). |
+| `{{booking::firstname}}` | First name of the person booking. |
+| `{{booking::lastname}}` | Last name of the person booking. |
+| `{{booking::email}}` | Email address of the person booking. |
+| `{{booking::bookingDate}}` | Date of the booking (formatted). |
+| `{{booking::status}}` | Current status of the booking (translated). |
+| `{{booking::paid}}` | Payment status (Yes/No, translated). |
+
+### C) For Course Registrations (course)
 Accesses data from the `tl_dc_course_students` (assignment), `tl_dc_students` (student), and `tl_dc_course_event` (course) tables.
 These tags refer to the course assignment, the student, and the event, based on `last_course_order`.
 
@@ -221,7 +250,7 @@ These tags refer to the course assignment, the student, and the event, based on 
 | `{{course::status}}` | Current status of the course assignment (raw value). |
 
 ### Usage & Formatting
-These insert tags can be used in all Contao text fields (content elements, email subjects, confirmation texts).
+These insert tags can be used in all Contao text fields (content elements, email subjects, confirmation texts). All code and templates are documented with inline comments to explain the purpose of each instruction.
 
 #### Date Values
 Fields such as `bookingDate`, `dateStart`, `dateEnd`, or `registered_on` are automatically formatted based on the date format (`datimFormat`) defined in the Contao system settings.
