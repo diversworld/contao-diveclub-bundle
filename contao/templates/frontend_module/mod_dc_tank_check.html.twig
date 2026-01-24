@@ -1,243 +1,264 @@
+{#
+    Das Template verwendet eine flache Block-Struktur, um die Erweiterbarkeit im Contao Template Studio zu maximieren.
+    Jeder Block kann einzeln überschrieben werden. Wichtig: Definieren Sie Blöcke in Ihrem Kind-Template
+    immer auf der obersten Ebene (nicht innerhalb anderer Blöcke verschachtelt).
+
+    Beispiel für ein Kind-Template:
+    {% extends "@Contao/frontend_module/mod_dc_tank_check.html.twig" %}
+    {% block booking_guest_fields %}
+        ... Felder für Vorname, Name etc. ...
+    {% endblock %}
+#}
 {% extends "@Contao/frontend_module/_base.html.twig" %}
 
 {% block content %}
     {% if success %}
-        {% block success_view %}
-            <p class="success">{{ labels.success_msg|format(totalPrice|number_format(2, ',', '.'))|raw }}</p>
-            <ul>
-                {% for order in orders %}
-                    <li>{{ order.serialNumber }} ({{ order.size }}L) - {{ order.totalPrice|number_format(2, ',', '.') }} €</li>
-                {% endfor %}
-            </ul>
-            <p><a href="{{ app.request.pathInfo }}">{{ labels.back_to_list }}</a></p>
-        {% endblock %}
+        {{ block('success_view') }}
     {% elseif isBooking %}
-        {% block booking_view %}
-            {% block booking_headline %}
-                <h3>{{ labels.booking_headline|format(proposal.title) }}</h3>
-            {% endblock %}
-            {% block form_add_tank %}
-                {# Formular zum Vormerken einer weiteren Flasche #}
-                <div class="add_tank_form border p-3 mb-4">
-                    <h4>{{ labels.add_tank }}</h4>
-                    <form method="post" id="tank_add_form">
-                        <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
-                        <input type="hidden" name="FORM_SUBMIT" value="dc_tank_check_add">
+        {{ block('booking_view') }}
+    {% else %}
+        {{ block('proposal_list') }}
+    {% endif %}
+{% endblock %}
 
-                        <div class="tank_details">
-                            {% if user and tanks|length > 0 %}
-                                <div class="widget member_tanks mb-3">
-                                    <label><strong>{{ labels.select_tank }}:</strong></label>
-                                    <div class="widget widget-checkbox">
-                                        {% for id, label in tanks %}
-                                            <div class="checkbox_item">
-                                                <input type="checkbox" name="tankIds[]" id="tank_{{ id }}" value="{{ id }}" class="checkbox member-tank-checkbox">
-                                                <label for="tank_{{ id }}">{{ label }}</label>
-                                            </div>
-                                        {% endfor %}
-                                    </div>
-                                    <p class="small text-muted mt-2">{{ labels.or_add_new_tank|default('Oder eine neue Flasche erfassen:') }}</p>
-                                </div>
-                            {% endif %}
+{% block success_view %}
+    <p class="success">{{ labels.success_msg|format(totalPrice|number_format(2, ',', '.'))|raw }}</p>
+    <ul>
+        {% for order in orders %}
+            <li>{{ order.serialNumber }} ({{ order.size }}L) - {{ order.totalPrice|number_format(2, ',', '.') }} €</li>
+        {% endfor %}
+    </ul>
+    <p><a href="{{ app.request.pathInfo }}">{{ labels.back_to_list }}</a></p>
+{% endblock %}
 
-                            <div class="new_tank_fields">
-                                <div class="widget">
-                                    <label for="serialNumber">{{ labels.serial_number_label }}:</label>
-                                    <input type="text" name="tank[serialNumber]" id="serialNumber" class="text">
-                                </div>
-                                <div class="widget">
-                                    <label for="manufacturer">{{ labels.manufacturer_label }}:</label>
-                                    <input type="text" name="tank[manufacturer]" id="manufacturer" class="text">
-                                </div>
-                                <div class="widget">
-                                    <label for="bazNumber">{{ labels.baz_number_label }}:</label>
-                                    <input type="text" name="tank[bazNumber]" id="bazNumber" class="text">
-                                </div>
-                                <div class="widget">
-                                    <label for="tankSize">{{ labels.tank_size_label }}:</label>
-                                    <select name="tank[tankSize]" id="tankSize" class="size-select">
-                                        {% for val, label in tankSizes %}
-                                            <option value="{{ val }}"{% if val == '12' %} selected{% endif %}>{{ label }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="widget">
-                                    <label for="tankData">{{ labels.tank_info_label }}:</label>
-                                    <textarea name="tank[tankData]" id="tankData" class="textarea"></textarea>
-                                </div>
-                            </div>
-                            <div class="widget tanks_o2">
-                                <p><strong>Verwendung mit Sauerstoff:</strong></p>
-                                <div class="widget widget-checkbox">
-                                    <div class="checkbox_item">
-                                        <label for="o2clean" >
-                                            <input class="checkbox tank-ox" type="checkbox" name="tank[o2clean]" id="o2clean" value="1">
-                                            <span>{{ labels.o2_clean_label }}</span>
-                                        </label>
+{% block booking_view %}
+    {% block booking_headline %}
+        <h3>{{ labels.booking_headline|format(proposal.title) }}</h3>
+    {% endblock %}
 
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="widget tanks_sectiom">
+    {% block form_add_tank %}
+        {# Formular zum Vormerken einer weiteren Flasche #}
+        <div class="add_tank_form border p-3 mb-4">
+            <h4>{{ labels.add_tank }}</h4>
+            <form method="post" id="tank_add_form">
+                <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
+                <input type="hidden" name="FORM_SUBMIT" value="dc_tank_check_add">
+
+                <div class="tank_details">
+                    {% if user and tanks|length > 0 %}
+                        <div class="widget member_tanks mb-3">
+                            <label><strong>{{ labels.select_tank }}:</strong></label>
                             <div class="widget widget-checkbox">
-                                <label><strong>{{ labels.other_articles_label }}</strong></label>
-                                {% for article in articles %}
+                                {% for id, label in tanks %}
                                     <div class="checkbox_item">
-                                        <label for="art_{{ article.id }}" >
-                                            <input type="checkbox" name="articles[]" id="art_{{ article.id }}" class="checkbox" value="{{ article.id }}"{% if article.default %} checked disabled{% endif %}>
-                                            {% if article.default %}
-                                                <span><input type="hidden" name="articles[]" value="{{ article.id }}"></span>
-                                            {% endif %}
-                                            <span>{{ article.title }} ({{ article.articlePriceBrutto|number_format(2, ',', '.') }} €)</span>
-                                        </label>
-                                    </div>
-                                {% else %}
-                                    <div class="widget articles-section">
-                                        <p><small>{{ labels.no_articles_available|default('Keine optionalen Artikel vorhanden.') }}</small></p>
+                                        <input type="checkbox" name="tankIds[]" id="tank_{{ id }}" value="{{ id }}" class="checkbox member-tank-checkbox">
+                                        <label for="tank_{{ id }}">{{ label }}</label>
                                     </div>
                                 {% endfor %}
                             </div>
+                            <p class="small text-muted mt-2">{{ labels.or_add_new_tank|default('Oder eine neue Flasche erfassen:') }}</p>
                         </div>
+                    {% endif %}
+
+                    <div class="new_tank_fields">
+                        <div class="widget">
+                            <label for="serialNumber">{{ labels.serial_number_label }}:</label>
+                            <input type="text" name="tank[serialNumber]" id="serialNumber" class="text">
+                        </div>
+                        <div class="widget">
+                            <label for="manufacturer">{{ labels.manufacturer_label }}:</label>
+                            <input type="text" name="tank[manufacturer]" id="manufacturer" class="text">
+                        </div>
+                        <div class="widget">
+                            <label for="bazNumber">{{ labels.baz_number_label }}:</label>
+                            <input type="text" name="tank[bazNumber]" id="bazNumber" class="text">
+                        </div>
+                        <div class="widget">
+                            <label for="tankSize">{{ labels.tank_size_label }}:</label>
+                            <select name="tank[tankSize]" id="tankSize" class="size-select">
+                                {% for val, label in tankSizes %}
+                                    <option value="{{ val }}"{% if val == '12' %} selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="widget">
+                            <label for="tankData">{{ labels.tank_info_label }}:</label>
+                            <textarea name="tank[tankData]" id="tankData" class="textarea"></textarea>
+                        </div>
+                    </div>
+                    <div class="widget tanks_o2">
+                        <p><strong>Verwendung mit Sauerstoff:</strong></p>
+                        <div class="widget widget-checkbox">
+                            <div class="checkbox_item">
+                                <label for="o2clean" >
+                                    <input class="checkbox tank-ox" type="checkbox" name="tank[o2clean]" id="o2clean" value="1">
+                                    <span>{{ labels.o2_clean_label }}</span>
+                                </label>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="widget tanks_sectiom">
+                    <div class="widget widget-checkbox">
+                        <label><strong>{{ labels.other_articles_label }}</strong></label>
+                        {% for article in articles %}
+                            <div class="checkbox_item">
+                                <label for="art_{{ article.id }}" >
+                                    <input type="checkbox" name="articles[]" id="art_{{ article.id }}" class="checkbox" value="{{ article.id }}"{% if article.default %} checked disabled{% endif %}>
+                                    {% if article.default %}
+                                        <span><input type="hidden" name="articles[]" value="{{ article.id }}"></span>
+                                    {% endif %}
+                                    <span>{{ article.title }} ({{ article.articlePriceBrutto|number_format(2, ',', '.') }} €)</span>
+                                </label>
+                            </div>
+                        {% else %}
+                            <div class="widget articles-section">
+                                <p><small>{{ labels.no_articles_available|default('Keine optionalen Artikel vorhanden.') }}</small></p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="submit_container mt-3">
+                    <button type="submit" class="submit btn btn-secondary">{{ labels.add_tank }}</button>
+                </div>
+            </form>
+        </div>
+    {% endblock %}
+
+    {% block reserved_tanks %}
+        {# Zusammenfassung der vorgemerkten Flaschen #}
+        <div class="tank_summary mb-4">
+            <h4>{{ labels.summary_headline }}</h4>
+            {% if sessionTanks|length > 0 %}
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>{{ labels.tank_nr|format('') }}</th>
+                        <th>{{ labels.tank_details }}</th>
+                        <th>{{ labels.total_price }}</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% set totalSum = 0 %}
+                    {% for tank in sessionTanks %}
+                        {% set totalSum = totalSum + tank.price %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ tank.displayName }}</td>
+                            <td>{{ tank.price|number_format(2, ',', '.') }} €</td>
+                            <td>
+                                <a href="{{ app.request.pathInfo }}?act=remove&idx={{ tank.index }}" class="btn btn-danger btn-sm" onclick="return confirm('{{ labels.remove_tank }}?')">{{ labels.remove_tank }}</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <th colspan="2">{{ labels.total_price_label }}</th>
+                        <th colspan="2">{{ totalSum|number_format(2, ',', '.') }} €</th>
+                    </tr>
+                    </tfoot>
+                </table>
+            {% else %}
+                <p>{{ labels.empty_session }}</p>
+            {% endif %}
+        </div>
+    {% endblock %}
+
+    {% block final_booking %}
+        {# Finales Buchungsformular #}
+        {% if sessionTanks|length > 0 %}
+            {% block form_final_booking %}
+                <div class="final_booking_form border p-3">
+                    <h4>{{ labels.submit_booking }}</h4>
+                    <form method="post" id="tank_check_form">
+                        <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
+                        <input type="hidden" name="FORM_SUBMIT" value="dc_tank_check_booking">
+
+                        <div class="member_details">
+                            {% block booking_member_details %}
+                                {% if user %}
+                                    {% block booking_user_info %}
+                                        <p><strong>{{ labels.logged_in_member }}</strong> {{ user.firstname }} {{ user.lastname }}</p>
+                                        <p><strong>{{ labels.email }}:</strong> {{ user.email }}</p>
+                                    {% endblock %}
+                                {% else %}
+                                    {% block booking_guest_fields %}
+                                        <div class="widget">
+                                            <label for="firstname">{{ labels.firstname }}:</label>
+                                            <input type="text" name="firstname" id="firstname" required class="text">
+                                        </div>
+                                        <div class="widget">
+                                            <label for="lastname">{{ labels.lastname }}:</label>
+                                            <input type="text" name="lastname" id="lastname" required class="text">
+                                        </div>
+                                        <div class="widget">
+                                            <label for="email">{{ labels.email }}:</label>
+                                            <input type="email" name="email" id="email" required class="text">
+                                        </div>
+                                        <div class="widget">
+                                            <label for="phone">{{ labels.phone }}:</label>
+                                            <input type="text" name="phone" id="phone" class="text">
+                                        </div>
+                                    {% endblock %}
+                                {% endif %}
+                            {% endblock %}
+                        </div>
+
+                        <div class="widget">
+                            <label for="notes">{{ labels.notes_label }}:</label>
+                            <textarea name="notes" id="notes" class="textarea"></textarea>
+                        </div>
+
                         <div class="submit_container mt-3">
-                            <button type="submit" class="submit btn btn-secondary">{{ labels.add_tank }}</button>
+                            <button type="submit" class="submit btn btn-primary">{{ labels.submit_booking }}</button>
                         </div>
                     </form>
                 </div>
             {% endblock %}
+        {% endif %}
 
-            {% block reserved_tanks %}
-                {# Zusammenfassung der vorgemerkten Flaschen #}
-                <div class="tank_summary mb-4">
-                    <h4>{{ labels.summary_headline }}</h4>
-                    {% if sessionTanks|length > 0 %}
-                        <table class="table">
-                            <thead>
-                            <tr>
-                                <th>{{ labels.tank_nr|format('') }}</th>
-                                <th>{{ labels.tank_details }}</th>
-                                <th>{{ labels.total_price }}</th>
-                                <th></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% set totalSum = 0 %}
-                            {% for tank in sessionTanks %}
-                                {% set totalSum = totalSum + tank.price %}
-                                <tr>
-                                    <td>{{ loop.index }}</td>
-                                    <td>{{ tank.displayName }}</td>
-                                    <td>{{ tank.price|number_format(2, ',', '.') }} €</td>
-                                    <td>
-                                        <a href="{{ app.request.pathInfo }}?act=remove&idx={{ tank.index }}" class="btn btn-danger btn-sm" onclick="return confirm('{{ labels.remove_tank }}?')">{{ labels.remove_tank }}</a>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                            <tfoot>
-                            <tr>
-                                <th colspan="2">{{ labels.total_price_label }}</th>
-                                <th colspan="2">{{ totalSum|number_format(2, ',', '.') }} €</th>
-                            </tr>
-                            </tfoot>
-                        </table>
-                    {% else %}
-                        <p>{{ labels.empty_session }}</p>
+        {% block final_booking_script %}
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // JS-Preisberechnung etc.
+                });
+            </script>
+        {% endblock %}
+
+        {% block final_booking_cancel %}
+            <p><a href="{{ app.request.pathInfo }}">{{ labels.cancel }}</a></p>
+        {% endblock %}
+    {% endblock %}
+{% endblock %}
+
+{% block proposal_list %}
+    <div class="tank-check-list">
+        {% for proposal in proposals %}
+            <div class="tank-check-item block">
+                <div class="details">
+                    <h4>{{ proposal.title }}</h4>
+                    <p>
+                        {% if proposal.eventDate %}
+                            <strong>{{ labels.event_date }}</strong><br>
+                            <small>{{ proposal.eventTitle }}</small>
+                        {% else %}
+                            <strong>{{ labels.proposal_date }}:</strong>
+                        {% endif %}
+                    </p>
+                    <p><strong>{{ labels.vendor }}:</strong> {{ proposal.vendorName }}</p>
+                    {% if proposal.notes %}
+                        <div class="notes">{{ proposal.notes|raw }}</div>
                     {% endif %}
                 </div>
-            {% endblock %}
-
-            {% block form_final_booking %}
-                {# Finales Buchungsformular #}
-                {% if sessionTanks|length > 0 %}
-                    <div class="final_booking_form border p-3">
-                        <h4>{{ labels.submit_booking }}</h4>
-                        <form method="post" id="tank_check_form">
-                            <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
-                            <input type="hidden" name="FORM_SUBMIT" value="dc_tank_check_booking">
-
-                            <div class="member_details">
-                                {% if user %}
-                                    <p><strong>{{ labels.logged_in_member }}</strong> {{ user.firstname }} {{ user.lastname }}</p>
-                                    <p><strong>{{ labels.email }}:</strong> {{ user.email }}</p>
-                                {% else %}
-                                    <div class="widget">
-                                        <label for="firstname">{{ labels.firstname }}:</label>
-                                        <input type="text" name="firstname" id="firstname" required class="text">
-                                    </div>
-                                    <div class="widget">
-                                        <label for="lastname">{{ labels.lastname }}:</label>
-                                        <input type="text" name="lastname" id="lastname" required class="text">
-                                    </div>
-                                    <div class="widget">
-                                        <label for="email">{{ labels.email }}:</label>
-                                        <input type="email" name="email" id="email" required class="text">
-                                    </div>
-                                    <div class="widget">
-                                        <label for="phone">{{ labels.phone }}:</label>
-                                        <input type="text" name="phone" id="phone" class="text">
-                                    </div>
-                                {% endif %}
-                            </div>
-
-                            <div class="widget">
-                                <label for="notes">{{ labels.notes_label }}:</label>
-                                <textarea name="notes" id="notes" class="textarea"></textarea>
-                            </div>
-
-                            {% if user %}
-                                {% set hasNewTanks = false %}
-                                {% for tank in sessionTanks %}
-                                    {% if tank.tankId is not defined or not tank.tankId %}
-                                        {% set hasNewTanks = true %}
-                                    {% endif %}
-                                {% endfor %}
-                            {% endif %}
-
-                            <div class="submit_container mt-3">
-                                <button type="submit" class="submit btn btn-primary">{{ labels.submit_booking }}</button>
-                            </div>
-                        </form>
-                    </div>
-                {% endif %}
-
-                <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        // Hier könnten wir noch eine JS-Preisberechnung für die aktuelle Flasche einbauen,
-                        // falls gewünscht, aber die Session-Zusammenfassung zeigt die bereits fixierten Preise.
-                    });
-                </script>
-                <p><a href="{{ app.request.pathInfo }}">{{ labels.cancel }}</a></p>
-            {% endblock %}
-        {% endblock %}
-    {% else %}
-        {% block proposal_list %}
-            <div class="tank-check-list">
-                {% for proposal in proposals %}
-                    <div class="tank-check-item block">
-                        <div class="details">
-                            <h4>{{ proposal.title }}</h4>
-                            <p>
-                                {% if proposal.eventDate %}
-                                    <strong>{{ labels.event_date }}</strong><br>
-                                    <small>{{ proposal.eventTitle }}</small>
-                                {% else %}
-                                    <strong>{{ labels.proposal_date }}:</strong>
-                                {% endif %}
-                            </p>
-                            <p><strong>{{ labels.vendor }}:</strong> {{ proposal.vendorName }}</p>
-                            {% if proposal.notes %}
-                                <div class="notes">{{ proposal.notes|raw }}</div>
-                            {% endif %}
-                        </div>
-                        <div class="action">
-                            <a href="{{ proposal.url }}" class="btn btn-primary">{{ labels.book_now }}</a>
-                        </div>
-                    </div>
-                {% else %}
-                    <p>{{ labels.no_proposals }}</p>
-                {% endfor %}
+                <div class="action">
+                    <a href="{{ proposal.url }}" class="btn btn-primary">{{ labels.book_now }}</a>
+                </div>
             </div>
-        {% endblock %}
-    {% endif %}
+        {% else %}
+            <p>{{ labels.no_proposals }}</p>
+        {% endfor %}
+    </div>
 {% endblock %}
