@@ -42,6 +42,8 @@ class CourseProgressController extends AbstractFrontendModuleController
         $user = System::getContainer()->get('security.helper')->getUser();
         $logger->info('CourseProgressController: User ID: ' . ($user ? $user->id : 'none'));
 
+        $dateFormat = Config::get('datimFormat');
+
         // Debug: Tabellen prüfen
         try {
             $dbCheck = Database::getInstance();
@@ -179,6 +181,8 @@ class CourseProgressController extends AbstractFrontendModuleController
                 'title' => (string)$exercises->exercise_title,
                 'module' => (string)$exercises->module_title,
                 'status' => (string)$exercises->status,
+                'instructor' => (string)$exercises->instructor,
+                'dateCompleted' => $exercises->dateCompleted ? Date::parse($dateFormat, (int)$exercises->dateCompleted) : '',
                 'status_label' => $GLOBALS['TL_LANG']['tl_dc_student_exercises']['itemStatus'][(string)$exercises->status]
                     ?? (string)$exercises->status,
                 'exercise_id' => (int)$exercises->exercise_id,
@@ -227,10 +231,13 @@ class CourseProgressController extends AbstractFrontendModuleController
                     'id' => (int)$exercises->id,
                     'title' => (string)$exercises->exercise_title,
                     'module' => (string)$exercises->module_title,
+                    'instructor' => (string)$exercises->instructor,
+                    'dateCompleted' => $exercises->dateCompleted ? Date::parse($dateFormat, (int)$exercises->dateCompleted) : '',
                     'status' => (string)$exercises->status,
                     'status_label' => $GLOBALS['TL_LANG']['tl_dc_student_exercises']['itemStatus'][(string)$exercises->status]
                         ?? (string)$exercises->status,
                     'exercise_id' => (int)$exercises->exercise_id,
+                    'notes' => (string)$exercises->notes
                 ];
             }
             $template->exercises = $exerciseList;
@@ -240,7 +247,6 @@ class CourseProgressController extends AbstractFrontendModuleController
         // 3. Zeitplan laden (über das Event der Zuweisung)
         $schedule = [];
         if ($assignmentRow['event_id']) {
-            $dateFormat = Config::get('datimFormat');
             $rows = $db->prepare(
                 'SELECT s.*, m.title AS module_title, e.title AS exercise_title
                  FROM tl_dc_course_event_schedule s
@@ -255,6 +261,7 @@ class CourseProgressController extends AbstractFrontendModuleController
                     'planned_at' => $rows->planned_at ? Date::parse($dateFormat, (int)$rows->planned_at) : '',
                     'location' => (string)$rows->location,
                     'notes' => (string)$rows->notes,
+                    'instructor' => (string)$rows->instructor,
                     'module' => (string)$rows->module_title,
                     'exercise' => (string)$rows->exercise_title,
                     'exercise_id' => (int)$rows->exercise_id,
