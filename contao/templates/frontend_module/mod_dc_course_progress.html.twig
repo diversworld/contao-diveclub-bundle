@@ -1,94 +1,132 @@
+{#
+    Das Template verwendet eine flache Block-Struktur, um die Erweiterbarkeit im Contao Template Studio zu maximieren.
+    Jeder Block kann einzeln überschrieben werden. Wichtig: Definieren Sie Blöcke in Ihrem Kind-Template
+    immer auf der obersten Ebene (nicht innerhalb anderer Blöcke verschachtelt).
+#}
 {% extends "@Contao/frontend_module/_base.html.twig" %}
 
 {% block content %}
     {% set container_attributes = attrs().addClass('mod_dc_course_progress').mergeWith(container_attributes|default) %}
     <div{{ container_attributes }}>
         {% if not isLoggedIn %}
-            {% block not_logged_in %}
-                <p class="message message--info">Bitte melden Sie sich an.</p>
-            {% endblock %}
+            {{ block('not_logged_in') }}
         {% elseif notFound %}
-            {% block not_found %}
-                <p class="message message--error">Die gewünschte Kurs-Zuweisung wurde nicht gefunden oder Sie haben keine
-                    Berechtigung diese einzusehen.</p>
-            {% endblock %}
+            {{ block('not_found') }}
         {% else %}
-            {% block progress_header %}
-                <h2>{{ labels.headline }}</h2>
-            {% endblock %}
-
-            {% block progress_exercises %}
-                <div class="progress-section progress-section--exercises">
-                    <h3>{{ labels.exercises }}</h3>
-                    {% if exercises is empty %}
-                        <p class="message message--info">Für diesen Kurs sind noch keine Übungen hinterlegt.</p>
-                    {% else %}
-                        <table class="table exercises-table">
-                            <thead>
-                            <tr>
-                                <th>Modul</th>
-                                <th>Übung</th>
-                                <th>Status</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for exercise in exercises %}
-                                {% block exercise_row %}
-                                    <tr class="status--{{ exercise.status }}">
-                                        <td>{{ exercise.module }}</td>
-                                        <td>{{ exercise.title }}</td>
-                                        <td>
-                                                <span class="status-label">
-                                                    {{ exercise.status_label }}
-                                                </span>
-                                        </td>
-                                    </tr>
-                                {% endblock %}
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    {% endif %}
-                </div>
-            {% endblock %}
-
-            {% block progress_schedule %}
-                {% if schedule is not empty %}
-                    <div class="progress-section progress-section--schedule">
-                        <h3>{{ labels.schedule }}</h3>
-                        <table class="table schedule-table">
-                            <thead>
-                            <tr>
-                                <th>Datum/Zeit</th>
-                                <th>Modul / Übung</th>
-                                <th>Ort</th>
-                                <th>Hinweis</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for item in schedule %}
-                                {% block schedule_row %}
-                                    <tr>
-                                        <td>{{ item.planned_at }}</td>
-                                        <td>
-                                            <strong>{{ item.module }}</strong><br>
-                                            {{ item.exercise }}
-                                        </td>
-                                        <td>{{ item.location }}</td>
-                                        <td>{{ item.notes }}</td>
-                                    </tr>
-                                {% endblock %}
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                {% endif %}
-            {% endblock %}
-
-            {% block progress_actions %}
-                <div class="actions">
-                    <a href="javascript:history.back()" class="btn btn-default">Zurück zur Übersicht</a>
-                </div>
-            {% endblock %}
+            {{ block('progress_header') }}
+            {{ block('progress_exercises') }}
+            {{ block('progress_schedule') }}
+            {{ block('progress_actions') }}
         {% endif %}
+    </div>
+{% endblock %}
+
+{% block not_logged_in %}
+    <p class="message message--info">Bitte melden Sie sich an.</p>
+{% endblock %}
+
+{% block not_found %}
+    <p class="message message--error">Die gewünschte Kurs-Zuweisung wurde nicht gefunden oder Sie haben keine
+        Berechtigung diese einzusehen.</p>
+{% endblock %}
+
+{% block progress_header %}
+    <h2>{{ labels.headline }}</h2>
+{% endblock %}
+
+{% block progress_exercises %}
+    <div class="progress-section progress-section--exercises">
+        <h3>{{ labels.exercises }}</h3>
+        {% if exercises is empty %}
+            {{ block('no_exercises') }}
+        {% else %}
+            {{ block('exercises_table') }}
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block no_exercises %}
+    <p class="message message--info">Für diesen Kurs sind noch keine Übungen hinterlegt.</p>
+{% endblock %}
+
+{% block exercises_table %}
+    <table class="table exercises-table">
+        {{ block('exercises_table_head') }}
+        <tbody>
+        {% for exercise in exercises %}
+            {{ block('exercise_row') }}
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block exercises_table_head %}
+    <thead>
+    <tr>
+        <th>Modul</th>
+        <th>Übung</th>
+        <th>Status</th>
+    </tr>
+    </thead>
+{% endblock %}
+
+{% block exercise_row %}
+    <tr class="status--{{ exercise.status }}">
+        <td>{{ exercise.module }}</td>
+        <td>{{ exercise.title }}</td>
+        <td>
+                <span class="status-label">
+                    {{ exercise.status_label }}
+                </span>
+        </td>
+    </tr>
+{% endblock %}
+
+{% block progress_schedule %}
+    {% if schedule is not empty %}
+        <div class="progress-section progress-section--schedule">
+            <h3>{{ labels.schedule }}</h3>
+            {{ block('schedule_table') }}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block schedule_table %}
+    <table class="table schedule-table">
+        {{ block('schedule_table_head') }}
+        <tbody>
+        {% for item in schedule %}
+            {{ block('schedule_row') }}
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block schedule_table_head %}
+    <thead>
+    <tr>
+        <th>Datum/Zeit</th>
+        <th>Modul / Übung</th>
+        <th>Ort</th>
+        <th>Hinweis</th>
+    </tr>
+    </thead>
+{% endblock %}
+
+{% block schedule_row %}
+    <tr>
+        <td>{{ item.planned_at }}</td>
+        <td>
+            <strong>{{ item.module }}</strong><br>
+            {{ item.exercise }}
+        </td>
+        <td>{{ item.location }}</td>
+        <td>{{ item.notes }}</td>
+    </tr>
+{% endblock %}
+
+{% block progress_actions %}
+    <div class="actions">
+        <a href="javascript:history.back()" class="btn btn-default">Zurück zur Übersicht</a>
     </div>
 {% endblock %}

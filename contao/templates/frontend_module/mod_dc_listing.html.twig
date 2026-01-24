@@ -1,45 +1,57 @@
 {#
-Twig-Template: Generische Listing-Ausgabe (Migration von .html5)
-Erwartete Variablen: items (Array), optional headline, description.
+    Das Template verwendet eine flache Block-Struktur, um die Erweiterbarkeit im Contao Template Studio zu maximieren.
+    Jeder Block kann einzeln überschrieben werden. Wichtig: Definieren Sie Blöcke in Ihrem Kind-Template
+    immer auf der obersten Ebene (nicht innerhalb anderer Blöcke verschachtelt).
 #}
 {% extends "@Contao/frontend_module/_base.html.twig" %}
 
 {% block content %}
     {% set container_attributes = attrs().addClass('dc-generic-listing').mergeWith(container_attributes|default) %}
     <div{{ container_attributes }}>
-        {% block listing_header %}
-            {% if description is defined and description %}
-                <div class="listing-description">{{ description|raw }}</div>
-            {% endif %}
-        {% endblock %}
-
-        {% block listing_items %}
-            {% if items is defined and items|length %}
-                {% set list_attributes = attrs().addClass('dc-items').mergeWith(list_attributes|default) %}
-                <ul{{ list_attributes }}>
-                    {% for it in items %}
-                        {% block listing_item %}
-                            {% set item_attributes = attrs().addClass('dc-item').mergeWith(item_attributes|default) %}
-                            <li{{ item_attributes }}>
-                                {% block item_title %}
-                                    <strong>{{ it.title|default(it.name|default('')) }}</strong>
-                                {% endblock %}
-                                {% block item_content %}
-                                    {% if it.teaser is defined and it.teaser %}
-                                        <div class="teaser">{{ it.teaser|raw }}</div>
-                                    {% elseif it.description is defined and it.description %}
-                                        <div class="description">{{ it.description|raw }}</div>
-                                    {% endif %}
-                                {% endblock %}
-                            </li>
-                        {% endblock %}
-                    {% endfor %}
-                </ul>
-            {% else %}
-                {% block no_items %}
-                    <p>Keine Einträge vorhanden.</p>
-                {% endblock %}
-            {% endif %}
-        {% endblock %}
+        {{ block('listing_header') }}
+        {{ block('listing_items') }}
     </div>
+{% endblock %}
+
+{% block listing_header %}
+    {% if description is defined and description %}
+        <div class="listing-description">{{ description|raw }}</div>
+    {% endif %}
+{% endblock %}
+
+{% block listing_items %}
+    {% if items is defined and items|length %}
+        {% set list_attributes = attrs().addClass('dc-items').mergeWith(list_attributes|default) %}
+        <ul{{ list_attributes }}>
+            {% for it in items %}
+                {{ block('listing_item') }}
+            {% endfor %}
+        </ul>
+    {% else %}
+        {{ block('no_items') }}
+    {% endif %}
+{% endblock %}
+
+{% block listing_item %}
+    {% set item_attributes = attrs().addClass('dc-item').mergeWith(item_attributes|default) %}
+    <li{{ item_attributes }}>
+        {{ block('item_title') }}
+        {{ block('item_content') }}
+    </li>
+{% endblock %}
+
+{% block item_title %}
+    <strong>{{ it.title|default(it.name|default('')) }}</strong>
+{% endblock %}
+
+{% block item_content %}
+    {% if it.teaser is defined and it.teaser %}
+        <div class="teaser">{{ it.teaser|raw }}</div>
+    {% elseif it.description is defined and it.description %}
+        <div class="description">{{ it.description|raw }}</div>
+    {% endif %}
+{% endblock %}
+
+{% block no_items %}
+    <p>Keine Einträge vorhanden.</p>
 {% endblock %}

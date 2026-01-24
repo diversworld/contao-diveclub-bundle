@@ -1,101 +1,97 @@
 {#
-Twig-Template für das Frontend-Modul „Meine Tauchkurse“
-Erwartete Template-Variablen (vom Modul gesetzt):
-- isLoggedIn: bool
-- studentFound: bool
-- hasCourses: bool
-- courses: array<{
-    assignment_id:int,
-    status:string,
-    registered_on:string,
-    payed:bool,
-    brevet:bool,
-    dateBrevet:string,
-    course:{ id:int, title:string, type:string, dateStart:string, dateEnd:string }
-  }>
-- labels: array
+    Das Template verwendet eine flache Block-Struktur, um die Erweiterbarkeit im Contao Template Studio zu maximieren.
+    Jeder Block kann einzeln überschrieben werden. Wichtig: Definieren Sie Blöcke in Ihrem Kind-Template
+    immer auf der obersten Ebene (nicht innerhalb anderer Blöcke verschachtelt).
 #}
-
 {% extends "@Contao/frontend_module/_base.html.twig" %}
 
 {% block content %}
     {% set container_attributes = attrs().addClass('mod_dc_student_courses').mergeWith(container_attributes|default) %}
     <div{{ container_attributes }}>
-        {% block student_courses_header %}
-            <h2>{{ labels.headline }}</h2>
-        {% endblock %}
+        {{ block('student_courses_header') }}
 
         {% if not isLoggedIn %}
-            {% block not_logged_in %}
-                <p class="message message--info">Bitte melden Sie sich an.</p>
-            {% endblock %}
+            {{ block('not_logged_in') }}
         {% else %}
             {% if not studentFound %}
-                {% block no_student %}
-                    <p class="message message--warn">{{ labels.noStudent }}</p>
-                {% endblock %}
+                {{ block('no_student') }}
             {% else %}
                 {% if not hasCourses %}
-                    {% block no_courses %}
-                        <p class="message message--info">{{ labels.noCourses }}</p>
-                    {% endblock %}
+                    {{ block('no_courses') }}
                 {% else %}
-                    {% block student_courses_list %}
-                        {% set list_attributes = attrs().addClass('course-list').mergeWith(list_attributes|default) %}
-                        <ul{{ list_attributes }}>
-                            {% for item in courses %}
-                                {% block course_item %}
-                                    {% set item_attributes = attrs().addClass('course-list__item').mergeWith(item_attributes|default) %}
-                                    <li{{ item_attributes }}>
-                                        {% block item_title %}
-                                            <div class="course-list__title">
-                                                {{ item.course.title }}
-                                            </div>
-                                        {% endblock %}
-
-                                        {% block item_meta %}
-                                            <div class="course-list__meta">
-                                                <span
-                                                    class="meta__entry"><strong>{{ labels.status }}:</strong> {{ item.status }}</span>
-                                                <span
-                                                    class="meta__entry"><strong>{{ labels.registered_on }}:</strong> {{ item.registered_on|default('-') }}</span>
-                                                <span
-                                                    class="meta__entry"><strong>{{ labels.course.category|default('Kurstyp') }}:</strong> {{ item.course.category|default('-') }}</span>
-                                                {% if item.course.dateStart %}
-                                                    <span
-                                                        class="meta__entry"><strong>{{ labels.dateStart }}:</strong> {{ item.course.dateStart }}</span>
-                                                {% endif %}
-                                                {% if item.course.dateEnd %}
-                                                    <span
-                                                        class="meta__entry"><strong>{{ labels.dateEnd }}:</strong> {{ item.course.dateEnd }}</span>
-                                                {% endif %}
-                                                <span
-                                                    class="meta__entry"><strong>{{ labels.payed }}:</strong> {{ item.payed ? 'Ja' : 'Nein' }}</span>
-                                                {% if item.brevet %}
-                                                    <span class="meta__entry"><strong>{{ labels.brevet }}:</strong> Ja</span>
-                                                    {% if item.dateBrevet %}
-                                                        <span
-                                                            class="meta__entry"><strong>{{ labels.dateBrevet }}:</strong> {{ item.dateBrevet }}</span>
-                                                    {% endif %}
-                                                {% endif %}
-                                            </div>
-                                        {% endblock %}
-
-                                        {% block item_actions %}
-                                            {% if item.progress_url %}
-                                                <div class="course-list__actions">
-                                                    <a href="{{ item.progress_url }}"
-                                                       class="btn btn-primary">{{ labels.view_progress }}</a>
-                                                </div>
-                                            {% endif %}
-                                        {% endblock %}
-                                    </li>
-                                {% endblock %}
-                            {% endfor %}
-                        </ul>
-                    {% endblock %}
+                    {{ block('student_courses_list') }}
                 {% endif %}
             {% endif %}
         {% endif %}
     </div>
+{% endblock %}
+
+{% block student_courses_header %}
+    <h2>{{ labels.headline }}</h2>
+{% endblock %}
+
+{% block not_logged_in %}
+    <p class="message message--info">Bitte melden Sie sich an.</p>
+{% endblock %}
+
+{% block no_student %}
+    <p class="message message--warn">{{ labels.noStudent }}</p>
+{% endblock %}
+
+{% block no_courses %}
+    <p class="message message--info">{{ labels.noCourses }}</p>
+{% endblock %}
+
+{% block student_courses_list %}
+    {% set list_attributes = attrs().addClass('course-list').mergeWith(list_attributes|default) %}
+    <ul{{ list_attributes }}>
+        {% for item in courses %}
+            {{ block('course_item') }}
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+{% block course_item %}
+    {% set item_attributes = attrs().addClass('course-list__item').mergeWith(item_attributes|default) %}
+    <li{{ item_attributes }}>
+        {{ block('item_title') }}
+        {{ block('item_meta') }}
+        {{ block('item_actions') }}
+    </li>
+{% endblock %}
+
+{% block item_title %}
+    <div class="course-list__title">
+        {{ item.course.title }}
+    </div>
+{% endblock %}
+
+{% block item_meta %}
+    <div class="course-list__meta">
+        <span class="meta__entry"><strong>{{ labels.status }}:</strong> {{ item.status }}</span>
+        <span class="meta__entry"><strong>{{ labels.registered_on }}:</strong> {{ item.registered_on|default('-') }}</span>
+        <span class="meta__entry"><strong>{{ labels.course.category|default('Kurstyp') }}:</strong> {{ item.course.category|default('-') }}</span>
+        {% if item.course.dateStart %}
+            <span class="meta__entry"><strong>{{ labels.dateStart }}:</strong> {{ item.course.dateStart }}</span>
+        {% endif %}
+        {% if item.course.dateEnd %}
+            <span class="meta__entry"><strong>{{ labels.dateEnd }}:</strong> {{ item.course.dateEnd }}</span>
+        {% endif %}
+        <span class="meta__entry"><strong>{{ labels.payed }}:</strong> {{ item.payed ? 'Ja' : 'Nein' }}</span>
+        {% if item.brevet %}
+            <span class="meta__entry"><strong>{{ labels.brevet }}:</strong> Ja</span>
+            {% if item.dateBrevet %}
+                <span class="meta__entry"><strong>{{ labels.dateBrevet }}:</strong> {{ item.dateBrevet }}</span>
+            {% endif %}
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block item_actions %}
+    {% if item.progress_url %}
+        <div class="course-list__actions">
+            <a href="{{ item.progress_url }}"
+               class="btn btn-primary">{{ labels.view_progress }}</a>
+        </div>
+    {% endif %}
 {% endblock %}

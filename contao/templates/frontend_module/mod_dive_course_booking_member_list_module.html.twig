@@ -1,6 +1,7 @@
 {#
-Twig-Template: Buchung – Mitgliederliste (Migration von .html5)
-Erwartete Variablen: members (Array) oder items
+    Das Template verwendet eine flache Block-Struktur, um die Erweiterbarkeit im Contao Template Studio zu maximieren.
+    Jeder Block kann einzeln überschrieben werden. Wichtig: Definieren Sie Blöcke in Ihrem Kind-Template
+    immer auf der obersten Ebene (nicht innerhalb anderer Blöcke verschachtelt).
 #}
 {% extends "@Contao/frontend_module/_base.html.twig" %}
 
@@ -8,29 +9,37 @@ Erwartete Variablen: members (Array) oder items
     {% set container_attributes = attrs().addClass('dc-booking-member-list').mergeWith(container_attributes|default) %}
     <div{{ container_attributes }}>
         {% set list = members is defined ? members : (items is defined ? items : []) %}
-        {% block member_list %}
-            {% if list|length %}
-                {% set list_attributes = attrs().addClass('dc-members').mergeWith(list_attributes|default) %}
-                <ul{{ list_attributes }}>
-                    {% for m in list %}
-                        {% block member_item %}
-                            {% set item_attributes = attrs().addClass('dc-member').mergeWith(item_attributes|default) %}
-                            <li{{ item_attributes }}>
-                                {% block member_info %}
-                                    <strong>{{ m.name|default(m.title|default('')) }}</strong>
-                                    {% if m.email is defined %}
-                                        <span class="email">{{ m.email }}</span>
-                                    {% endif %}
-                                {% endblock %}
-                            </li>
-                        {% endblock %}
-                    {% endfor %}
-                </ul>
-            {% else %}
-                {% block no_members %}
-                    <p>Keine Mitglieder gefunden.</p>
-                {% endblock %}
-            {% endif %}
-        {% endblock %}
+        {{ block('member_list') }}
     </div>
+{% endblock %}
+
+{% block member_list %}
+    {% if list|length %}
+        {% set list_attributes = attrs().addClass('dc-members').mergeWith(list_attributes|default) %}
+        <ul{{ list_attributes }}>
+            {% for m in list %}
+                {{ block('member_item') }}
+            {% endfor %}
+        </ul>
+    {% else %}
+        {{ block('no_members') }}
+    {% endif %}
+{% endblock %}
+
+{% block member_item %}
+    {% set item_attributes = attrs().addClass('dc-member').mergeWith(item_attributes|default) %}
+    <li{{ item_attributes }}>
+        {{ block('member_info') }}
+    </li>
+{% endblock %}
+
+{% block member_info %}
+    <strong>{{ m.name|default(m.title|default('')) }}</strong>
+    {% if m.email is defined %}
+        <span class="email">{{ m.email }}</span>
+    {% endif %}
+{% endblock %}
+
+{% block no_members %}
+    <p>Keine Mitglieder gefunden.</p>
 {% endblock %}

@@ -1,94 +1,110 @@
 {#
-Contao 5 Twig-Template: Liste der Kursveranstaltungen
-Erwartete Template-Variablen:
-- hasEvents: bool
-- events: array of { id, alias, title, dateStart, dateEnd, price, url }
-- hasReaderArticle: bool
+    Das Template verwendet eine flache Block-Struktur, um die Erweiterbarkeit im Contao Template Studio zu maximieren.
+    Jeder Block kann einzeln überschrieben werden. Wichtig: Definieren Sie Blöcke in Ihrem Kind-Template
+    immer auf der obersten Ebene (nicht innerhalb anderer Blöcke verschachtelt).
 #}
-
 {% extends "@Contao/frontend_module/_base.html.twig" %}
 
 {% block content %}
     {% set container_attributes = attrs().addClass('dc-events-list').mergeWith(container_attributes|default) %}
     <div{{ container_attributes }}>
         {% if not hasEvents %}
-            {% block no_events %}
-                <p>Aktuell sind keine Kursveranstaltungen veröffentlicht.</p>
-            {% endblock %}
+            {{ block('no_events') }}
         {% else %}
-            {% block events_warning %}
-                {% if not hasJumpTo %}
-                    <p class="error">Hinweis: In der Modulkonfiguration ist keine Ziel-Seite (Event-Reader) ausgewählt.
-                        Links
-                        können nicht erzeugt werden.</p>
-                {% endif %}
-            {% endblock %}
-
-            {% block events_list %}
-                {% set list_attributes = attrs().addClass('events').mergeWith(list_attributes|default) %}
-                <ul{{ list_attributes }}>
-                    {% for ev in events %}
-                        {% block event_item %}
-                            {% set item_attributes = attrs().addClass('event').mergeWith(item_attributes|default) %}
-                            <li{{ item_attributes }}>
-                                {% block event_title %}
-                                    <h3>{{ ev.title }}</h3>
-                                {% endblock %}
-
-                                {% block event_details %}
-                                    <p>
-                                    <ul>
-                                        {% if ev.dateStart %}
-                                            <li><strong>Beginn:</strong> {{ ev.dateStart }}</li>
-                                        {% endif %}
-                                        {% if ev.dateEnd %}
-                                            <li>
-                                                <strong>Ende:</strong> {{ ev.dateEnd }}
-                                            </li>
-                                        {% endif %}
-                                        {% if ev.instructor %}
-                                            <li>
-                                                <strong>Tauchlehrer:</strong> {{ ev.instructor }}
-                                            </li>
-                                        {% endif %}
-                                        {% if ev.location %}
-                                            <li>
-                                                <strong>Ort:</strong> {{ ev.location }}
-                                            </li>
-                                        {% endif %}
-                                        {% if ev.maxParticipants %}
-                                            <li>
-                                                <strong>Max. Teilnehmer:</strong> {{ ev.maxParticipants }}
-                                            </li>
-                                        {% endif %}
-                                        {% if ev.price %}
-                                            <li>
-                                                <strong>Preis:</strong> {{ ev.price }}
-                                            </li>
-                                        {% endif %}
-                                    </ul>
-                                    {% if ev.description %}
-                                        <div><br>
-                                            <strong>Beschreibung:</strong><br> {{ ev.description|raw }}
-                                        </div>
-                                    {% endif %}
-                                    </p>
-                                {% endblock %}
-
-                                {% block event_link %}
-                                    <p>
-                                        {% if ev.url %}
-                                            <a href="{{ ev.url }}">Details &amp; Anmeldung</a>
-                                        {% else %}
-                                            <span class="muted">Details &amp; Anmeldung (nicht verfügbar)</span>
-                                        {% endif %}
-                                    </p>
-                                {% endblock %}
-                            </li>
-                        {% endblock %}
-                    {% endfor %}
-                </ul>
-            {% endblock %}
+            {{ block('events_warning') }}
+            {{ block('events_list') }}
         {% endif %}
     </div>
+{% endblock %}
+
+{% block no_events %}
+    <p>Aktuell sind keine Kursveranstaltungen veröffentlicht.</p>
+{% endblock %}
+
+{% block events_warning %}
+    {% if not hasJumpTo %}
+        <p class="error">Hinweis: In der Modulkonfiguration ist keine Ziel-Seite (Event-Reader) ausgewählt.
+            Links
+            können nicht erzeugt werden.</p>
+    {% endif %}
+{% endblock %}
+
+{% block events_list %}
+    {% set list_attributes = attrs().addClass('events').mergeWith(list_attributes|default) %}
+    <ul{{ list_attributes }}>
+        {% for ev in events %}
+            {{ block('event_item') }}
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+{% block event_item %}
+    {% set item_attributes = attrs().addClass('event').mergeWith(item_attributes|default) %}
+    <li{{ item_attributes }}>
+        {{ block('event_title') }}
+        {{ block('event_details') }}
+        {{ block('event_link') }}
+    </li>
+{% endblock %}
+
+{% block event_title %}
+    <h3>{{ ev.title }}</h3>
+{% endblock %}
+
+{% block event_details %}
+    <p>
+        {{ block('event_details_list') }}
+        {{ block('event_description') }}
+    </p>
+{% endblock %}
+
+{% block event_details_list %}
+    <ul>
+        {% if ev.dateStart %}
+            <li><strong>Beginn:</strong> {{ ev.dateStart }}</li>
+        {% endif %}
+        {% if ev.dateEnd %}
+            <li>
+                <strong>Ende:</strong> {{ ev.dateEnd }}
+            </li>
+        {% endif %}
+        {% if ev.instructor %}
+            <li>
+                <strong>Tauchlehrer:</strong> {{ ev.instructor }}
+            </li>
+        {% endif %}
+        {% if ev.location %}
+            <li>
+                <strong>Ort:</strong> {{ ev.location }}
+            </li>
+        {% endif %}
+        {% if ev.maxParticipants %}
+            <li>
+                <strong>Max. Teilnehmer:</strong> {{ ev.maxParticipants }}
+            </li>
+        {% endif %}
+        {% if ev.price %}
+            <li>
+                <strong>Preis:</strong> {{ ev.price }}
+            </li>
+        {% endif %}
+    </ul>
+{% endblock %}
+
+{% block event_description %}
+    {% if ev.description %}
+        <div><br>
+            <strong>Beschreibung:</strong><br> {{ ev.description|raw }}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block event_link %}
+    <p>
+        {% if ev.url %}
+            <a href="{{ ev.url }}">Details &amp; Anmeldung</a>
+        {% else %}
+            <span class="muted">Details &amp; Anmeldung (nicht verfügbar)</span>
+        {% endif %}
+    </p>
 {% endblock %}

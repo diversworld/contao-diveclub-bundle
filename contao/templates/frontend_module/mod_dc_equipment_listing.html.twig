@@ -1,38 +1,48 @@
 {#
-Twig-Template: Equipment-Liste (Migration von .html5)
-Erwartete Variablen: items (Array von Ausrüstungen) o.ä.
-Da die alte .html5-Version nicht bekannt ist, wird eine generische Ausgabe verwendet.
+    Das Template verwendet eine flache Block-Struktur, um die Erweiterbarkeit im Contao Template Studio zu maximieren.
+    Jeder Block kann einzeln überschrieben werden. Wichtig: Definieren Sie Blöcke in Ihrem Kind-Template
+    immer auf der obersten Ebene (nicht innerhalb anderer Blöcke verschachtelt).
 #}
 {% extends "@Contao/frontend_module/_base.html.twig" %}
 
 {% block content %}
     {% set container_attributes = attrs().addClass('dc-equipment-listing').mergeWith(container_attributes|default) %}
     <div{{ container_attributes }}>
-        {% block listing_items %}
-            {% if items is defined and items|length %}
-                {% set list_attributes = attrs().addClass('equipment-items').mergeWith(list_attributes|default) %}
-                <ul{{ list_attributes }}>
-                    {% for item in items %}
-                        {% block listing_item %}
-                            {% set item_attributes = attrs().addClass('equipment-item').mergeWith(item_attributes|default) %}
-                            <li{{ item_attributes }}>
-                                {% block item_title %}
-                                    <strong>{{ item.title|default(item.name|default('')) }}</strong>
-                                {% endblock %}
-                                {% block item_description %}
-                                    {% if item.description is defined and item.description %}
-                                        <div class="description">{{ item.description|raw }}</div>
-                                    {% endif %}
-                                {% endblock %}
-                            </li>
-                        {% endblock %}
-                    {% endfor %}
-                </ul>
-            {% else %}
-                {% block no_items %}
-                    <p>Keine Ausrüstung gefunden.</p>
-                {% endblock %}
-            {% endif %}
-        {% endblock %}
+        {{ block('listing_items') }}
     </div>
+{% endblock %}
+
+{% block listing_items %}
+    {% if items is defined and items|length %}
+        {% set list_attributes = attrs().addClass('equipment-items').mergeWith(list_attributes|default) %}
+        <ul{{ list_attributes }}>
+            {% for item in items %}
+                {{ block('listing_item') }}
+            {% endfor %}
+        </ul>
+    {% else %}
+        {{ block('no_items') }}
+    {% endif %}
+{% endblock %}
+
+{% block listing_item %}
+    {% set item_attributes = attrs().addClass('equipment-item').mergeWith(item_attributes|default) %}
+    <li{{ item_attributes }}>
+        {{ block('item_title') }}
+        {{ block('item_description') }}
+    </li>
+{% endblock %}
+
+{% block item_title %}
+    <strong>{{ item.title|default(item.name|default('')) }}</strong>
+{% endblock %}
+
+{% block item_description %}
+    {% if item.description is defined and item.description %}
+        <div class="description">{{ item.description|raw }}</div>
+    {% endif %}
+{% endblock %}
+
+{% block no_items %}
+    <p>Keine Ausrüstung gefunden.</p>
 {% endblock %}

@@ -1,169 +1,187 @@
 {#
-Contao 5 Twig-Template: Detailansicht einer Kursveranstaltung
-Erwartete Template-Variablen:
-- notFound: bool
-- event: { title, dateStart, dateEnd, price, instructor, description }
-- hasSchedule: bool
-- schedule: array of { planned_at, module, exercise, location, notes }
-- isLoggedIn: bool
-- hasStudent: bool
-- alreadyRegistered: bool
-- assignmentId: int
+    Das Template verwendet eine flache Block-Struktur, um die Erweiterbarkeit im Contao Template Studio zu maximieren.
+    Jeder Block kann einzeln überschrieben werden. Wichtig: Definieren Sie Blöcke in Ihrem Kind-Template
+    immer auf der obersten Ebene (nicht innerhalb anderer Blöcke verschachtelt).
 #}
-
 {% extends "@Contao/frontend_module/_base.html.twig" %}
 
 {% block content %}
     {% set container_attributes = attrs().addClass('dc-event-reader').mergeWith(container_attributes|default) %}
     <div{{ container_attributes }}>
         {% if notFound|default(false) %}
-            {% block not_found %}
-                <p>Die gewünschte Kursveranstaltung wurde nicht gefunden.</p>
-            {% endblock %}
+            {{ block('not_found') }}
         {% else %}
-            {% block event_title %}
-                <h2>{{ event.title }}</h2>
-            {% endblock %}
-
-            {% block event_details %}
-                <p>
-                    {% if event.dateStart %}
-                        <strong>Beginn:</strong> {{ event.dateStart }}
-                    {% endif %}
-                    {% if event.dateEnd %}
-                        &nbsp;–&nbsp;<strong>Ende:</strong> {{ event.dateEnd }}
-                    {% endif %}
-                </p>
-                {% if event.price %}
-                    <p><strong>Preis:</strong> {{ event.price }}</p>
-                {% endif %}
-                {% if event.instructor %}
-                    <p><strong>Instruktor:</strong> {{ event.instructor }}</p>
-                {% endif %}
-            {% endblock %}
-
-            {% block event_description %}
-                {% if event.description %}
-                    <div class="description">{{ event.description|raw }}</div>
-                {% endif %}
-            {% endblock %}
-
-            {% block event_schedule %}
-                <h3>Zeitplan</h3>
-                {% if not hasSchedule %}
-                    <p>Für diese Veranstaltung ist noch kein Zeitplan veröffentlicht.</p>
-                {% else %}
-                    <table class="schedule">
-                        <thead>
-                        <tr>
-                            <th>Datum/Zeit</th>
-                            <th>Modul</th>
-                            <th>Übung</th>
-                            <th>Ort</th>
-                            <th>Hinweis</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for row in schedule %}
-                            <tr>
-                                <td>{{ row.planned_at }}</td>
-                                <td>{{ row.module }}</td>
-                                <td>{{ row.exercise }}</td>
-                                <td>{{ row.location }}</td>
-                                <td>{{ row.notes }}</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                {% endif %}
-            {% endblock %}
-
-            {% block event_signup %}
-                <h3>Anmeldung</h3>
-                {% if isLoggedIn and not hasStudent %}
-                    <p>Für Ihr Mitgliedskonto ist kein Tauchschüler hinterlegt.</p>
-                {% elseif alreadyRegistered %}
-                    <p>Sie sind für diese Veranstaltung bereits angemeldet. (Zuweisungs-ID: {{ assignmentId }})</p>
-                {% else %}
-                    {% if not isLoggedIn %}
-                        {% block signup_guest %}
-                            {# Gast-Anmeldung mit Feldern #}
-                            <form method="post" enctype="application/x-www-form-urlencoded"
-                                  class="dc-event-signup dc-event-signup--guest">
-                                <input type="hidden" name="FORM_SUBMIT" value="dc_event_signup">
-                                <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
-                                <input type="hidden" name="mode" value="guest">
-                                <div class="widget widget-select">
-                                    <label for="ctrl_gender">{{ 'Anrede' }}</label>
-                                    <select name="gender" id="ctrl_gender" class="select" required>
-                                        <option value="">-</option>
-                                        <option value="male" {{ app.request.request.get('gender') == 'male' ? 'selected' : '' }}>Herr</option>
-                                        <option value="female" {{ app.request.request.get('gender') == 'female' ? 'selected' : '' }}>Frau</option>
-                                        <option value="other" {{ app.request.request.get('gender') == 'other' ? 'selected' : '' }}>Divers</option>
-                                    </select>
-                                </div>
-                                <div class="widget widget-text">
-                                    <label for="ctrl_firstname">{{ 'Vorname' }}</label>
-                                    <input type="text" id="ctrl_firstname" name="firstname"
-                                           value="{{ app.request.request.get('firstname')|default('') }}" required>
-                                </div>
-                                <div class="widget widget-text">
-                                    <label for="ctrl_lastname">{{ 'Nachname' }}</label>
-                                    <input type="text" id="ctrl_lastname" name="lastname"
-                                           value="{{ app.request.request.get('lastname')|default('') }}" required>
-                                </div>
-                                <div class="widget widget-text">
-                                    <label for="ctrl_street">{{ 'Straße' }}</label>
-                                    <input type="text" id="ctrl_street" name="street"
-                                           value="{{ app.request.request.get('street')|default('') }}" required>
-                                </div>
-                                <div class="widget widget-text">
-                                    <label for="ctrl_postal">{{ 'PLZ' }}</label>
-                                    <input type="text" id="ctrl_postal" name="postal"
-                                           value="{{ app.request.request.get('postal')|default('') }}" required>
-                                </div>
-                                <div class="widget widget-text">
-                                    <label for="ctrl_city">{{ 'Wohnort' }}</label>
-                                    <input type="text" id="ctrl_city" name="city"
-                                           value="{{ app.request.request.get('city')|default('') }}" required>
-                                </div>
-                                <div class="widget widget-text">
-                                    <label for="email">{{ 'E-Mail' }}</label>
-                                    <input type="email" id="email" name="email"
-                                           value="{{ app.request.request.get('email')|default('') }}" required>
-                                </div>
-                                <div class="widget widget-text">
-                                    <label for="ctrl_phone">{{ 'Telefon' }}</label>
-                                    <input type="text" id="ctrl_phone" name="phone"
-                                           value="{{ app.request.request.get('phone')|default('') }}">
-                                </div>
-                                <div class="widget widget-text">
-                                    <label for="ctrl_birthdate">{{ 'Geburtsdatum' }}</label>
-                                    <input type="date" id="ctrl_birthdate" name="birthdate"
-                                           value="{{ app.request.request.get('birthdate')|default('') }}">
-                                </div>
-                                <div class="widget widget-checkbox">
-                                    <input type="checkbox" id="ctrl_privacy" name="privacy" value="1" required>
-                                    <label for="ctrl_privacy">{{ 'Ich stimme der Verarbeitung meiner Daten zu.' }}</label>
-                                </div>
-                                <div class="submit-container">
-                                    <button type="submit">{{ signup.submit|default('Anmelden') }}</button>
-                                </div>
-                            </form>
-                        {% endblock %}
-                    {% else %}
-                        {% block signup_member %}
-                            {# Eingeloggt: kurzes Formular #}
-                            <form method="post" enctype="application/x-www-form-urlencoded"
-                                  class="dc-event-signup dc-event-signup--member">
-                                <input type="hidden" name="FORM_SUBMIT" value="dc_event_signup">
-                                <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
-                                <button type="submit">Jetzt anmelden</button>
-                            </form>
-                        {% endblock %}
-                    {% endif %}
-                {% endif %}
-            {% endblock %}
+            {{ block('event_title') }}
+            {{ block('event_details') }}
+            {{ block('event_description') }}
+            {{ block('event_schedule') }}
+            {{ block('event_signup') }}
         {% endif %}
     </div>
+{% endblock %}
+
+{% block not_found %}
+    <p>Die gewünschte Kursveranstaltung wurde nicht gefunden.</p>
+{% endblock %}
+
+{% block event_title %}
+    <h2>{{ event.title }}</h2>
+{% endblock %}
+
+{% block event_details %}
+    <p>
+        {% if event.dateStart %}
+            <strong>Beginn:</strong> {{ event.dateStart }}
+        {% endif %}
+        {% if event.dateEnd %}
+            &nbsp;–&nbsp;<strong>Ende:</strong> {{ event.dateEnd }}
+        {% endif %}
+    </p>
+    {% if event.price %}
+        <p><strong>Preis:</strong> {{ event.price }}</p>
+    {% endif %}
+    {% if event.instructor %}
+        <p><strong>Instruktor:</strong> {{ event.instructor }}</p>
+    {% endif %}
+{% endblock %}
+
+{% block event_description %}
+    {% if event.description %}
+        <div class="description">{{ event.description|raw }}</div>
+    {% endif %}
+{% endblock %}
+
+{% block event_schedule %}
+    <h3>Zeitplan</h3>
+    {% if not hasSchedule %}
+        <p>Für diese Veranstaltung ist noch kein Zeitplan veröffentlicht.</p>
+    {% else %}
+        {{ block('schedule_table') }}
+    {% endif %}
+{% endblock %}
+
+{% block schedule_table %}
+    <table class="schedule">
+        <thead>
+        <tr>
+            <th>Datum/Zeit</th>
+            <th>Modul</th>
+            <th>Übung</th>
+            <th>Ort</th>
+            <th>Hinweis</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for row in schedule %}
+            {{ block('schedule_row') }}
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block schedule_row %}
+    <tr>
+        <td>{{ row.planned_at }}</td>
+        <td>{{ row.module }}</td>
+        <td>{{ row.exercise }}</td>
+        <td>{{ row.location }}</td>
+        <td>{{ row.notes }}</td>
+    </tr>
+{% endblock %}
+
+{% block event_signup %}
+    <h3>Anmeldung</h3>
+    {% if isLoggedIn and not hasStudent %}
+        <p>Für Ihr Mitgliedskonto ist kein Tauchschüler hinterlegt.</p>
+    {% elseif alreadyRegistered %}
+        <p>Sie sind für diese Veranstaltung bereits angemeldet. (Zuweisungs-ID: {{ assignmentId }})</p>
+    {% else %}
+        {% if not isLoggedIn %}
+            {{ block('signup_guest') }}
+        {% else %}
+            {{ block('signup_member') }}
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
+{% block signup_guest %}
+    {# Gast-Anmeldung mit Feldern #}
+    <form method="post" enctype="application/x-www-form-urlencoded"
+          class="dc-event-signup dc-event-signup--guest">
+        <input type="hidden" name="FORM_SUBMIT" value="dc_event_signup">
+        <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
+        <input type="hidden" name="mode" value="guest">
+
+        {{ block('signup_guest_fields') }}
+
+        <div class="submit-container">
+            <button type="submit">{{ signup.submit|default('Anmelden') }}</button>
+        </div>
+    </form>
+{% endblock %}
+
+{% block signup_guest_fields %}
+    <div class="widget widget-select">
+        <label for="ctrl_gender">{{ 'Anrede' }}</label>
+        <select name="gender" id="ctrl_gender" class="select" required>
+            <option value="">-</option>
+            <option value="male" {{ app.request.request.get('gender') == 'male' ? 'selected' : '' }}>Herr</option>
+            <option value="female" {{ app.request.request.get('gender') == 'female' ? 'selected' : '' }}>Frau</option>
+            <option value="other" {{ app.request.request.get('gender') == 'other' ? 'selected' : '' }}>Divers</option>
+        </select>
+    </div>
+    <div class="widget widget-text">
+        <label for="ctrl_firstname">{{ 'Vorname' }}</label>
+        <input type="text" id="ctrl_firstname" name="firstname"
+               value="{{ app.request.request.get('firstname')|default('') }}" required>
+    </div>
+    <div class="widget widget-text">
+        <label for="ctrl_lastname">{{ 'Nachname' }}</label>
+        <input type="text" id="ctrl_lastname" name="lastname"
+               value="{{ app.request.request.get('lastname')|default('') }}" required>
+    </div>
+    <div class="widget widget-text">
+        <label for="ctrl_street">{{ 'Straße' }}</label>
+        <input type="text" id="ctrl_street" name="street"
+               value="{{ app.request.request.get('street')|default('') }}" required>
+    </div>
+    <div class="widget widget-text">
+        <label for="ctrl_postal">{{ 'PLZ' }}</label>
+        <input type="text" id="ctrl_postal" name="postal"
+               value="{{ app.request.request.get('postal')|default('') }}" required>
+    </div>
+    <div class="widget widget-text">
+        <label for="ctrl_city">{{ 'Wohnort' }}</label>
+        <input type="text" id="ctrl_city" name="city"
+               value="{{ app.request.request.get('city')|default('') }}" required>
+    </div>
+    <div class="widget widget-text">
+        <label for="email">{{ 'E-Mail' }}</label>
+        <input type="email" id="email" name="email"
+               value="{{ app.request.request.get('email')|default('') }}" required>
+    </div>
+    <div class="widget widget-text">
+        <label for="ctrl_phone">{{ 'Telefon' }}</label>
+        <input type="text" id="ctrl_phone" name="phone"
+               value="{{ app.request.request.get('phone')|default('') }}">
+    </div>
+    <div class="widget widget-text">
+        <label for="ctrl_birthdate">{{ 'Geburtsdatum' }}</label>
+        <input type="date" id="ctrl_birthdate" name="birthdate"
+               value="{{ app.request.request.get('birthdate')|default('') }}">
+    </div>
+    <div class="widget widget-checkbox">
+        <input type="checkbox" id="ctrl_privacy" name="privacy" value="1" required>
+        <label for="ctrl_privacy">{{ 'Ich stimme der Verarbeitung meiner Daten zu.' }}</label>
+    </div>
+{% endblock %}
+
+{% block signup_member %}
+    {# Eingeloggt: kurzes Formular #}
+    <form method="post" enctype="application/x-www-form-urlencoded"
+          class="dc-event-signup dc-event-signup--member">
+        <input type="hidden" name="FORM_SUBMIT" value="dc_event_signup">
+        <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
+        <button type="submit">Jetzt anmelden</button>
+    </form>
 {% endblock %}

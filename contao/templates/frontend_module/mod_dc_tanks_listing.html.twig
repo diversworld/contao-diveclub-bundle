@@ -1,6 +1,7 @@
 {#
-Twig-Template: Tanks-Liste (Migration von .html5)
-Erwartete Variablen: tanks (Array) oder items
+    Das Template verwendet eine flache Block-Struktur, um die Erweiterbarkeit im Contao Template Studio zu maximieren.
+    Jeder Block kann einzeln überschrieben werden. Wichtig: Definieren Sie Blöcke in Ihrem Kind-Template
+    immer auf der obersten Ebene (nicht innerhalb anderer Blöcke verschachtelt).
 #}
 {% extends "@Contao/frontend_module/_base.html.twig" %}
 
@@ -8,34 +9,44 @@ Erwartete Variablen: tanks (Array) oder items
     {% set container_attributes = attrs().addClass('dc-tanks-listing').mergeWith(container_attributes|default) %}
     <div{{ container_attributes }}>
         {% set list = tanks is defined ? tanks : (items is defined ? items : []) %}
-        {% block tanks_list %}
-            {% if list|length %}
-                {% set list_attributes = attrs().addClass('dc-tanks').mergeWith(list_attributes|default) %}
-                <ul{{ list_attributes }}>
-                    {% for t in list %}
-                        {% block tank_item %}
-                            {% set item_attributes = attrs().addClass('dc-tank').mergeWith(item_attributes|default) %}
-                            <li{{ item_attributes }}>
-                                {% block tank_title %}
-                                    <strong>{{ t.title|default(t.name|default('')) }}</strong>
-                                {% endblock %}
-                                {% block tank_details %}
-                                    {% if t.volume is defined %}
-                                        <span class="volume">{{ t.volume }}</span>
-                                    {% endif %}
-                                    {% if t.description is defined and t.description %}
-                                        <div class="description">{{ t.description|raw }}</div>
-                                    {% endif %}
-                                {% endblock %}
-                            </li>
-                        {% endblock %}
-                    {% endfor %}
-                </ul>
-            {% else %}
-                {% block no_tanks %}
-                    <p>Keine Tauchgeräte gefunden.</p>
-                {% endblock %}
-            {% endif %}
-        {% endblock %}
+        {{ block('tanks_list') }}
     </div>
+{% endblock %}
+
+{% block tanks_list %}
+    {% if list|length %}
+        {% set list_attributes = attrs().addClass('dc-tanks').mergeWith(list_attributes|default) %}
+        <ul{{ list_attributes }}>
+            {% for t in list %}
+                {{ block('tank_item') }}
+            {% endfor %}
+        </ul>
+    {% else %}
+        {{ block('no_tanks') }}
+    {% endif %}
+{% endblock %}
+
+{% block tank_item %}
+    {% set item_attributes = attrs().addClass('dc-tank').mergeWith(item_attributes|default) %}
+    <li{{ item_attributes }}>
+        {{ block('tank_title') }}
+        {{ block('tank_details') }}
+    </li>
+{% endblock %}
+
+{% block tank_title %}
+    <strong>{{ t.title|default(t.name|default('')) }}</strong>
+{% endblock %}
+
+{% block tank_details %}
+    {% if t.volume is defined %}
+        <span class="volume">{{ t.volume }}</span>
+    {% endif %}
+    {% if t.description is defined and t.description %}
+        <div class="description">{{ t.description|raw }}</div>
+    {% endif %}
+{% endblock %}
+
+{% block no_tanks %}
+    <p>Keine Tauchgeräte gefunden.</p>
 {% endblock %}

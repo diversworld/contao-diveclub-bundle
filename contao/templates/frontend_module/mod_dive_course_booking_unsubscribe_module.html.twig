@@ -1,31 +1,37 @@
 {#
-Twig-Template: Buchung – Abmelden (Migration von .html5)
-Erwartete Variablen: formAction (optional), assignmentId (optional)
+    Das Template verwendet eine flache Block-Struktur, um die Erweiterbarkeit im Contao Template Studio zu maximieren.
+    Jeder Block kann einzeln überschrieben werden. Wichtig: Definieren Sie Blöcke in Ihrem Kind-Template
+    immer auf der obersten Ebene (nicht innerhalb anderer Blöcke verschachtelt).
 #}
 {% extends "@Contao/frontend_module/_base.html.twig" %}
 
 {% block content %}
     {% set container_attributes = attrs().addClass('dc-booking-unsubscribe').mergeWith(container_attributes|default) %}
     <div{{ container_attributes }}>
-        {% block unsubscribe_form %}
-            {% set form_attributes = attrs().addClass('dc-unsubscribe-form').mergeWith(form_attributes|default) %}
-            <form method="post" action="{{ formAction|default('') }}" enctype="application/x-www-form-urlencoded"{{ form_attributes }}>
-                <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
-                <input type="hidden" name="FORM_SUBMIT" value="dc_booking_unsubscribe">
-                {% if assignmentId is defined %}
-                    <input type="hidden" name="assignment" value="{{ assignmentId }}">
-                {% endif %}
+        {{ block('unsubscribe_form') }}
+    </div>
+{% endblock %}
 
-                {% block unsubscribe_message %}
-                    <p>Möchten Sie die Buchung wirklich stornieren?</p>
-                {% endblock %}
+{% block unsubscribe_form %}
+    {% set form_attributes = attrs().addClass('dc-unsubscribe-form').mergeWith(form_attributes|default) %}
+    <form method="post" action="{{ formAction|default('') }}" enctype="application/x-www-form-urlencoded"{{ form_attributes }}>
+        <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
+        <input type="hidden" name="FORM_SUBMIT" value="dc_booking_unsubscribe">
+        {% if assignmentId is defined %}
+            <input type="hidden" name="assignment" value="{{ assignmentId }}">
+        {% endif %}
 
-                {% block unsubscribe_submit %}
-                    <div class="submit-container">
-                        <button type="submit">Stornieren</button>
-                    </div>
-                {% endblock %}
-            </form>
-        {% endblock %}
+        {{ block('unsubscribe_message') }}
+        {{ block('unsubscribe_submit') }}
+    </form>
+{% endblock %}
+
+{% block unsubscribe_message %}
+    <p>Möchten Sie die Buchung wirklich stornieren?</p>
+{% endblock %}
+
+{% block unsubscribe_submit %}
+    <div class="submit-container">
+        <button type="submit">Stornieren</button>
     </div>
 {% endblock %}

@@ -32,11 +32,17 @@
 {% endblock %}
 
 {% block booking_view %}
-    {% block booking_headline %}
-        <h3>{{ labels.booking_headline|format(proposal.title) }}</h3>
-    {% endblock %}
+    {{ block('booking_headline') }}
+    {{ block('form_add_tank') }}
+    {{ block('reserved_tanks') }}
+    {{ block('final_booking') }}
+{% endblock %}
 
-    {% block form_add_tank %}
+{% block booking_headline %}
+    <h3>{{ labels.booking_headline|format(proposal.title) }}</h3>
+{% endblock %}
+
+{% block form_add_tank %}
         {# Formular zum Vormerken einer weiteren Flasche #}
         <div class="add_tank_form border p-3 mb-4">
             <h4>{{ labels.add_tank }}</h4>
@@ -170,95 +176,126 @@
     {% block final_booking %}
         {# Finales Buchungsformular #}
         {% if sessionTanks|length > 0 %}
-            {% block form_final_booking %}
-                <div class="final_booking_form border p-3">
-                    <h4>{{ labels.submit_booking }}</h4>
-                    <form method="post" id="tank_check_form">
-                        <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
-                        <input type="hidden" name="FORM_SUBMIT" value="dc_tank_check_booking">
-
-                        <div class="member_details">
-                            {% block booking_member_details %}
-                                {% if user %}
-                                    {% block booking_user_info %}
-                                        <p><strong>{{ labels.logged_in_member }}</strong> {{ user.firstname }} {{ user.lastname }}</p>
-                                        <p><strong>{{ labels.email }}:</strong> {{ user.email }}</p>
-                                    {% endblock %}
-                                {% else %}
-                                    {% block booking_guest_fields %}
-                                        <div class="widget">
-                                            <label for="firstname">{{ labels.firstname }}:</label>
-                                            <input type="text" name="firstname" id="firstname" required class="text">
-                                        </div>
-                                        <div class="widget">
-                                            <label for="lastname">{{ labels.lastname }}:</label>
-                                            <input type="text" name="lastname" id="lastname" required class="text">
-                                        </div>
-                                        <div class="widget">
-                                            <label for="email">{{ labels.email }}:</label>
-                                            <input type="email" name="email" id="email" required class="text">
-                                        </div>
-                                        <div class="widget">
-                                            <label for="phone">{{ labels.phone }}:</label>
-                                            <input type="text" name="phone" id="phone" class="text">
-                                        </div>
-                                    {% endblock %}
-                                {% endif %}
-                            {% endblock %}
-                        </div>
-
-                        <div class="widget">
-                            <label for="notes">{{ labels.notes_label }}:</label>
-                            <textarea name="notes" id="notes" class="textarea"></textarea>
-                        </div>
-
-                        <div class="submit_container mt-3">
-                            <button type="submit" class="submit btn btn-primary">{{ labels.submit_booking }}</button>
-                        </div>
-                    </form>
-                </div>
-            {% endblock %}
+            {{ block('form_final_booking') }}
         {% endif %}
 
-        {% block final_booking_script %}
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    // JS-Preisberechnung etc.
-                });
-            </script>
-        {% endblock %}
+        {{ block('final_booking_script') }}
+        {{ block('final_booking_cancel') }}
+    {% endblock %}
 
-        {% block final_booking_cancel %}
-            <p><a href="{{ app.request.pathInfo }}">{{ labels.cancel }}</a></p>
-        {% endblock %}
+    {% block form_final_booking %}
+        <div class="final_booking_form border p-3">
+            <h4>{{ labels.submit_booking }}</h4>
+            <form method="post" id="tank_check_form">
+                <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
+                <input type="hidden" name="FORM_SUBMIT" value="dc_tank_check_booking">
+
+                {{ block('member_details_wrapper') }}
+
+                <div class="widget">
+                    <label for="notes">{{ labels.notes_label }}:</label>
+                    <textarea name="notes" id="notes" class="textarea"></textarea>
+                </div>
+
+                <div class="submit_container mt-3">
+                    <button type="submit" class="submit btn btn-primary">{{ labels.submit_booking }}</button>
+                </div>
+            </form>
+        </div>
+    {% endblock %}
+
+    {% block member_details_wrapper %}
+        <div class="member_details">
+            {{ block('booking_member_details') }}
+        </div>
+    {% endblock %}
+
+    {% block booking_member_details %}
+        {% if user %}
+            {{ block('booking_user_info') }}
+        {% else %}
+            {{ block('booking_guest_fields') }}
+        {% endif %}
+    {% endblock %}
+
+    {% block booking_user_info %}
+        <p><strong>{{ labels.logged_in_member }}</strong> {{ user.firstname }} {{ user.lastname }}</p>
+        <p><strong>{{ labels.email }}:</strong> {{ user.email }}</p>
+    {% endblock %}
+
+    {% block booking_guest_fields %}
+        <div class="widget">
+            <label for="firstname">{{ labels.firstname }}:</label>
+            <input type="text" name="firstname" id="firstname" required class="text">
+        </div>
+        <div class="widget">
+            <label for="lastname">{{ labels.lastname }}:</label>
+            <input type="text" name="lastname" id="lastname" required class="text">
+        </div>
+        <div class="widget">
+            <label for="email">{{ labels.email }}:</label>
+            <input type="email" name="email" id="email" required class="text">
+        </div>
+        <div class="widget">
+            <label for="phone">{{ labels.phone }}:</label>
+            <input type="text" name="phone" id="phone" class="text">
+        </div>
+    {% endblock %}
+
+    {% block final_booking_script %}
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // JS-Preisberechnung etc.
+            });
+        </script>
+    {% endblock %}
+
+    {% block final_booking_cancel %}
+        <p><a href="{{ app.request.pathInfo }}">{{ labels.cancel }}</a></p>
     {% endblock %}
 {% endblock %}
 
 {% block proposal_list %}
     <div class="tank-check-list">
         {% for proposal in proposals %}
-            <div class="tank-check-item block">
-                <div class="details">
-                    <h4>{{ proposal.title }}</h4>
-                    <p>
-                        {% if proposal.eventDate %}
-                            <strong>{{ labels.event_date }}</strong><br>
-                            <small>{{ proposal.eventTitle }}</small>
-                        {% else %}
-                            <strong>{{ labels.proposal_date }}:</strong>
-                        {% endif %}
-                    </p>
-                    <p><strong>{{ labels.vendor }}:</strong> {{ proposal.vendorName }}</p>
-                    {% if proposal.notes %}
-                        <div class="notes">{{ proposal.notes|raw }}</div>
-                    {% endif %}
-                </div>
-                <div class="action">
-                    <a href="{{ proposal.url }}" class="btn btn-primary">{{ labels.book_now }}</a>
-                </div>
-            </div>
+            {{ block('proposal_item') }}
         {% else %}
-            <p>{{ labels.no_proposals }}</p>
+            {{ block('no_proposals') }}
         {% endfor %}
     </div>
+{% endblock %}
+
+{% block proposal_item %}
+    <div class="tank-check-item block">
+        <div class="details">
+            {{ block('proposal_details') }}
+        </div>
+        <div class="action">
+            {{ block('proposal_action') }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block proposal_details %}
+    <h4>{{ proposal.title }}</h4>
+    <p>
+        {% if proposal.eventDate %}
+            <strong>{{ labels.event_date }}</strong><br>
+            <small>{{ proposal.eventTitle }}</small>
+        {% else %}
+            <strong>{{ labels.proposal_date }}:</strong>
+        {% endif %}
+    </p>
+    <p><strong>{{ labels.vendor }}:</strong> {{ proposal.vendorName }}</p>
+    {% if proposal.notes %}
+        <div class="notes">{{ proposal.notes|raw }}</div>
+    {% endif %}
+{% endblock %}
+
+{% block proposal_action %}
+    <a href="{{ proposal.url }}" class="btn btn-primary">{{ labels.book_now }}</a>
+{% endblock %}
+
+{% block no_proposals %}
+    <p>{{ labels.no_proposals }}</p>
 {% endblock %}

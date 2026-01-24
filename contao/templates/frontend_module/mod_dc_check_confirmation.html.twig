@@ -1,45 +1,72 @@
+{#
+    Das Template verwendet eine flache Block-Struktur, um die Erweiterbarkeit im Contao Template Studio zu maximieren.
+    Jeder Block kann einzeln überschrieben werden. Wichtig: Definieren Sie Blöcke in Ihrem Kind-Template
+    immer auf der obersten Ebene (nicht innerhalb anderer Blöcke verschachtelt).
+#}
 {% extends "@Contao/frontend_module/_base.html.twig" %}
 
 {% block content %}
     <div class="dc_check_confirmation">
-        {% block message %}
-            {% if confirmation_text %}
-                <div class="confirmation_message">
-                    {{ confirmation_text|raw }}
-                </div>
-            {% endif %}
-        {% endblock %}
-        {% block orders %}
-            {% if orders %}
-                {% block table %}
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Seriennummer</th>
-                                <th>Größe</th>
-                                <th>Preis</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for order in orders %}
-                                <tr>
-                                    <td>{{ order.serialNumber }}</td>
-                                    <td>{{ order.size }}L</td>
-                                    <td>{{ order.totalPrice|number_format(2, ',', '.') }} €</td>
-                                    <td>{{ order.status_label }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <td colspan="2"><strong>Gesamtpreis</strong></td>
-                                <td colspan="2"><strong>{{ booking.totalPrice|number_format(2, ',', '.') }} €</strong></td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                {% endblock %}
-            {% endif %}
-        {% endblock %}
+        {{ block('message') }}
+        {{ block('orders') }}
     </div>
+{% endblock %}
+
+{% block message %}
+    {% if confirmation_text %}
+        <div class="confirmation_message">
+            {{ confirmation_text|raw }}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block orders %}
+    {% if orders %}
+        {{ block('table') }}
+    {% endif %}
+{% endblock %}
+
+{% block table %}
+    <table class="table">
+        {{ block('table_head') }}
+        {{ block('table_body') }}
+        {{ block('table_foot') }}
+    </table>
+{% endblock %}
+
+{% block table_head %}
+    <thead>
+        <tr>
+            <th>Seriennummer</th>
+            <th>Größe</th>
+            <th>Preis</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+{% endblock %}
+
+{% block table_body %}
+    <tbody>
+        {% for order in orders %}
+            {{ block('table_row') }}
+        {% endfor %}
+    </tbody>
+{% endblock %}
+
+{% block table_row %}
+    <tr>
+        <td>{{ order.serialNumber }}</td>
+        <td>{{ order.size }}L</td>
+        <td>{{ order.totalPrice|number_format(2, ',', '.') }} €</td>
+        <td>{{ order.status_label }}</td>
+    </tr>
+{% endblock %}
+
+{% block table_foot %}
+    <tfoot>
+        <tr>
+            <td colspan="2"><strong>Gesamtpreis</strong></td>
+            <td colspan="2"><strong>{{ booking.totalPrice|number_format(2, ',', '.') }} €</strong></td>
+        </tr>
+    </tfoot>
 {% endblock %}
