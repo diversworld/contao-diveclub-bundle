@@ -254,7 +254,7 @@ These insert tags can be used in all Contao text fields (content elements, email
 
 ## Frontend-Module & Templates
 
-Das Bundle stellt verschiedene Frontend-Module zur Verfügung. Die Darstellung kann über Twig-Templates angepasst werden. Eine detaillierte Dokumentation der Templates und ihrer Anpassungsmöglichkeiten finden Sie in der [TEMPLATES.md](TEMPLATES.md).
+The bundle provides various frontend modules. The presentation can be customized via Twig templates. You can find detailed documentation of the templates and their customization options in [TEMPLATES.md](TEMPLATES.md).
 
 #### Date Values
 Fields such as `bookingDate`, `dateStart`, `dateEnd`, or `registered_on` are automatically formatted based on the date format (`datimFormat`) defined in the Contao system settings.
