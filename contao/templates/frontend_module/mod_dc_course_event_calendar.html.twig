@@ -1,0 +1,116 @@
+{% extends "@Contao/frontend_module/_base.html.twig" %}
+
+{% block content %}
+    {% set container_attributes = attrs().addClass('dc-course-calendar').mergeWith(container_attributes|default) %}
+    <div{{ container_attributes }}>
+        {% if be_message is defined %}
+            {{ block('be_info') }}
+        {% elseif not hasEvents %}
+            {{ block('no_events') }}
+        {% else %}
+            {{ block('calendar_table') }}
+            {{ block('calendar_script') }}
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block be_info %}
+    <div class="be_info" style="background: #eee; padding: 1em; border: 1px solid #ccc;">
+        {{ be_message }}
+    </div>
+{% endblock %}
+
+{% block no_events %}
+    <p>Für diese Veranstaltung ist noch kein Zeitplan veröffentlicht.</p>
+{% endblock %}
+
+{% block calendar_table %}
+    <table class="calendar">
+        <thead>
+            {{ block('calendar_nav') }}
+            {{ block('calendar_day_labels') }}
+        </thead>
+        <tbody>
+            {% for week in weeks %}
+                {{ block('calendar_week_row') }}
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block calendar_nav %}
+    <tr>
+        <th colspan="2" class="head previous">
+            <a href="{{ prevHref }}" title="{{ prevTitle }}">{{ prevLabel }}</a>
+        </th>
+        <th colspan="3" class="head current">{{ currentMonth }}</th>
+        <th colspan="2" class="head next">
+            <a href="{{ nextHref }}" title="{{ nextTitle }}">{{ nextLabel }}</a>
+        </th>
+    </tr>
+{% endblock %}
+
+{% block calendar_day_labels %}
+    <tr>
+        {% for day in days %}
+            <th class="label{{ day.class }}">{{ day.name }}</th>
+        {% endfor %}
+    </tr>
+{% endblock %}
+
+{% block calendar_week_row %}
+    <tr>
+        {% for day in week %}
+            {{ block('calendar_day_cell') }}
+        {% endfor %}
+    </tr>
+{% endblock %}
+
+{% block calendar_day_cell %}
+    <td class="{{ day.class }}">
+        <div class="header">{{ day.label }}</div>
+        {% for event in day.events %}
+            {{ block('calendar_event') }}
+        {% endfor %}
+    </td>
+{% endblock %}
+
+{% block calendar_event %}
+    <div class="event cal_{{ event.parent|default('0') }} {{ event.class|default('') }}"
+         onclick="this.classList.toggle('show-details')"
+         style="cursor: pointer;">
+        <span class="time">{{ event.time }}</span>
+        <span class="title" title="{{ event.title }}">
+            {{ event.title }}
+        </span>
+        {{ block('calendar_event_details') }}
+    </div>
+{% endblock %}
+
+{% block calendar_event_details %}
+    <div class="details" style="display: none; padding-top: 5px; border-top: 1px solid #ccc; margin-top: 5px;">
+        {% if event.location %}
+            <div class="location"><strong>Ort:</strong> {{ event.location }}</div>
+        {% endif %}
+        {% if event.instructor %}
+            <div class="instructor"><strong>Instruktor:</strong> {{ event.instructor }}</div>
+        {% endif %}
+        {% if event.notes %}
+            <div class="notes"><strong>Notizen:</strong> {{ event.notes|raw }}</div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block calendar_script %}
+    <style>
+        .dc-course-calendar .event.show-details .details {
+            display: block !important;
+        }
+        .dc-course-calendar .event {
+            transition: background 0.2s;
+        }
+        .dc-course-calendar .event:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+    </style>
+{% endblock %}

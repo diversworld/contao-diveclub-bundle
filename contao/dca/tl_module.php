@@ -39,6 +39,14 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['dc_course_event_reader'] =
     '{protected_legend:hide},protected;' .
     '{expert_legend:hide},guests,cssID';
 
+// Kalender für Kursveranstaltungen
+$GLOBALS['TL_DCA']['tl_module']['palettes']['dc_course_event_calendar'] =
+    '{title_legend},name,headline,type;' .
+    '{config_legend},dc_calendar_view;' .
+    '{template_legend:hide},customTpl;' .
+    '{protected_legend:hide},protected;' .
+    '{expert_legend:hide},guests,cssID';
+
 $GLOBALS['TL_DCA']['tl_module']['palettes']['dc_booking'] =
     '{title_legend},name,headline,type;' .
     '{template_legend:hide},customTpl;' .
@@ -136,6 +144,16 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['confirmation_text'] = [
     'inputType' => 'textarea',
     'eval'      => ['rte' => 'tinyMCE', 'tl_class' => 'clr'],
     'sql'       => "text NULL"
+];
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['dc_calendar_view'] = [
+    'label'     => &$GLOBALS['TL_LANG']['tl_module']['dc_calendar_view'],
+    'exclude'   => true,
+    'inputType' => 'select',
+    'options'   => ['dayGridMonth', 'timeGridWeek', 'listYear'],
+    'reference' => &$GLOBALS['TL_LANG']['tl_module']['dc_calendar_view_options'],
+    'eval'      => ['tl_class' => 'w50'],
+    'sql'       => "varchar(32) NOT NULL default 'dayGridMonth'"
 ];
 
 // Hinweis: Das Feld "jumpTo" ist ein Standardfeld von tl_module (Seitenauswahl)

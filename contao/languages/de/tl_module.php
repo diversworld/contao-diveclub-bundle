@@ -13,3 +13,10 @@ $GLOBALS['TL_LANG']['tl_module']['confirmation_text'] = ['Bestätigungstext', 'G
 $GLOBALS['TL_LANG']['tl_module']['showCourseEvents']  = ['Tauchkurse anzeigen', 'Wählen Sie diese Option, um Tauchkurse in der Liste anzuzeigen.'];
 $GLOBALS['TL_LANG']['tl_module']['showTankChecks']   = ['TÜV-Prüfungen Liste', 'Wählen Sie diese Option, um TÜV-Prüfungen in der Liste anzuzeigen.'];
 $GLOBALS['TL_LANG']['tl_module']['tankCheckJumpTo']  = ['TÜV-Reader-Seite', 'Wählen Sie die Seite aus, auf der das Modul für die TÜV-Prüfung (Tank-Check) eingebunden ist.'];
+
+$GLOBALS['TL_LANG']['tl_module']['dc_calendar_view'] = ['Standardansicht', 'Wählen Sie die Standardansicht für den Kalender.'];
+$GLOBALS['TL_LANG']['tl_module']['dc_calendar_view_options'] = [
+    'dayGridMonth' => 'Monatsdarstellung',
+    'timeGridWeek' => 'Wochenweise Darstellung',
+    'listYear'     => 'Jahresdarstellung (Liste)'
+];

@@ -252,6 +252,10 @@ These tags refer to the course assignment, the student, and the event, based on 
 ### Usage & Formatting
 These insert tags can be used in all Contao text fields (content elements, email subjects, confirmation texts). All code and templates are documented with inline comments to explain the purpose of each instruction.
 
+## Frontend-Module & Templates
+
+Das Bundle stellt verschiedene Frontend-Module zur Verfügung. Die Darstellung kann über Twig-Templates angepasst werden. Eine detaillierte Dokumentation der Templates und ihrer Anpassungsmöglichkeiten finden Sie in der [TEMPLATES.md](TEMPLATES.md).
+
 #### Date Values
 Fields such as `bookingDate`, `dateStart`, `dateEnd`, or `registered_on` are automatically formatted based on the date format (`datimFormat`) defined in the Contao system settings.
 
