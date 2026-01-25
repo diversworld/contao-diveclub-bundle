@@ -80,7 +80,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
 
         // Zeitplan laden (mit Modul- und Übungsnamen)
         $schedule = System::getContainer()->get('database_connection')->fetchAllAssociative(
-            'SELECT s.id, s.planned_at, s.location, s.notes, m.title AS module_title, e.title AS exercise_title
+            'SELECT s.id, s.planned_at, s.location, s.instructor, s.notes, m.title AS module_title, e.title AS exercise_title
              FROM tl_dc_course_event_schedule s
              INNER JOIN tl_dc_course_modules m ON m.id = s.module_id
              INNER JOIN tl_dc_course_exercises e ON e.id = s.exercise_id
@@ -94,6 +94,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
             $rows[] = [
                 'planned_at' => $row['planned_at'] ? Date::parse($dateFormat, (int)$row['planned_at']) : '',
                 'location' => (string)$row['location'],
+                'instructor' => (string)$row['instructor'],
                 'notes' => (string)$row['notes'],
                 'module' => (string)$row['module_title'],
                 'exercise' => (string)$row['exercise_title'],
