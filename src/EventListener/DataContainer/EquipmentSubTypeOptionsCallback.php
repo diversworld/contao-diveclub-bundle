@@ -20,7 +20,7 @@ class EquipmentSubTypeOptionsCallback
 
     public function __invoke(DataContainer $dc = null): array
     {
-        if (!$dc->activeRecord || !$dc->activeRecord->title) {
+        if (!$dc->activeRecord) {
             return [];
         }
 

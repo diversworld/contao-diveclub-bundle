@@ -70,11 +70,11 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
     ],
     'palettes' => [
         '__selector__' => ['addNotes'],
-        'default' => '{title_legend},type,subType,title,alias;
-                                {status_legend},status,rentalFee;
-                                {details_legend},manufacturer,model,color,size,serialNumber,buyDate;
-                                {notes_legend},addNotes;
-                                {publish_legend},published,start,stop;'
+        'default'   => '{title_legend},title,type,subType,alias;
+                        {status_legend},status,rentalFee;
+                        {details_legend},manufacturer,model,color,size,serialNumber,buyDate;
+                        {notes_legend},addNotes;
+                        {publish_legend},published,start,stop;'
     ],
     'subpalettes' => [
         'addNotes' => 'notes',
@@ -103,7 +103,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
         'alias' => [
             'search' => true,
             'inputType' => 'text',
-            'eval' => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w33'],
+            'eval' => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w33 clr'],
             'save_callback' => [
                 ['tl_dc_equipment', 'generateAlias']
             ],
