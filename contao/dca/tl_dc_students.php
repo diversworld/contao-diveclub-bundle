@@ -221,7 +221,7 @@ $GLOBALS['TL_DCA']['tl_dc_students'] = [
             'options_callback' => [MemberOptionsListener::class, '__invoke'],
             'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50', 'submitOnChange' => true],
             'sql' => "int(10) unsigned NOT NULL default 0",
-            'foreignKey' => 'tl_member.lastname',
+            'foreignKey' => 'tl_member.id',
             'relation' => ['type' => 'hasOne', 'load' => 'lazy']
         ],
         'notes' => [

@@ -140,7 +140,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_booking'] = [
             'options_callback' => [MemberOptionsListener::class, '__invoke'],
             'eval' => ['chosen' => true, 'includeBlankOption' => true, 'tl_class' => 'w50 clr'],
             'sql' => "int(10) unsigned NOT NULL default 0",
-            'foreignKey' => 'tl_member.lastname',
+            'foreignKey' => 'tl_member.id',
             'relation' => ['type' => 'hasOne', 'load' => 'lazy']
         ],
         'firstname' => [

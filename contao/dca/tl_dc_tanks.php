@@ -228,7 +228,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
-            'foreignKey'        => 'tl_member.lastname',
+            'foreignKey'        => 'tl_member.id',
             'relation'          => ['type' => 'belongsTo', 'load' => 'lazy'],       // Relationstyp
             'eval'              => [
                 'includeBlankOption'=> true,                                        // Option "Bitte wählen" hinzufügen

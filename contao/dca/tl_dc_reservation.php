@@ -171,7 +171,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'options_callback' => [MemberOptionsListener::class, '__invoke'],
             'eval' => array('submitOnChange' => true, 'includeBlankOption' => true, 'tl_class' => 'w25 clr'),
             'sql' => "int(10) unsigned NOT NULL default 0", // Speichert eine ID (Int)
-            'foreignKey' => 'tl_member.lastname',
+            'foreignKey' => 'tl_member.id',
             'relation' => array('type' => 'hasOne', 'load' => 'lazy')
         ],
         'reservedFor' => [
@@ -184,7 +184,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'options_callback' => [MemberOptionsListener::class, '__invoke'],
             'eval' => array('submitOnChange' => true, 'includeBlankOption' => true, 'tl_class' => 'w25'),
             'sql' => "int(10) unsigned NOT NULL default 0", // Speichert eine ID (Int)
-            'foreignKey' => 'tl_member.lastname',
+            'foreignKey' => 'tl_member.id',
             'relation' => array('type' => 'hasOne', 'load' => 'lazy')
         ],
         'rentalFee' => [
