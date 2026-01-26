@@ -10,7 +10,7 @@ use Diversworld\ContaoDiveclubBundle\Model\DcCheckBookingModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckOrderModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckProposalModel;
 use RuntimeException;
-use setasign\Fpdi\Tcpdf\Fpdi;
+use setasign\Fpdi\TcpdfFpdi as Fpdi;
 
 class TuvListGenerator
 {

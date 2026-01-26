@@ -24,6 +24,8 @@ use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationPick
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationReturnedCallback;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationStatusCallback;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationTitleCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationAliasListener;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\MemberOptionsListener;
 
 /**
  * Table tl_dc_reservation
@@ -106,7 +108,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'search' => true,
             'inputType' => 'text',
             'eval' => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w33'],
-            'save_callback' => [['tl_dc_reservation', 'generateAlias']],
+            'save_callback' => [[ReservationAliasListener::class, '__invoke']],
             'sql' => "varchar(255) BINARY NOT NULL default ''"
         ],
         'reservation_status' => [
@@ -166,9 +168,10 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'filter' => false,
             'sorting' => true,
             'save_callback' => [[ReservationMemberIdCallbackListener::class, '__invoke']],
-            'foreignKey' => 'tl_member.CONCAT(firstname, " ", lastname)',
+            'options_callback' => [MemberOptionsListener::class, '__invoke'],
             'eval' => array('submitOnChange' => true, 'includeBlankOption' => true, 'tl_class' => 'w25 clr'),
             'sql' => "int(10) unsigned NOT NULL default 0", // Speichert eine ID (Int)
+            'foreignKey' => 'tl_member.lastname',
             'relation' => array('type' => 'hasOne', 'load' => 'lazy')
         ],
         'reservedFor' => [
@@ -178,9 +181,10 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'search' => true,
             'filter' => false,
             'sorting' => true,
-            'foreignKey' => 'tl_member.CONCAT(firstname, " ", lastname)',
+            'options_callback' => [MemberOptionsListener::class, '__invoke'],
             'eval' => array('submitOnChange' => true, 'includeBlankOption' => true, 'tl_class' => 'w25'),
             'sql' => "int(10) unsigned NOT NULL default 0", // Speichert eine ID (Int)
+            'foreignKey' => 'tl_member.lastname',
             'relation' => array('type' => 'hasOne', 'load' => 'lazy')
         ],
         'rentalFee' => [
@@ -226,49 +230,3 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
         ]
     ]
 ];
-
-/**
- * Provide miscellaneous methods that are used by the data configuration array.
- *
- * @property DcReservation $dcBooking
- *
- * @internal
- */
-class tl_dc_reservation extends Backend
-{
-    /**
-     * Auto-generate the event alias if it has not been set yet
-     *
-     * @param mixed $varValue
-     * @param DataContainer $dc
-     *
-     * @return mixed
-     *
-     * @throws Exception
-     */
-    public function generateAlias(mixed $varValue, DataContainer $dc): mixed
-    {
-        $aliasExists = static function (string $alias) use ($dc): bool {
-            $result = Database::getInstance()
-                ->prepare("SELECT id FROM tl_dc_reservation WHERE alias=? AND id!=?")
-                ->execute($alias, $dc->id);
-
-            return $result->numRows > 0;
-        };
-
-        // Generate the alias if there is none
-        if (!$varValue) {
-            $varValue = System::getContainer()->get('contao.slug')->generate(
-                $dc->activeRecord->title,
-                [],
-                $aliasExists
-            );
-        } elseif (preg_match('/^[1-9]\d*$/', $varValue)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
-        } elseif ($aliasExists($varValue)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
-        }
-
-        return $varValue;
-    }
-}

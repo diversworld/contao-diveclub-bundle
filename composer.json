@@ -25,7 +25,7 @@
         "php": "^8.2",
         "contao/core-bundle": "^5.3",
         "tecnickcom/tcpdf": "^6.6",
-        "setasign/fpdi-tcpdf": "^2.3"
+        "setasign/fpdi": "^2.6"
     },
     "require-dev": {
         "contao/manager-plugin": "^2.12",

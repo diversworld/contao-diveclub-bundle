@@ -19,6 +19,8 @@ use Contao\Image;
 use Contao\StringUtil;
 use Contao\System;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\BookingLabelListener;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\MemberOptionsListener;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\BookingPdfButtonListener;
 
 /**
  * Table tl_dc_check_booking
@@ -66,7 +68,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_booking'] = [
                 'href' => 'key=pdf',
                 'icon' => 'bundles/diversworldcontaodiveclub/icons/pdf.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()"',
-                'button_callback' => [tl_dc_check_booking::class, 'generatePdfButton']
+                'button_callback' => [BookingPdfButtonListener::class, '__invoke']
             ],
             'copy',
             'cut',
@@ -135,9 +137,10 @@ $GLOBALS['TL_DCA']['tl_dc_check_booking'] = [
             'exclude' => true,
             'filter' => true,
             'inputType' => 'select',
-            'foreignKey' => 'tl_member.CONCAT(firstname, " ", lastname)',
+            'options_callback' => [MemberOptionsListener::class, '__invoke'],
             'eval' => ['chosen' => true, 'includeBlankOption' => true, 'tl_class' => 'w50 clr'],
             'sql' => "int(10) unsigned NOT NULL default 0",
+            'foreignKey' => 'tl_member.lastname',
             'relation' => ['type' => 'hasOne', 'load' => 'lazy']
         ],
         'firstname' => [
@@ -176,13 +179,3 @@ $GLOBALS['TL_DCA']['tl_dc_check_booking'] = [
         ],
     ]
 ];
-
-class tl_dc_check_booking extends Backend
-{
-    public function generatePdfButton($row, $href, $label, $title, $icon, $attributes)
-    {
-        $url = System::getContainer()->get('router')->generate('dc_check_order_pdf', ['id' => $row['id']]);
-
-        return '<a href="' . $url . '" title="' . StringUtil::specialchars($title) . '" ' . $attributes . ' target="_blank">' . Image::getHtml($icon, $label) . '</a> ';
-    }
-}

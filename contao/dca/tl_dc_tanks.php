@@ -19,7 +19,12 @@ use Contao\DC_Table;
 use Contao\System;
 use Contao\Input;
 use Contao\CoreBundle\Monolog\ContaoContext;
-use Diversworld\ContaoDiveclubBundle\DataContainer\DcTanks;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\TankLabelListener;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\MemberOptionsListener;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\TankAliasListener;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\TankCheckDateListener;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\TankCalendarOptionsListener;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\TankPriceListener;
 
 /**
  * Table tl_dc_tanks
@@ -50,8 +55,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'fields'            => ['title','owner','serialNumber','manufacturer','size','o2clean','lastCheckDate','nextCheckDate','status'],
             'showColumns'       => true,
             'format'            => '%s',
-            'label_callback'    => ['tl_dc_tanks', 'formatCheckDates'],
-            'group_callback'    => ['tl_dc_tanks', 'formatGroupHeader'],
+            'label_callback'    => [TankLabelListener::class, '__invoke'],
         ],
         'global_operations' => [
             'all'               => [
@@ -100,9 +104,9 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'inputType'         => 'text',
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_tanks']['alias'],
             'search'            => true,
-            'eval'              => ['rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w25'],
+            'eval'              => ['rgxp'=>'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
             'save_callback' => [
-                        ['tl_dc_tanks', 'generateAlias']
+                [TankAliasListener::class, '__invoke']
             ],
             'sql'           => "varchar(255) BINARY NOT NULL default ''"
         ],
@@ -164,9 +168,9 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_tanks']['checkId'],
             'foreignKey'        => 'tl_calendar_events.title',      // Zeigt den Titel des Events als Auswahl
             'relation'          => ['type' => 'hasOne', 'load' => 'lazy'], // Relationstyp
-            'options_callback'  => ['tl_dc_tanks', 'getCalendarOptions'],  // Option Callback
+            'options_callback'  => [TankCalendarOptionsListener::class, '__invoke'],  // Option Callback
             'save_callback'     => [
-                ['tl_dc_tanks', 'setLastCheckDate']
+                [TankCheckDateListener::class, '__invoke']
             ],
             'eval'              => [
                 'includeBlankOption'=> true,                      // Option "Bitte wählen" hinzufügen
@@ -212,18 +216,19 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'search'            => false,
             'filter'            => true,
             'sorting'           => true,
-            'save_callback'     => [['tl_dc_tanks', 'convertPrice']],
+            'save_callback'     => [[TankPriceListener::class, '__invoke']],
             'eval'              => [ 'mandatory'=>false, 'tl_class' => 'w25'], // Beachten Sie "rgxp" für Währungsangaben
             'sql'               => "DECIMAL(10,2) NOT NULL default '0.00'"
         ],
         'owner'             => [
             'inputType'         => 'select',                                        // Typ ist "select"
-            'foreignKey'        => 'tl_member.CONCAT(firstname, " ", lastname)',    // Zeigt Vor- und Nachnamen als Titel
+            'options_callback'  => [MemberOptionsListener::class, '__invoke'],              // Optionen über Callback holen
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_tanks']['owner'],
             'exclude'           => true,
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
+            'foreignKey'        => 'tl_member.lastname',
             'relation'          => ['type' => 'belongsTo', 'load' => 'lazy'],       // Relationstyp
             'eval'              => [
                 'includeBlankOption'=> true,                                        // Option "Bitte wählen" hinzufügen
@@ -282,189 +287,3 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
         ]
     ]
 ];
-
-/**
- * Provide miscellaneous methods that are used by the data configuration array.
- *
- * @property DcTanks $DcTanks
- *
- * @internal
- */
-class tl_dc_tanks extends Backend
-{
-    /**
-     * Auto-generate the event alias if it has not been set yet
-     *
-     * @param mixed $varValue
-     * @param DataContainer $dc
-     *
-     * @return mixed
-     *
-     * @throws Exception
-     */
-    public function generateAlias(mixed $varValue, DataContainer $dc): mixed
-    {
-        $aliasExists = static function (string $alias) use ($dc): bool {
-            $result = Database::getInstance()
-                ->prepare("SELECT id FROM tl_dc_tanks WHERE alias=? AND id!=?")
-                ->execute($alias, $dc->id);
-            return $result->numRows > 0;
-        };
-
-        // Generate the alias if there is none
-        if (!$varValue) {
-            $varValue = System::getContainer()->get('contao.slug')->generate(
-                $dc->activeRecord->title,
-                [],
-                $aliasExists
-            );
-        } elseif (preg_match('/^[1-9]\d*$/', $varValue)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
-        } elseif ($aliasExists($varValue)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
-        }
-
-        return $varValue;
-    }
-
-    function formatCheckDates($row): string
-    {
-        $owners = $this->getOwnerOptions(); // Add this line to get owner options stucture
-        $ownerName = $owners[$row['owner']] ?? 'N/A';
-
-        $title = $row['title'] ?? '';
-        $serialnumber = $row['serialNumber'] ?? '';
-        $size = $row['size'] ?? '';
-        $manufacturer = $row['manufacturer'] ?? '';
-
-        if($row['o2clean'] == 1){
-            $o2CleanValue = 'ja';
-        } else {
-            $o2CleanValue = 'nein';
-        }
-
-        $lastCheckDate = isset($row['lastCheckDate']) && is_numeric($row['lastCheckDate'])
-            ? date('d.m.Y', $row['lastCheckDate'])
-            : 'N/A';
-
-        $nextCheckDate = isset($row['nextCheckDate']) && is_numeric($row['nextCheckDate'])
-            ? date('d.m.Y', $row['nextCheckDate'])
-            : 'N/A';
-
-        return sprintf('%s - %s - %s L - %s - O2: %s - %s - letzter TÜV %s - nächster TÜV %s',
-            $title,
-            $serialnumber,
-            $size,
-            $manufacturer,
-            $o2CleanValue,
-            $ownerName,
-            $lastCheckDate,
-            $nextCheckDate
-        );
-    }
-
-    function formatGroupHeader($group, $field, $row): string
-    {
-        return $group; // default return
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function setLastCheckDate($varValue, DataContainer $dc)
-    {
-        $logger = System::getContainer()->get('monolog.logger.contao');
-        $logger->error(
-            'Varvalue: ' . $varValue,
-            ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)]
-        );
-
-        if ($varValue)
-        {
-            // Holen Sie das startDate des ausgewählten TÜV-Termins
-            $db = Contao\Database::getInstance();
-            $result = $db->prepare("SELECT startDate FROM tl_calendar_events WHERE id = ?")
-                ->execute($varValue);
-
-            $row = $result->fetchAssoc();
-
-            $logger->error(
-                'StartDate: ' . $row['startDate'],
-                ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)]
-            );
-
-            $lastCheckDate = new DateTime('@'.$row['startDate']);
-            $lastCheckDate->modify('+2 years');
-
-            $nextCheckDate = $lastCheckDate->getTimestamp();
-
-            // Setzen Sie lastCheckDate auf das startDate des ausgewählten TÜV-Termins
-            $updateStmt = Database::getInstance()
-                ->prepare("UPDATE tl_dc_tanks SET lastCheckDate = ?, nextCheckDate = ? WHERE id = ?");
-            $updateStmt->execute($row['startDate'], $nextCheckDate, $dc->id);
-        }
-
-        return $varValue;
-    }
-
-    public function getOwnerOptions(): array
-    {
-        $owners = Database::getInstance()->execute("SELECT id, CONCAT(firstname, ' ', lastname) as name FROM tl_member")->fetchAllAssoc();
-        $options = array();
-
-        foreach($owners as $owner)
-        {
-            $options[$owner['id']] = $owner['name'];
-        }
-
-        return $options;
-    }
-
-    function getCalendarOptions():array
-    {
-        $events = Database::getInstance()->execute("SELECT id, title FROM tl_calendar_events WHERE addCheckInfo = '1' and published = '1'")->fetchAllAssoc();
-        $options = [];
-
-        foreach($events as $event)
-        {
-            System::getContainer()->get('monolog.logger.contao.general')
-            ->info('Event-Daten: ', $event); // Log zusätzlicher Details
-
-            $options[$event['id']] = $event['title'];
-        }
-
-        return $options;
-    }
-
-    public function filterTanksByEventId(DataContainer $dc): void
-    {
-        if (Input::get('do') == 'calendar' && ($eventId = Input::get('event_id')) !== null) {
-            $GLOBALS['TL_DCA']['tl_dc_tanks']['list']['sorting']['filter'] = [['pid=?', $eventId]];
-        }
-    }
-
-    /**
-     * Formatiert den Preis für die Anzeige im Backend
-     */
-    public function formatPrice($value): string
-    {
-        return number_format((float)$value, 2, '.', ',') . ' €'; // z. B. "123.45 €"
-    }
-
-    /**
-     * Konvertiert den eingegebenen Preis zurück ins DB-Format
-     */
-    public function convertPrice($value): float
-    {
-        // Logik für leere Eingabe
-        if (empty($value)) {
-            return 0.00;
-        }
-
-        // Entferne eventuell angefügte Währungszeichen und whitespace
-        $value = str_replace(['€', ' '], '', $value);
-
-        // Stelle sicher, dass es ein gültiger Dezimalwert ist
-        return round((float)$value, 2);
-    }
-}

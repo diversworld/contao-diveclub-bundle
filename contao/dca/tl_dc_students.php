@@ -15,6 +15,7 @@ use Contao\System;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\StudentLabelListener;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\StudentLoadMemberDataCallback;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\StudentSyncCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\MemberOptionsListener;
 
 $GLOBALS['TL_DCA']['tl_dc_students'] = [
     'config' => [
@@ -217,9 +218,11 @@ $GLOBALS['TL_DCA']['tl_dc_students'] = [
             'exclude' => true,
             'search' => true,
             'inputType' => 'select',
-            'foreignKey' => "tl_member.CONCAT(firstname, ' ', lastname)",
+            'options_callback' => [MemberOptionsListener::class, '__invoke'],
             'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50', 'submitOnChange' => true],
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int(10) unsigned NOT NULL default 0",
+            'foreignKey' => 'tl_member.lastname',
+            'relation' => ['type' => 'hasOne', 'load' => 'lazy']
         ],
         'notes' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_students']['notes'],
