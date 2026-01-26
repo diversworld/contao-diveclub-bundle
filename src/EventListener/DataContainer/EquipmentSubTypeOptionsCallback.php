@@ -18,7 +18,7 @@ class EquipmentSubTypeOptionsCallback
         $this->templateHelper = $templateHelper;
     }
 
-    public function __invoke(DataContainer $dc = null): array
+    public function __invoke(DataContainer $dc): array
     {
         if (!$dc->activeRecord) {
             return [];
