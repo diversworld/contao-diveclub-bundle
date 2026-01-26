@@ -21,6 +21,7 @@ use Contao\StringUtil;
 use Contao\System;
 use Diversworld\ContaoDiveclubBundle\DataContainer\DcCheckProposal;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentManufacturerOptionsCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\RegulatorsLabelListener;
 
 /**
  * Table tl_dc_regulators
@@ -47,10 +48,10 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'panelLayout' => 'filter;sort,search,limit'
         ],
         'label' => [
-            'fields' => ['title', 'manufacturer', 'regModel1st', 'regModel2ndPri', 'regModel2ndSec', 'status'],
+            'fields' => ['title', 'manufacturer', 'regModel1st', 'regModel2ndPri', 'regModel2ndSec', 'status', 'id'],
             'showColumns' => true,
-            'format' => '%s - %s - %s %s %s %s',
-            'label_callback' => ['tl_dc_regulators', 'customLabelCallback']
+            'format' => '%s - %s - %s %s %s %s (Letzte Revision: %s)',
+            'label_callback' => [RegulatorsLabelListener::class, '__invoke']
         ],
         'global_operations' => [
             'all' => [
@@ -386,47 +387,6 @@ class tl_dc_regulators extends Backend
         return $models[$manufacturer]['regModel2nd'];
     }
 
-    public function customLabelCallback(array $row, string $label, DataContainer $dc = null, array $args = null): array
-    {
-        // Hersteller auslesen
-        $manufacturer = $row['manufacturer'];
-        $manufacturers = $this->getManufacturers();
-
-        $args[1] = $manufacturers[$row['manufacturer']] ?? '-'; // Hersteller-Name einsetzen
-
-        // Modelle für die erste und zweite Stufe basierend auf dem Hersteller laden
-        $models = $this->getTemplateOptions('regulatorsFile');
-
-        // Namen der Modelle statt der Indexwerte benutzen
-        if (isset($models[$manufacturer]['regModel1st'][$row['regModel1st']])) {
-            $args[2] = $models[$manufacturer]['regModel1st'][$row['regModel1st']];
-        } else {
-            $args[2] = '-'; // Fallback, falls nichts gefunden wird
-        }
-
-        if (isset($models[$manufacturer]['regModel2nd'][$row['regModel2ndPri']])) {
-            $args[3] = $models[$manufacturer]['regModel2nd'][$row['regModel2ndPri']];
-        } else {
-            $args[3] = '-'; // Fallback
-        }
-
-        if (isset($models[$manufacturer]['regModel2nd'][$row['regModel2ndSec']])) {
-            $args[4] = $models[$manufacturer]['regModel2nd'][$row['regModel2ndSec']];
-        } else {
-            $args[4] = '-'; // Fallback
-        }
-
-        return $args;
-    }
-
-    public function getManufacturers()
-    {
-        return $this->getTemplateOptions('manufacturersFile');
-    }
-
-    /**
-     * Konvertiert den eingegebenen Preis zurück ins DB-Format
-     */
     public function convertPrice($value): float
     {
         // Logik für leere Eingabe

@@ -18,6 +18,7 @@ use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\RegControlHeaderCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\RegulatorControlLabelListener;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\SetRegNextCheckDateCallback;
 
 /**
@@ -41,16 +42,17 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
     'list' => [
         'sorting' => [
             'mode' => DataContainer::MODE_PARENT,
-            'fields' => ['title', 'alias', 'published'],
+            'fields' => ['actualCheckDate'],
             'headerFields' => ['title', 'manufacturer', 'regModel1st', 'regModel2ndPri', 'regModel2ndSec'],
             'header_callback' => [RegControlHeaderCallback::class, '__invoke'],
-            'flag' => DataContainer::SORT_ASC,
+            'flag' => DataContainer::SORT_YEAR_DESC,
             'panelLayout' => 'filter;sort,search,limit',
         ],
         'label' => [
-            'fields' => ['title', 'midPressurePre', 'inhalePressurePre', 'exhalePressurePre', 'midPressurePost', 'inhalePressurePost', 'exhalePressurePost'],
+            'fields' => ['title', 'actualCheckDate', 'midPressurePost30', 'midPressurePost200', 'inhalePressurePost', 'exhalePressurePost'],
             'headerFields' => ['title', 'regModel1st', 'regModel2ndPri', 'regModel2ndSec'],
-            'format' => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['label_format'], // Dynamische Formatierung
+            'format' => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['label_format'],
+            'label_callback' => [RegulatorControlLabelListener::class, '__invoke'],
         ],
         'global_operations' => [
             'all' => [
@@ -70,9 +72,9 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
     'palettes' => [
         '__selector__' => ['addNotes'],
         'default' => '{title_legend},title,alias;
-                                {details_legend},actualCheckDate,nextCheckDate,price,midPressurePre30,midPressurePre200,inhalePressurePre,exhalePressurePre,midPressurePost30,midPressurePost200,inhalePressurePost,exhalePressurePost;
-                                {notes_legend},addNotes;
-                                {publish_legend},published,start,stop;'
+                      {details_legend},actualCheckDate,nextCheckDate,price,midPressurePre30,midPressurePre200,inhalePressurePre,exhalePressurePre,midPressurePost30,midPressurePost200,inhalePressurePost,exhalePressurePost;
+                      {notes_legend},addNotes;
+                      {publish_legend},published,start,stop;'
     ],
     'subpalettes' => [
         'addNotes' => 'notes',
