@@ -7,9 +7,7 @@ declare(strict_types=1);
  * Tauchschüler (kann alternativ tl_member referenzieren)
  */
 
-use Contao\Backend;
 use Contao\DataContainer;
-use Contao\Date;
 use Contao\DC_Table;
 use Contao\System;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\StudentLabelListener;

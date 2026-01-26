@@ -32,9 +32,9 @@ class StudentLoadMemberDataCallback
 
             // Falls allowLogin gesetzt war, deaktivieren wir es, da die Anmeldung über das Mitgliedskonto erfolgt
             if ($objStudent->allowLogin) {
-                $db->prepare("UPDATE tl_dc_students SET allowLogin='' WHERE id=?")
+                $db->prepare("UPDATE tl_dc_students SET allowLogin='0' WHERE id=?")
                     ->execute($dc->id);
-                $objStudent->allowLogin = '';
+                $objStudent->allowLogin = '0';
             }
         }
 
