@@ -21,9 +21,6 @@ $GLOBALS['TL_DCA']['tl_dc_student_exercises'] = [
         'ptable' => 'tl_dc_course_students',
         'enableVersioning' => true,
         'markAsCopy' => 'headline',
-        'onload_callback' => [
-            ['tl_dc_student_exercises', 'checkCustomAktion']
-        ],
         'sql' => [
             'keys' => [
                 'id' => 'primary',
@@ -42,7 +39,6 @@ $GLOBALS['TL_DCA']['tl_dc_student_exercises'] = [
         ],
         'label' => [
             'fields' => ['exercise_id', 'status'],
-            'label_callback' => ['tl_dc_student_exercises', 'addExerciseInfo'],
             'format' => '%s — <span style="color:#b3b3b3; padding-left:8px;">%s</span>',
         ],
         'global_operations' => [
@@ -57,8 +53,6 @@ $GLOBALS['TL_DCA']['tl_dc_student_exercises'] = [
             '!complete' => [
                 'label' => ['Übung abschließen', 'Status auf OK setzen und Datum eintragen'],
                 'icon' => 'ok.svg',
-                'href' => 'key=completeExercise',
-                'button_callback' => ['tl_dc_student_exercises', 'showCompleteButton'],
                 'primary' => true,
                 'showInHeader' => true
             ],
@@ -97,6 +91,13 @@ $GLOBALS['TL_DCA']['tl_dc_student_exercises'] = [
             'inputType' => 'select',
             'foreignKey' => 'tl_dc_course_exercises.title',
             'eval' => ['mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'],
+            'sql' => "int(10) unsigned NOT NULL default 0",
+        ],
+        'module_id' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['title'],
+            'inputType' => 'select',
+            'foreignKey' => 'tl_dc_course_modules.title',
+            'eval' => ['includeBlankOption' => true, 'tl_class' => 'w50', 'readonly' => true],
             'sql' => "int(10) unsigned NOT NULL default 0",
         ],
         'status' => [
@@ -147,74 +148,3 @@ $GLOBALS['TL_DCA']['tl_dc_student_exercises'] = [
     ],
 ];
 
-class tl_dc_student_exercises extends Backend
-{
-    /**
-     * Prüft beim Laden der Liste, ob eine Quick-Action ausgeführt werden soll
-     */
-    public function checkCustomAktion(DataContainer $dc): void
-    {
-        if (Input::get('key') === 'completeExercise' && Input::get('id')) {
-            $this->completeExercise((int)Input::get('id'));
-        }
-    }
-
-    public function completeExercise($id): void
-    {
-        $db = Database::getInstance();
-
-        // Hinweis: dateCompleted wird als Zeitstempel gespeichert,
-        // stelle sicher dass das Feld im DCA 'rgxp' => 'date' oder 'datim' hat.
-        $db->prepare("UPDATE tl_dc_student_exercises SET status='ok', dateCompleted=? WHERE id=?")
-            ->execute(time(), $id);
-
-        // Wir leiten zurück zur Liste, um die URL zu säubern (Parameter key/id entfernen)
-        // Das verhindert auch das Problem der leeren Seite
-        $this->redirect($this->getReferer());
-    }
-
-    /**
-     * Zeigt den Button nur an, wenn der Status noch nicht 'ok' ist
-     */
-    public function showCompleteButton($row, $href, $label, $title, $icon, $attributes): string
-    {
-        if ($row['status'] === 'ok') {
-            return Image::getHtml(str_replace('.svg', '_1.svg', $icon), $label, 'class="disabled"');
-        }
-
-        return sprintf('<a href="%s" title="%s"%s>%s</a> ',
-            $this->addToUrl($href . '&amp;id=' . $row['id']),
-            StringUtil::specialchars($title),
-            $attributes,
-            Image::getHtml($icon, $label)
-        );
-    }
-
-    public function addExerciseInfo(array $row, string $label): string
-    {
-        $db = Database::getInstance();
-
-        // Übungs- und Modulnamen über die Template-Tabellen holen
-        $objInfo = $db->prepare("
-            SELECT e.title AS exTitle, m.title AS modTitle
-            FROM tl_dc_course_exercises e
-            JOIN tl_dc_course_modules m ON e.pid = m.id
-            WHERE e.id = ?
-        ")->execute($row['exercise_id']);
-
-        if ($objInfo->numRows < 1) {
-            return $label;
-        }
-
-        $statusLabel = $GLOBALS['TL_LANG']['tl_dc_student_exercises']['status'][$row['status']] ?? $row['status'];
-        $color = ($row['status'] === 'ok') ? '#2fb31b' : (($row['status'] === 'pending') ? '#ff8000' : '#ff0000');
-
-        return sprintf(
-            '<span style="color:#999; width:150px; display:inline-block;">[%s]</span> <span style="width:250px; display:inline-block;"><strong>%s</strong></span> — <span style="color:%s; font-weight:bold;">%s</span>',
-            $objInfo->modTitle,
-            $objInfo->exTitle,
-            $color,
-            $statusLabel
-        );
-    }
-}

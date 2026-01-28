@@ -20,6 +20,7 @@ use Contao\System;
 use Diversworld\ContaoDiveclubBundle\DataContainer\DcDiveCourse;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseCategoryOptionsCallback;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseTypeOptionsCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\DiveCourseAliasListener;
 use Diversworld\ContaoDiveclubBundle\Model\DcDiveCourseModel;
 
 /**
@@ -120,7 +121,6 @@ $GLOBALS['TL_DCA']['tl_dc_dive_course'] = [
             'search' => true,
             'inputType' => 'text',
             'eval' => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w33'],
-            'save_callback' => ['tl_dc_dive_course', 'generateAlias'],
             'sql' => "varchar(255) BINARY NOT NULL default ''",
         ],
         'course_type' => [
@@ -288,40 +288,3 @@ $GLOBALS['TL_DCA']['tl_dc_dive_course'] = [
     ],
 ];
 
-/**
- * Provide miscellaneous methods that are used by the data configuration array.
- *
- * @property DcDiveCourse $Courses
- *
- * @internal
- */
-class tl_dc_dive_course extends Backend
-{
-    /**
-     * Auto-generate the event alias if it has not been set yet
-     *
-     * @param mixed $varValue
-     * @param DataContainer $dc
-     *
-     * @return mixed
-     *
-     * @throws Exception
-     */
-    public function generateAlias(mixed $varValue, DataContainer $dc): mixed
-    {
-        $aliasExists = function (string $alias) use ($dc): bool {
-            return $this->Database->prepare("SELECT id FROM tl_dc_dive_course WHERE alias=? AND id!=?")->execute($alias, $dc->id)->numRows > 0;
-        };
-
-        // Generate alias if there is none
-        if (!$varValue) {
-            $varValue = System::getContainer()->get('contao.slug')->generate($dc->activeRecord->headline, DcDiveCourseModel::findByPk($dc->activeRecord->pid)->jumpTo, $aliasExists);
-        } elseif (preg_match('/^[1-9]\d*$/', $varValue)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
-        } elseif ($aliasExists($varValue)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
-        }
-
-        return $varValue;
-    }
-}

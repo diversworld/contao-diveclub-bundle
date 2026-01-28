@@ -13,6 +13,7 @@ use Contao\DataContainer;
 use Contao\Date;
 use Contao\DC_Table;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseEventLabelListener;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseEventOnSubmitListener;
 
 $GLOBALS['TL_DCA']['tl_dc_course_event'] = [
     'config' => [
@@ -20,9 +21,6 @@ $GLOBALS['TL_DCA']['tl_dc_course_event'] = [
         'ctable' => ['tl_dc_course_event_schedule'],
         'enableVersioning' => true,
         'markAsCopy' => 'headline',
-        'onsubmit_callback' => [
-            ['tl_dc_course_event', 'generateDefaultSchedule']
-        ],
         'sql' => [
             'keys' => [
                 'id' => 'primary',
@@ -42,7 +40,6 @@ $GLOBALS['TL_DCA']['tl_dc_course_event'] = [
         'label' => [
             'fields' => ['title', 'dateStart', 'course_id'],
             'format' => '%s <span style="color:#999;">(%s) [Kurs‑Vorlage: %s]</span>',
-            'label_callback' => [CourseEventLabelListener::class, '__invoke']
         ],
         'global_operations' => [
             'all' => [
@@ -158,40 +155,3 @@ $GLOBALS['TL_DCA']['tl_dc_course_event'] = [
         ],
     ],
 ];
-
-class tl_dc_course_event extends Backend
-{
-    /**
-     * Generiert den Standard‑Zeitplan (eine Zeile pro Übung der gewählten Kurs‑Vorlage)
-     */
-    public function generateDefaultSchedule(DataContainer $dc): void
-    {
-        if (!$dc->activeRecord || !$dc->activeRecord->course_id) {
-            return;
-        }
-
-        $db = Database::getInstance();
-
-        // Prüfen, ob bereits Einträge existieren
-        $exists = $db->prepare("SELECT id FROM tl_dc_course_event_schedule WHERE pid=? LIMIT 1")
-            ->execute($dc->id);
-
-        if ($exists->numRows > 0) {
-            return; // nichts erzeugen, wenn schon vorhanden
-        }
-
-        // Alle Übungen der Kurs‑Vorlage über Module ziehen und als Plan-Zeilen anlegen
-        $exercises = $db->prepare("
-            SELECT m.id AS module_id, e.id AS exercise_id
-            FROM tl_dc_course_modules m
-            JOIN tl_dc_course_exercises e ON e.pid = m.id
-            WHERE m.pid = ?
-            ORDER BY m.sorting, e.sorting
-        ")->execute($dc->activeRecord->course_id);
-
-        while ($exercises->next()) {
-            $db->prepare("INSERT INTO tl_dc_course_event_schedule (pid, tstamp, module_id, exercise_id, published) VALUES (?, ?, ?, ?, ?)")
-                ->execute($dc->id, time(), (int)$exercises->module_id, (int)$exercises->exercise_id, 1);
-        }
-    }
-}

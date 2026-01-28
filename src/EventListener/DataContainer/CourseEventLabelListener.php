@@ -10,9 +10,9 @@ use Contao\DataContainer;
 use Contao\Date;
 use Doctrine\DBAL\Connection;
 
-#[AsCallback(table: 'tl_dc_course_event', target: 'list.label.label')]
 class CourseEventLabelListener
 {
+    #[AsCallback(table: 'tl_dc_course_event', target: 'list.label.label')]
     public function __invoke(array $row, string $label, DataContainer $dc, ?array $args = null): array|string
     {
         if (null !== $args) {

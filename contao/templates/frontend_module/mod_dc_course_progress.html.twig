@@ -37,49 +37,106 @@
 {% block progress_exercises %}
     <div class="progress-section progress-section--exercises">
         <h3>{{ labels.exercises }}</h3>
-        {% if exercises is empty %}
+        {% if modules is empty %}
             {{ block('no_exercises') }}
         {% else %}
-            {{ block('exercises_table') }}
+            {{ block('modules_list') }}
         {% endif %}
     </div>
+
+    <script>
+        document.querySelectorAll('.module-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const moduleBody = header.nextElementSibling;
+                moduleBody.style.display = moduleBody.style.display === 'none' ? 'block' : 'none';
+                header.classList.toggle('is-open');
+            });
+        });
+
+        function toggleExercise(id, currentStatus) {
+            const newStatus = currentStatus === 'completed' ? 'pending' : 'completed';
+            const formData = new FormData();
+            formData.append('action', 'toggleExerciseStatus');
+            formData.append('exerciseId', id);
+            formData.append('status', newStatus);
+
+            fetch(window.location.href, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload(); // Einfachste Lösung: Seite neu laden
+                } else {
+                    alert('Fehler: ' + (data.error || 'Unbekannter Fehler'));
+                }
+            });
+        }
+    </script>
+
+    <style>
+        .module-item { border: 1px solid #ddd; margin-bottom: 10px; border-radius: 4px; overflow: hidden; }
+        .module-header { background: #f5f5f5; padding: 10px 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .module-header:hover { background: #eee; }
+        .module-header h4 { margin: 0; font-size: 1.1em; }
+        .module-header::after { content: '▶'; transition: transform 0.3s; }
+        .module-header.is-open::after { transform: rotate(90deg); }
+        .module-body { padding: 0; border-top: 1px solid #ddd; }
+        .exercises-table { margin-bottom: 0; width: 100%; border-collapse: collapse; }
+        .exercises-table th, .exercises-table td { padding: 10px 15px; text-align: left; border-bottom: 1px solid #eee; }
+        .status--completed { background-color: #dff0d8; }
+        .btn-toggle { padding: 2px 8px; font-size: 0.85em; cursor: pointer; }
+    </style>
 {% endblock %}
 
 {% block no_exercises %}
     <p class="message message--info">Für diesen Kurs sind noch keine Übungen hinterlegt.</p>
 {% endblock %}
 
-{% block exercises_table %}
-    <table class="table exercises-table">
-        {{ block('exercises_table_head') }}
-        <tbody>
-        {% for exercise in exercises %}
-            {{ block('exercise_row') }}
+{% block modules_list %}
+    <div class="modules-list">
+        {% for moduleId, module in modules %}
+            <div class="module-item">
+                <div class="module-header">
+                    <h4>{{ module.title }}</h4>
+                </div>
+                <div class="module-body" style="display: none;">
+                    {% if module.exercises is empty %}
+                        <p style="padding: 15px;">Keine Übungen für dieses Modul.</p>
+                    {% else %}
+                        <table class="exercises-table">
+                            <thead>
+                                <tr>
+                                    <th>Übung</th>
+                                    <th>Status</th>
+                                    {% if isInstructor %}<th>Aktion</th>{% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for exercise in module.exercises %}
+                                    <tr class="status--{{ exercise.status }}">
+                                        <td>{{ exercise.title }}</td>
+                                        <td><span class="status-label">{{ exercise.status_label }}</span></td>
+                                        {% if isInstructor %}
+                                            <td>
+                                                <button class="btn btn-toggle" onclick="toggleExercise({{ exercise.id }}, '{{ exercise.status }}')">
+                                                    {% if exercise.status == 'completed' %}Wieder öffnen{% else %}Abschließen{% endif %}
+                                                </button>
+                                            </td>
+                                        {% endif %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </div>
+            </div>
         {% endfor %}
-        </tbody>
-    </table>
-{% endblock %}
-
-{% block exercises_table_head %}
-    <thead>
-    <tr>
-        <th>Modul</th>
-        <th>Übung</th>
-        <th>Status</th>
-    </tr>
-    </thead>
-{% endblock %}
-
-{% block exercise_row %}
-    <tr class="status--{{ exercise.status }}">
-        <td>{{ exercise.module }}</td>
-        <td>{{ exercise.title }}</td>
-        <td>
-                <span class="status-label">
-                    {{ exercise.status_label }}
-                </span>
-        </td>
-    </tr>
+    </div>
 {% endblock %}
 
 {% block progress_schedule %}

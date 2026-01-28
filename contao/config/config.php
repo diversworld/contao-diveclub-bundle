@@ -64,7 +64,8 @@ $GLOBALS['BE_MOD']['diveclub'] = [
     'dc_course_event_collection' => [
         'tables' => [
             'tl_dc_course_event',
-            'tl_dc_course_event_schedule'
+            'tl_dc_course_event_schedule',
+            'tl_dc_event_schedule_exercises'
         ],
     ],
     'dc_dive_student_collection' => [

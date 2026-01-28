@@ -12,6 +12,7 @@ use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseStudentLabelCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseStudentOnSubmitListener;
 
 $GLOBALS['TL_DCA']['tl_dc_course_students'] = [
     'config' => [
@@ -19,9 +20,6 @@ $GLOBALS['TL_DCA']['tl_dc_course_students'] = [
         'ptable' => 'tl_dc_students',
         'ctable' => ['tl_dc_student_exercises'],
         'enableVersioning' => true,
-        'onsubmit_callback' => [
-            ['tl_dc_course_students', 'generateDefaultExercises']
-        ],
         'markAsCopy' => 'headline',
         'sql' => [
             'keys' => [
@@ -44,7 +42,6 @@ $GLOBALS['TL_DCA']['tl_dc_course_students'] = [
             //'format' => '%s — Status: <span style="color:#b3b3b3; padding-left:8px;">%s</span> (Angemeldet am: %s), Bezahlt: %s',
             //'label_callback' => null,
             'showColumns' => true,
-            'label_callback' => [CourseStudentLabelCallback::class, '__invoke'],
         ],
         'global_operations' => [
             'all' => [
@@ -62,7 +59,6 @@ $GLOBALS['TL_DCA']['tl_dc_course_students'] = [
                 'primary' => true,
                 'showInHeader' => true
             ],
-            'children',
             'copy',
             'cut',
             'delete',
@@ -164,58 +160,3 @@ $GLOBALS['TL_DCA']['tl_dc_course_students'] = [
     ],
 ];
 
-class tl_dc_course_students extends Backend
-{
-    /**
-     * Automatische Erstellung der Übungs-Checkliste für den Schüler
-     */
-    public function generateDefaultExercises(DataContainer $dc): void
-    {
-        if (!$dc->activeRecord) {
-            return;
-        }
-
-        $db = Database::getInstance();
-        $assignmentId = $dc->id;
-        $courseTemplateId = (int)$dc->activeRecord->course_id;
-
-        // Wenn eine Veranstaltung gewählt wurde, nutze deren Kursvorlage
-        if ((int)$dc->activeRecord->event_id > 0) {
-            $event = $db->prepare("SELECT course_id FROM tl_dc_course_event WHERE id=?")
-                ->execute((int)$dc->activeRecord->event_id);
-            if ($event->numRows > 0 && (int)$event->course_id > 0) {
-                $courseTemplateId = (int)$event->course_id;
-
-                // Falls course_id in der Zuweisung noch leer ist, jetzt setzen
-                if (!(int)$dc->activeRecord->course_id) {
-                    $db->prepare("UPDATE tl_dc_course_students SET course_id=? WHERE id=?")
-                        ->execute($courseTemplateId, $assignmentId);
-                }
-            }
-        }
-
-        if ($courseTemplateId <= 0) {
-            return;
-        }
-
-        // 1. Alle Übungen des Kurs-Templates finden (über die Module)
-        $objExercises = $db->prepare("
-            SELECT e.id
-            FROM tl_dc_course_exercises e
-            JOIN tl_dc_course_modules m ON e.pid = m.id
-            WHERE m.pid = ?
-        ")->execute($courseTemplateId);
-
-        while ($objExercises->next()) {
-            // 2. Prüfen, ob die Übung für diese Zuweisung schon existiert
-            $objCheck = $db->prepare("SELECT id FROM tl_dc_student_exercises WHERE pid=? AND exercise_id=?")
-                ->execute($assignmentId, $objExercises->id);
-
-            if ($objCheck->numRows < 1) {
-                // 3. Übung als 'pending' anlegen
-                $db->prepare("INSERT INTO tl_dc_student_exercises (pid, tstamp, exercise_id, status, published) VALUES (?, ?, ?, ?, ?)")
-                    ->execute($assignmentId, time(), $objExercises->id, 'pending', 1);
-            }
-        }
-    }
-}

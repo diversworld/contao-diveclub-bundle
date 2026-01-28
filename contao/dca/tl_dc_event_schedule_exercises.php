@@ -3,43 +3,38 @@
 declare(strict_types=1);
 
 /*
- * DCA: tl_dc_course_exercises
- * Übungen / Skills pro Modul
+ * DCA: tl_dc_event_schedule_exercises
+ * Übungen pro Zeitplan-Eintrag (geerbte Übungen aus Kursstammdaten)
  */
 
 use Contao\Backend;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseExerciseAliasListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseExerciseOptionsListener;
 
-$GLOBALS['TL_DCA']['tl_dc_course_exercises'] = [
+$GLOBALS['TL_DCA']['tl_dc_event_schedule_exercises'] = [
     'config' => [
         'dataContainer' => DC_Table::class,
-        'ptable' => 'tl_dc_course_modules',
+        'ptable' => 'tl_dc_course_event_schedule',
         'enableVersioning' => true,
-        'markAsCopy' => 'headline',
         'sql' => [
             'keys' => [
                 'id' => 'primary',
                 'pid' => 'index',
-                'tstamp' => 'index',
+                'exercise_id' => 'index',
             ],
         ],
     ],
-
     'list' => [
         'sorting' => [
             'mode' => DataContainer::MODE_PARENT,
-            'fields' => ['sorting', 'title'],
-            'headerFields' => ['shortcode', 'title'],
-            'flag' => DataContainer::SORT_INITIAL_LETTER_ASC,
+            'fields' => ['sorting'],
+            'headerFields' => ['module_id', 'planned_at'],
             'panelLayout' => 'sort,filter;search,limit',
         ],
         'label' => [
-            'fields' => ['title', 'required'],
-            'format' => '%s <span style="color:#b3b3b3; padding-left:8px;">%s</span>',
+            'fields' => ['title', 'exercise_id'],
+            'format' => '%s <span style="color:#b3b3b3; padding-left:8px;">[ID: %s]</span>',
         ],
         'global_operations' => [
             'all' => [
@@ -50,28 +45,24 @@ $GLOBALS['TL_DCA']['tl_dc_course_exercises'] = [
         ],
         'operations' => [
             'edit',
-            'children',
             'copy',
             'cut',
             'delete',
-            'toggle',
             'show',
         ],
     ],
-
     'palettes' => [
-        'default' => '{title_legend},title,alias;
+        'default' => '{exercise_legend},title,exercise_id,planned_at,instructor;
                       {detail_legend},description,required,duration;
                       {notes_legend},notes;
-                      {publish_legend},published,start,stop'
+                      {publish_legend},published'
     ],
-
     'fields' => [
         'id' => [
             'sql' => "int(10) unsigned NOT NULL auto_increment"
         ],
         'pid' => [
-            'foreignKey' => 'tl_dc_course_modules.title',
+            'foreignKey' => 'tl_dc_course_event_schedule.id',
             'sql' => "int(10) unsigned NOT NULL default 0"
         ],
         'sorting' => [
@@ -89,26 +80,18 @@ $GLOBALS['TL_DCA']['tl_dc_course_exercises'] = [
             'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'alias' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_exercises']['alias'],
-            'inputType' => 'text',
-            'eval' => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
-            'sql' => "varchar(255) BINARY NOT NULL default ''",
+        'exercise_id' => [
+            'label' => ['Original-Übung', 'Referenz auf die Stammdaten-Übung'],
+            'inputType' => 'select',
+            'foreignKey' => 'tl_dc_course_exercises.title',
+            'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
+            'sql' => "int(10) unsigned NOT NULL default 0",
         ],
         'description' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_exercises']['description'],
             'inputType' => 'textarea',
             'eval' => ['rte' => 'tinyMCE', 'tl_class' => 'clr'],
             'sql' => "text NULL",
-        ],
-        'prerequisites' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_exercises']['prerequisites'],
-            'inputType' => 'select',
-            'search' => true,
-            'filter' => true,
-            'sorting' => true,
-            'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr w50'],
-            'sql' => "int(10) unsigned NOT NULL default 0",
         ],
         'required' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_exercises']['required'],
@@ -131,22 +114,22 @@ $GLOBALS['TL_DCA']['tl_dc_course_exercises'] = [
             'eval' => ['style' => 'height:60px', 'decodeEntities' => true, 'rte' => 'tinyMCE', 'basicEntities' => true, 'tl_class' => 'clr'],
             'sql' => "text NULL",
         ],
-        'published' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_exercises']['published'],
-            'inputType' => 'checkbox',
-            'eval' => ['tl_class' => 'w50 clr'],
-            'sql' => ['type' => 'boolean', 'default' => false],
-        ],
-        'start' => [
-            'inputType' => 'text',
-            'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'clr w50 wizard'],
-            'sql' => "varchar(10) NOT NULL default ''"
-        ],
-        'stop' => [
+        'planned_at' => [
             'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
-            'sql' => "varchar(10) NOT NULL default ''"
-        ]
+            'sql' => "varchar(16) NOT NULL default ''",
+        ],
+        'instructor' => [
+            'inputType' => 'text',
+            'eval' => ['maxlength' => 128, 'tl_class' => 'w50'],
+            'sql' => "varchar(128) NOT NULL default ''",
+        ],
+        'published' => [
+            'toggle' => true,
+            'filter' => true,
+            'inputType' => 'checkbox',
+            'eval' => ['doNotCopy' => true, 'tl_class' => 'w50'],
+            'sql' => ['type' => 'boolean', 'default' => true]
+        ],
     ],
 ];
-

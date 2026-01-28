@@ -3,7 +3,6 @@
 $GLOBALS['TL_LANG']['tl_dc_course_event_schedule'] = [
     //Felder
     'module_id' => ['Modul', 'Zugehöriges Kursmodul.'],
-    'exercise_id' => ['Übung', 'Zugehörige Übung innerhalb des Moduls.'],
     'planned_at' => ['Geplant am/um', 'Datum und Uhrzeit, wann die Übung stattfinden soll.'],
     'location' => ['Ort', 'Ort der Übung (z. B. Pool, See, Theorie-Raum).'],
     'instructor' => ['Instructor', 'Zugehöriger Instructor für diesen Termin.'],

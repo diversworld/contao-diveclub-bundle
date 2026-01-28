@@ -20,12 +20,6 @@ $GLOBALS['TL_DCA']['tl_dc_students'] = [
         'dataContainer' => DC_Table::class,
         'ctable' => ['tl_dc_course_students'],
         'enableVersioning' => true,
-        'onload_callback' => [
-            [StudentLoadMemberDataCallback::class, '__invoke']
-        ],
-        'onsubmit_callback' => [
-            [StudentSyncCallback::class, '__invoke']
-        ],
         'markAsCopy' => 'headline',
         'sql' => [
             'keys' => [
@@ -47,7 +41,6 @@ $GLOBALS['TL_DCA']['tl_dc_students'] = [
         'label' => [
             'fields' => ['lastname', 'firstname', 'dateOfBirth', 'phone', 'email'],
             'format' => '%s, %s <span style="color:#b3b3b3; padding-left:8px;">%s</span>, %s, %s',
-            'label_callback' => [StudentLabelListener::class, '__invoke']
         ],
         'global_operations' => [
             'all' => [
@@ -65,7 +58,6 @@ $GLOBALS['TL_DCA']['tl_dc_students'] = [
                 'primary' => true,
                 'showInHeader' => true
             ],
-            'children',
             'copy',
             'cut',
             'delete',

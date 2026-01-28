@@ -11,7 +11,8 @@ use Contao\Backend;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
-use Contao\System;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseModuleAliasListener;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseModuleOptionsListener;
 
 $GLOBALS['TL_DCA']['tl_dc_course_modules'] = [
     'config' => [
@@ -97,7 +98,6 @@ $GLOBALS['TL_DCA']['tl_dc_course_modules'] = [
         'alias' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['alias'],
             'inputType' => 'text',
-            'save_callback' => ['tl_dc_course_modules', 'generateAlias'],
             'eval' => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => "varchar(255) BINARY NOT NULL default ''",
         ],
@@ -134,7 +134,6 @@ $GLOBALS['TL_DCA']['tl_dc_course_modules'] = [
         'preModule' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['preModule'],
             'inputType' => 'select',
-            'options_callback' => ['tl_dc_course_modules', 'getModuleOptions'],
             'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w25'],
             'sql' => "int(10) unsigned NOT NULL default 0",
         ],
@@ -160,66 +159,3 @@ $GLOBALS['TL_DCA']['tl_dc_course_modules'] = [
     ],
 ];
 
-class tl_dc_course_modules extends Backend
-{
-    /**
-     * Auto-generate the event alias if it has not been set yet
-     *
-     * @param mixed $varValue
-     * @param DataContainer $dc
-     *
-     * @return mixed
-     *
-     * @throws Exception
-     */
-    public function generateAlias(mixed $varValue, DataContainer $dc): mixed
-    {
-        $aliasExists = static function (string $alias) use ($dc): bool {
-            $result = Database::getInstance()
-                ->prepare("SELECT id FROM tl_dc_course_modules WHERE alias=? AND id!=?")
-                ->execute($alias, $dc->id);
-
-            return $result->numRows > 0;
-        };
-
-        // Generate the alias if there is none
-        if (!$varValue) {
-            $varValue = System::getContainer()->get('contao.slug')->generate(
-                $dc->activeRecord->title,
-                [],
-                $aliasExists
-            );
-        } elseif (preg_match('/^[1-9]\d*$/', $varValue)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
-        } elseif ($aliasExists($varValue)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
-        }
-
-        return $varValue;
-    }
-
-    /**
-     * Get all modules grouped by their courses as options
-     */
-    public function getModuleOptions(DataContainer $dc): array
-    {
-        $options = [];
-        $db = Database::getInstance();
-
-        // Holen aller Kurse und ihrer Module
-        // Wir schließen das aktuelle Modul selbst aus ($dc->id), um Zirkelbezüge zu vermeiden
-        $objModules = $db->prepare("
-            SELECT m.id, m.title AS moduleTitle, c.title AS courseTitle
-            FROM tl_dc_course_modules m
-            LEFT JOIN tl_dc_dive_course c ON m.pid = c.id
-            WHERE m.id != ?
-            ORDER BY c.title, m.title
-        ")->execute($dc->id ?: 0);
-
-        while ($objModules->next()) {
-            $options[$objModules->courseTitle][$objModules->id] = $objModules->moduleTitle;
-        }
-
-        return $options;
-    }
-}

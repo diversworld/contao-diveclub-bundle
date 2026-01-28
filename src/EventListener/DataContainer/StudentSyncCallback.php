@@ -12,7 +12,6 @@ use Contao\Message;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
-#[AsCallback(table: 'tl_dc_students', target: 'config.onsubmit')]
 class StudentSyncCallback
 {
     public function __construct(
@@ -21,6 +20,7 @@ class StudentSyncCallback
     {
     }
 
+    #[AsCallback(table: 'tl_dc_students', target: 'config.onsubmit')]
     public function __invoke(DataContainer $dc): void
     {
         if (Environment::get('isAjaxRequest')) {
@@ -136,10 +136,12 @@ class StudentSyncCallback
                     ->execute($newMemberId, $student->id);
             }
 
+/*
             Message::addRaw('<div class="tl_info" style="border: 2px solid #86af35; padding: 20px; font-size: 1.2em;">
                 <strong>WICHTIG: Neues Mitglied angelegt!</strong><br>
                 Das vorläufige Passwort lautet: <code style="background:#eee; padding:2px 5px; border:1px solid #ccc;">' . $password . '</code>
             </div>');
+            */
         }
     }
 }

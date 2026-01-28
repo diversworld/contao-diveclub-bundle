@@ -8,6 +8,7 @@ use Contao\Config;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Twig\FragmentTemplate;
+use Contao\Database;
 use Contao\Date;
 use Contao\FrontendUser;
 use Contao\Input;
@@ -18,6 +19,7 @@ use Contao\System;
 use Diversworld\ContaoDiveclubBundle\Model\DcCourseEventModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCourseStudentsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcStudentsModel;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseStudentOnSubmitListener;
 use Exception;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -78,26 +80,63 @@ class CourseEventReaderController extends AbstractFrontendModuleController
         // Request Token für Twig bereitstellen
         $template->request_token = System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue();
 
-        // Zeitplan laden (mit Modul- und Übungsnamen)
+        // Zeitplan laden (mit Modulnamen)
         $schedule = System::getContainer()->get('database_connection')->fetchAllAssociative(
-            'SELECT s.id, s.planned_at, s.location, s.instructor, s.notes, m.title AS module_title, e.title AS exercise_title
+            'SELECT s.id, s.planned_at, s.location, s.instructor, s.notes, s.module_id,
+                    m.title AS module_title
              FROM tl_dc_course_event_schedule s
-             INNER JOIN tl_dc_course_modules m ON m.id = s.module_id
-             INNER JOIN tl_dc_course_exercises e ON e.id = s.exercise_id
-             WHERE s.pid = ? AND s.published = 1
-             ORDER BY s.planned_at, m.sorting, e.sorting',
+             LEFT JOIN tl_dc_course_modules m ON m.id = s.module_id
+             WHERE s.pid = ?
+             ORDER BY s.sorting, s.planned_at',
             [(int)$event->id]
         );
 
         $rows = [];
         foreach ($schedule as $row) {
+            $exercises = [];
+            // Zuerst spezifische Übungen aus dem Zeitplan laden
+            $scheduleExercises = System::getContainer()->get('database_connection')->fetchAllAssociative(
+                'SELECT se.planned_at, se.instructor, se.title, se.description
+                 FROM tl_dc_event_schedule_exercises se
+                 WHERE se.pid = ?
+                 ORDER BY se.sorting',
+                [(int)$row['id']]
+            );
+
+            if (!empty($scheduleExercises)) {
+                foreach ($scheduleExercises as $se) {
+                    $exercises[] = [
+                        'title' => (string)$se['title'],
+                        'description' => (string)$se['description'],
+                        'planned_at' => $se['planned_at'] ? Date::parse($dateFormat, (int)$se['planned_at']) : $row['planned_at'],
+                        'instructor' => (string)$se['instructor'] ?: $row['instructor']
+                    ];
+                }
+            } elseif ($row['module_id'] > 0) {
+                // Fallback: Übungen zum Modul aus Stammdaten laden
+                $exercisesData = System::getContainer()->get('database_connection')->fetchAllAssociative(
+                    'SELECT title, description FROM tl_dc_course_exercises WHERE pid = ? ORDER BY sorting',
+                    [(int)$row['module_id']]
+                );
+                foreach ($exercisesData as $ex) {
+                    $exercises[] = [
+                        'title' => (string)$ex['title'],
+                        'description' => (string)$ex['description'],
+                        'planned_at' => $row['planned_at'] ? Date::parse($dateFormat, (int)$row['planned_at']) : '',
+                        'instructor' => (string)$row['instructor']
+                    ];
+                }
+            }
+
             $rows[] = [
+                'id' => $row['id'],
                 'planned_at' => $row['planned_at'] ? Date::parse($dateFormat, (int)$row['planned_at']) : '',
                 'location' => (string)$row['location'],
                 'instructor' => (string)$row['instructor'],
                 'notes' => (string)$row['notes'],
                 'module' => (string)$row['module_title'],
-                'exercise' => (string)$row['exercise_title'],
+                'exercises' => $exercises,
+                'isModule' => true
             ];
         }
         $template->schedule = $rows;
@@ -146,6 +185,35 @@ class CourseEventReaderController extends AbstractFrontendModuleController
         }
         $template->alreadyRegistered = $alreadyRegistered;
         $template->assignmentId = $assignmentId;
+
+        // Falls angemeldet, Übungen (Kursfortschritt) laden
+        if ($assignmentId) {
+            $studentExercises = System::getContainer()->get('database_connection')->fetchAllAssociative(
+                'SELECT se.status, se.dateCompleted, se.instructor, e.title AS exercise_title, m.title AS module_title
+                 FROM tl_dc_student_exercises se
+                 JOIN tl_dc_course_exercises e ON e.id = se.exercise_id
+                 JOIN tl_dc_course_modules m ON m.id = se.module_id
+                 WHERE se.pid = ?
+                 ORDER BY m.sorting, e.sorting',
+                [$assignmentId]
+            );
+
+            $progress = [];
+            System::loadLanguageFile('tl_dc_student_exercises');
+
+            foreach ($studentExercises as $se) {
+                $progress[] = [
+                    'title' => $se['exercise_title'],
+                    'module' => $se['module_title'],
+                    'status' => $se['status'],
+                    'status_label' => $GLOBALS['TL_LANG']['tl_dc_student_exercises']['itemStatus'][$se['status']] ?? $se['status'],
+                    'date' => $se['dateCompleted'] ? Date::parse($dateFormat, (int)$se['dateCompleted']) : '',
+                    'instructor' => $se['instructor']
+                ];
+            }
+            $template->studentProgress = $progress;
+            $template->hasProgress = !empty($progress);
+        }
 
         // Debug-Log
         System::getContainer()->get('monolog.logger.contao.general')->info('CourseEventReaderController::getResponse called. Method: ' . $request->getMethod() . ', FORM_SUBMIT: ' . Input::post('FORM_SUBMIT'));
@@ -302,22 +370,23 @@ class CourseEventReaderController extends AbstractFrontendModuleController
             }
             // Zuweisung anlegen
             try {
-                $db = System::getContainer()->get('database_connection');
+                $db = Database::getInstance();
                 $logger = System::getContainer()->get('monolog.logger.contao.general');
 
                 $logger->info('Starte Kurs-Zuweisung für Student ID ' . $currentStudentId . ', Event ID ' . $event->id . ', Course ID ' . $event->course_id);
 
-                $db->insert('tl_dc_course_students', [
-                    'pid' => (int)$currentStudentId,
-                    'tstamp' => time(),
-                    'course_id' => (int)$event->course_id ?: (int)Input::post('course_id'),
-                    'event_id' => (int)$event->id,
-                    'status' => 'registered',
-                    'registered_on' => (string)time(),
-                    'published' => '1'
-                ]);
+                $db->prepare("INSERT INTO tl_dc_course_students (pid, tstamp, course_id, event_id, status, registered_on, published) VALUES (?, ?, ?, ?, ?, ?, ?)")
+                   ->execute(
+                    (int)$currentStudentId,
+                    time(),
+                    (int)$event->course_id ?: (int)Input::post('course_id'),
+                    (int)$event->id,
+                    'registered',
+                    (string)time(),
+                    '1'
+                );
 
-                $newAssignmentId = (int)$db->lastInsertId();
+                $newAssignmentId = (int)$db->insertId;
                 $logger->info('Kurs-Zuweisung erfolgreich angelegt. Neue ID: ' . $newAssignmentId);
             } catch (Exception $e) {
                 System::getContainer()->get('monolog.logger.contao.general')->error('Fehler beim Anlegen der Kurs-Zuweisung: ' . $e->getMessage());
@@ -329,7 +398,15 @@ class CourseEventReaderController extends AbstractFrontendModuleController
             System::getContainer()->get('monolog.logger.contao.general')->info('Kursanmeldung erfolgreich: Student ID ' . $currentStudentId . ', Assignment ID ' . $newAssignmentId);
 
             // Übungen erzeugen
-            $this->generateExercises($newAssignmentId, (int)$event->course_id);
+            $listener = new CourseStudentOnSubmitListener($container->get('database_connection'));
+            $dc = new \Contao\DC_Table('tl_dc_course_students');
+            $dc->id = $newAssignmentId;
+            $dc->activeRecord = (object)[
+                'id' => $newAssignmentId,
+                'course_id' => $event->course_id,
+                'event_id' => $event->id
+            ];
+            $listener->__invoke($dc);
 
             // Speichere die ID in der Session für Insert-Tags
             $request->getSession()->set('last_course_order', $newAssignmentId);
@@ -365,41 +442,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
 
     private function generateExercises(int $assignmentId, int $courseId): void
     {
-        $db = System::getContainer()->get('database_connection');
-        $logger = System::getContainer()->get('monolog.logger.contao.general');
-        $logger->info('Erzeuge Übungen für Assignment ID ' . $assignmentId . ' und Course ID ' . $courseId);
-
-        // 1. Alle Übungen des Kurs-Templates finden (über die Module)
-        $exercises = $db->fetchAllAssociative("
-            SELECT e.id
-            FROM tl_dc_course_exercises e
-            JOIN tl_dc_course_modules m ON e.pid = m.id
-            WHERE m.pid = ?
-        ", [$courseId]);
-
-        $logger->info('Gefundene Übungen für Kurs ' . $courseId . ': ' . count($exercises));
-
-        foreach ($exercises as $exercise) {
-            try {
-                // 2. Prüfen, ob die Übung für diese Zuweisung schon existiert (analog zum Backend)
-                $check = $db->fetchOne("SELECT id FROM tl_dc_student_exercises WHERE pid=? AND exercise_id=?", [$assignmentId, $exercise['id']]);
-
-                if (!$check) {
-                    // 3. Übung als 'pending' anlegen
-                    $db->insert('tl_dc_student_exercises', [
-                        'pid' => $assignmentId,
-                        'tstamp' => time(),
-                        'exercise_id' => $exercise['id'],
-                        'status' => 'pending',
-                        'published' => '1'
-                    ]);
-
-                    $newExId = $db->lastInsertId();
-                    $logger->info('Schüler-Übung angelegt: Assignment ' . $assignmentId . ', Exercise ' . $exercise['id'] . ', New ID ' . $newExId);
-                }
-            } catch (Exception $e) {
-                $logger->error('Fehler beim Erzeugen der Schüler-Übung: ' . $e->getMessage());
-            }
-        }
+        // Veraltet, wird durch tl_dc_course_students::generateDefaultExercises ersetzt
+        // Bleibt als Fallback oder kann später entfernt werden
     }
 }

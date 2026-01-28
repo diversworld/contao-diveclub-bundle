@@ -9,9 +9,9 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\DataContainer;
 use Contao\Date;
 
-#[AsCallback(table: 'tl_dc_students', target: 'list.label.label')]
 class StudentLabelListener
 {
+    #[AsCallback(table: 'tl_dc_students', target: 'list.label.label')]
     public function __invoke(array $row, string $label, DataContainer $dc, ?array $args = null): array|string
     {
         if (null !== $args) {

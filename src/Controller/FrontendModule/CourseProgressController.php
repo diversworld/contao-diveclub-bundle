@@ -44,6 +44,30 @@ class CourseProgressController extends AbstractFrontendModuleController
 
         $dateFormat = Config::get('datimFormat');
 
+        // Berechtigungsprüfung (Instructor-Check)
+        $isInstructor = false;
+        if ($user instanceof FrontendUser) {
+            $groups = StringUtil::deserialize($user->groups, true);
+            // Wir erlauben es, wenn der User in Gruppe 2 (Instructor) ist
+            $isInstructor = in_array('2', $groups);
+        }
+
+        // AJAX-Request für Status-Update verarbeiten
+        if ($request->isXmlHttpRequest() && $request->request->get('action') === 'toggleExerciseStatus') {
+            $exerciseId = (int)$request->request->get('exerciseId');
+            $newStatus = $request->request->get('status') === 'completed' ? 'completed' : 'pending';
+
+            if ($isInstructor && $exerciseId > 0) {
+                $db = Database::getInstance();
+                $db->prepare("UPDATE tl_dc_student_exercises SET status=?, dateCompleted=? WHERE id=?")
+                    ->execute($newStatus, $newStatus === 'completed' ? time() : '', $exerciseId);
+
+                return new Response(json_encode(['success' => true, 'newStatus' => $newStatus]));
+            }
+
+            return new Response(json_encode(['success' => false, 'error' => 'Access denied']), 403);
+        }
+
         // Debug: Tabellen prüfen
         try {
             $dbCheck = Database::getInstance();
@@ -99,7 +123,6 @@ class CourseProgressController extends AbstractFrontendModuleController
         $db = Database::getInstance();
 
         // 1. Zuweisung laden und prüfen, ob sie dem User gehört
-        // Wir suchen zuerst die Zuweisung, um zu sehen ob sie überhaupt existiert.
         $assignmentResult = $db->prepare(
             'SELECT cs.*, c.title AS course_title, c.id AS course_id, s.memberId, s.email as student_email
              FROM tl_dc_course_students cs
@@ -160,13 +183,26 @@ class CourseProgressController extends AbstractFrontendModuleController
             'status' => (string)$assignmentRow['status'],
             'course_title' => (string)$assignmentRow['course_title'],
         ];
+        $template->isInstructor = $isInstructor;
 
-        $logger->info('CourseProgressController: Loading exercises for PID ' . $assignmentId);
+        // 2. Alle Module des Kurses laden (um sicherzustellen, dass alle Module angezeigt werden)
+        $courseId = (int)$assignmentRow['course_id'];
+        $modulesResult = $db->prepare('SELECT id, title FROM tl_dc_course_modules WHERE pid = ? ORDER BY sorting')
+            ->execute($courseId);
+
+        $modules = [];
+        while ($modulesResult->next()) {
+            $modules[$modulesResult->id] = [
+                'title' => (string)$modulesResult->title,
+                'exercises' => []
+            ];
+        }
+
         $exercises = $db->prepare(
-            'SELECT se.*, e.title AS exercise_title, m.title AS module_title
+            'SELECT se.*, e.title AS exercise_title, m.id AS module_id, m.title AS module_title
              FROM tl_dc_student_exercises se
              LEFT JOIN tl_dc_course_exercises e ON e.id = se.exercise_id
-             LEFT JOIN tl_dc_course_modules m ON m.id = e.pid
+             LEFT JOIN tl_dc_course_modules m ON m.id = se.module_id
              WHERE se.pid = ?
              ORDER BY m.sorting, e.sorting'
         )->execute($assignmentId);
@@ -176,7 +212,7 @@ class CourseProgressController extends AbstractFrontendModuleController
 
         $exerciseList = [];
         while ($exercises->next()) {
-            $exerciseList[] = [
+            $exData = [
                 'id' => (int)$exercises->id,
                 'title' => (string)$exercises->exercise_title,
                 'module' => (string)$exercises->module_title,
@@ -187,9 +223,15 @@ class CourseProgressController extends AbstractFrontendModuleController
                     ?? (string)$exercises->status,
                 'exercise_id' => (int)$exercises->exercise_id,
             ];
+            $exerciseList[] = $exData;
+
+            if (isset($modules[$exercises->module_id])) {
+                $modules[$exercises->module_id]['exercises'][] = $exData;
+            }
         }
         $template->exercises = $exerciseList;
-        $logger->info('CourseProgressController: Loaded ' . count($exerciseList) . ' exercises.');
+        $template->modules = $modules;
+        $logger->info('CourseProgressController: Loaded ' . count($exerciseList) . ' exercises in ' . count($modules) . ' modules.');
 
         // Falls wir im Logger sehen wollen, was genau geladen wurde:
         if (count($exerciseList) > 0) {
@@ -198,10 +240,8 @@ class CourseProgressController extends AbstractFrontendModuleController
 
         // Wenn keine Übungen da sind, versuchen wir sie zu generieren (falls ein Kurs verknüpft ist)
         if (empty($exerciseList) && (int)$assignmentRow['course_id'] > 0) {
-            $logger->info('CourseProgressController: Exercises empty, trying to generate for assignment ' . $assignmentId);
-
             $db_exercises = $db->prepare("
-                SELECT e.id
+                SELECT e.id, m.id AS module_id
                 FROM tl_dc_course_exercises e
                 JOIN tl_dc_course_modules m ON e.pid = m.id
                 WHERE m.pid = ?
@@ -210,17 +250,50 @@ class CourseProgressController extends AbstractFrontendModuleController
             while ($db_exercises->next()) {
                 $check = $db->prepare("SELECT id FROM tl_dc_student_exercises WHERE pid=? AND exercise_id=?")->execute($assignmentId, $db_exercises->id);
                 if ($check->numRows < 1) {
-                    $db->prepare("INSERT INTO tl_dc_student_exercises (pid, tstamp, exercise_id, status, published) VALUES (?, ?, ?, ?, ?)")
-                        ->execute($assignmentId, time(), $db_exercises->id, 'pending', 1);
+                    $plannedAt = '';
+                    $instructor = '';
+
+                    // Datum und Instruktor vom Modul aus dem Event-Zeitplan erben
+                    if ((int)$assignmentRow['event_id'] > 0) {
+                        // Zuerst im Zeitplan nach spezifischer Übung suchen
+                        $objScheduleEx = $db->prepare("
+                            SELECT se.planned_at, se.instructor
+                            FROM tl_dc_event_schedule_exercises se
+                            JOIN tl_dc_course_event_schedule s ON s.id = se.pid
+                            WHERE s.pid = ? AND se.exercise_id = ?
+                            LIMIT 1
+                        ")->execute((int)$assignmentRow['event_id'], $db_exercises->id);
+
+                        if ($objScheduleEx->numRows > 0) {
+                            $plannedAt = $objScheduleEx->planned_at;
+                            $instructor = $objScheduleEx->instructor;
+                        }
+
+                        // Falls nicht gefunden oder leer, vom Modul-Zeitplan erben
+                        if ($plannedAt === '') {
+                            $objSchedule = $db->prepare("SELECT planned_at, instructor FROM tl_dc_course_event_schedule WHERE pid=? AND module_id=? LIMIT 1")
+                                ->execute((int)$assignmentRow['event_id'], $db_exercises->module_id);
+
+                            if ($objSchedule->numRows > 0) {
+                                $plannedAt = $objSchedule->planned_at;
+                                if ($instructor === '') {
+                                    $instructor = $objSchedule->instructor;
+                                }
+                            }
+                        }
+                    }
+
+                    $db->prepare("INSERT INTO tl_dc_student_exercises (pid, tstamp, exercise_id, module_id, status, dateCompleted, instructor, published) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+                        ->execute($assignmentId, time(), $db_exercises->id, $db_exercises->module_id, 'pending', $plannedAt, $instructor, 1);
                 }
             }
 
             // Erneut laden
             $exercises = $db->prepare(
-                'SELECT se.*, e.title AS exercise_title, m.title AS module_title
+                'SELECT se.*, e.title AS exercise_title, m.id AS module_id, m.title AS module_title
                  FROM tl_dc_student_exercises se
                  LEFT JOIN tl_dc_course_exercises e ON e.id = se.exercise_id
-                 LEFT JOIN tl_dc_course_modules m ON m.id = e.pid
+                 LEFT JOIN tl_dc_course_modules m ON m.id = se.module_id
                  WHERE se.pid = ?
                  ORDER BY m.sorting, e.sorting'
             )->execute($assignmentId);
@@ -237,22 +310,21 @@ class CourseProgressController extends AbstractFrontendModuleController
                     'status_label' => $GLOBALS['TL_LANG']['tl_dc_student_exercises']['itemStatus'][(string)$exercises->status]
                         ?? (string)$exercises->status,
                     'exercise_id' => (int)$exercises->exercise_id,
-                    'notes' => (string)$exercises->notes
+                    'notes' => (string)$exercises->notes,
+                    'planned_at' => $exercises->dateCompleted ? Date::parse($dateFormat, (int)$exercises->dateCompleted) : '',
                 ];
             }
             $template->exercises = $exerciseList;
-            $logger->info('CourseProgressController: After generation loaded ' . count($exerciseList) . ' exercises.');
         }
 
         // 3. Zeitplan laden (über das Event der Zuweisung)
         $schedule = [];
         if ($assignmentRow['event_id']) {
             $rows = $db->prepare(
-                'SELECT s.*, m.title AS module_title, e.title AS exercise_title
+                'SELECT s.*, m.title AS module_title
                  FROM tl_dc_course_event_schedule s
                  LEFT JOIN tl_dc_course_modules m ON m.id = s.module_id
-                 LEFT JOIN tl_dc_course_exercises e ON e.id = s.exercise_id
-                 WHERE s.pid = ? AND s.published = 1
+                 WHERE s.pid = ?
                  ORDER BY s.planned_at'
             )->execute((int)$assignmentRow['event_id']);
 
@@ -263,8 +335,6 @@ class CourseProgressController extends AbstractFrontendModuleController
                     'notes' => (string)$rows->notes,
                     'instructor' => (string)$rows->instructor,
                     'module' => (string)$rows->module_title,
-                    'exercise' => (string)$rows->exercise_title,
-                    'exercise_id' => (int)$rows->exercise_id,
                 ];
             }
         }

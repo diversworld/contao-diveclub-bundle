@@ -81,11 +81,10 @@ class CourseEventCalendarController extends AbstractFrontendModuleController
         // Zeitplan-Daten für dieses Event laden
         $db = System::getContainer()->get('database_connection');
         $schedule = $db->fetchAllAssociative(
-            'SELECT s.id, s.planned_at, s.location, s.instructor, s.notes, m.title AS module_title, e.title AS exercise_title
+            'SELECT s.id, s.planned_at, s.location, s.instructor, s.notes, m.title AS module_title
              FROM tl_dc_course_event_schedule s
              INNER JOIN tl_dc_course_modules m ON m.id = s.module_id
-             INNER JOIN tl_dc_course_exercises e ON e.id = s.exercise_id
-             WHERE s.pid = ? AND s.published = 1
+             WHERE s.pid = ?
              ORDER BY s.planned_at',
             [(int)$event->id]
         );
@@ -99,7 +98,7 @@ class CourseEventCalendarController extends AbstractFrontendModuleController
             if (!$row['planned_at']) continue;
             $key = date('Ymd', (int)$row['planned_at']);
             $eventsByDate[$key][] = [
-                'title' => $row['module_title'] . ': ' . $row['exercise_title'],
+                'title' => $row['module_title'],
                 'date' => Date::parse($dateFormat, (int)$row['planned_at']),
                 'time' => Date::parse($timeFormat, (int)$row['planned_at']),
                 'location' => $row['location'],

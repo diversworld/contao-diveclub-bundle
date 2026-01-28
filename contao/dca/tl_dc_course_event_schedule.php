@@ -14,22 +14,20 @@ use Contao\DataContainer;
 use Contao\Date;
 use Contao\DC_Table;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ScheduleLabelListener;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ScheduleOnSubmitListener;
 
 $GLOBALS['TL_DCA']['tl_dc_course_event_schedule'] = [
     'config' => [
         'dataContainer' => DC_Table::class,
         'ptable' => 'tl_dc_course_event',
+        'ctable' => ['tl_dc_event_schedule_exercises'],
         'enableVersioning' => true,
         'markAsCopy' => 'headline',
-        'onsubmit_callback' => [
-            ['tl_dc_course_event_schedule', 'syncToStudentExercises']
-        ],
         'sql' => [
             'keys' => [
                 'id' => 'primary',
                 'pid' => 'index',
                 'module_id' => 'index',
-                'exercise_id' => 'index',
                 'planned_at' => 'index',
                 'published,start,stop' => 'index'
             ],
@@ -38,16 +36,15 @@ $GLOBALS['TL_DCA']['tl_dc_course_event_schedule'] = [
     'list' => [
         'sorting' => [
             'mode' => DataContainer::MODE_PARENT,
-            'fields' => ['planned_at', 'module_id', 'exercise_id'],
+            'fields' => ['planned_at', 'module_id'],
             'headerFields' => ['title', 'dateStart', 'dateEnd'],
             'flag' => DataContainer::SORT_MONTH_ASC,
             'panelLayout' => 'sort,filter;search,limit',
             'disableGrouping' => true,
         ],
         'label' => [
-            'fields' => ['planned_at', 'module_id', 'exercise_id'],
-            'format' => '%s — Modul: %s — Übung: %s',
-            'label_callback' => [ScheduleLabelListener::class, '__invoke']
+            'fields' => ['planned_at', 'module_id'],
+            'format' => '%s — Modul: %s',
         ],
         'global_operations' => [
             'all' => [
@@ -58,6 +55,10 @@ $GLOBALS['TL_DCA']['tl_dc_course_event_schedule'] = [
         ],
         'operations' => [
             'edit',
+            'exercises' => [
+                'href' => 'table=tl_dc_event_schedule_exercises',
+                'icon' => 'edit.svg',
+            ],
             'copy',
             'cut',
             'delete',
@@ -66,7 +67,7 @@ $GLOBALS['TL_DCA']['tl_dc_course_event_schedule'] = [
         ],
     ],
     'palettes' => [
-        'default' => '{plan_legend},module_id,exercise_id,planned_at,location,instructor;
+        'default' => '{plan_legend},module_id,planned_at,location,instructor;
                       {notes_legend},notes;
                       {publish_legend},published,start,stop'
     ],
@@ -87,12 +88,6 @@ $GLOBALS['TL_DCA']['tl_dc_course_event_schedule'] = [
         'module_id' => [
             'inputType' => 'select',
             'foreignKey' => 'tl_dc_course_modules.title',
-            'eval' => ['mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
-            'sql' => "int(10) unsigned NOT NULL default 0",
-        ],
-        'exercise_id' => [
-            'inputType' => 'select',
-            'foreignKey' => 'tl_dc_course_exercises.title',
             'eval' => ['mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
             'sql' => "int(10) unsigned NOT NULL default 0",
         ],
@@ -136,37 +131,4 @@ $GLOBALS['TL_DCA']['tl_dc_course_event_schedule'] = [
     ],
 ];
 
-class tl_dc_course_event_schedule extends Backend
-{
-    /**
-     * Synchronisiert Änderungen am Zeitplan mit den Übungsergebnissen der Schüler
-     */
-    public function syncToStudentExercises(DataContainer $dc): void
-    {
-        if (!$dc->activeRecord) {
-            return;
-        }
-
-        $db = Database::getInstance();
-        $eventId = (int)$dc->activeRecord->pid;
-        $exerciseId = (int)$dc->activeRecord->exercise_id;
-        $instructor = $dc->activeRecord->instructor;
-
-        // 1. Alle Zuweisungen für dieses Event finden
-        $students = $db->prepare("SELECT id FROM tl_dc_course_students WHERE event_id=?")
-            ->execute($eventId);
-
-        if ($students->numRows < 1) {
-            return;
-        }
-
-        $studentIds = $students->fetchEach('id');
-
-        // 2. Alle Schüler-Übungen aktualisieren, die zu diesen Zuweisungen gehören und die gleiche Übungs-ID haben
-        // Wir synchronisieren hier den Instructor.
-        // Falls gewünscht, könnten wir auch andere Felder synchronisieren.
-        $db->prepare("UPDATE tl_dc_student_exercises SET instructor=? WHERE pid IN (" . implode(',', $studentIds) . ") AND exercise_id=?")
-            ->execute($instructor, $exerciseId);
-    }
-}
 

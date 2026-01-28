@@ -8,9 +8,9 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\Database;
 use Contao\DataContainer;
 
-#[AsCallback(table: 'tl_dc_students', target: 'config.onload')]
 class StudentLoadMemberDataCallback
 {
+    #[AsCallback(table: 'tl_dc_students', target: 'config.onload')]
     public function __invoke(DataContainer $dc): void
     {
         if (!$dc->id) {

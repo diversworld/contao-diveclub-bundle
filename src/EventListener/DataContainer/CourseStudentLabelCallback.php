@@ -10,13 +10,13 @@ use Contao\DataContainer;
 use Contao\Date;
 use Doctrine\DBAL\Connection;
 
-#[AsCallback(table: 'tl_dc_course_students', target: 'list.label.label')]
 class CourseStudentLabelCallback
 {
     public function __construct(private readonly Connection $connection)
     {
     }
 
+    #[AsCallback(table: 'tl_dc_course_students', target: 'list.label.label')]
     public function __invoke(array $row, string $label, DataContainer $dc, array $args = null): array|string
     {
         // 1. Kurs-Titel über Doctrine DBAL abrufen
