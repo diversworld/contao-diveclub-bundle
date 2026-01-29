@@ -50,8 +50,9 @@ class CourseStudentOnSubmitListener
             return;
         }
 
-        // 1. Übungen sammeln
-        $exercises = [];
+        // 1. Module und Übungen sammeln
+        $moduleExercises = [];
+        $allModules = [];
 
         // Fall A: Es gibt einen Zeitplan (tl_dc_course_event_schedule)
         if ((int) $dc->activeRecord->event_id > 0) {
@@ -64,6 +65,16 @@ class CourseStudentOnSubmitListener
             );
 
             foreach ($scheduleRows as $objSchedule) {
+                $moduleId = (int)$objSchedule['module_id'];
+                if ($moduleId <= 0) continue;
+
+                if (!isset($allModules[$moduleId])) {
+                    $allModules[$moduleId] = [
+                        'planned_at' => $objSchedule['planned_at'],
+                        'instructor' => $objSchedule['instructor']
+                    ];
+                }
+
                 // Erst schauen, ob es spezifische Übungen im Zeitplan für dieses Modul-Event gibt
                 $scheduleExRows = $this->connection->fetchAllAssociative(
                     "SELECT exercise_id, title, planned_at, instructor FROM tl_dc_event_schedule_exercises WHERE pid=? ORDER BY sorting",
@@ -74,29 +85,29 @@ class CourseStudentOnSubmitListener
                     foreach ($scheduleExRows as $objScheduleEx) {
                         $exId = (int) $objScheduleEx['exercise_id'];
                         // Eindeutige Kennung für Übung im Kontext dieses Moduls
-                        $key = $objSchedule['module_id'] . '_' . $exId;
-                        if (!isset($exercises[$key])) {
-                            $exercises[$key] = [
+                        $key = $moduleId . '_' . $exId;
+                        if (!isset($moduleExercises[$key])) {
+                            $moduleExercises[$key] = [
                                 'id' => $exId,
-                                'module_id' => (int) $objSchedule['module_id'],
+                                'module_id' => $moduleId,
                                 'planned_at' => $objScheduleEx['planned_at'] ?: $objSchedule['planned_at'],
                                 'instructor' => $objScheduleEx['instructor'] ?: $objSchedule['instructor']
                             ];
                         }
                     }
-                } elseif ((int) $objSchedule['module_id'] > 0) {
+                } else {
                     // Fallback: Alle Übungen dieses Moduls aus Stammdaten laden
                     $modExIds = $this->connection->fetchFirstColumn(
                         "SELECT id FROM tl_dc_course_exercises WHERE pid = ? ORDER BY sorting",
-                        [(int) $objSchedule['module_id']]
+                        [$moduleId]
                     );
                     foreach ($modExIds as $modExId) {
                         $exId = (int) $modExId;
-                        $key = $objSchedule['module_id'] . '_' . $exId;
-                        if (!isset($exercises[$key])) {
-                            $exercises[$key] = [
+                        $key = $moduleId . '_' . $exId;
+                        if (!isset($moduleExercises[$key])) {
+                            $moduleExercises[$key] = [
                                 'id' => $exId,
-                                'module_id' => (int) $objSchedule['module_id'],
+                                'module_id' => $moduleId,
                                 'planned_at' => $objSchedule['planned_at'],
                                 'instructor' => $objSchedule['instructor']
                             ];
@@ -107,59 +118,86 @@ class CourseStudentOnSubmitListener
         }
 
         // Fall B: Kein Zeitplan oder keine Übungen im Zeitplan gefunden -> Nutze Kurs-Template
-        if (empty($exercises)) {
-            $modExRows = $this->connection->fetchAllAssociative(
-                "SELECT e.id, e.pid AS module_id
-                FROM tl_dc_course_exercises e
-                JOIN tl_dc_course_modules m ON e.pid = m.id
-                WHERE m.pid = ?
-                ORDER BY m.sorting, e.sorting",
+        if (empty($allModules)) {
+            $modules = $this->connection->fetchAllAssociative(
+                "SELECT id FROM tl_dc_course_modules WHERE pid = ? ORDER BY sorting",
                 [$courseTemplateId]
             );
 
-            foreach ($modExRows as $objModEx) {
-                $exercises[] = [
-                    'id' => (int) $objModEx['id'],
-                    'module_id' => (int) $objModEx['module_id'],
-                    'planned_at' => '',
-                    'instructor' => ''
-                ];
+            foreach ($modules as $mod) {
+                $moduleId = (int)$mod['id'];
+                $allModules[$moduleId] = ['planned_at' => '', 'instructor' => ''];
+
+                $modExRows = $this->connection->fetchAllAssociative(
+                    "SELECT id FROM tl_dc_course_exercises WHERE pid = ? ORDER BY sorting",
+                    [$moduleId]
+                );
+
+                foreach ($modExRows as $objModEx) {
+                    $exId = (int)$objModEx['id'];
+                    $key = $moduleId . '_' . $exId;
+                    $moduleExercises[$key] = [
+                        'id' => $exId,
+                        'module_id' => $moduleId,
+                        'planned_at' => '',
+                        'instructor' => ''
+                    ];
+                }
             }
         }
 
-        // 2. Übungen anlegen (Reihenfolge beibehalten)
+        // 2. Einträge anlegen (Reihenfolge: Modulweise)
         $sorting = 128;
-        foreach ($exercises as $exData) {
-            $exerciseId = (int) $exData['id'];
-            $plannedAt = $exData['planned_at'];
-            $instructor = $exData['instructor'];
+        foreach ($allModules as $moduleId => $modData) {
+            // Find exercises for this module
+            $exercisesForThisModule = [];
+            foreach ($moduleExercises as $key => $exData) {
+                if ($exData['module_id'] === $moduleId) {
+                    $exercisesForThisModule[] = $exData;
+                }
+            }
 
-            // Prüfen, ob die Übung für diese Zuweisung schon existiert
-            $checkId = $this->connection->fetchOne(
-                "SELECT id FROM tl_dc_student_exercises WHERE pid=? AND exercise_id=? AND module_id=?",
-                [$assignmentId, $exerciseId, (int) ($exData['module_id'] ?? 0)]
-            );
-
-            if (!$checkId) {
-                $this->connection->insert('tl_dc_student_exercises', [
-                    'pid' => $assignmentId,
-                    'tstamp' => time(),
-                    'sorting' => $sorting,
-                    'exercise_id' => $exerciseId,
-                    'module_id' => (int) ($exData['module_id'] ?? 0),
-                    'status' => 'pending',
-                    'dateCompleted' => $plannedAt,
-                    'instructor' => $instructor,
-                    'published' => 1
-                ]);
+            if (empty($exercisesForThisModule)) {
+                // Modul-Eintrag ohne Übung anlegen
+                $this->upsertEntry($assignmentId, 0, $moduleId, $modData['planned_at'], $modData['instructor'], $sorting);
                 $sorting += 128;
             } else {
-                // Falls sie existiert, aber vielleicht das Datum noch fehlt/anders ist, synchronisieren
-                $this->connection->executeStatement(
-                    "UPDATE tl_dc_student_exercises SET dateCompleted=?, instructor=? WHERE id=? AND (dateCompleted='' OR dateCompleted IS NULL)",
-                    [$plannedAt, $instructor, (int) $checkId]
-                );
+                foreach ($exercisesForThisModule as $exData) {
+                    $this->upsertEntry($assignmentId, $exData['id'], $moduleId, $exData['planned_at'], $exData['instructor'], $sorting);
+                    $sorting += 128;
+                }
             }
+        }
+    }
+
+    private function upsertEntry(int $assignmentId, int $exerciseId, int $moduleId, $plannedAt, $instructor, int $sorting): void
+    {
+        // Prüfen, ob der Eintrag für diese Zuweisung schon existiert
+        $checkSql = "SELECT id FROM tl_dc_student_exercises WHERE pid=? AND exercise_id=? AND module_id=?";
+        $checkParams = [$assignmentId, $exerciseId, $moduleId];
+
+        $checkId = $this->connection->fetchOne($checkSql, $checkParams);
+
+        if (!$checkId) {
+            $insertData = [
+                'pid' => $assignmentId,
+                'tstamp' => time(),
+                'sorting' => $sorting,
+                'exercise_id' => $exerciseId,
+                'module_id' => $moduleId,
+                'status' => 'pending',
+                'dateCompleted' => $plannedAt,
+                'instructor' => $instructor,
+                'published' => 1
+            ];
+
+            $this->connection->insert('tl_dc_student_exercises', $insertData);
+        } else {
+            // Falls er existiert, aber vielleicht das Datum noch fehlt/anders ist, synchronisieren
+            $this->connection->executeStatement(
+                "UPDATE tl_dc_student_exercises SET dateCompleted=?, instructor=? WHERE id=? AND (dateCompleted='' OR dateCompleted IS NULL)",
+                [$plannedAt, $instructor, (int)$checkId]
+            );
         }
     }
 }

@@ -48,8 +48,27 @@ class CourseProgressController extends AbstractFrontendModuleController
         $isInstructor = false;
         if ($user instanceof FrontendUser) {
             $groups = StringUtil::deserialize($user->groups, true);
-            // Wir erlauben es, wenn der User in Gruppe 2 (Instructor) ist
-            $isInstructor = in_array('2', $groups);
+
+            // Konfiguration laden
+            $db = Database::getInstance();
+            $configResult = $db->prepare("SELECT instructor_groups FROM tl_dc_config WHERE published='1' LIMIT 1")->execute();
+
+            $instructorGroups = [];
+            if ($configResult->numRows > 0) {
+                $instructorGroups = StringUtil::deserialize($configResult->instructor_groups, true);
+            }
+
+            // Fallback auf Standardgruppen, falls nichts konfiguriert ist
+            if (empty($instructorGroups)) {
+                $instructorGroups = ['2', '3'];
+            }
+
+            foreach ($instructorGroups as $groupId) {
+                if (in_array((string)$groupId, $groups, true)) {
+                    $isInstructor = true;
+                    break;
+                }
+            }
         }
 
         // AJAX-Request für Status-Update verarbeiten
@@ -82,6 +101,8 @@ class CourseProgressController extends AbstractFrontendModuleController
         $template->class = $template->element_css_classes;
         $template->cssID = $model->cssID[0] ?? '';
         $template->notFound = false;
+        $template->hasProgress = false;
+        $template->studentProgress = [];
         $template->exercises = [];
         $template->schedule = [];
         $template->labels = [];
@@ -198,23 +219,39 @@ class CourseProgressController extends AbstractFrontendModuleController
             ];
         }
 
-        $exercises = $db->prepare(
-            'SELECT se.*, e.title AS exercise_title, m.id AS module_id, m.title AS module_title
-             FROM tl_dc_student_exercises se
-             LEFT JOIN tl_dc_course_exercises e ON e.id = se.exercise_id
-             LEFT JOIN tl_dc_course_modules m ON m.id = se.module_id
-             WHERE se.pid = ?
-             ORDER BY m.sorting, e.sorting'
-        )->execute($assignmentId);
+        try {
+            $exercises = $db->prepare(
+                'SELECT se.*, e.title AS exercise_title, m.title AS module_title
+                 FROM tl_dc_student_exercises se
+                 LEFT JOIN tl_dc_course_exercises e ON e.id = se.exercise_id
+                 LEFT JOIN tl_dc_course_modules m ON m.id = se.module_id
+                 WHERE se.pid = ?
+                 ORDER BY se.sorting'
+            )->execute($assignmentId);
+        } catch (\Exception $e) {
+            $exercises = $db->prepare(
+                'SELECT se.*, e.title AS exercise_title, m.title AS module_title
+                 FROM tl_dc_student_exercises se
+                 LEFT JOIN tl_dc_course_exercises e ON e.id = se.exercise_id
+                 LEFT JOIN tl_dc_course_modules m ON m.id = e.pid
+                 WHERE se.pid = ?
+                 ORDER BY se.sorting'
+            )->execute($assignmentId);
+        }
 
         // WICHTIG: Lade die Sprachdateien explizit für das Frontend
         System::loadLanguageFile('tl_dc_student_exercises');
 
         $exerciseList = [];
         while ($exercises->next()) {
+            $title = (string)$exercises->exercise_title;
+            if ($exercises->exercise_id == 0) {
+                $title = 'Modul-Abschluss';
+            }
+
             $exData = [
                 'id' => (int)$exercises->id,
-                'title' => (string)$exercises->exercise_title,
+                'title' => $title,
                 'module' => (string)$exercises->module_title,
                 'status' => (string)$exercises->status,
                 'instructor' => (string)$exercises->instructor,
@@ -222,11 +259,13 @@ class CourseProgressController extends AbstractFrontendModuleController
                 'status_label' => $GLOBALS['TL_LANG']['tl_dc_student_exercises']['itemStatus'][(string)$exercises->status]
                     ?? (string)$exercises->status,
                 'exercise_id' => (int)$exercises->exercise_id,
+                'module_id' => (int)($exercises->module_id ?: 0),
             ];
             $exerciseList[] = $exData;
 
-            if (isset($modules[$exercises->module_id])) {
-                $modules[$exercises->module_id]['exercises'][] = $exData;
+            $mId = (int)($exercises->module_id ?: 0);
+            if (isset($modules[$mId])) {
+                $modules[$mId]['exercises'][] = $exData;
             }
         }
         $template->exercises = $exerciseList;
@@ -241,11 +280,18 @@ class CourseProgressController extends AbstractFrontendModuleController
         // Wenn keine Übungen da sind, versuchen wir sie zu generieren (falls ein Kurs verknüpft ist)
         if (empty($exerciseList) && (int)$assignmentRow['course_id'] > 0) {
             $db_exercises = $db->prepare("
-                SELECT e.id, m.id AS module_id
-                FROM tl_dc_course_exercises e
-                JOIN tl_dc_course_modules m ON e.pid = m.id
-                WHERE m.pid = ?
-            ")->execute((int)$assignmentRow['course_id']);
+                    SELECT e.id, m.id AS module_id
+                    FROM tl_dc_course_exercises e
+                    JOIN tl_dc_course_modules m ON e.pid = m.id
+                    WHERE m.pid = ?
+                ")->execute((int)$assignmentRow['course_id']);
+
+            $hasModuleId = true;
+            try {
+                $db->prepare("SELECT module_id FROM tl_dc_student_exercises LIMIT 1")->execute();
+            } catch (\Exception $e) {
+                $hasModuleId = false;
+            }
 
             while ($db_exercises->next()) {
                 $check = $db->prepare("SELECT id FROM tl_dc_student_exercises WHERE pid=? AND exercise_id=?")->execute($assignmentId, $db_exercises->id);
@@ -257,12 +303,12 @@ class CourseProgressController extends AbstractFrontendModuleController
                     if ((int)$assignmentRow['event_id'] > 0) {
                         // Zuerst im Zeitplan nach spezifischer Übung suchen
                         $objScheduleEx = $db->prepare("
-                            SELECT se.planned_at, se.instructor
-                            FROM tl_dc_event_schedule_exercises se
-                            JOIN tl_dc_course_event_schedule s ON s.id = se.pid
-                            WHERE s.pid = ? AND se.exercise_id = ?
-                            LIMIT 1
-                        ")->execute((int)$assignmentRow['event_id'], $db_exercises->id);
+                                SELECT se.planned_at, se.instructor
+                                FROM tl_dc_event_schedule_exercises se
+                                JOIN tl_dc_course_event_schedule s ON s.id = se.pid
+                                WHERE s.pid = ? AND se.exercise_id = ?
+                                LIMIT 1
+                            ")->execute((int)$assignmentRow['event_id'], $db_exercises->id);
 
                         if ($objScheduleEx->numRows > 0) {
                             $plannedAt = $objScheduleEx->planned_at;
@@ -283,26 +329,47 @@ class CourseProgressController extends AbstractFrontendModuleController
                         }
                     }
 
-                    $db->prepare("INSERT INTO tl_dc_student_exercises (pid, tstamp, exercise_id, module_id, status, dateCompleted, instructor, published) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
-                        ->execute($assignmentId, time(), $db_exercises->id, $db_exercises->module_id, 'pending', $plannedAt, $instructor, 1);
+                    if ($hasModuleId) {
+                        $db->prepare("INSERT INTO tl_dc_student_exercises (pid, tstamp, exercise_id, module_id, status, dateCompleted, instructor, published) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+                            ->execute($assignmentId, time(), $db_exercises->id, $db_exercises->module_id, 'pending', $plannedAt, $instructor, 1);
+                    } else {
+                        $db->prepare("INSERT INTO tl_dc_student_exercises (pid, tstamp, exercise_id, status, dateCompleted, instructor, published) VALUES (?, ?, ?, ?, ?, ?, ?)")
+                            ->execute($assignmentId, time(), $db_exercises->id, 'pending', $plannedAt, $instructor, 1);
+                    }
                 }
             }
 
             // Erneut laden
-            $exercises = $db->prepare(
-                'SELECT se.*, e.title AS exercise_title, m.id AS module_id, m.title AS module_title
-                 FROM tl_dc_student_exercises se
-                 LEFT JOIN tl_dc_course_exercises e ON e.id = se.exercise_id
-                 LEFT JOIN tl_dc_course_modules m ON m.id = se.module_id
-                 WHERE se.pid = ?
-                 ORDER BY m.sorting, e.sorting'
-            )->execute($assignmentId);
+            try {
+                $exercises = $db->prepare(
+                    'SELECT se.*, e.title AS exercise_title, m.title AS module_title
+                     FROM tl_dc_student_exercises se
+                     LEFT JOIN tl_dc_course_exercises e ON e.id = se.exercise_id
+                     LEFT JOIN tl_dc_course_modules m ON m.id = se.module_id
+                     WHERE se.pid = ?
+                     ORDER BY se.sorting'
+                )->execute($assignmentId);
+            } catch (\Exception $e) {
+                $exercises = $db->prepare(
+                    'SELECT se.*, e.title AS exercise_title, m.title AS module_title
+                     FROM tl_dc_student_exercises se
+                     LEFT JOIN tl_dc_course_exercises e ON e.id = se.exercise_id
+                     LEFT JOIN tl_dc_course_modules m ON m.id = e.pid
+                     WHERE se.pid = ?
+                     ORDER BY se.sorting'
+                )->execute($assignmentId);
+            }
 
             $exerciseList = [];
             while ($exercises->next()) {
-                $exerciseList[] = [
+                $title = (string)$exercises->exercise_title;
+                if ($exercises->exercise_id == 0) {
+                    $title = 'Modul-Abschluss';
+                }
+
+                $exData = [
                     'id' => (int)$exercises->id,
-                    'title' => (string)$exercises->exercise_title,
+                    'title' => $title,
                     'module' => (string)$exercises->module_title,
                     'instructor' => (string)$exercises->instructor,
                     'dateCompleted' => $exercises->dateCompleted ? Date::parse($dateFormat, (int)$exercises->dateCompleted) : '',
@@ -310,11 +377,19 @@ class CourseProgressController extends AbstractFrontendModuleController
                     'status_label' => $GLOBALS['TL_LANG']['tl_dc_student_exercises']['itemStatus'][(string)$exercises->status]
                         ?? (string)$exercises->status,
                     'exercise_id' => (int)$exercises->exercise_id,
+                    'module_id' => (int)($exercises->module_id ?: 0),
                     'notes' => (string)$exercises->notes,
                     'planned_at' => $exercises->dateCompleted ? Date::parse($dateFormat, (int)$exercises->dateCompleted) : '',
                 ];
+                $exerciseList[] = $exData;
+
+                $mId = (int)($exercises->module_id ?: 0);
+                if (isset($modules[$mId])) {
+                    $modules[$mId]['exercises'][] = $exData;
+                }
             }
             $template->exercises = $exerciseList;
+            $template->modules = $modules;
         }
 
         // 3. Zeitplan laden (über das Event der Zuweisung)
@@ -324,17 +399,23 @@ class CourseProgressController extends AbstractFrontendModuleController
                 'SELECT s.*, m.title AS module_title
                  FROM tl_dc_course_event_schedule s
                  LEFT JOIN tl_dc_course_modules m ON m.id = s.module_id
-                 WHERE s.pid = ?
+                 WHERE s.pid = ? AND s.published = "1"
                  ORDER BY s.planned_at'
             )->execute((int)$assignmentRow['event_id']);
 
             while ($rows->next()) {
+                // Übungen für diesen Zeitplan-Eintrag holen
+                $exerciseRows = $db->prepare('SELECT title FROM tl_dc_event_schedule_exercises WHERE pid = ? AND published = "1" ORDER BY sorting')
+                    ->execute($rows->id);
+                $exerciseTitles = $exerciseRows->fetchEach('title');
+
                 $schedule[] = [
                     'planned_at' => $rows->planned_at ? Date::parse($dateFormat, (int)$rows->planned_at) : '',
                     'location' => (string)$rows->location,
                     'notes' => (string)$rows->notes,
                     'instructor' => (string)$rows->instructor,
                     'module' => (string)$rows->module_title,
+                    'exercise' => implode(', ', $exerciseTitles),
                 ];
             }
         }

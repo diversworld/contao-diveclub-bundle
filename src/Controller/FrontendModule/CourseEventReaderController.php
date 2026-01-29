@@ -33,6 +33,8 @@ class CourseEventReaderController extends AbstractFrontendModuleController
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         $template->notFound = false;
+        $template->hasProgress = false;
+        $template->studentProgress = [];
         $template->element_html_id = 'mod_' . $model->id;
         $template->element_css_classes = trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? ''));
         $template->class = $template->element_css_classes;
@@ -188,22 +190,39 @@ class CourseEventReaderController extends AbstractFrontendModuleController
 
         // Falls angemeldet, Übungen (Kursfortschritt) laden
         if ($assignmentId) {
-            $studentExercises = System::getContainer()->get('database_connection')->fetchAllAssociative(
-                'SELECT se.status, se.dateCompleted, se.instructor, e.title AS exercise_title, m.title AS module_title
-                 FROM tl_dc_student_exercises se
-                 JOIN tl_dc_course_exercises e ON e.id = se.exercise_id
-                 JOIN tl_dc_course_modules m ON m.id = se.module_id
-                 WHERE se.pid = ?
-                 ORDER BY m.sorting, e.sorting',
-                [$assignmentId]
-            );
+            try {
+                $studentExercises = System::getContainer()->get('database_connection')->fetchAllAssociative(
+                    'SELECT se.exercise_id, se.status, se.dateCompleted, se.instructor, e.title AS exercise_title, m.title AS module_title
+                     FROM tl_dc_student_exercises se
+                     LEFT JOIN tl_dc_course_exercises e ON e.id = se.exercise_id
+                     LEFT JOIN tl_dc_course_modules m ON m.id = se.module_id
+                     WHERE se.pid = ?
+                     ORDER BY m.sorting, se.sorting',
+                    [$assignmentId]
+                );
+            } catch (\Exception $e) {
+                // Fallback falls module_id Spalte noch fehlt (Migration ausstehend)
+                $studentExercises = System::getContainer()->get('database_connection')->fetchAllAssociative(
+                    'SELECT se.exercise_id, se.status, se.dateCompleted, se.instructor, e.title AS exercise_title, m.title AS module_title
+                     FROM tl_dc_student_exercises se
+                     LEFT JOIN tl_dc_course_exercises e ON e.id = se.exercise_id
+                     LEFT JOIN tl_dc_course_modules m ON m.id = e.pid
+                     WHERE se.pid = ?
+                     ORDER BY m.sorting, se.sorting',
+                    [$assignmentId]
+                );
+            }
 
             $progress = [];
             System::loadLanguageFile('tl_dc_student_exercises');
 
             foreach ($studentExercises as $se) {
+                $title = $se['exercise_title'];
+                if ($se['exercise_id'] == 0) {
+                    $title = 'Modul-Abschluss';
+                }
                 $progress[] = [
-                    'title' => $se['exercise_title'],
+                    'title' => $title,
                     'module' => $se['module_title'],
                     'status' => $se['status'],
                     'status_label' => $GLOBALS['TL_LANG']['tl_dc_student_exercises']['itemStatus'][$se['status']] ?? $se['status'],
@@ -399,7 +418,26 @@ class CourseEventReaderController extends AbstractFrontendModuleController
 
             // Übungen erzeugen
             $listener = new CourseStudentOnSubmitListener($container->get('database_connection'));
-            $dc = new \Contao\DC_Table('tl_dc_course_students');
+            $dc = new class extends \Contao\DataContainer {
+                public function __construct()
+                {
+                    // Do nothing
+                }
+
+                public function save($varValue)
+                {
+                }
+
+                public function isChanged()
+                {
+                    return false;
+                }
+
+                public function getPalette()
+                {
+                    return '';
+                }
+            };
             $dc->id = $newAssignmentId;
             $dc->activeRecord = (object)[
                 'id' => $newAssignmentId,

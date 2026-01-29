@@ -53,7 +53,7 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
                                 {equipment_legend},addEquipment;
                                 {sizes_legend},addSizes;
                                 {types_legend},addTypes;
-                                {course_legend},addCourses;
+                                {course_legend},addCourses,instructor_groups;
                                 {regulator_legend},addRegulators;
                                 {invoice_legend},invoiceTemplate,invoiceText,pdfFolder;
                                 {tuv_legend},tuvListFormat,tuvListFolder;
@@ -163,6 +163,14 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
             'inputType' => 'fileTree',
             'eval' => ['fieldType' => 'radio', 'files' => true, 'tl_class' => 'w33clr'],
             'sql' => "binary(16) NULL"
+        ],
+        'instructor_groups' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_config']['instructor_groups'],
+            'exclude' => true,
+            'inputType' => 'checkboxWizard',
+            'foreignKey' => 'tl_member_group.name',
+            'eval' => ['multiple' => true, 'tl_class' => 'clr'],
+            'sql' => "blob NULL"
         ],
         'invoiceTemplate' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_config']['invoiceTemplate'],

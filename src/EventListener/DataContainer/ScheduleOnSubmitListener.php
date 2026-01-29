@@ -67,11 +67,20 @@ class ScheduleOnSubmitListener
                 $exPlannedAt = $objScheduleEx['planned_at'] ?: $plannedAt;
                 $exInstructor = $objScheduleEx['instructor'] ?: $instructor;
 
-                $this->connection->executeStatement(
-                    "UPDATE tl_dc_student_exercises SET instructor=?, dateCompleted=? WHERE pid IN (?) AND exercise_id=? AND module_id=?",
-                    [$exInstructor, $exPlannedAt, $studentIds, $objScheduleEx['exercise_id'], $moduleId],
-                    [null, null, Connection::PARAM_INT_ARRAY, null, null]
-                );
+                try {
+                    $this->connection->executeQuery("SELECT module_id FROM tl_dc_student_exercises LIMIT 1");
+                    $this->connection->executeStatement(
+                        "UPDATE tl_dc_student_exercises SET instructor=?, dateCompleted=? WHERE pid IN (?) AND exercise_id=? AND module_id=?",
+                        [$exInstructor, $exPlannedAt, $studentIds, $objScheduleEx['exercise_id'], $moduleId],
+                        [null, null, Connection::PARAM_INT_ARRAY, null, null]
+                    );
+                } catch (\Exception $e) {
+                    $this->connection->executeStatement(
+                        "UPDATE tl_dc_student_exercises SET instructor=?, dateCompleted=? WHERE pid IN (?) AND exercise_id=?",
+                        [$exInstructor, $exPlannedAt, $studentIds, $objScheduleEx['exercise_id']],
+                        [null, null, Connection::PARAM_INT_ARRAY, null]
+                    );
+                }
             }
         } else {
             // Fallback: Alle Übungen dieses Moduls aus den Stammdaten finden
@@ -81,11 +90,20 @@ class ScheduleOnSubmitListener
             );
 
             if (!empty($exIds)) {
-                $this->connection->executeStatement(
-                    "UPDATE tl_dc_student_exercises SET instructor=?, dateCompleted=? WHERE pid IN (?) AND exercise_id IN (?) AND module_id=?",
-                    [$instructor, $plannedAt, $studentIds, $exIds, $moduleId],
-                    [null, null, Connection::PARAM_INT_ARRAY, Connection::PARAM_INT_ARRAY, null]
-                );
+                try {
+                    $this->connection->executeQuery("SELECT module_id FROM tl_dc_student_exercises LIMIT 1");
+                    $this->connection->executeStatement(
+                        "UPDATE tl_dc_student_exercises SET instructor=?, dateCompleted=? WHERE pid IN (?) AND exercise_id IN (?) AND module_id=?",
+                        [$instructor, $plannedAt, $studentIds, $exIds, $moduleId],
+                        [null, null, Connection::PARAM_INT_ARRAY, Connection::PARAM_INT_ARRAY, null]
+                    );
+                } catch (\Exception $e) {
+                    $this->connection->executeStatement(
+                        "UPDATE tl_dc_student_exercises SET instructor=?, dateCompleted=? WHERE pid IN (?) AND exercise_id IN (?)",
+                        [$instructor, $plannedAt, $studentIds, $exIds],
+                        [null, null, Connection::PARAM_INT_ARRAY, Connection::PARAM_INT_ARRAY]
+                    );
+                }
             }
         }
     }

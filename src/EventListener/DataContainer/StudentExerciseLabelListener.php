@@ -16,12 +16,22 @@ class StudentExerciseLabelListener
         $db = Database::getInstance();
 
         // Übungs- und Modulnamen über die Template-Tabellen holen
-        $objInfo = $db->prepare("
-            SELECT e.title AS exTitle, m.title AS modTitle
-            FROM tl_dc_course_exercises e
-            JOIN tl_dc_course_modules m ON m.id = ?
-            WHERE e.id = ?
-        ")->execute($row['module_id'] ?: 0, $row['exercise_id']);
+        if ($row['exercise_id'] > 0) {
+            $objInfo = $db->prepare("
+                SELECT e.title AS exTitle, m.title AS modTitle
+                FROM tl_dc_course_exercises e
+                JOIN tl_dc_course_modules m ON m.id = ?
+                WHERE e.id = ?
+            ")->execute($row['module_id'] ?: 0, $row['exercise_id']);
+            $title = $objInfo->exTitle;
+        } else {
+            $objInfo = $db->prepare("
+                SELECT title AS modTitle
+                FROM tl_dc_course_modules
+                WHERE id = ?
+            ")->execute($row['module_id'] ?: 0);
+            $title = 'Modul-Abschluss';
+        }
 
         if ($objInfo->numRows < 1) {
             return $label;
@@ -34,7 +44,7 @@ class StudentExerciseLabelListener
             $args[0] = sprintf(
                 '<span style="color:#999; width:150px; display:inline-block;">[%s]</span> <span style="width:250px; display:inline-block;"><strong>%s</strong></span>',
                 $objInfo->modTitle,
-                $objInfo->exTitle
+                $title
             );
             $args[1] = sprintf('<span style="color:%s; font-weight:bold;">%s</span>', $color, $statusLabel);
             return $args;
@@ -43,7 +53,7 @@ class StudentExerciseLabelListener
         return sprintf(
             '<span style="color:#999; width:150px; display:inline-block;">[%s]</span> <span style="width:250px; display:inline-block;"><strong>%s</strong></span> — <span style="color:%s; font-weight:bold;">%s</span>',
             $objInfo->modTitle,
-            $objInfo->exTitle,
+            $title,
             $color,
             $statusLabel
         );

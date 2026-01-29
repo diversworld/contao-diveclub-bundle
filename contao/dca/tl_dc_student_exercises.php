@@ -66,7 +66,7 @@ $GLOBALS['TL_DCA']['tl_dc_student_exercises'] = [
     ],
 
     'palettes' => [
-        'default' => '{exercise_legend},exercise_id;
+        'default' => '{exercise_legend},module_id,exercise_id;
                       {result_legend},status,dateCompleted,instructor;
                       {notes_legend},notes;
                       {publish_legend},published,start,stop',
@@ -90,7 +90,7 @@ $GLOBALS['TL_DCA']['tl_dc_student_exercises'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_student_exercises']['exercise_id'],
             'inputType' => 'select',
             'foreignKey' => 'tl_dc_course_exercises.title',
-            'eval' => ['mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'],
+            'eval' => ['mandatory' => false, 'includeBlankOption' => true, 'tl_class' => 'w50'],
             'sql' => "int(10) unsigned NOT NULL default 0",
         ],
         'module_id' => [

@@ -57,6 +57,7 @@ $GLOBALS['TL_LANG']['tl_dc_config']['addSizes'] = ['Größen hinzufügen', 'Grö
 $GLOBALS['TL_LANG']['tl_dc_config']['addTypes'] = ['Typen hinzufügen', 'Typen im Template hinzufügen'];
 $GLOBALS['TL_LANG']['tl_dc_config']['addCourses'] = ['Kurse hinzufügen', 'Kurse im Template hinzufügen'];
 $GLOBALS['TL_LANG']['tl_dc_config']['addRegulators'] = ['Atemregler hinzufügen', 'Atemregler im Template hinzufügen'];
+$GLOBALS['TL_LANG']['tl_dc_config']['instructor_groups'] = ['Instruktoren-Gruppen', 'Bitte wählen Sie die Mitgliedergruppen aus, die als Instruktoren gelten.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['addReservations'] = ['Reservierungen hinzufügen', 'Das Modul Reservierungen im Backend anzeigen'];
 $GLOBALS['TL_LANG']['tl_dc_config']['addChecks'] = ['Prüfungen hinzufügen', 'Das Modul Prüfungen im Backend anzeigen'];
 $GLOBALS['TL_LANG']['tl_dc_config']['default'] = ['Default-Template', 'Eine neue Template-Konfiguration anlegen'];
