@@ -108,7 +108,7 @@ class DcCourseInsertTag implements InsertTagResolverNestedResolvedInterface
         // Handle date fields
         if (in_array($property, ['tstamp', 'dateStart', 'dateEnd', 'registered_on', 'dateOfBirth'], true)) { // Prüfe auf Datumsfelder
             if (is_numeric($value) && (int)$value > 0) {
-                $value = Date::parse(Config::get('datimFormat'), (int) $value); // Formatiere den Zeitstempel
+                $value = Date::parse(Config::get('datimFormat'), (int)$value); // Formatiere den Zeitstempel
             }
         }
 

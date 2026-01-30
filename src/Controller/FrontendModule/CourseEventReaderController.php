@@ -212,7 +212,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
                     'SELECT se.exercise_id, se.status, se.dateCompleted, se.instructor, e.title AS exercise_title, m.title AS module_title
                      FROM tl_dc_student_exercises se
                      LEFT JOIN tl_dc_course_exercises e ON e.id = se.exercise_id
-                     LEFT JOIN tl_dc_course_modules m ON m.id = se.module_id
+                     LEFT JOIN tl_dc_course_modules m ON m.id = se.pid
                      WHERE se.pid = ?
                      ORDER BY m.sorting, se.sorting',
                     [$assignmentId]
@@ -415,7 +415,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
                    ->execute(
                     (int)$currentStudentId,
                     time(),
-                    (int)($event->course_id ?: Input::post('course_id')),
+                       (int)($event->course_id ?: Input::post('course_id')),
                     (int)$event->id,
                     'registered',
                     (string)time(),
@@ -426,8 +426,8 @@ class CourseEventReaderController extends AbstractFrontendModuleController
 
                 if (!$newAssignmentId) {
                     $newAssignmentId = (int)$db->prepare("SELECT id FROM tl_dc_course_students WHERE pid=? AND event_id=? ORDER BY id DESC")
-                                         ->execute((int)$currentStudentId, (int)$event->id)
-                                         ->id;
+                        ->execute((int)$currentStudentId, (int)$event->id)
+                        ->id;
                 }
                 $logger->info('Kurs-Zuweisung erfolgreich angelegt. Neue ID: ' . $newAssignmentId);
             } catch (Exception $e) {
