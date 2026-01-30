@@ -7,6 +7,7 @@ namespace Diversworld\ContaoDiveclubBundle\EventListener\DataContainer;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\Database;
 use Contao\DataContainer;
+use Contao\Message;
 
 class StudentLoadMemberDataCallback
 {
@@ -15,6 +16,17 @@ class StudentLoadMemberDataCallback
     {
         if (!$dc->id) {
             return;
+        }
+
+        // Passwort-Anzeige aus Session (falls gerade angelegt)
+        if (isset($_SESSION['NEW_STUDENT_PASSWORD'][$dc->id])) {
+            $password = $_SESSION['NEW_STUDENT_PASSWORD'][$dc->id];
+            unset($_SESSION['NEW_STUDENT_PASSWORD'][$dc->id]);
+
+            Message::addRaw('<div class="tl_info" style="border: 2px solid #86af35; padding: 20px; font-size: 1.2em;">
+                <strong>WICHTIG: Neues Mitglied angelegt!</strong><br>
+                Das vorläufige Passwort lautet: <code style="background:#eee; padding:2px 5px; border:1px solid #ccc;">' . $password . '</code>
+            </div>');
         }
 
         $db = Database::getInstance();

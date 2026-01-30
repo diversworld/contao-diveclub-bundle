@@ -18,6 +18,7 @@ use Contao\StringUtil;
 use Contao\System;
 use Diversworld\ContaoDiveclubBundle\Model\DcCourseEventModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCourseStudentsModel;
+use Diversworld\ContaoDiveclubBundle\Model\DcDiveCourseModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcStudentsModel;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseStudentOnSubmitListener;
 use Exception;
@@ -75,9 +76,25 @@ class CourseEventReaderController extends AbstractFrontendModuleController
             'dateStart' => $event->dateStart ? Date::parse($dateFormat, (int)$event->dateStart) : '',
             'dateEnd' => $event->dateEnd ? Date::parse($dateFormat, (int)$event->dateEnd) : '',
             'price' => (string)$event->price,
-            'instructor' => (string)$event->instructor,
+            'instructor' => $this->getInstructorName((int)$event->instructor),
             'description' => (string)$event->description,
         ];
+
+        // Fallback: Wenn Titel, Preis oder Beschreibung am Event fehlen, aus Kurs-Vorlage laden
+        if ($event->course_id > 0) {
+            $course = DcDiveCourseModel::findByPk($event->course_id);
+            if (null !== $course) {
+                if ($template->event['title'] === '') {
+                    $template->event['title'] = (string)$course->title;
+                }
+                if ($template->event['price'] === '') {
+                    $template->event['price'] = (string)$course->price;
+                }
+                if ($template->event['description'] === '') {
+                    $template->event['description'] = (string)$course->description;
+                }
+            }
+        }
 
         // Request Token für Twig bereitstellen
         $template->request_token = System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue();
@@ -398,7 +415,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
                    ->execute(
                     (int)$currentStudentId,
                     time(),
-                    (int)$event->course_id ?: (int)Input::post('course_id'),
+                    (int)($event->course_id ?: Input::post('course_id')),
                     (int)$event->id,
                     'registered',
                     (string)time(),
@@ -406,6 +423,12 @@ class CourseEventReaderController extends AbstractFrontendModuleController
                 );
 
                 $newAssignmentId = (int)$db->insertId;
+
+                if (!$newAssignmentId) {
+                    $newAssignmentId = (int)$db->prepare("SELECT id FROM tl_dc_course_students WHERE pid=? AND event_id=? ORDER BY id DESC")
+                                         ->execute((int)$currentStudentId, (int)$event->id)
+                                         ->id;
+                }
                 $logger->info('Kurs-Zuweisung erfolgreich angelegt. Neue ID: ' . $newAssignmentId);
             } catch (Exception $e) {
                 System::getContainer()->get('monolog.logger.contao.general')->error('Fehler beim Anlegen der Kurs-Zuweisung: ' . $e->getMessage());
@@ -447,7 +470,8 @@ class CourseEventReaderController extends AbstractFrontendModuleController
             $listener->__invoke($dc);
 
             // Speichere die ID in der Session für Insert-Tags
-            $request->getSession()->set('last_course_order', $newAssignmentId);
+            $request->getSession()->set('last_course_order', (int)$newAssignmentId);
+            $request->getSession()->save();
 
             // Bestätigungs-Meldung setzen
             $this->addHtml5Message('Erfolgreich zur Veranstaltung angemeldet.', 'confirm');
@@ -467,6 +491,22 @@ class CourseEventReaderController extends AbstractFrontendModuleController
         }
 
         return $template->getResponse();
+    }
+
+    private function getInstructorName(int $instructorId): string
+    {
+        if ($instructorId <= 0) {
+            return '';
+        }
+
+        $db = Database::getInstance();
+        $result = $db->prepare("SELECT firstname, lastname FROM tl_member WHERE id=?")->execute($instructorId);
+
+        if ($result->numRows > 0) {
+            return $result->firstname . ' ' . $result->lastname;
+        }
+
+        return '';
     }
 
     private function addHtml5Message(string $message, string $type): void

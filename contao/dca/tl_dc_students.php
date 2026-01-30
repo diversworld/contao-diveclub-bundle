@@ -21,6 +21,9 @@ $GLOBALS['TL_DCA']['tl_dc_students'] = [
         'ctable' => ['tl_dc_course_students'],
         'enableVersioning' => true,
         'markAsCopy' => 'headline',
+        'onsubmit_callback' => [
+            [StudentSyncCallback::class, '__invoke']
+        ],
         'sql' => [
             'keys' => [
                 'id' => 'primary',

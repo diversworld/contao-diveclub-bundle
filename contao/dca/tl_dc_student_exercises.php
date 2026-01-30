@@ -14,6 +14,7 @@ use Contao\DC_Table;
 use Contao\Image;
 use Contao\Input;
 use Contao\StringUtil;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\InstructorOptionsListener;
 
 $GLOBALS['TL_DCA']['tl_dc_student_exercises'] = [
     'config' => [
@@ -116,9 +117,9 @@ $GLOBALS['TL_DCA']['tl_dc_student_exercises'] = [
         ],
         'instructor' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_student_exercises']['instructor'],
-            'inputType' => 'text',
-            'eval' => ['maxlength' => 128, 'tl_class' => 'w50'],
-            'sql' => "varchar(128) NOT NULL default ''",
+            'inputType' => 'select',
+            'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
+            'sql' => "int(10) unsigned NOT NULL default 0",
         ],
         'notes' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_student_exercises']['notes'],

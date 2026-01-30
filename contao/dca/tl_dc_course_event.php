@@ -12,8 +12,10 @@ use Contao\Database;
 use Contao\DataContainer;
 use Contao\Date;
 use Contao\DC_Table;
+use Contao\StringUtil;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseEventLabelListener;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseEventOnSubmitListener;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\InstructorOptionsListener;
 
 $GLOBALS['TL_DCA']['tl_dc_course_event'] = [
     'config' => [
@@ -116,9 +118,9 @@ $GLOBALS['TL_DCA']['tl_dc_course_event'] = [
             'sql' => "varchar(128) NOT NULL default ''",
         ],
         'instructor' => [
-            'inputType' => 'text',
-            'eval' => ['maxlength' => 128, 'tl_class' => 'w25'],
-            'sql' => "varchar(128) NOT NULL default ''",
+            'inputType' => 'select',
+            'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w25'],
+            'sql' => "int(10) unsigned NOT NULL default 0",
         ],
         'max_participants' => [
             'inputType' => 'text',
