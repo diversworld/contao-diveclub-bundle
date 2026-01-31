@@ -120,9 +120,10 @@ $GLOBALS['TL_DCA']['tl_dc_event_schedule_exercises'] = [
             'sql' => "varchar(16) NOT NULL default ''",
         ],
         'instructor' => [
-            'inputType' => 'text',
-            'eval' => ['maxlength' => 128, 'tl_class' => 'w50'],
-            'sql' => "varchar(128) NOT NULL default ''",
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_event_schedule_exercises']['instructor'],
+            'inputType' => 'select',
+            'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w25'],
+            'sql' => "int(10) unsigned NOT NULL default 0",
         ],
         'published' => [
             'toggle' => true,

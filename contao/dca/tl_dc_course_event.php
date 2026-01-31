@@ -118,6 +118,7 @@ $GLOBALS['TL_DCA']['tl_dc_course_event'] = [
             'sql' => "varchar(128) NOT NULL default ''",
         ],
         'instructor' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_event']['instructor'],
             'inputType' => 'select',
             'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w25'],
             'sql' => "int(10) unsigned NOT NULL default 0",

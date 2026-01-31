@@ -144,9 +144,9 @@ $GLOBALS['TL_DCA']['tl_dc_dive_course'] = [
         ],
         'instructor' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_dive_course']['instructor'],
-            'inputType' => 'text',
-            'eval' => ['mandatory' => true, 'maxlength' => 128, 'tl_class' => 'w33'],
-            'sql' => "varchar(128) NOT NULL default ''",
+            'inputType' => 'select',
+            'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w25'],
+            'sql' => "int(10) unsigned NOT NULL default 0",
         ],
         'max_participants' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_dive_course']['max_participants'],
