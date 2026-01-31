@@ -59,6 +59,8 @@ class CourseInstructorController extends AbstractFrontendModuleController
         $template->notFound = false;
         $template->students = array_values($students);
         $template->isInstructor = $isInstructor;
+        System::loadLanguageFile('tl_dc_student_exercises');
+        $template->statusOptions = $GLOBALS['TL_LANG']['tl_dc_student_exercises']['itemStatus'] ?? [];
         $template->request_token = System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue();
         $template->action = $request->getUri();
 
@@ -111,6 +113,7 @@ class CourseInstructorController extends AbstractFrontendModuleController
         }
 
         $db = Database::getInstance();
+        System::loadLanguageFile('tl_dc_student_exercises');
 
         foreach ($exercises as $exerciseId => $data) {
             $exerciseId = (int)$exerciseId;
@@ -136,13 +139,16 @@ class CourseInstructorController extends AbstractFrontendModuleController
                 continue;
             }
 
-            $newStatus = isset($data['status']) && $data['status'] === 'completed' ? 'completed' : 'pending';
+            $newStatus = $data['status'] ?? 'pending';
+            if (!isset($GLOBALS['TL_LANG']['tl_dc_student_exercises']['itemStatus'][$newStatus])) {
+                $newStatus = 'pending';
+            }
             $notes = $data['notes'] ?? '';
 
             $current = $db->prepare("SELECT status, dateCompleted FROM tl_dc_student_exercises WHERE id=?")->execute($exerciseId);
             $completedAt = $current->numRows > 0 ? $current->dateCompleted : '';
 
-            if ($newStatus === 'completed') {
+            if ($newStatus === 'ok') {
                 if ($completedAt === null || $completedAt === '' || $completedAt === '0') {
                     $completedAt = time();
                 }

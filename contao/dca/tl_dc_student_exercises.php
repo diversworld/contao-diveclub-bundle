@@ -15,6 +15,7 @@ use Contao\Image;
 use Contao\Input;
 use Contao\StringUtil;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\InstructorOptionsListener;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\StudentExerciseLabelListener;
 
 $GLOBALS['TL_DCA']['tl_dc_student_exercises'] = [
     'config' => [
@@ -41,6 +42,7 @@ $GLOBALS['TL_DCA']['tl_dc_student_exercises'] = [
         'label' => [
             'fields' => ['exercise_id', 'status'],
             'format' => '%s — <span style="color:#b3b3b3; padding-left:8px;">%s</span>',
+            'label_callback' => [StudentExerciseLabelListener::class, '__invoke'],
         ],
         'global_operations' => [
             'all' => [

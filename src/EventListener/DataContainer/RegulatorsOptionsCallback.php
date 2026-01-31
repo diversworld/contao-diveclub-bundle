@@ -12,7 +12,8 @@ class RegulatorsOptionsCallback
 {
     public function __construct(
         private readonly DcaTemplateHelper $templateHelper
-    ) {
+    )
+    {
     }
 
     #[AsCallback(table: 'tl_dc_regulators', target: 'fields.regModel1st.options')]

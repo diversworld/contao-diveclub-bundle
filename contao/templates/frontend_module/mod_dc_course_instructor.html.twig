@@ -70,14 +70,11 @@
                                                                         <select
                                                                             name="exercises[{{ studentEx.id }}][status]"
                                                                             class="status-select">
-                                                                            <option value="pending"
-                                                                                    {% if studentEx.status != 'completed' %}selected{% endif %}>
-                                                                                Offen
-                                                                            </option>
-                                                                            <option value="completed"
-                                                                                    {% if studentEx.status == 'completed' %}selected{% endif %}>
-                                                                                Abgeschlossen
-                                                                            </option>
+                                                                            {% for key, label in statusOptions %}
+                                                                                <option value="{{ key }}" {% if studentEx.status == key %}selected{% endif %}>
+                                                                                    {{ label }}
+                                                                                </option>
+                                                                            {% endfor %}
                                                                         </select>
                                                                     {% else %}
                                                                         <span class="text-muted">Nicht zugewiesen</span>
@@ -173,8 +170,16 @@
                     border-bottom: 1px solid #eee;
                 }
 
-                .status--completed {
-                    background-color: #f8f9fa;
+                .status--ok {
+                    background-color: #e8f5e9;
+                }
+
+                .status--repeat {
+                    background-color: #fff3e0;
+                }
+
+                .status--failed {
+                    background-color: #ffeae6;
                 }
 
                 /* Adjusted color for form mode */

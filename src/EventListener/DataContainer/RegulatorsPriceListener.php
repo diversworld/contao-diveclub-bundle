@@ -16,9 +16,9 @@ class RegulatorsPriceListener
         }
 
         // Entferne eventuell angefügte Währungszeichen und whitespace
-        $value = str_replace(['€', ' '], '', (string) $value);
+        $value = str_replace(['€', ' '], '', (string)$value);
 
         // Stelle sicher, dass es ein gültiger Dezimalwert ist
-        return round((float) $value, 2);
+        return round((float)$value, 2);
     }
 }
