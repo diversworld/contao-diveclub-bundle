@@ -3,232 +3,307 @@
 {% block content %}
     <div class="mod_dc_course_instructor">
         {% if notFound %}
-            <p class="message message--error">Keine aktiven Kurse gefunden.</p>
+            {{ block('not_found_message') }}
         {% else %}
-            <form action="{{ action }}" method="post">
-                <input type="hidden" name="FORM_SUBMIT" value="dc_course_instructor">
-                <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
-
-                {% for student in students %}
-                    <div class="student-block">
-                        <h2 class="student-name">{{ student.name }}</h2>
-                        {% if student.email %}
-                            <div class="student-email">{{ student.email }}</div>
-                        {% endif %}
-
-                        {% if student.courses is empty %}
-                            <p class="message message--info">Keine aktiven Kurszuweisungen.</p>
-                        {% else %}
-                            {% for course in student.courses %}
-                                <div class="course-block">
-                                    <h3 class="course-title">{{ course.course.title }}</h3>
-
-                                    <div class="course-meta">
-                                        {% if course.event.title %}
-                                            <div class="course-event">
-                                                <span class="label">Event:</span>
-                                                <span class="value">{{ course.event.title }}</span>
-                                                {% if course.event.dateStart or course.event.dateEnd %}
-                                                    <span class="dates">
-                                                        {% if course.event.dateStart %}{{ course.event.dateStart }}{% endif %}
-                                                        {% if course.event.dateEnd %} – {{ course.event.dateEnd }}{% endif %}
-                                                    </span>
-                                                {% endif %}
-                                            </div>
-                                        {% endif %}
-                                        {% if course.event.instructor %}
-                                            <div class="course-instructor">
-                                                Instructor: {{ course.event.instructor }}</div>
-                                        {% endif %}
-                                        <div class="course-status">Status: {{ course.status }}</div>
-                                        {% if course.registered_on %}
-                                            <div class="course-registered">Angemeldet: {{ course.registered_on }}</div>
-                                        {% endif %}
-                                    </div>
-
-                                    <div class="student-progress">
-                                        {% if course.modules is empty %}
-                                            <p class="message message--info">Keine Übungen für diesen Kurs gefunden.</p>
-                                        {% else %}
-                                            {% for module in course.modules %}
-                                                <div class="module-group">
-                                                    <h4 class="module-title">{{ module.title }}</h4>
-                                                    <table class="exercises-table">
-                                                        <thead>
-                                                        <tr>
-                                                            <th>Übung</th>
-                                                            <th>Status</th>
-                                                            <th>Bemerkung</th>
-                                                        </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                        {% for studentEx in module.exercises %}
-                                                            <tr class="exercise-row status--{{ studentEx.status|default('pending') }}">
-                                                                <td>{{ studentEx.title }}</td>
-                                                                <td>
-                                                                    {% if studentEx.id %}
-                                                                        <select
-                                                                            name="exercises[{{ studentEx.id }}][status]"
-                                                                            class="status-select">
-                                                                            {% for key, label in statusOptions %}
-                                                                                <option value="{{ key }}"
-                                                                                        {% if studentEx.status == key %}selected{% endif %}>
-                                                                                    {{ label }}
-                                                                                </option>
-                                                                            {% endfor %}
-                                                                        </select>
-                                                                    {% else %}
-                                                                        <span class="text-muted">Nicht zugewiesen</span>
-                                                                    {% endif %}
-                                                                </td>
-                                                                <td>
-                                                                    {% if studentEx.id %}
-                                                                        <textarea
-                                                                            name="exercises[{{ studentEx.id }}][notes]"
-                                                                            class="notes-field">{{ studentEx.notes }}</textarea>
-                                                                    {% endif %}
-                                                                </td>
-                                                            </tr>
-                                                        {% endfor %}
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            {% endfor %}
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        {% endif %}
-                    </div>
-                {% endfor %}
-
-                <div class="form-submit-row">
-                    <button type="submit" class="btn btn-primary">Änderungen speichern</button>
-                </div>
-            </form>
-
-            <style>
-                .student-block {
-                    border: 1px solid #ccc;
-                    margin-bottom: 2.5rem;
-                    padding: 1rem;
-                    border-radius: 8px;
-                    background: #fff;
-                }
-
-                .student-name {
-                    background: #007bff;
-                    color: #fff;
-                    padding: 0.5rem 1rem;
-                    margin: -1rem -1rem 0.75rem -1rem;
-                    border-radius: 8px 8px 0 0;
-                }
-
-                .student-email {
-                    margin: 0.5rem 0 1rem;
-                    color: #6c757d;
-                }
-
-                .course-block {
-                    margin-bottom: 2rem;
-                }
-
-                .course-title {
-                    margin-bottom: 0.25rem;
-                }
-
-                .course-meta {
-                    color: #555;
-                    margin-bottom: 1rem;
-                }
-
-                .course-meta .label {
-                    font-weight: bold;
-                }
-
-                .course-meta .dates {
-                    margin-left: 0.5rem;
-                    color: #777;
-                }
-
-                .module-group {
-                    margin-bottom: 1.5rem;
-                }
-
-                .module-title {
-                    border-bottom: 2px solid #eee;
-                    padding-bottom: 0.5rem;
-                }
-
-                .exercises-table {
-                    width: 100%;
-                    border-collapse: collapse;
-                }
-
-                .exercises-table th, .exercises-table td {
-                    padding: 8px;
-                    text-align: left;
-                    border-bottom: 1px solid #eee;
-                }
-
-                .status--ok {
-                    background-color: #e8f5e9;
-                }
-
-                .status--repeat {
-                    background-color: #fff3e0;
-                }
-
-                .status--failed {
-                    background-color: #ffeae6;
-                }
-
-                /* Adjusted color for form mode */
-                .text-muted {
-                    color: #6c757d;
-                    font-style: italic;
-                }
-
-                .notes-field {
-                    width: 100%;
-                    min-height: 40px;
-                    border: 1px solid #ccc;
-                    border-radius: 4px;
-                    padding: 4px;
-                    font-size: 0.9em;
-                    display: block;
-                }
-
-                .status-select {
-                    padding: 4px;
-                    border-radius: 4px;
-                    border: 1px solid #ccc;
-                }
-
-                .form-submit-row {
-                    position: sticky;
-                    bottom: 0;
-                    background: #fff;
-                    padding: 1rem;
-                    border-top: 2px solid #007bff;
-                    text-align: right;
-                    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-                }
-
-                .btn-primary {
-                    background: #007bff;
-                    color: #fff;
-                    border: none;
-                    padding: 10px 20px;
-                    border-radius: 4px;
-                    cursor: pointer;
-                    font-weight: bold;
-                }
-
-                .btn-primary:hover {
-                    background: #0056b3;
-                }
-            </style>
+            {{ block('instructor_form') }}
         {% endif %}
     </div>
+{% endblock %}
+
+{% block not_found_message %}
+    <p class="message message--error">Keine aktiven Kurse gefunden.</p>
+{% endblock %}
+
+{% block instructor_form %}
+    <form action="{{ action }}" method="post">
+        <input type="hidden" name="FORM_SUBMIT" value="dc_course_instructor">
+        <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
+
+        {{ block('student_list') }}
+        {{ block('form_submit') }}
+    </form>
+    {{ block('styles') }}
+{% endblock %}
+
+{% block student_list %}
+    {% for student in students %}
+        {{ block('student_item') }}
+    {% endfor %}
+{% endblock %}
+
+{% block student_item %}
+    <div class="student-block">
+        {{ block('student_header') }}
+
+        {% if student.courses is empty %}
+            {{ block('no_courses_message') }}
+        {% else %}
+            {{ block('course_list') }}
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block student_header %}
+    <h2 class="student-name">{{ student.name }}</h2>
+    {% if student.email %}
+        <div class="student-email">{{ student.email }}</div>
+    {% endif %}
+{% endblock %}
+
+{% block no_courses_message %}
+    <p class="message message--info">Keine aktiven Kurszuweisungen.</p>
+{% endblock %}
+
+{% block course_list %}
+    {% for course in student.courses %}
+        {{ block('course_item') }}
+    {% endfor %}
+{% endblock %}
+
+{% block course_item %}
+    <div class="course-block">
+        {{ block('course_header') }}
+        {{ block('course_meta') }}
+        {{ block('student_progress') }}
+    </div>
+{% endblock %}
+
+{% block course_header %}
+    <h3 class="course-title">{{ course.course.title }}</h3>
+{% endblock %}
+
+{% block course_meta %}
+    <div class="course-meta">
+        {% if course.event.title %}
+            <div class="course-event">
+                <span class="label">Event:</span>
+                <span class="value">{{ course.event.title }}</span>
+                {% if course.event.dateStart or course.event.dateEnd %}
+                    <span class="dates">
+                        {% if course.event.dateStart %}{{ course.event.dateStart }}{% endif %}
+                        {% if course.event.dateEnd %} – {{ course.event.dateEnd }}{% endif %}
+                    </span>
+                {% endif %}
+            </div>
+        {% endif %}
+        {% if course.event.instructor %}
+            <div class="course-instructor">Instructor: {{ course.event.instructor }}</div>
+        {% endif %}
+        <div class="course-status">Status: {{ course.status }}</div>
+        {% if course.registered_on %}
+            <div class="course-registered">Angemeldet: {{ course.registered_on }}</div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block student_progress %}
+    <div class="student-progress">
+        {% if course.modules is empty %}
+            {{ block('no_modules_message') }}
+        {% else %}
+            {{ block('module_list') }}
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block no_modules_message %}
+    <p class="message message--info">Keine Übungen für diesen Kurs gefunden.</p>
+{% endblock %}
+
+{% block module_list %}
+    {% for module in course.modules %}
+        {{ block('module_item') }}
+    {% endfor %}
+{% endblock %}
+
+{% block module_item %}
+    <div class="module-group">
+        {{ block('module_header') }}
+        {{ block('exercises_table') }}
+    </div>
+{% endblock %}
+
+{% block module_header %}
+    <h4 class="module-title">{{ module.title }}</h4>
+{% endblock %}
+
+{% block exercises_table %}
+    <table class="exercises-table">
+        {{ block('exercises_header') }}
+        {{ block('exercises_body') }}
+    </table>
+{% endblock %}
+
+{% block exercises_header %}
+    <thead>
+    <tr>
+        <th>Übung</th>
+        <th>Status</th>
+        <th>Bemerkung</th>
+    </tr>
+    </thead>
+{% endblock %}
+
+{% block exercises_body %}
+    <tbody>
+    {% for studentEx in module.exercises %}
+        {{ block('exercise_row') }}
+    {% endfor %}
+    </tbody>
+{% endblock %}
+
+{% block exercise_row %}
+    <tr class="exercise-row status--{{ studentEx.status|default('pending') }}">
+        <td>{{ studentEx.title }}</td>
+        <td>
+            {% if studentEx.id %}
+                <select name="exercises[{{ studentEx.id }}][status]" class="status-select">
+                    {% for key, label in statusOptions %}
+                        <option value="{{ key }}" {% if studentEx.status == key %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            {% else %}
+                <span class="text-muted">Nicht zugewiesen</span>
+            {% endif %}
+        </td>
+        <td>
+            {% if studentEx.id %}
+                <textarea name="exercises[{{ studentEx.id }}][notes]"
+                          class="notes-field">{{ studentEx.notes }}</textarea>
+            {% endif %}
+        </td>
+    </tr>
+{% endblock %}
+
+{% block form_submit %}
+    <div class="form-submit-row">
+        <button type="submit" class="btn btn-primary">Änderungen speichern</button>
+    </div>
+{% endblock %}
+
+{% block styles %}
+    <style>
+        .student-block {
+            border: 1px solid #ccc;
+            margin-bottom: 2.5rem;
+            padding: 1rem;
+            border-radius: 0px;
+            background: #fff;
+        }
+
+        .student-name {
+            background: #007bff;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            margin: -1rem -1rem 0.75rem -1rem;
+            border-radius: 0px 0px 0 0;
+        }
+
+        .student-email {
+            margin: 0.5rem 0 1rem;
+            color: #6c757d;
+        }
+
+        .course-block {
+            margin-bottom: 2rem;
+        }
+
+        .course-title {
+            margin-bottom: 0.25rem;
+        }
+
+        .course-meta {
+            color: #555;
+            margin-bottom: 1rem;
+        }
+
+        .course-meta .label {
+            font-weight: bold;
+        }
+
+        .course-meta .dates {
+            margin-left: 0.5rem;
+            color: #777;
+        }
+
+        .module-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .module-title {
+            border-bottom: 2px solid #eee;
+            padding-bottom: 0.5rem;
+        }
+
+        .exercises-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .exercises-table th, .exercises-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .status--ok {
+            background-color: #e8f5e9;
+        }
+
+        .status--repeat {
+            background-color: #fff3e0;
+        }
+
+        .status--failed {
+            background-color: #ffeae6;
+        }
+
+        /* Adjusted color for form mode */
+        .text-muted {
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .notes-field {
+            width: 100%;
+            min-height: 40px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 4px;
+            font-size: 0.9em;
+            display: block;
+        }
+
+        .status-select {
+            padding: 4px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        .form-submit-row {
+            position: sticky;
+            bottom: 0;
+            background: #fff;
+            padding: 1rem;
+            border-top: 2px solid #007bff;
+            text-align: right;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+    </style>
 {% endblock %}
