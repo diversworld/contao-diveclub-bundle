@@ -28,15 +28,16 @@ $GLOBALS['TL_LANG']['MOD']['dc_reservation_collection'] = ['Reservierungen', 'Ve
 $GLOBALS['TL_LANG']['MOD']['dc_dive_module_collection'] = ['Module', 'Verwalten der Kursmodule'];
 $GLOBALS['TL_LANG']['MOD']['dc_dive_student_collection'] = ['Tauchschüler', 'Verwalten der Tauchschüler'];
 $GLOBALS['TL_LANG']['MOD']['dc_course_event_collection'] = ['Kursveranstaltungen', 'Verwalten von Kursveranstaltungen und deren Zeitplänen'];
-$GLOBALS['TL_LANG']['MOD']['dc_course_instructor'] = ['Kursverwaltung', 'Verwaltung von Kursveranstaltungen und deren Zeitplänen durch Instruktoren'];
 
+/**
+ * Frontend modules
+ */
+$GLOBALS['TL_LANG']['FMD']['dc_course_instructor'] = ['Kursverwaltung', 'Verwaltung von Kursveranstaltungen und deren Zeitplänen durch Instruktoren'];
 $GLOBALS['TL_LANG']['FMD']['dc_manager'] = ['Tauchclubmanager', 'Module des Tauchclubmanagers'];
 $GLOBALS['TL_LANG']['FMD']['dc_listing'] = ['Angebotsdetails', 'Diveclub Manager'];
 $GLOBALS['TL_LANG']['FMD']['dc_tanks_listing'] = ['Tauchgeräte', 'Liste der erfassten Tauchgeräte'];
 $GLOBALS['TL_LANG']['FMD']['dc_equipment_listing'] = ['Ausrüstung', 'Liste der erfassten Ausrüstung'];
 $GLOBALS['TL_LANG']['FMD']['dc_booking'] = ['Ausrüstungsverleih', 'Vereinsausrüstung ausleihen.'];
-
-// Diveclub FE: Tauchschüler-Kurse
 $GLOBALS['TL_LANG']['FMD']['dc_student_courses'] = ['Meine Tauchkurse', 'Zeigt dem angemeldeten Mitglied bzw. verknüpften Tauchschüler seine Tauchkurse an.'];
 $GLOBALS['TL_LANG']['FMD']['dc_course_progress'] = ['Kursfortschritt', 'Zeigt dem angemeldeten Mitglied bzw. verknüpften Tauchschüler den Fortschritt im aktuellen Kurs an.'];
 $GLOBALS['TL_LANG']['FMD']['dc_course_events_list'] = ['Kursveranstaltungen (Liste)', 'Listet veröffentlichte Kursveranstaltungen auf und verlinkt zur Detailansicht.'];
