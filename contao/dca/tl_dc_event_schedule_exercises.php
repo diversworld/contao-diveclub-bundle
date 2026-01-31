@@ -11,6 +11,7 @@ use Contao\Backend;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\InstructorOptionsListener;
 
 $GLOBALS['TL_DCA']['tl_dc_event_schedule_exercises'] = [
     'config' => [

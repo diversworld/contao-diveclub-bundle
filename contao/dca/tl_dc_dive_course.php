@@ -21,6 +21,7 @@ use Diversworld\ContaoDiveclubBundle\DataContainer\DcDiveCourse;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseCategoryOptionsCallback;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseTypeOptionsCallback;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\DiveCourseAliasListener;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\InstructorOptionsListener;
 use Diversworld\ContaoDiveclubBundle\Model\DcDiveCourseModel;
 
 /**

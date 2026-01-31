@@ -13,6 +13,7 @@ use Contao\Database;
 use Contao\DataContainer;
 use Contao\Date;
 use Contao\DC_Table;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\InstructorOptionsListener;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ScheduleLabelListener;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ScheduleOnSubmitListener;
 

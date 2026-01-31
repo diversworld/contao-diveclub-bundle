@@ -12,6 +12,9 @@ use Contao\StringUtil;
 class InstructorOptionsListener
 {
     #[AsCallback(table: 'tl_dc_course_event', target: 'fields.instructor.options')]
+    #[AsCallback(table: 'tl_dc_course_event_schedule', target: 'fields.instructor.options')]
+    #[AsCallback(table: 'tl_dc_dive_course', target: 'fields.instructor.options')]
+    #[AsCallback(table: 'tl_dc_event_schedule_exercises', target: 'fields.instructor.options')]
     #[AsCallback(table: 'tl_dc_student_exercises', target: 'fields.instructor.options')]
     public function onGetInstructors(?DataContainer $dc = null): array
     {
