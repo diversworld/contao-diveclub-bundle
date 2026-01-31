@@ -39,6 +39,33 @@ class StudentCoursesController extends AbstractFrontendModuleController
             ];
         }
 
+        // WICHTIG: Lade die Sprachdateien explizit für das Frontend
+        System::loadLanguageFile('default');
+        System::loadLanguageFile('tl_dc_course_students');
+        System::loadLanguageFile('tl_dc_dive_course');
+
+        // Sprachtexte verfügbar machen (aus MSC)
+        $labels = $GLOBALS['TL_LANG']['MSC']['dc_student_courses'] ?? null;
+
+        if (null === $labels) {
+            System::getContainer()->get('monolog.logger.contao.general')->error('StudentCoursesController: Labels for dc_student_courses not found in $GLOBALS[\'TL_LANG\'][\'MSC\']');
+        }
+
+        $template->labels = $labels ?? [
+            'headline' => 'Meine Tauchkurse',
+            'noStudent' => 'Kein verknüpfter Tauchschüler gefunden.',
+            'noCourses' => 'Für Sie sind derzeit keine Tauchkurse gespeichert.',
+            'course' => 'Kurs',
+            'status' => 'Status',
+            'registered_on' => 'Angemeldet am',
+            'payed' => 'Bezahlt',
+            'brevet' => 'Brevet erteilt',
+            'dateBrevet' => 'Brevet am',
+            'dateStart' => 'Beginn',
+            'dateEnd' => 'Ende',
+            'view_progress' => 'Kursfortschritt anzeigen',
+        ];
+
         /** @var FrontendUser|null $user */
         $user = System::getContainer()->get('security.helper')->getUser();
 
@@ -116,10 +143,6 @@ class StudentCoursesController extends AbstractFrontendModuleController
             return Date::parse($format, $ts);
         };
 
-        // WICHTIG: Lade die Sprachdateien explizit für das Frontend
-        System::loadLanguageFile('tl_dc_course_students');
-        System::loadLanguageFile('tl_dc_dive_course');
-
         $courses = [];
         while ($assignments->next()) {
             // Werte vorformatieren gemäß Systemformaten
@@ -153,23 +176,6 @@ class StudentCoursesController extends AbstractFrontendModuleController
 
         $template->courses = $courses;
         $template->hasCourses = !empty($courses);
-
-        // Sprachtexte verfügbar machen (aus MSC)
-        $labels = $GLOBALS['TL_LANG']['MSC']['dc_student_courses'] ?? null;
-        $template->labels = $labels ?? [
-            'headline' => 'Meine Tauchkurse',
-            'noStudent' => 'Kein verknüpfter Tauchschüler gefunden.',
-            'noCourses' => 'Für Sie sind derzeit keine Tauchkurse gespeichert.',
-            'course' => 'Kurs',
-            'status' => 'Status',
-            'registered_on' => 'Angemeldet am',
-            'payed' => 'Bezahlt',
-            'brevet' => 'Brevet erteilt',
-            'dateBrevet' => 'Brevet am',
-            'dateStart' => 'Beginn',
-            'dateEnd' => 'Ende',
-            'view_progress' => 'Kursfortschritt anzeigen',
-        ];
 
         return $template->getResponse();
     }
