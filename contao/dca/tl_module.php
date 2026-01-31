@@ -85,7 +85,7 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['dc_check_confirmation'] =
     '{protected_legend:hide},protected;' .
     '{expert_legend:hide},guests,cssID';
 
-$GLOBALS['TL_DCA']['tl_module']['palettes']['dc_ccourse_instructor'] =
+$GLOBALS['TL_DCA']['tl_module']['palettes']['dc_course_instructor'] =
     '{title_legend},name,headline,type;' .
     '{config_legend},confirmation_text;' .
     '{template_legend:hide},customTpl;' .
