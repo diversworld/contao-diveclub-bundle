@@ -18,9 +18,16 @@ use Contao\System;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Controller für das Frontend-Modul "Kurslehrer-Übersicht".
+ * Ermöglicht es Ausbildern, den Fortschritt ihrer Schüler zu sehen und Übungen abzuzeichnen.
+ */
 #[AsFrontendModule('dc_course_instructor', category: 'dc_manager', template: 'frontend_module/mod_dc_course_instructor')]
 class CourseInstructorController extends AbstractFrontendModuleController
 {
+    /**
+     * Verarbeitet die Anfrage und gibt die Antwort zurück.
+     */
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         $user = System::getContainer()->get('security.helper')->getUser();
@@ -58,6 +65,9 @@ class CourseInstructorController extends AbstractFrontendModuleController
         return $template->getResponse();
     }
 
+    /**
+     * Prüft, ob der aktuelle Benutzer ein Ausbilder ist.
+     */
     private function isInstructor($user): bool
     {
         if (!$user instanceof FrontendUser) {
@@ -86,6 +96,9 @@ class CourseInstructorController extends AbstractFrontendModuleController
         return false;
     }
 
+    /**
+     * Verarbeitet das Formular-Submit zum Abzeichnen von Übungen.
+     */
     private function processForm(Request $request, FrontendUser $user): void
     {
         if ($request->request->get('FORM_SUBMIT') !== 'dc_course_instructor') {

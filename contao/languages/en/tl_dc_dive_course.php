@@ -15,48 +15,83 @@ declare(strict_types=1);
 /**
  * Legends
  */
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['first_legend'] = "Basis Einstellungen";
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['details_section'] = "Kursdetails";
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['requirenment_section'] = "Requirements";
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['image_legend'] = "Bild Einstellungen";
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['publish_legend'] = "Veröffentlichen";
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['first_legend'] = "Basic settings";
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['details_section'] = "Course details";
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['requirenment_section'] = "Requirements";
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['image_legend'] = "Image settings";
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['publish_legend'] = "Publish";
+
 /**
  * Global operations
  */
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['new'] = ["Neu", "Ein neues Element anlegen"];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['new'] = ["New", "Create a new element"];
 
 /**
  * Operations
  */
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['edit'] = "Datensatz mit ID: %s bearbeiten";
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['copy'] = "Datensatz mit ID: %s kopieren";
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['delete'] = "Datensatz mit ID: %s löschen";
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['show'] = "Datensatz mit ID: %s ansehen";
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['edit'] = "Edit record ID %s";
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['copy'] = "Copy record ID %s";
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['delete'] = "Delete record ID %s";
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['show'] = "View record ID %s";
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['modules'] = ['Module management', 'Manage course modules'];
 
 /**
  * Fields
  */
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['title'] = ["Titel", "Geben Sie den Titel ein"];
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['alias'] = ["Alias", "Geben Sie den Alias ein"];
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['category'] = ["Kategorie", "Wählen Sie die Kurskategorie aus."];
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['description'] = ["Beschreibung", "Bitte geben Sie die Kursbeschreibung an."];
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['requirements'] = ["Voraussetzungen", "Geben Sie die Voraussetzngen für die Kursteilnahme ein."];
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['addImage'] = ["Bild hinzufügen", "Hier können Sie die Bild Einstellungen aktivieren."];
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['fullsize'] = ["Textarea", "Geben Sie einen Text ein"];
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['size'] = ["Bildgröße", "Geben Sie die Bildgröße an. "];
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['floating'] = ["Anordnung", "Wo soll das Bild angezeigt werden. "];
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['overwriteMeta'] = ["Metadaten überschreiben", "Überschreiben Sie die Metadaten des Bildes."];
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['published'] = ['Veröffentlicht', 'Markieren Sie das Equipment als veröffentlicht.'];
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['start'] = ['Startdatum', 'Geben Sie ein Startdatum an.'];
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['stop'] = ['Enddatum', 'Geben Sie ein Enddatum an.'];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['title'] = ['Course title', 'Title of the dive course'];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['alias'] = ['Alias', 'The alias is a unique reference that can be called up instead of the numeric ID.'];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['instructor'] = ['Instructor', 'Responsible instructor'];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['course_type'] = ['Course type', 'Type of course (e.g. OWD, AOWD, Rescue)'];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['max_participants'] = ["Max. participants", "Maximum number of participants"];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['price'] = ['Price', 'Participation fee'];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['dateStart'] = ["Course start", "Date on which the course begins."];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['dateEnd'] = ["Course end", "Date on which the course ends."];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['category'] = ["Category", "Select the course category."];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['description'] = ["Description", "Please provide the course description."];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['requirements'] = ["Prerequisites", "Enter the prerequisites for course participation."];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['addImage'] = ["Add image", "You can activate the image settings here."];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['fullsize'] = ["Fullsize", "Open the image in fullsize."];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['size'] = ["Image size", "Enter the image size."];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['floating'] = ["Alignment", "Where should the image be displayed."];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['overwriteMeta'] = ["Overwrite metadata", "Overwrite the metadata of the image."];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['singleSRC'] = ["Source file", "Please select a file from the file manager."];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['alt'] = ["Alternative text", "Here you can enter an alternative text for the image (alt attribute)."];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['imageTitle'] = ["Image title", "Here you can enter the title of the image (title attribute)."];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['caption'] = ["Caption", "Here you can enter a caption."];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['imageUrl'] = ["Image link address", "Here you can enter a web address to which the image should be linked."];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['published'] = ['Published', 'Mark the dive course as published.'];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['start'] = ['Start date', 'Enter a start date.'];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['stop'] = ['End date', 'Enter an end date.'];
 
 /**
  * References
  */
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['firstoption'] = "Erste Option";
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['secondoption'] = "Zweite Option";
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['itemCategory'] = [
+    'basic' => 'Basic Course',
+    'specialty' => 'Specialty Courses',
+    'mixgas' => 'Mixed Gas Diving',
+    'professional' => 'Professional'
+];
+
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['itemCourseType'] = [
+    'try' => 'Try Scuba',
+    'basic' => 'GDL Pool Diver (DTSA Basic)',
+    'gdlsd' => 'GDL* Sports Diver (DTSA*)',
+    'gdlasd' => 'GDL** Advanced Sports Diver (DTSA**)',
+    'gdldl' => 'GDL*** Dive Leader (DTSA***)',
+    'gdldd' => 'GDL Deep Diver',
+    'gdlgl' => 'GDL Dive Group Leader',
+    'gdldsd' => 'GDL Dry Suit Diver',
+    'gdlnavd' => 'GDL Navigation Diver',
+    'gdlnd' => 'GDL Night Diver',
+    'gdlsard' => 'GDL Safety & Rescue Diver',
+    'gdlsrd' => 'GDL Self Rescue Diver',
+    'gdknx1' => 'GDL Basic Nitrox Diver (DTSA Nitrox*)',
+    'gdlnx2' => 'GDL Advanced Nitrox Diver (DTSA Nitrox**)',
+    'gdltb' => 'GDL Advanced Skills Diver (DTSA TEC Basic)',
+];
 
 /**
  * Buttons
  */
-$GLOBALS['TL_LANG']['tl_dc_divecourse']['customButton'] = "Custom Routine starten";
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['customButton'] = "Start custom routine";

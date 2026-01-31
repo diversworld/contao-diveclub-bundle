@@ -12,17 +12,14 @@ declare(strict_types=1);
  * @link https://github.com/diversworld/contao-diveclub-bundle
  */
 
-use Contao\Backend;
-use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
-use Contao\System;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentAliasListener;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentLabelCallback;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentManufacturerOptionsCallback;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentSizeOptionsCallback;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentSubTypeOptionsCallback;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentTypeOptionsCallback;
-use Psr\Log\LoggerInterface;
 
 /**
  * Table tl_dc_tanks
@@ -105,7 +102,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
             'inputType' => 'text',
             'eval' => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w33 clr'],
             'save_callback' => [
-                ['tl_dc_equipment', 'generateAlias']
+                [EquipmentAliasListener::class, '__invoke']
             ],
             'sql' => "varchar(255) BINARY NOT NULL default ''"
         ],
@@ -255,43 +252,3 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
         ]
     ]
 ];
-
-class tl_dc_equipment extends Backend
-{
-    public LoggerInterface $logger;
-
-    /**
-     * Auto-generate the event alias if it has not been set yet
-     *
-     * @param mixed $varValue
-     * @param DataContainer $dc
-     *
-     * @return mixed
-     *
-     * @throws Exception
-     */
-    public function generateAlias(mixed $varValue, DataContainer $dc): mixed
-    {
-        $aliasExists = static function (string $alias) use ($dc): bool {
-            $result = Database::getInstance()
-                ->prepare("SELECT id FROM tl_dc_equipment WHERE alias=? AND id!=?")
-                ->execute($alias, $dc->id);
-            return $result->numRows > 0;
-        };
-
-        // Generate the alias if there is none
-        if (!$varValue) {
-            $varValue = System::getContainer()->get('contao.slug')->generate(
-                $dc->activeRecord->title,
-                [],
-                $aliasExists
-            );
-        } elseif (preg_match('/^[1-9]\d*$/', $varValue)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
-        } elseif ($aliasExists($varValue)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
-        }
-
-        return $varValue;
-    }
-}

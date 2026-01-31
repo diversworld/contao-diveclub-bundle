@@ -111,57 +111,57 @@ $GLOBALS['TL_DCA']['tl_dc_dive_course'] = [
             'sql' => "int(10) unsigned NOT NULL default 0"
         ],
         'title' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['title'],
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_dive_course']['title'],
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'alias' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['alias'],
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_dive_course']['alias'],
             'search' => true,
             'inputType' => 'text',
             'eval' => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w33'],
             'sql' => "varchar(255) BINARY NOT NULL default ''",
         ],
         'course_type' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['course_type'],
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_dive_course']['course_type'],
             'inputType' => 'select',
             'options_callback' => [CourseTypeOptionsCallback::class, '__invoke'],
             'eval' => ['mandatory' => true, 'tl_class' => 'w33'],
             'sql' => "varchar(32) NOT NULL default ''",
         ],
         'dateStart' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['dateStart'],
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_dive_course']['dateStart'],
             'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
             'sql' => "varchar(16) NOT NULL default ''",
         ],
         'dateEnd' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['dateEnd'],
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_dive_course']['dateEnd'],
             'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
             'sql' => "varchar(16) NOT NULL default ''",
         ],
         'instructor' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['instructor'],
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_dive_course']['instructor'],
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 128, 'tl_class' => 'w33'],
             'sql' => "varchar(128) NOT NULL default ''",
         ],
         'max_participants' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['max_participants'],
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_dive_course']['max_participants'],
             'inputType' => 'text',
             'eval' => ['rgxp' => 'digit', 'tl_class' => 'w33'],
             'sql' => "smallint(5) unsigned NOT NULL default 0",
         ],
         'price' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['max_participants'],
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_dive_course']['price'],
             'inputType' => 'text',
             'eval' => ['rgxp' => 'price', 'tl_class' => 'w33'],
             'sql' => "decimal(10,2) NOT NULL default '0.00'",
         ],
         'description' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['description'],
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_dive_course']['description'],
             'inputType' => 'textarea',
             'exclude' => true,
             'search' => true,
@@ -169,7 +169,7 @@ $GLOBALS['TL_DCA']['tl_dc_dive_course'] = [
             'sql' => 'text NULL'
         ],
         'requirements' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['requirements'],
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_dive_course']['requirements'],
             'inputType' => 'textarea',
             'exclude' => true,
             'search' => true,
@@ -177,6 +177,7 @@ $GLOBALS['TL_DCA']['tl_dc_dive_course'] = [
             'sql' => 'text NULL'
         ],
         'category' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_dive_course']['category'],
             'inputType' => 'select',
             'exclude' => true,
             'search' => true,
@@ -188,38 +189,38 @@ $GLOBALS['TL_DCA']['tl_dc_dive_course'] = [
         ],
         'addImage' => [
             'inputType' => 'checkbox',
-            'label' => &$GLOBALS['TL_LANG']['tl_dc_courses']['addImage'],
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_dive_course']['addImage'],
             'eval' => ['submitOnChange' => true, 'tl_class' => 'w33 clr'],
             'sql' => ['type' => 'boolean', 'default' => false],
         ],
         'overwriteMeta' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_dc_courses']['overwriteMeta'],
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_dive_course']['overwriteMeta'],
             'inputType' => 'checkbox',
             'eval' => ['submitOnChange' => true, 'tl_class' => 'w50 clr'],
             'sql' => ['type' => 'boolean', 'default' => false],
         ],
         'singleSRC' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_dc_courses']['singleSRC'],
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_dive_course']['singleSRC'],
             'inputType' => 'fileTree',
             'eval' => ['filesOnly' => true, 'fieldType' => 'radio', 'extensions' => '%contao.image.valid_extensions%', 'mandatory' => true],
             'sql' => "binary(16) NULL"
         ],
         'alt' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_dc_courses']['alt'],
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_dive_course']['alt'],
             'search' => true,
             'inputType' => 'text',
             'eval' => ['maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''"
         ],
         'imageTitle' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_dc_courses']['imageTitle'],
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_dive_course']['imageTitle'],
             'search' => true,
             'inputType' => 'text',
             'eval' => ['maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''"
         ],
         'size' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_dc_courses']['imgSize'],
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_dive_course']['size'],
             'inputType' => 'imageSize',
             'reference' => &$GLOBALS['TL_LANG']['MSC'],
             'eval' => ['rgxp' => 'natural', 'includeBlankOption' => true, 'nospace' => true, 'helpwizard' => true, 'tl_class' => 'w50 clr'],

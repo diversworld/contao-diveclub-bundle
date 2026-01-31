@@ -12,6 +12,9 @@ use Contao\Message;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
+/**
+ * Synchronisiert Daten zwischen tl_dc_students und tl_member.
+ */
 class StudentSyncCallback
 {
     public function __construct(
@@ -20,6 +23,9 @@ class StudentSyncCallback
     {
     }
 
+    /**
+     * Wird beim Absenden des DCA-Formulars tl_dc_students aufgerufen.
+     */
     #[AsCallback(table: 'tl_dc_students', target: 'config.onsubmit')]
     public function __invoke(DataContainer $dc): void
     {

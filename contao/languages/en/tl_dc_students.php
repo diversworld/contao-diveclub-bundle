@@ -35,6 +35,6 @@ $GLOBALS['TL_LANG']['tl_dc_students']['country'] = ['Country', 'Please select th
 $GLOBALS['TL_LANG']['tl_dc_students']['language'] = ['Language', 'Please select the language.'];
 $GLOBALS['TL_LANG']['tl_dc_students']['mobile'] = ['Mobile', 'Please enter the mobile number here.'];
 
-$GLOBALS['TL_LANG']['tl_dc_students']['published'] = ['Published', 'Mark the student as published.'];
+$GLOBALS['TL_LANG']['tl_dc_students']['published'] = ['Published', 'Publish the record.'];
 $GLOBALS['TL_LANG']['tl_dc_students']['start'] = ['Start date', 'Please enter a start date.'];
 $GLOBALS['TL_LANG']['tl_dc_students']['stop'] = ['End date', 'Please enter an end date.'];

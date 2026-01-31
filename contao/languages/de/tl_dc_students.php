@@ -16,7 +16,6 @@ $GLOBALS['TL_LANG']['tl_dc_students']['show'] = ['Schülerdetails', 'Details des
 
 $GLOBALS['TL_LANG']['tl_dc_students']['memberId'] = ['Bestehendes Mitglied', 'Wählen Sie ein bestehendes Mitglied aus, um dessen Daten zu übernehmen.'];
 $GLOBALS['TL_LANG']['tl_dc_students']['firstname'] = ['Vorname', 'Vorname des Schülers'];
-$GLOBALS['TL_LANG']['tl_dc_course_modules']['alias'] = ['Alias', 'Der Alias ist eine eindeutige Referenz, die anstelle der numerischen ID aufgerufen werden kann.'];
 $GLOBALS['TL_LANG']['tl_dc_students']['lastname'] = ['Nachname', 'Nachname des Schülers'];
 $GLOBALS['TL_LANG']['tl_dc_students']['dateOfBirth'] = ['Geburtsdatum', 'Geburtsdatum des Schülers'];
 $GLOBALS['TL_LANG']['tl_dc_students']['email'] = ['E-Mail', 'E-Mail-Adresse'];
@@ -29,10 +28,10 @@ $GLOBALS['TL_LANG']['tl_dc_students']['street'] = ['Straße', 'Bitte geben Sie d
 $GLOBALS['TL_LANG']['tl_dc_students']['postal'] = ['PLZ', 'Bitte geben sie die Postleitzahl ein.'];
 $GLOBALS['TL_LANG']['tl_dc_students']['city'] = ['Wohnort', 'Bitte geben Sie den Namen des Wohnortes ein.'];
 $GLOBALS['TL_LANG']['tl_dc_students']['state'] = ['Land / Region', 'Bitte wählen Sie das Land / die Region aus.'];
-$GLOBALS['TL_LANG']['tl_dc_students']['coubtry'] = ['Staat', 'Bitt wählen sie den Staat aus.'];
+$GLOBALS['TL_LANG']['tl_dc_students']['country'] = ['Staat', 'Bitte wählen Sie den Staat aus.'];
 $GLOBALS['TL_LANG']['tl_dc_students']['language'] = ['Sprache', 'Bitte wählen Sie die Sprache.'];
 $GLOBALS['TL_LANG']['tl_dc_students']['mobile'] = ['Mobil', 'Geben sie hier die Mobilnummer ein.'];
 
-$GLOBALS['TL_LANG']['tl_dc_students']['published'] = ['Veröffentlicht', 'Markieren Sie das Equipment als veröffentlicht.'];
+$GLOBALS['TL_LANG']['tl_dc_students']['published'] = ['Veröffentlicht', 'Datensatz veröffentlichen.'];
 $GLOBALS['TL_LANG']['tl_dc_students']['start'] = ['Startdatum', 'Geben Sie ein Startdatum an.'];
 $GLOBALS['TL_LANG']['tl_dc_students']['stop'] = ['Enddatum', 'Geben Sie ein Enddatum an.'];

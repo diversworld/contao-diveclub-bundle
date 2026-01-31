@@ -21,7 +21,7 @@ $GLOBALS['TL_LANG']['tl_dc_course_students']['payed'] = ['Paid', 'The course fee
 $GLOBALS['TL_LANG']['tl_dc_course_students']['brevet'] = ['Certified', 'The certificate has been requested from the association.'];
 $GLOBALS['TL_LANG']['tl_dc_course_students']['notes'] = ['Notes', 'Notes on this course.'];
 $GLOBALS['TL_LANG']['tl_dc_course_students']['dateBrevet'] = ['Certified on', 'Certification date.'];
-$GLOBALS['TL_LANG']['tl_dc_course_students']['published'] = ['Published', 'Mark the item as published.'];
+$GLOBALS['TL_LANG']['tl_dc_course_students']['published'] = ['Published', 'Publish the course assignment.'];
 $GLOBALS['TL_LANG']['tl_dc_course_students']['start'] = ['Start date', 'Please enter a start date.'];
 $GLOBALS['TL_LANG']['tl_dc_course_students']['stop'] = ['End date', 'Please enter an end date.'];
 

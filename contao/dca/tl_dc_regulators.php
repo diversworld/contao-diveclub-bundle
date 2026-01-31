@@ -12,16 +12,13 @@ declare(strict_types=1);
  * @link https://github.com/diversworld/contao-diveclub-bundle
  */
 
-use Contao\Backend;
-use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
-use Contao\FilesModel;
-use Contao\StringUtil;
-use Contao\System;
-use Diversworld\ContaoDiveclubBundle\DataContainer\DcCheckProposal;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentManufacturerOptionsCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\RegulatorsAliasListener;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\RegulatorsLabelListener;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\RegulatorsOptionsCallback;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\RegulatorsPriceListener;
 
 /**
  * Table tl_dc_regulators
@@ -102,7 +99,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'search' => true,
             'inputType' => 'text',
             'eval' => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
-            'save_callback' => [['tl_dc_regulators', 'generateAlias']],
+            'save_callback' => [[RegulatorsAliasListener::class, '__invoke']],
             'sql' => "varchar(255) BINARY NOT NULL default ''"
         ],
         'manufacturer' => [
@@ -135,7 +132,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'search' => true,
             'filter' => true,
             'sorting' => true,
-            'options_callback' => ['tl_dc_regulators', 'getRegModels1st'],
+            'options_callback' => [RegulatorsOptionsCallback::class, 'getRegModels1st'],
             'eval' => ['submitOnChange' => true, 'includeBlankOption' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql' => "varchar(255) NOT NULL default ''"
         ],
@@ -157,7 +154,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'search' => true,
             'filter' => true,
             'sorting' => true,
-            'options_callback' => ['tl_dc_regulators', 'getRegModels2nd'],
+            'options_callback' => [RegulatorsOptionsCallback::class, 'getRegModels2ndPri'],
             'eval' => ['includeBlankOption' => true, 'submitOnChange' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql' => "varchar(255) NOT NULL default ''"
         ],
@@ -178,7 +175,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'search' => true,
             'filter' => true,
             'sorting' => true,
-            'options_callback' => ['tl_dc_regulators', 'getRegModels2nd'],
+            'options_callback' => [RegulatorsOptionsCallback::class, 'getRegModels2ndSec'],
             'eval' => ['includeBlankOption' => true, 'submitOnChange' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql' => "varchar(255) NOT NULL default ''"
         ],
@@ -201,7 +198,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'search' => false,
             'filter' => true,
             'sorting' => false,
-            'save_callback' => [['tl_dc_regulators', 'convertPrice']],
+            'save_callback' => [[RegulatorsPriceListener::class, '__invoke']],
             'eval' => ['rgxp' => 'digit', 'mandatory' => false, 'tl_class' => 'w25'], // Beachten Sie "rgxp" für Währungsangaben
             'sql' => "DECIMAL(10,2) NOT NULL default '0.00'"
         ],
@@ -241,163 +238,3 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
         ]
     ]
 ];
-
-/**
- * Provide miscellaneous methods that are used by the data configuration array.
- *
- * @property DcCheckProposal $dcCheckProposal
- *
- * @internal
- */
-class tl_dc_regulators extends Backend
-{
-    /**
-     * Auto-generate the event alias if it has not been set yet
-     *
-     * @param mixed $varValue
-     * @param DataContainer $dc
-     *
-     * @return mixed
-     *
-     * @throws Exception
-     */
-    public function generateAlias(mixed $varValue, DataContainer $dc): mixed
-    {
-        $aliasExists = static function (string $alias) use ($dc): bool {
-            $result = Database::getInstance()
-                ->prepare("SELECT id FROM tl_dc_regulators WHERE alias=? AND id!=?")
-                ->execute($alias, $dc->id);
-
-            return $result->numRows > 0;
-        };
-
-        // Generate the alias if there is none
-        if (!$varValue) {
-            $varValue = System::getContainer()->get('contao.slug')->generate(
-                $dc->activeRecord->title,
-                [],
-                $aliasExists
-            );
-        } elseif (preg_match('/^[1-9]\d*$/', $varValue)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
-        } elseif ($aliasExists($varValue)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
-        }
-
-        return $varValue;
-    }
-
-    public function getRegModels1st(DataContainer $dc): array
-    {
-        // Sicherstellen, dass ein aktiver Datensatz vorhanden ist
-        if (!$dc->activeRecord || !$dc->activeRecord->manufacturer) {
-            return [];
-        }
-
-        // Ermittle den aktuellen Typ aus dem aktiven Datensatz
-        $manufacturer = $dc->activeRecord->manufacturer; // Aktueller Hersteller
-        $models = $this->getTemplateOptions('regulatorsFile');
-
-        // Prüfen, ob der Hersteller existiert und Modelle für die erste Stufe definiert sind
-        if (!isset($models[$manufacturer]['regModel1st']) || !is_array($models[$manufacturer]['regModel1st'])) {
-            return [];
-        }
-
-        // Rückgabe der Modelle für die erste Stufe
-        return $models[$manufacturer]['regModel1st'];
-    }
-
-    private function getTemplateOptions($templateName)
-    {
-        // Templatepfad über Contao ermitteln
-        $templatePath = $this->getTemplateFromConfig($templateName);
-
-        // Überprüfen, ob die Datei existiert
-        if (!$templatePath || !file_exists($templatePath)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['templateNotFound'], $templatePath));
-        }
-
-        $options = include $templatePath;
-
-        if (!is_array($options)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['templateContent'], $options));
-        }
-
-        return $options;
-    }
-
-    function getTemplateFromConfig($templateName): string
-    {
-        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
-        $configArray = [];
-
-        // Lade die erforderlichen Felder aus der Tabelle tl_dc_config
-        $result = Database::getInstance()->execute("
-            SELECT manufacturersFile, typesFile, regulatorsFile, sizesFile
-            FROM tl_dc_config
-            LIMIT 1"
-        );
-
-        if ($result->numRows > 0) {
-            // Für jedes Feld die UUID verarbeiten
-            $files = [
-                'manufacturersFile' => $result->manufacturersFile,
-                'typesFile' => $result->typesFile,
-                'regulatorsFile' => $result->regulatorsFile,
-                'sizesFile' => $result->sizesFile,
-            ];
-
-            // UUIDs in Pfade umwandeln
-            foreach ($files as $key => $uuid) {
-                if (!empty($uuid)) {
-                    $convertedUuid = StringUtil::binToUuid($uuid);
-                    $fileModel = FilesModel::findByUuid($convertedUuid);
-
-                    if ($fileModel !== null && file_exists($rootDir . '/' . $fileModel->path)) {
-                        $configArray[$key] = $rootDir . '/' . $fileModel->path;
-                    } else {
-                        $configArray[$key] = null; // Datei nicht gefunden oder ungültige UUID
-                    }
-                } else {
-                    $configArray[$key] = null; // Leerer Wert in der DB
-                }
-            }
-        } else {
-            throw new RuntimeException('Keine Einträge in der Tabelle tl_dc_config gefunden.');
-        }
-
-        return $configArray[$templateName];
-    }
-
-    public function getRegModels2nd(DataContainer $dc): array
-    {
-        if (!$dc->activeRecord || !$dc->activeRecord->manufacturer) {
-            return [];
-        }
-
-        $manufacturer = $dc->activeRecord->manufacturer; // Aktueller Hersteller
-        $models = $this->getTemplateOptions('regulatorsFile');
-
-        // Prüfen, ob der Hersteller existiert und Modelle für die zweite Stufe definiert sind
-        if (!isset($models[$manufacturer]['regModel2nd']) || !is_array($models[$manufacturer]['regModel2nd'])) {
-            return [];
-        }
-
-        // Rückgabe der Modelle für die zweite Stufe
-        return $models[$manufacturer]['regModel2nd'];
-    }
-
-    public function convertPrice($value): float
-    {
-        // Logik für leere Eingabe
-        if (empty($value)) {
-            return 0.00;
-        }
-
-        // Entferne eventuell angefügte Währungszeichen und whitespace
-        $value = str_replace(['€', ' '], '', $value);
-
-        // Stelle sicher, dass es ein gültiger Dezimalwert ist
-        return round((float)$value, 2);
-    }
-}

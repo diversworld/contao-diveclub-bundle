@@ -139,7 +139,7 @@ $GLOBALS['TL_DCA']['tl_dc_course_students'] = [
             'sql' => "text NULL",
         ],
         'published' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_dc_courses']['published'],
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_students']['published'],
             'toggle' => true,
             'filter' => true,
             'flag' => DataContainer::SORT_INITIAL_LETTER_DESC,
@@ -148,11 +148,13 @@ $GLOBALS['TL_DCA']['tl_dc_course_students'] = [
             'sql' => ['type' => 'boolean', 'default' => false]
         ],
         'start' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_students']['start'],
             'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'clr w50 wizard'],
             'sql' => "varchar(10) NOT NULL default ''"
         ],
         'stop' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_students']['stop'],
             'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
             'sql' => "varchar(10) NOT NULL default ''"

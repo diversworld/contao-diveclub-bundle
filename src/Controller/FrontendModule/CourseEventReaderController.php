@@ -28,9 +28,16 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use function is_array;
 
+/**
+ * Controller für das Frontend-Modul "Kurs-Termin-Reader".
+ * Zeigt Details zu einem spezifischen Kurstermin an und ermöglicht die Anmeldung.
+ */
 #[AsFrontendModule('dc_course_event_reader', category: 'dc_manager', template: 'frontend_module/mod_dc_course_event_reader')]
 class CourseEventReaderController extends AbstractFrontendModuleController
 {
+    /**
+     * Verarbeitet die Anfrage und gibt die Antwort zurück.
+     */
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         $template->notFound = false;

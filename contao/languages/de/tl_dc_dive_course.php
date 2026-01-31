@@ -17,7 +17,7 @@ declare(strict_types=1);
  */
 $GLOBALS['TL_LANG']['tl_dc_dive_course']['first_legend'] = "Basis Einstellungen";
 $GLOBALS['TL_LANG']['tl_dc_dive_course']['details_section'] = "Kursdetails";
-$GLOBALS['TL_LANG']['tl_dc_dive_course']['drequirenment_section'] = "Anforderungen";
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['requirenment_section'] = "Anforderungen";
 $GLOBALS['TL_LANG']['tl_dc_dive_course']['image_legend'] = "Bild Einstellungen";
 $GLOBALS['TL_LANG']['tl_dc_dive_course']['publish_legend'] = "Veröffentlichen";
 /**
@@ -53,7 +53,12 @@ $GLOBALS['TL_LANG']['tl_dc_dive_course']['fullsize'] = ["Textarea", "Geben Sie e
 $GLOBALS['TL_LANG']['tl_dc_dive_course']['size'] = ["Bildgröße", "Geben Sie die Bildgröße an. "];
 $GLOBALS['TL_LANG']['tl_dc_dive_course']['floating'] = ["Anordnung", "Wo soll das Bild angezeigt werden. "];
 $GLOBALS['TL_LANG']['tl_dc_dive_course']['overwriteMeta'] = ["Metadaten überschreiben", "Überschreiben Sie die Metadaten des Bildes."];
-$GLOBALS['TL_LANG']['tl_dc_dive_course']['published'] = ['Veröffentlicht', 'Markieren Sie das Equipment als veröffentlicht.'];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['singleSRC'] = ["Quelldatei", "Bitte wählen Sie eine Datei aus der Dateiübersicht."];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['alt'] = ["Alternativer Text", "Hier können Sie einen alternativen Text für das Bild eingeben (alt-Attribut)."];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['imageTitle'] = ["Bildtitel", "Hier können Sie den Titel des Bildes eingeben (title-Attribut)."];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['caption'] = ["Bildunterschrift", "Hier können Sie eine Bildunterschrift eingeben."];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['imageUrl'] = ["Bildlink-Adresse", "Hier können Sie eine Web-Adresse eingeben, auf die das Bild verlinkt werden soll."];
+$GLOBALS['TL_LANG']['tl_dc_dive_course']['published'] = ['Veröffentlicht', 'Markieren Sie den Tauchkurs als veröffentlicht.'];
 $GLOBALS['TL_LANG']['tl_dc_dive_course']['start'] = ['Startdatum', 'Geben Sie ein Startdatum an.'];
 $GLOBALS['TL_LANG']['tl_dc_dive_course']['stop'] = ['Enddatum', 'Geben Sie ein Enddatum an.'];
 
