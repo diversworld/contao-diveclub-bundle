@@ -71,7 +71,8 @@
                                                                             name="exercises[{{ studentEx.id }}][status]"
                                                                             class="status-select">
                                                                             {% for key, label in statusOptions %}
-                                                                                <option value="{{ key }}" {% if studentEx.status == key %}selected{% endif %}>
+                                                                                <option value="{{ key }}"
+                                                                                        {% if studentEx.status == key %}selected{% endif %}>
                                                                                     {{ label }}
                                                                                 </option>
                                                                             {% endfor %}

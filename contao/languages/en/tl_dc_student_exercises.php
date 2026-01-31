@@ -28,7 +28,7 @@ $GLOBALS['TL_LANG']['tl_dc_student_exercises']['stop'] = ['End date', 'Please en
 
 $GLOBALS['TL_LANG']['tl_dc_student_exercises']['itemStatus'] = [
     'pending' => 'Pending',
-    'ok'      => 'Completed',
-    'repeat'  => 'Repeat',
-    'failed'  => 'Not achieved'
+    'ok' => 'Completed',
+    'repeat' => 'Repeat',
+    'failed' => 'Not achieved'
 ];
