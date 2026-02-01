@@ -16,6 +16,7 @@ use Contao\Input;
 use Contao\StringUtil;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\InstructorOptionsListener;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\StudentExerciseLabelListener;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\StudentExerciseListener;
 
 $GLOBALS['TL_DCA']['tl_dc_student_exercises'] = [
     'config' => [
@@ -55,6 +56,7 @@ $GLOBALS['TL_DCA']['tl_dc_student_exercises'] = [
             'edit',
             '!complete' => [
                 'label' => ['Übung abschließen', 'Status auf OK setzen und Datum eintragen'],
+                'button_callback' => [StudentExerciseListener::class, 'showCompleteButton'],
                 'icon' => 'ok.svg',
                 'primary' => true,
                 'showInHeader' => true
@@ -115,7 +117,7 @@ $GLOBALS['TL_DCA']['tl_dc_student_exercises'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_student_exercises']['dateCompleted'],
             'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
-            'sql' => "varchar(16) NOT NULL default ''",
+            'sql' => "int unsigned NOT NULL default 0",
         ],
         'instructor' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_student_exercises']['instructor'],
