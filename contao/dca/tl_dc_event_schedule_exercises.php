@@ -35,7 +35,7 @@ $GLOBALS['TL_DCA']['tl_dc_event_schedule_exercises'] = [
         ],
         'label' => [
             'fields' => ['title', 'exercise_id'],
-            'format' => '%s <span style="color:#b3b3b3; padding-left:8px;">[ID: %s]</span>',
+            'format' => '%s gude <span style="color:#b3b3b3; padding-left:8px;">[ID: %s]</span>',
         ],
         'global_operations' => [
             'all' => [
@@ -60,17 +60,17 @@ $GLOBALS['TL_DCA']['tl_dc_event_schedule_exercises'] = [
     ],
     'fields' => [
         'id' => [
-            'sql' => "int(10) unsigned NOT NULL auto_increment"
+            'sql' => "int unsigned NOT NULL auto_increment"
         ],
         'pid' => [
             'foreignKey' => 'tl_dc_course_event_schedule.id',
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'sorting' => [
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'tstamp' => [
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'title' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_exercises']['title'],
@@ -86,7 +86,7 @@ $GLOBALS['TL_DCA']['tl_dc_event_schedule_exercises'] = [
             'inputType' => 'select',
             'foreignKey' => 'tl_dc_course_exercises.title',
             'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
-            'sql' => "int(10) unsigned NOT NULL default 0",
+            'sql' => "int unsigned NOT NULL default 0",
         ],
         'description' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_exercises']['description'],
@@ -107,7 +107,7 @@ $GLOBALS['TL_DCA']['tl_dc_event_schedule_exercises'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_exercises']['duration'],
             'inputType' => 'text',
             'eval' => ['rgxp' => 'natural', 'tl_class' => 'w50'],
-            'sql' => "int(10) unsigned NOT NULL default 0",
+            'sql' => "int unsigned NOT NULL default 0",
         ],
         'notes' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_exercises']['notes'],
@@ -124,7 +124,7 @@ $GLOBALS['TL_DCA']['tl_dc_event_schedule_exercises'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_event_schedule_exercises']['instructor'],
             'inputType' => 'select',
             'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w25'],
-            'sql' => "int(10) unsigned NOT NULL default 0",
+            'sql' => "int unsigned NOT NULL default 0",
         ],
         'published' => [
             'toggle' => true,

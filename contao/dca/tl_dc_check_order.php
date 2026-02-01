@@ -80,18 +80,18 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
     ],
     'fields' => [
         'id' => [
-            'sql' => "int(10) unsigned NOT NULL auto_increment"
+            'sql' => "int unsigned NOT NULL auto_increment"
         ],
         'pid' => [
             'foreignKey' => 'tl_dc_check_booking.bookingNumber',
-            'sql' => "int(10) unsigned NOT NULL default 0",
+            'sql' => "int unsigned NOT NULL default 0",
             'relation' => ['type' => 'belongsTo', 'load' => 'lazy']
         ],
         'sorting' => [
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'tstamp' => [
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'bookingId' => [
             'exclude' => true,

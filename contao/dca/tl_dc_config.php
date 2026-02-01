@@ -70,10 +70,10 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
     ],
     'fields' => [ // Definition der einzelnen Datenbankfelder
         'id' => [ // ID-Feld
-            'sql' => "int(10) unsigned NOT NULL auto_increment", // SQL-Typ
+            'sql' => "int unsigned NOT NULL auto_increment", // SQL-Typ
         ],
         'tstamp' => [ // Zeitstempel-Feld
-            'sql' => "int(10) unsigned NOT NULL default 0", // SQL-Typ
+            'sql' => "int unsigned NOT NULL default 0", // SQL-Typ
         ],
         'title' => [ // Titel-Feld
             'inputType' => 'text', // Eingabetyp Text
@@ -93,7 +93,7 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
             'save_callback' => [ // Callback-Funktion vor dem Speichern
                 ['tl_dc_config', 'generateAlias'] // Generiert den Alias automatisch
             ],
-            'sql' => "varchar(255) BINARY NOT NULL default ''" // SQL-Typ
+            'sql' => "varchar(255) NOT NULL default ''" // SQL-Typ
         ],
         'addManufacturer' => [ // Checkbox zum Aktivieren von Herstellern
             'label' => &$GLOBALS['TL_LANG']['tl_dc_config']['addManufacturer'], // Label

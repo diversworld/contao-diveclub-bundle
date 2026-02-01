@@ -75,17 +75,18 @@ $GLOBALS['TL_DCA']['tl_dc_course_event'] = [
     ],
     'fields' => [
         'id' => [
-            'sql' => "int(10) unsigned NOT NULL auto_increment"
+            'sql' => "int unsigned NOT NULL auto_increment"
         ],
         'sorting' => [
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'tstamp' => [
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'title' => [
             'inputType' => 'text',
             'search' => true,
+            'filter' => true,
             'sorting' => true,
             'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''",
@@ -93,40 +94,52 @@ $GLOBALS['TL_DCA']['tl_dc_course_event'] = [
         'alias' => [
             'inputType' => 'text',
             'eval' => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
-            'sql' => "varchar(255) BINARY NOT NULL default ''",
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
         'course_id' => [
             'label' => ['Kurs‑Vorlage', 'Referenz auf tl_dc_dive_course'],
             'inputType' => 'select',
             'foreignKey' => 'tl_dc_dive_course.title',
             'eval' => ['mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w33 clr'],
-            'sql' => "int(10) unsigned NOT NULL default 0",
+            'sql' => "int unsigned NOT NULL default 0",
         ],
         'dateStart' => [
             'inputType' => 'text',
-            'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 clr wizard'],
-            'sql' => "varchar(16) NOT NULL default ''",
+            'search'    => true,
+            'filter'    => true,
+            'sorting'   => true,
+            'eval'      => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 clr wizard'],
+            'sql'       => "int unsigned NOT NULL default 0",
         ],
         'dateEnd' => [
             'inputType' => 'text',
-            'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
-            'sql' => "varchar(16) NOT NULL default ''",
+            'search'    => true,
+            'filter'    => true,
+            'sorting'   => true,
+            'eval'      => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
+            'sql'       => "int unsigned NOT NULL default 0",
         ],
         'location' => [
             'inputType' => 'text',
+            'search' => true,
+            'filter' => true,
+            'sorting' => true,
             'eval' => ['maxlength' => 128, 'tl_class' => 'w25 clr'],
             'sql' => "varchar(128) NOT NULL default ''",
         ],
         'instructor' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_event']['instructor'],
             'inputType' => 'select',
+            'search' => true,
+            'filter' => true,
+            'sorting' => true,
             'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w25'],
-            'sql' => "int(10) unsigned NOT NULL default 0",
+            'sql' => "int unsigned NOT NULL default 0",
         ],
         'max_participants' => [
             'inputType' => 'text',
             'eval' => ['rgxp' => 'natural', 'tl_class' => 'w25'],
-            'sql' => "int(10) unsigned NOT NULL default 0",
+            'sql' => "int unsigned NOT NULL default 0",
         ],
         'price' => [
             'inputType' => 'text',

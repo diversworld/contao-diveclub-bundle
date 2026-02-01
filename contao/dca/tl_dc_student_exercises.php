@@ -77,31 +77,31 @@ $GLOBALS['TL_DCA']['tl_dc_student_exercises'] = [
 
     'fields' => [
         'id' => [
-            'sql' => "int(10) unsigned NOT NULL auto_increment"
+            'sql' => "int unsigned NOT NULL auto_increment"
         ],
         'pid' => [
             'foreignKey' => 'tl_dc_course_students.id',
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'sorting' => [
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'tstamp' => [
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'exercise_id' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_student_exercises']['exercise_id'],
             'inputType' => 'select',
             'foreignKey' => 'tl_dc_course_exercises.title',
             'eval' => ['mandatory' => false, 'includeBlankOption' => true, 'tl_class' => 'w50'],
-            'sql' => "int(10) unsigned NOT NULL default 0",
+            'sql' => "int unsigned NOT NULL default 0",
         ],
         'module_id' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['title'],
             'inputType' => 'select',
             'foreignKey' => 'tl_dc_course_modules.title',
             'eval' => ['includeBlankOption' => true, 'tl_class' => 'w50', 'readonly' => true],
-            'sql' => "int(10) unsigned NOT NULL default 0",
+            'sql' => "int unsigned NOT NULL default 0",
         ],
         'status' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_student_exercises']['status'],
@@ -121,7 +121,7 @@ $GLOBALS['TL_DCA']['tl_dc_student_exercises'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_student_exercises']['instructor'],
             'inputType' => 'select',
             'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
-            'sql' => "int(10) unsigned NOT NULL default 0",
+            'sql' => "int unsigned NOT NULL default 0",
         ],
         'notes' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_student_exercises']['notes'],

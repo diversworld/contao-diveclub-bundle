@@ -82,18 +82,18 @@ $GLOBALS['TL_DCA']['tl_dc_check_booking'] = [
     ],
     'fields' => [
         'id' => [
-            'sql' => "int(10) unsigned NOT NULL auto_increment"
+            'sql' => "int unsigned NOT NULL auto_increment"
         ],
         'pid' => [
             'foreignKey' => 'tl_dc_check_proposal.title',
-            'sql' => "int(10) unsigned NOT NULL default 0",
+            'sql' => "int unsigned NOT NULL default 0",
             'relation' => ['type' => 'belongsTo', 'load' => 'lazy']
         ],
         'sorting' => [
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'tstamp' => [
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'bookingNumber' => [
             'exclude' => true,
@@ -109,7 +109,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_booking'] = [
             'flag' => DataContainer::SORT_DESC,
             'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'totalPrice' => [
             'exclude' => true,
@@ -139,7 +139,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_booking'] = [
             'inputType' => 'select',
             'options_callback' => [MemberOptionsListener::class, '__invoke'],
             'eval' => ['chosen' => true, 'includeBlankOption' => true, 'tl_class' => 'w50 clr'],
-            'sql' => "int(10) unsigned NOT NULL default 0",
+            'sql' => "int unsigned NOT NULL default 0",
             'foreignKey' => 'tl_member.id',
             'relation' => ['type' => 'hasOne', 'load' => 'lazy']
         ],

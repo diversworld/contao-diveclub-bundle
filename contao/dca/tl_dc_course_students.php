@@ -74,31 +74,31 @@ $GLOBALS['TL_DCA']['tl_dc_course_students'] = [
     ],
     'fields' => [
         'id' => [
-            'sql' => "int(10) unsigned NOT NULL auto_increment"
+            'sql' => "int unsigned NOT NULL auto_increment"
         ],
         'pid' => [
             'foreignKey' => 'tl_dc_students.lastname',
-            'sql' => "int(10) unsigned NOT NULL default 0",
+            'sql' => "int unsigned NOT NULL default 0",
         ],
         'sorting' => [
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'tstamp' => [
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'course_id' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_students']['course_id'],
             'inputType' => 'select',
             'foreignKey' => 'tl_dc_dive_course.title',
             'eval' => ['mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'w33'],
-            'sql' => "int(10) unsigned NOT NULL default 0",
+            'sql' => "int unsigned NOT NULL default 0",
         ],
         'event_id' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_students']['event_id'],
             'inputType' => 'select',
             'foreignKey' => 'tl_dc_course_event.title',
             'eval' => ['includeBlankOption' => true, 'tl_class' => 'w33'],
-            'sql' => "int(10) unsigned NOT NULL default 0",
+            'sql' => "int unsigned NOT NULL default 0",
         ],
         'status' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_students']['status'],

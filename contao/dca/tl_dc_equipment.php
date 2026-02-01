@@ -78,13 +78,13 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
     ],
     'fields' => [
         'id' => [
-            'sql' => "int(10) unsigned NOT NULL auto_increment"
+            'sql' => "int unsigned NOT NULL auto_increment"
         ],
         'pid' => [
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'tstamp' => [
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'title' => [
             'inputType' => 'text',
@@ -104,7 +104,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
             'save_callback' => [
                 [EquipmentAliasListener::class, '__invoke']
             ],
-            'sql' => "varchar(255) BINARY NOT NULL default ''"
+            'sql' => "varchar(255) NOT NULL default ''"
         ],
         'type' => [
             'inputType' => 'select',
@@ -116,7 +116,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
             'options_callback' => [EquipmentTypeOptionsCallback::class, '__invoke'],
             'flag' => DataContainer::SORT_INITIAL_LETTERS_ASC,
             'eval' => array('includeBlankOption' => true, 'submitOnChange' => true, 'mandatory' => true, 'tl_class' => 'w25 clr'),
-            'sql' => "int(10) unsigned NOT NULL default 0",
+            'sql' => "int unsigned NOT NULL default 0",
         ],
         'subType' => [
             'inputType' => 'select',
@@ -124,7 +124,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
             'exclude' => true,
             'options_callback' => [EquipmentSubTypeOptionsCallback::class, '__invoke'],
             'eval' => ['includeBlankOption' => true, 'mandatory' => true, 'tl_class' => 'w25',],
-            'sql' => "int(10) unsigned NOT NULL default 0",
+            'sql' => "int unsigned NOT NULL default 0",
         ],
         'rentalFee' => [
             'inputType' => 'text',
@@ -145,7 +145,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
             'sorting' => true,
             'options_callback' => [EquipmentManufacturerOptionsCallback::class, '__invoke'],
             'eval' => ['mandatory' => true, 'tl_class' => 'w25 clr'],
-            'sql' => "int(10) unsigned NOT NULL default 0",
+            'sql' => "int unsigned NOT NULL default 0",
         ],
         'model' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_equipment']['model'],
@@ -176,7 +176,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
             'sorting' => true,
             'options_callback' => [EquipmentSizeOptionsCallback::class, '__invoke'],
             'eval' => ['mandatory' => false, 'includeBlankOption' => true, 'tl_class' => 'w25'],
-            'sql' => "int(10) unsigned NOT NULL default 0",
+            'sql' => "int unsigned NOT NULL default 0",
         ],
         'serialNumber' => [
             'inputType' => 'text',

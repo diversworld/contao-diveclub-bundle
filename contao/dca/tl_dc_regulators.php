@@ -79,10 +79,10 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
     ],
     'fields' => [
         'id' => [
-            'sql' => "int(10) unsigned NOT NULL auto_increment"
+            'sql' => "int unsigned NOT NULL auto_increment"
         ],
         'tstamp' => [
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'title' => [
             'inputType' => 'text',
@@ -100,7 +100,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'inputType' => 'text',
             'eval' => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
             'save_callback' => [[RegulatorsAliasListener::class, '__invoke']],
-            'sql' => "varchar(255) BINARY NOT NULL default ''"
+            'sql' => "varchar(255) NOT NULL default ''"
         ],
         'manufacturer' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_regulators']['manufacturer'],

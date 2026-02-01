@@ -81,13 +81,13 @@ $GLOBALS['TL_DCA']['tl_dc_students'] = [
     ],
     'fields' => [
         'id' => [
-            'sql' => "int(10) unsigned NOT NULL auto_increment"
+            'sql' => "int unsigned NOT NULL auto_increment"
         ],
         'sorting' => [
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'tstamp' => [
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'firstname' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_students']['firstname'],
@@ -213,7 +213,7 @@ $GLOBALS['TL_DCA']['tl_dc_students'] = [
             'inputType' => 'select',
             'options_callback' => [MemberOptionsListener::class, '__invoke'],
             'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50', 'submitOnChange' => true],
-            'sql' => "int(10) unsigned NOT NULL default 0",
+            'sql' => "int unsigned NOT NULL default 0",
             'foreignKey' => 'tl_member.id',
             'relation' => ['type' => 'hasOne', 'load' => 'lazy']
         ],

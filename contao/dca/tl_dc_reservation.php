@@ -84,13 +84,13 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
     ],
     'fields' => [
         'id' => [
-            'sql' => "int(10) unsigned NOT NULL auto_increment"
+            'sql' => "int unsigned NOT NULL auto_increment"
         ],
         'tstamp' => [
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'sorting' => [
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'title' => [
             'inputType' => 'text',
@@ -109,7 +109,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'inputType' => 'text',
             'eval' => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w33'],
             'save_callback' => [[ReservationAliasListener::class, '__invoke']],
-            'sql' => "varchar(255) BINARY NOT NULL default ''"
+            'sql' => "varchar(255) NOT NULL default ''"
         ],
         'reservation_status' => [
             'inputType' => 'select',
@@ -170,7 +170,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'save_callback' => [[ReservationMemberIdCallbackListener::class, '__invoke']],
             'options_callback' => [MemberOptionsListener::class, '__invoke'],
             'eval' => array('submitOnChange' => true, 'includeBlankOption' => true, 'tl_class' => 'w25 clr'),
-            'sql' => "int(10) unsigned NOT NULL default 0", // Speichert eine ID (Int)
+            'sql' => "int unsigned NOT NULL default 0", // Speichert eine ID (Int)
             'foreignKey' => 'tl_member.id',
             'relation' => array('type' => 'hasOne', 'load' => 'lazy')
         ],
@@ -183,7 +183,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'sorting' => true,
             'options_callback' => [MemberOptionsListener::class, '__invoke'],
             'eval' => array('submitOnChange' => true, 'includeBlankOption' => true, 'tl_class' => 'w25'),
-            'sql' => "int(10) unsigned NOT NULL default 0", // Speichert eine ID (Int)
+            'sql' => "int unsigned NOT NULL default 0", // Speichert eine ID (Int)
             'foreignKey' => 'tl_member.id',
             'relation' => array('type' => 'hasOne', 'load' => 'lazy')
         ],

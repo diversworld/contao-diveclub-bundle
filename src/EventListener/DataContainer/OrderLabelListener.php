@@ -11,7 +11,7 @@ use Contao\DataContainer;
 #[AsCallback(table: 'tl_dc_check_order', target: 'list.label.label')] // Registriert die Klasse als Label-Callback für die Tabelle tl_dc_check_order
 class OrderLabelListener // Listener zur Anpassung der Label-Anzeige für Bestellpositionen
 {
-    public function __invoke(array $row, string $label, DataContainer $dc, array $args = null): array|string // Methode zur Formatierung des Labels
+    public function __invoke(array $row, string $label, DataContainer $dc, ?array $args = null): array|string // Methode zur Formatierung des Labels
     {
         if (null === $args) { // Fallback für die Standard-Anzeige (wenn keine Spalten genutzt werden)
             return sprintf(

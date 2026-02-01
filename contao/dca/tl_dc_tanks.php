@@ -84,10 +84,10 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
     ],
     'fields'            => [
         'id'                => [
-            'sql'               => "int(10) unsigned NOT NULL auto_increment"
+            'sql'               => "int unsigned NOT NULL auto_increment"
         ],
         'tstamp'            => [
-            'sql'               => "int(10) unsigned NOT NULL default 0"
+            'sql'               => "int unsigned NOT NULL default 0"
         ],
         'title'             => [
             'inputType'         => 'text',
@@ -108,7 +108,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'save_callback' => [
                 [TankAliasListener::class, '__invoke']
             ],
-            'sql'           => "varchar(255) BINARY NOT NULL default ''"
+            'sql'           => "varchar(255) NOT NULL default ''"
         ],
         'serialNumber'      => [
             'inputType'         => 'text',
@@ -178,7 +178,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
                 'submitOnChange'    => true,                       // Lade-Seite bei Änderung reload
                 'tl_class'          => 'w33 clr'                   // Layout-Klasse
             ],
-            'sql'               => "int(10) unsigned NOT NULL default 0" // Datenbankspalte
+            'sql'               => "int unsigned NOT NULL default 0" // Datenbankspalte
         ],
         'lastCheckDate'     => [
             'inputType'         => 'text',
@@ -236,7 +236,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
                 'mandatory'         => false,                                       // Nicht obligatorisch
                 'tl_class'          => 'w33 clr'                                    // Layout-Klasse
             ],
-            'sql'               => "int(10) unsigned NOT NULL default 0"            // Datenbankspalte
+            'sql'               => "int unsigned NOT NULL default 0"            // Datenbankspalte
         ],
         'status'        => [
             'inputType'         => 'select',

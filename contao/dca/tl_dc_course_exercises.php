@@ -68,17 +68,17 @@ $GLOBALS['TL_DCA']['tl_dc_course_exercises'] = [
 
     'fields' => [
         'id' => [
-            'sql' => "int(10) unsigned NOT NULL auto_increment"
+            'sql' => "int unsigned NOT NULL auto_increment"
         ],
         'pid' => [
             'foreignKey' => 'tl_dc_course_modules.title',
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'sorting' => [
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'tstamp' => [
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'title' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_exercises']['title'],
@@ -93,7 +93,7 @@ $GLOBALS['TL_DCA']['tl_dc_course_exercises'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_exercises']['alias'],
             'inputType' => 'text',
             'eval' => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
-            'sql' => "varchar(255) BINARY NOT NULL default ''",
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
         'description' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_exercises']['description'],
@@ -108,7 +108,7 @@ $GLOBALS['TL_DCA']['tl_dc_course_exercises'] = [
             'filter' => true,
             'sorting' => true,
             'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr w50'],
-            'sql' => "int(10) unsigned NOT NULL default 0",
+            'sql' => "int unsigned NOT NULL default 0",
         ],
         'required' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_exercises']['required'],
@@ -123,7 +123,7 @@ $GLOBALS['TL_DCA']['tl_dc_course_exercises'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_exercises']['duration'],
             'inputType' => 'text',
             'eval' => ['rgxp' => 'natural', 'tl_class' => 'w50'],
-            'sql' => "int(10) unsigned NOT NULL default 0",
+            'sql' => "int unsigned NOT NULL default 0",
         ],
         'notes' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_exercises']['notes'],

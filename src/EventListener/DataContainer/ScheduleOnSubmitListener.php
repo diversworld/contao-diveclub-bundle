@@ -68,7 +68,7 @@ class ScheduleOnSubmitListener
                 $exInstructor = $objScheduleEx['instructor'] ?: $instructor;
 
                 try {
-                    $this->connection->executeQuery("SELECT module_id FROM tl_dc_student_exercises LIMIT 1");
+                    $this->connection->fetchOne("SELECT module_id FROM tl_dc_student_exercises LIMIT 1");
                     $this->connection->executeStatement(
                         "UPDATE tl_dc_student_exercises SET instructor=?, dateCompleted=? WHERE pid IN (?) AND exercise_id=? AND module_id=?",
                         [$exInstructor, $exPlannedAt, $studentIds, $objScheduleEx['exercise_id'], $moduleId],
@@ -91,7 +91,7 @@ class ScheduleOnSubmitListener
 
             if (!empty($exIds)) {
                 try {
-                    $this->connection->executeQuery("SELECT module_id FROM tl_dc_student_exercises LIMIT 1");
+                    $this->connection->fetchOne("SELECT module_id FROM tl_dc_student_exercises LIMIT 1");
                     $this->connection->executeStatement(
                         "UPDATE tl_dc_student_exercises SET instructor=?, dateCompleted=? WHERE pid IN (?) AND exercise_id IN (?) AND module_id=?",
                         [$instructor, $plannedAt, $studentIds, $exIds, $moduleId],

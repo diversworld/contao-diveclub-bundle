@@ -17,7 +17,7 @@ class CourseStudentLabelCallback
     }
 
     #[AsCallback(table: 'tl_dc_course_students', target: 'list.label.label')]
-    public function __invoke(array $row, string $label, DataContainer $dc, array $args = null): array|string
+    public function __invoke(array $row, string $label, DataContainer $dc, ?array $args = null): array|string
     {
         // 1. Kurs-Titel über Doctrine DBAL abrufen
         $courseTitle = $this->connection->fetchOne(

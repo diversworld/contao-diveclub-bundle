@@ -37,15 +37,16 @@ $GLOBALS['TL_DCA']['tl_dc_course_event_schedule'] = [
     'list' => [
         'sorting' => [
             'mode' => DataContainer::MODE_PARENT,
-            'fields' => ['planned_at', 'module_id'],
-            'headerFields' => ['title', 'dateStart', 'dateEnd'],
+            'fields' => ['planned_at', 'module_id', 'instructor'],
+            'headerFields' => ['title', 'dateStart', 'dateEnd', 'instructor'],
             'flag' => DataContainer::SORT_MONTH_ASC,
             'panelLayout' => 'sort,filter;search,limit',
             'disableGrouping' => true,
         ],
         'label' => [
             'fields' => ['planned_at', 'module_id'],
-            'format' => '%s — Modul: %s',
+            'showColumns' => true,
+            //'format' => '%s',
         ],
         'global_operations' => [
             'all' => [
@@ -74,23 +75,23 @@ $GLOBALS['TL_DCA']['tl_dc_course_event_schedule'] = [
     ],
     'fields' => [
         'id' => [
-            'sql' => "int(10) unsigned NOT NULL auto_increment"
+            'sql' => "int unsigned NOT NULL auto_increment"
         ],
         'pid' => [
             'foreignKey' => 'tl_dc_course_event.title',
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'sorting' => [
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'tstamp' => [
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'module_id' => [
             'inputType' => 'select',
             'foreignKey' => 'tl_dc_course_modules.title',
             'eval' => ['mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
-            'sql' => "int(10) unsigned NOT NULL default 0",
+            'sql' => "int unsigned NOT NULL default 0",
         ],
         'planned_at' => [
             'inputType' => 'text',
@@ -106,7 +107,7 @@ $GLOBALS['TL_DCA']['tl_dc_course_event_schedule'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_event_schedule']['instructor'],
             'inputType' => 'select',
             'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w25'],
-            'sql' => "int(10) unsigned NOT NULL default 0",
+            'sql' => "int unsigned NOT NULL default 0",
         ],
         'notes' => [
             'inputType' => 'textarea',

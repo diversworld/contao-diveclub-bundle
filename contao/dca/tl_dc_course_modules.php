@@ -74,17 +74,17 @@ $GLOBALS['TL_DCA']['tl_dc_course_modules'] = [
     ],
     'fields' => [
         'id' => [
-            'sql' => "int(10) unsigned NOT NULL auto_increment",
+            'sql' => "int unsigned NOT NULL auto_increment",
         ],
         'pid' => [
             'foreignKey' => 'tl_dc_dive_course.title',
-            'sql' => "int(10) unsigned NOT NULL default 0",
+            'sql' => "int unsigned NOT NULL default 0",
         ],
         'sorting' => [
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'tstamp' => [
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'title' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['title'],
@@ -99,7 +99,7 @@ $GLOBALS['TL_DCA']['tl_dc_course_modules'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['alias'],
             'inputType' => 'text',
             'eval' => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
-            'sql' => "varchar(255) BINARY NOT NULL default ''",
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
         'shortcode' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['shortcode'],
@@ -135,7 +135,7 @@ $GLOBALS['TL_DCA']['tl_dc_course_modules'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['preModule'],
             'inputType' => 'select',
             'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w25'],
-            'sql' => "int(10) unsigned NOT NULL default 0",
+            'sql' => "int unsigned NOT NULL default 0",
         ],
         'published' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['published'],

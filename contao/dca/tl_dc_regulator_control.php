@@ -81,15 +81,15 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
     ],
     'fields' => [
         'id' => [
-            'sql' => "int(10) unsigned NOT NULL auto_increment"
+            'sql' => "int unsigned NOT NULL auto_increment"
         ],
         'pid' => [
             'foreignKey' => 'tl_dc_check_proposal.title',
-            'sql' => "int(10) unsigned NOT NULL default 0",
+            'sql' => "int unsigned NOT NULL default 0",
             'relation' => ['type' => 'belongsTo', 'load' => 'lazy'], // Typ anpassen, falls notwendig
         ],
         'tstamp' => [
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'title' => [
             'inputType' => 'text',
@@ -109,7 +109,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'save_callback' => [
                 ['tl_dc_regulator_control', 'generateAlias']
             ],
-            'sql' => "varchar(255) BINARY NOT NULL default ''",
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
         'actualCheckDate' => [
             'inputType' => 'text',

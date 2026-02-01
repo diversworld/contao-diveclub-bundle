@@ -85,17 +85,17 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
     ],
     'fields' => [
         'id' => [
-            'sql' => "int(10) unsigned NOT NULL auto_increment"
+            'sql' => "int unsigned NOT NULL auto_increment"
         ],
         'tstamp' => [
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'sorting' => [
-            'sql' => "int(10) unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'pid' => [
             'foreignKey' => 'tl_dc_reservation.title',
-            'sql' => "int(10) unsigned NOT NULL default 0",
+            'sql' => "int unsigned NOT NULL default 0",
             'relation' => ['type' => 'belongsTo', 'load' => 'lazy'],
         ],
         'item_type' => [
@@ -161,7 +161,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
                 'helpwizard' => true,
                 'tl_class' => 'w25'
             ],
-            'sql' => "int(10) unsigned NOT NULL default 0",
+            'sql' => "int unsigned NOT NULL default 0",
         ],
         'reserved_at' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_reservation_items']['reserved_at'],

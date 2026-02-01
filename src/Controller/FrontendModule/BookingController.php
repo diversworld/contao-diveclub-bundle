@@ -100,7 +100,7 @@ class BookingController extends AbstractFrontendModuleController
         $template->storedAssets = $this->loadStoredAssets($sessionData);
 
         // Member Liste an das Template übergeben
-        $memberResult = $this->db->prepare('SELECT id, firstname, lastname FROM tl_member ORDER BY lastname, firstname')->executeQuery();
+        $memberResult = $this->db->executeQuery('SELECT id, firstname, lastname FROM tl_member ORDER BY lastname, firstname');
         // Ergebnisse in ein assoziatives Array umwandeln
         $template->memberList = $memberResult->fetchAllAssociative();
 
