@@ -42,9 +42,11 @@ class StudentExerciseLabelListener
 
         if (is_array($args)) {
             $args[0] = sprintf(
-                '<span style="color:#999; width:150px; display:inline-block;">[%s]</span> <span style="width:250px; display:inline-block;"><strong>%s</strong></span>',
+                '<span style="color:#999; width:150px; display:inline-block;">[%s]</span> <span style="width:250px; display:inline-block;"><strong>%s</strong></span></span> — <span style="color:%s; font-weight:bold;">%s</span>',
                 $objInfo->modTitle,
-                $title
+                $title,
+                $color,
+                $statusLabel
             );
             $args[1] = sprintf('<span style="color:%s; font-weight:bold;">%s</span>', $color, $statusLabel);
             return $args;

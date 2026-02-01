@@ -42,7 +42,7 @@ $GLOBALS['TL_DCA']['tl_dc_student_exercises'] = [
         'label' => [
             'fields' => ['exercise_id', 'status'],
             'format' => '%s — <span style="color:#b3b3b3; padding-left:8px;">%s</span>',
-            'label_callback' => [StudentExerciseLabelListener::class, '__invoke'],
+            //'label_callback' => [StudentExerciseLabelListener::class, '__invoke'],
         ],
         'global_operations' => [
             'all' => [
