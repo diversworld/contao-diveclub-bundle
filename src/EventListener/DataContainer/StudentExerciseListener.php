@@ -21,7 +21,7 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 
 class StudentExerciseListener
 {
-    public function __construct(private readonly RequestStack $requestStack,)
+    public function __construct(private readonly RequestStack $requestStack)
     {
     }
 
@@ -29,7 +29,7 @@ class StudentExerciseListener
     public function onLoad(DataContainer $dc): void
     {
         if (Input::get('key') === 'completeExercise' && Input::get('rid')) {
-            $this->completeExercise((int) Input::get('rid'));
+            $this->completeExercise((int)Input::get('rid'));
         }
     }
 
@@ -38,8 +38,8 @@ class StudentExerciseListener
         // CSRF prüfen (Contao backend request token "rt")
         $container = System::getContainer();
         $tokenManager = $container->get('contao.csrf.token_manager');
-        $tokenId = (string) $container->getParameter('contao.csrf_token_name');
-        $rt = (string) Input::get('rt');
+        $tokenId = (string)$container->getParameter('contao.csrf_token_name');
+        $rt = (string)Input::get('rt');
 
         if ($rt === '' || !$tokenManager->isTokenValid(new CsrfToken($tokenId, $rt))) {
             throw new AccessDeniedException('Invalid request token.');
@@ -68,7 +68,7 @@ class StudentExerciseListener
     public function showCompleteButton(array $row, ?string $href, string $label, string $title, ?string $icon, string $attributes): string
     {
         if (($row['status'] ?? '') === 'ok') {
-            return Image::getHtml(str_replace('.svg', '_1.svg', (string) $icon), $label, 'class="disabled"');
+            return Image::getHtml(str_replace('.svg', '_1.svg', (string)$icon), $label, 'class="disabled"');
         }
 
         $rt = System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue();
@@ -76,13 +76,13 @@ class StudentExerciseListener
         $request = $this->requestStack->getCurrentRequest();
         if (null === $request) {
             // Fallback: alte Variante
-            $url = Backend::addToUrl('key=completeExercise&rid=' . (int) $row['id'] . '&rt=' . $rt);
+            $url = Backend::addToUrl('key=completeExercise&rid=' . (int)$row['id'] . '&rt=' . $rt);
         } else {
             // aktuelle Parameter übernehmen und dann gezielt setzen/überschreiben
             $params = $request->query->all();
             $params['key'] = 'completeExercise';
-            $params['rid'] = (int) $row['id'];
-            $params['rt']  = $rt;
+            $params['rid'] = (int)$row['id'];
+            $params['rt'] = $rt;
 
             $path = $request->getBaseUrl() . $request->getPathInfo();
             $url = $path . '?' . http_build_query($params);
@@ -93,7 +93,7 @@ class StudentExerciseListener
             $url,
             StringUtil::specialchars($title),
             $attributes,
-            Image::getHtml((string) $icon, $label)
+            Image::getHtml((string)$icon, $label)
         );
     }
 }
