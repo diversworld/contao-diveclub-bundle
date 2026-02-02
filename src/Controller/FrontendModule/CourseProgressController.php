@@ -399,13 +399,13 @@ class CourseProgressController extends AbstractFrontendModuleController
                 'SELECT s.*, m.title AS module_title
                  FROM tl_dc_course_event_schedule s
                  LEFT JOIN tl_dc_course_modules m ON m.id = s.module_id
-                 WHERE s.pid = ? AND s.published = "1"
+                 WHERE s.pid = ? AND s.published = 1
                  ORDER BY s.planned_at'
             )->execute((int)$assignmentRow['event_id']);
 
             while ($rows->next()) {
                 // Übungen für diesen Zeitplan-Eintrag holen
-                $exerciseRows = $db->prepare('SELECT title FROM tl_dc_event_schedule_exercises WHERE pid = ? AND published = "1" ORDER BY sorting')
+                $exerciseRows = $db->prepare('SELECT title FROM tl_dc_event_schedule_exercises WHERE pid = ? AND published = 1 ORDER BY sorting')
                     ->execute($rows->id);
                 $exerciseTitles = $exerciseRows->fetchEach('title');
 
