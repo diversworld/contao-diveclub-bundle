@@ -186,7 +186,7 @@ class CourseStudentOnSubmitListener
                 'exercise_id' => $exerciseId,
                 'module_id' => $moduleId,
                 'status' => 'pending',
-                'dateCompleted' => $plannedAt,
+                'dateCompleted' => (int)$plannedAt,
                 'instructor' => $instructor,
                 'published' => 1
             ];
@@ -195,8 +195,8 @@ class CourseStudentOnSubmitListener
         } else {
             // Falls er existiert, aber vielleicht das Datum noch fehlt/anders ist, synchronisieren
             $this->connection->executeStatement(
-                "UPDATE tl_dc_student_exercises SET dateCompleted=?, instructor=? WHERE id=? AND (dateCompleted='' OR dateCompleted IS NULL)",
-                [$plannedAt, $instructor, (int)$checkId]
+                "UPDATE tl_dc_student_exercises SET dateCompleted=?, instructor=? WHERE id=? AND (dateCompleted=0 OR dateCompleted='' OR dateCompleted IS NULL)",
+                [(int)$plannedAt, $instructor, (int)$checkId]
             );
         }
     }

@@ -42,8 +42,8 @@ class ScheduleOnSubmitListener
 
         // 0. Übungen im Zeitplan synchronisieren
         $this->connection->executeStatement(
-            "UPDATE tl_dc_event_schedule_exercises SET planned_at=?, instructor=? WHERE pid=? AND (planned_at='' OR planned_at IS NULL)",
-            [$plannedAt, $instructor, $scheduleId]
+            "UPDATE tl_dc_event_schedule_exercises SET planned_at=?, instructor=? WHERE pid=? AND (planned_at=0 OR planned_at='' OR planned_at IS NULL)",
+            [(int)$plannedAt, $instructor, $scheduleId]
         );
 
         // 1. Alle Zuweisungen für dieses Event finden
@@ -71,13 +71,13 @@ class ScheduleOnSubmitListener
                     $this->connection->fetchOne("SELECT module_id FROM tl_dc_student_exercises LIMIT 1");
                     $this->connection->executeStatement(
                         "UPDATE tl_dc_student_exercises SET instructor=?, dateCompleted=? WHERE pid IN (?) AND exercise_id=? AND module_id=?",
-                        [$exInstructor, $exPlannedAt, $studentIds, $objScheduleEx['exercise_id'], $moduleId],
+                        [$exInstructor, (int)$exPlannedAt, $studentIds, $objScheduleEx['exercise_id'], $moduleId],
                         [null, null, Connection::PARAM_INT_ARRAY, null, null]
                     );
                 } catch (\Exception $e) {
                     $this->connection->executeStatement(
                         "UPDATE tl_dc_student_exercises SET instructor=?, dateCompleted=? WHERE pid IN (?) AND exercise_id=?",
-                        [$exInstructor, $exPlannedAt, $studentIds, $objScheduleEx['exercise_id']],
+                        [$exInstructor, (int)$exPlannedAt, $studentIds, $objScheduleEx['exercise_id']],
                         [null, null, Connection::PARAM_INT_ARRAY, null]
                     );
                 }
@@ -94,13 +94,13 @@ class ScheduleOnSubmitListener
                     $this->connection->fetchOne("SELECT module_id FROM tl_dc_student_exercises LIMIT 1");
                     $this->connection->executeStatement(
                         "UPDATE tl_dc_student_exercises SET instructor=?, dateCompleted=? WHERE pid IN (?) AND exercise_id IN (?) AND module_id=?",
-                        [$instructor, $plannedAt, $studentIds, $exIds, $moduleId],
+                        [$instructor, (int)$plannedAt, $studentIds, $exIds, $moduleId],
                         [null, null, Connection::PARAM_INT_ARRAY, Connection::PARAM_INT_ARRAY, null]
                     );
                 } catch (\Exception $e) {
                     $this->connection->executeStatement(
                         "UPDATE tl_dc_student_exercises SET instructor=?, dateCompleted=? WHERE pid IN (?) AND exercise_id IN (?)",
-                        [$instructor, $plannedAt, $studentIds, $exIds],
+                        [$instructor, (int)$plannedAt, $studentIds, $exIds],
                         [null, null, Connection::PARAM_INT_ARRAY, Connection::PARAM_INT_ARRAY]
                     );
                 }

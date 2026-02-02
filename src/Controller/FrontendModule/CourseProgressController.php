@@ -79,7 +79,7 @@ class CourseProgressController extends AbstractFrontendModuleController
             if ($isInstructor && $exerciseId > 0) {
                 $db = Database::getInstance();
                 $db->prepare("UPDATE tl_dc_student_exercises SET status=?, dateCompleted=? WHERE id=?")
-                    ->execute($newStatus, $newStatus === 'completed' ? time() : '', $exerciseId);
+                    ->execute($newStatus, $newStatus === 'completed' ? time() : 0, $exerciseId);
 
                 return new Response(json_encode(['success' => true, 'newStatus' => $newStatus]));
             }

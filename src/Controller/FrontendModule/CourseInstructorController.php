@@ -146,14 +146,14 @@ class CourseInstructorController extends AbstractFrontendModuleController
             $notes = $data['notes'] ?? '';
 
             $current = $db->prepare("SELECT status, dateCompleted FROM tl_dc_student_exercises WHERE id=?")->execute($exerciseId);
-            $completedAt = $current->numRows > 0 ? $current->dateCompleted : '';
+            $completedAt = $current->numRows > 0 ? $current->dateCompleted : '0';
 
             if ($newStatus === 'ok') {
-                if ($completedAt === null || $completedAt === '' || $completedAt === '0') {
+                if ($completedAt === null || $completedAt === '' || $completedAt === '0' || $completedAt === 0) {
                     $completedAt = time();
                 }
             } else {
-                $completedAt = '';
+                $completedAt = 0;
             }
 
             $db->prepare("UPDATE tl_dc_student_exercises SET status=?, notes=?, dateCompleted=?, instructor=?, tstamp=? WHERE id=?")
