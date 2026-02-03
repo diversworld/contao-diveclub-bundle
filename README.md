@@ -250,26 +250,25 @@ These tags refer to the course assignment, the student, and the event, based on 
 | `{{course::status}}` | Current status of the course assignment (raw value). |
 
 ### Usage & Formatting
+
 These insert tags can be used in all Contao text fields (content elements, email subjects, confirmation texts). All code and templates are documented with inline comments to explain the purpose of each instruction.
 
 ## Frontend-Module & Templates
 
 The bundle provides various frontend modules. The presentation can be customized via Twig templates. You can find detailed documentation of the templates and their customization options in [TEMPLATES.md](TEMPLATES.md).
-
 #### Date Values
 Fields such as `bookingDate`, `dateStart`, `dateEnd`, or `registered_on` are automatically formatted based on the date format (`datimFormat`) defined in the Contao system settings.
-
 #### Standard Flags
 Since these tags utilize the modern Contao 5 system, they can be combined with standard flags:
 - `{{dc_check::totalPrice|number_format:2}}`
 - `{{course::title|strtoupper}}`
-
 ## Future Plans
 
 - Automatic notification when course status changes
 - Automatic notification when equipment checks are needed
 - Members will be able to record their own equipment.
 
+### [Weitere Informationen im WIKI](https://github.com/EckhardBecker/Diversworld_DiveClubManager/wiki)
 
 ## Donation
 
