@@ -6,9 +6,19 @@ namespace Diversworld\ContaoDiveclubBundle\EventListener\DataContainer;
 
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\DataContainer;
+use Contao\System;
+use Doctrine\DBAL\Connection;
+use Exception;
 
-class RegulatorsAliasListener extends AbstractAliasListener
+class RegulatorsAliasListener
 {
+    private Connection $db;
+
+    public function __construct(Connection $db)
+    {
+        $this->db = $db;
+    }
+
     protected function getTable(): string
     {
         return 'tl_dc_regulators';
@@ -17,6 +27,26 @@ class RegulatorsAliasListener extends AbstractAliasListener
     #[AsCallback(table: 'tl_dc_regulators', target: 'fields.alias.save')]
     public function __invoke(mixed $varValue, DataContainer $dc): mixed
     {
-        return $this->generateAlias($varValue, $dc);
+        $aliasExists = function (string $alias) use ($dc): bool {
+            return (bool)$this->db->fetchOne(
+                "SELECT id FROM tl_dc_regulators WHERE alias=? AND id!=?",
+                [$alias, $dc->id]
+            );
+        };
+
+        // Generate the alias if there is none
+        if (!$varValue) {
+            $varValue = System::getContainer()->get('contao.slug')->generate(
+                $dc->activeRecord->title,
+                [],
+                $aliasExists
+            );
+        } elseif (preg_match('/^[1-9]\d*$/', (string)$varValue)) {
+            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'] ?? 'Alias %s must not be numeric!', $varValue));
+        } elseif ($aliasExists((string)$varValue)) {
+            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'] ?? 'Alias %s already exists!', $varValue));
+        }
+
+        return $varValue;
     }
 }

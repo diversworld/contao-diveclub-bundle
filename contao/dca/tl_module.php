@@ -26,7 +26,7 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['dc_course_progress'] =
 // Liste der Kursveranstaltungen
 $GLOBALS['TL_DCA']['tl_module']['palettes']['dc_course_events_list'] =
     '{title_legend},name,headline,type;' .
-    '{config_legend},jumpTo,tankCheckJumpTo,showCourseEvents,showTankChecks;' .
+    '{config_legend},courseJumpTo,tankCheckJumpTo,showCourseEvents,showTankChecks;' .
     '{template_legend:hide},customTpl;' .
     '{protected_legend:hide},protected;' .
     '{expert_legend:hide},guests,cssID';
@@ -106,6 +106,16 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['showTankChecks'] = [
     'inputType' => 'checkbox',
     'eval'      => ['tl_class' => 'w50 m12'],
     'sql'       => "char(1) NOT NULL default ''"
+];
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['courseJumpTo'] = [
+    'label' => &$GLOBALS['TL_LANG']['tl_module']['tankCheckJumpTo'],
+    'exclude' => true,
+    'inputType' => 'pageTree',
+    'foreignKey' => 'tl_page.title',
+    'eval' => ['mandatory' => false, 'fieldType' => 'radio', 'tl_class' => 'clr'],
+    'sql' => "int unsigned NOT NULL default 0",
+    'relation' => ['type' => 'hasOne', 'load' => 'lazy']
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['tankCheckJumpTo'] = [

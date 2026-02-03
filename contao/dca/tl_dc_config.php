@@ -48,18 +48,19 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
     ],
     'palettes' => [ // Definition der Eingabemasken (Paletten)
         '__selector__' => ['addManufacturer', 'addRegulators', 'addEquipment', 'addSizes', 'addCourses', 'addReservations', 'addChecks'], // Selektoren für Subpaletten
-        'default' => '{title_legend},title,alias; // Standardpalette mit verschiedenen Legenden und Feldern
-                                {manufacturer_legend},addManufacturer;
-                                {equipment_legend},addEquipment;
-                                {sizes_legend},addSizes;
-                                {types_legend},addTypes;
-                                {course_legend},addCourses,instructor_groups;
-                                {regulator_legend},addRegulators;
-                                {invoice_legend},invoiceTemplate,invoiceText,pdfFolder;
-                                {tuv_legend},tuvListFormat,tuvListFolder;
-                                {reservation_legend},reservationMessage,reservationInfo,reservationInfoText;
-                                {conditions_legend},rentalConditions;
-                                {publish_legend},published,start,stop;'
+        // Standardpalette mit verschiedenen Legenden und Feldern
+        'default' => '{title_legend},title,alias;
+                            {manufacturer_legend},addManufacturer;
+                            {equipment_legend},addEquipment;
+                            {sizes_legend},addSizes;
+                            {types_legend},addTypes;
+                            {course_legend},addCourses,instructor_groups;
+                            {regulator_legend},addRegulators;
+                            {invoice_legend},invoiceTemplate,invoiceText,pdfFolder;
+                            {tuv_legend},tuvListFormat,tuvListFolder;
+                            {reservation_legend},reservationMessage,reservationInfo,reservationInfoText;
+                            {conditions_legend},rentalConditions;
+                            {publish_legend},published,start,stop;'
     ],
     'subpalettes' => [ // Definition der Subpaletten (eingeblendet bei Checkbox-Aktivierung)
         'addManufacturer' => 'manufacturersFile', // Erscheint wenn addManufacturer aktiv ist

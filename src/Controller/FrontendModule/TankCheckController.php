@@ -147,7 +147,17 @@ class TankCheckController extends AbstractFrontendModuleController
         $sessionTanks = $bag->get('tank_check_items', []);
 
         if ($user) {
-            $template->tanks = TankCheckHelper::getMemberTanks((int)$user->id);
+            $memberTanks = TankCheckHelper::getMemberTanks((int)$user->id);
+            $sessionTankIds = array_filter(array_column($sessionTanks, 'tankId'));
+
+            // Bereits vorgemerkte Flaschen aus der Auswahl entfernen
+            foreach ($sessionTankIds as $sid) {
+                if (isset($memberTanks[$sid])) {
+                    unset($memberTanks[$sid]);
+                }
+            }
+
+            $template->tanks = $memberTanks;
             // Tank-Daten für JS-Preisberechnung
             $db = Database::getInstance();
             $userTanks = $db->prepare("SELECT id, size FROM tl_dc_tanks WHERE owner=?")->execute($user->id)->fetchAllAssoc();
@@ -222,16 +232,32 @@ class TankCheckController extends AbstractFrontendModuleController
 
                 // 1. Vorhandene Flaschen verarbeiten
                 if (!empty($tankIds)) {
+                    $sessionTankIds = array_filter(array_column($sessionTanks, 'tankId'));
                     foreach ($tankIds as $tId) {
+                        // Prüfen, ob die Flasche bereits vorgemerkt wurde
+                        if (in_array((string)$tId, array_map('strval', $sessionTankIds), true)) {
+                            continue;
+                        }
                         $addToSession(['tankId' => $tId, 'articles' => $selectedArticles]);
                     }
                 }
 
                 // 2. Neue Flasche verarbeiten (falls Seriennummer angegeben)
                 if (!empty($tankData['serialNumber'])) {
-                    $tankData['articles'] = $selectedArticles;
-                    $tankData['tankId'] = 0; // Sicherstellen, dass tankId für Twig vorhanden ist
-                    $addToSession($tankData);
+                    // Prüfen, ob eine Flasche mit dieser Seriennummer bereits in der Session ist (für Gast-Buchungen oder neue Flaschen)
+                    $alreadyInSession = false;
+                    foreach ($sessionTanks as $st) {
+                        if (isset($st['serialNumber']) && $st['serialNumber'] === $tankData['serialNumber']) {
+                            $alreadyInSession = true;
+                            break;
+                        }
+                    }
+
+                    if (!$alreadyInSession) {
+                        $tankData['articles'] = $selectedArticles;
+                        $tankData['tankId'] = 0; // Sicherstellen, dass tankId für Twig vorhanden ist
+                        $addToSession($tankData);
+                    }
                 }
 
                 $bag->set('tank_check_items', $sessionTanks);

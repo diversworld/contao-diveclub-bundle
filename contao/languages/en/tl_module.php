@@ -29,3 +29,11 @@ $GLOBALS['TL_LANG']['tl_module']['confirmation_text'] = ['Confirmation text', 'P
 $GLOBALS['TL_LANG']['tl_module']['showCourseEvents']  = ['Show course events', 'Select this option to show course events in the list.'];
 $GLOBALS['TL_LANG']['tl_module']['showTankChecks']   = ['Show tank checks', 'Select this option to show tank checks (TÜV) in the list.'];
 $GLOBALS['TL_LANG']['tl_module']['tankCheckJumpTo']  = ['Tank check reader page', 'Please select the page on which the tank check (TÜV) module is integrated.'];
+$GLOBALS['TL_LANG']['tl_module']['courseJumpTo'] = ['Kursbestätigung-Seite', 'Wählen Sie die Seite aus, auf der die Bestätigung der Kursbuchung'];
+
+$GLOBALS['TL_LANG']['tl_module']['dc_calendar_view'] = ['Defaultview', 'Choose the default view for the course calendar.'];
+$GLOBALS['TL_LANG']['tl_module']['dc_calendar_view_options'] = [
+    'dayGridMonth' => 'Monthly',
+    'timeGridWeek' => 'Weekly',
+    'listYear' => 'Yearly (List)'
+];

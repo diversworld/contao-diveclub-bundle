@@ -192,6 +192,15 @@
 
             {{ block('member_details_wrapper') }}
 
+            {% if user %}
+                <div class="widget widget-checkbox mb-3">
+                    <div class="checkbox_item">
+                        <input type="checkbox" name="savePermanent" id="savePermanent" value="1" class="checkbox">
+                        <label for="savePermanent">{{ labels.save_tank_label }}</label>
+                    </div>
+                </div>
+            {% endif %}
+
             <div class="widget">
                 <label for="notes">{{ labels.notes_label }}:</label>
                 <textarea name="notes" id="notes" class="textarea"></textarea>
