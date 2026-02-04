@@ -250,7 +250,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
                     'module' => $se['module_title'],
                     'status' => $se['status'],
                     'status_label' => $GLOBALS['TL_LANG']['tl_dc_student_exercises']['itemStatus'][$se['status']] ?? $se['status'],
-                    'date' => $se['dateCompleted'] ? Date::parse($dateFormat, (int)$se['dateCompleted']) : '',
+                    'date' => $se['dateCompleted'] ? Date::parse($dateFormat, (int)$se['dateCompleted']) : 0,
                     'instructor' => $se['instructor']
                 ];
             }

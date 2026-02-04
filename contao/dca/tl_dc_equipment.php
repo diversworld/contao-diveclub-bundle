@@ -198,7 +198,7 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
             'filter' => true,
             'flag' => DataContainer::SORT_YEAR_DESC,
             'eval' => ['rgxp' => 'date', 'doNotCopy' => false, 'datepicker' => true, 'tl_class' => 'w25 wizard'],
-            'sql' => "bigint(20) NULL"
+            'sql' => "int unsigned NULL"
         ],
         'status' => [
             'inputType' => 'select',

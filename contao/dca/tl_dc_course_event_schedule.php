@@ -96,7 +96,7 @@ $GLOBALS['TL_DCA']['tl_dc_course_event_schedule'] = [
         'planned_at' => [
             'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
-            'sql' => "varchar(16) NOT NULL default ''",
+            'sql' => "int(10) unsigned NULL",
         ],
         'location' => [
             'inputType' => 'text',

@@ -118,7 +118,7 @@ $GLOBALS['TL_DCA']['tl_dc_event_schedule_exercises'] = [
         'planned_at' => [
             'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
-            'sql' => "varchar(16) NOT NULL default ''",
+            'sql' => "varchar(10) NOT NULL default ''",
         ],
         'instructor' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_event_schedule_exercises']['instructor'],

@@ -105,7 +105,7 @@ $GLOBALS['TL_DCA']['tl_dc_students'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_students']['dateOfBirth'],
             'inputType' => 'text',
             'eval' => array('rgxp' => 'date', 'datepicker' => true, 'feEditable' => true, 'feGroup' => 'personal', 'tl_class' => 'w25 wizard clr'),
-            'sql' => "varchar(11) NOT NULL default ''"
+            'sql' => "int unsigned NULL"
         ],
         'gender' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_students']['gender'],

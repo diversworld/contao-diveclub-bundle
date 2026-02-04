@@ -109,7 +109,7 @@ $GLOBALS['TL_DCA']['tl_dc_course_event'] = [
             'filter' => true,
             'sorting' => true,
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 clr wizard'],
-            'sql' => "int unsigned NOT NULL default 0",
+            'sql' => "int unsigned NULL",
         ],
         'dateEnd' => [
             'inputType' => 'text',
@@ -117,7 +117,7 @@ $GLOBALS['TL_DCA']['tl_dc_course_event'] = [
             'filter' => true,
             'sorting' => true,
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
-            'sql' => "int unsigned NOT NULL default 0",
+            'sql' => "int unsigned NULL",
         ],
         'location' => [
             'inputType' => 'text',

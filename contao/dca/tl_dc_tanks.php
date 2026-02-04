@@ -188,7 +188,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'filter'            => true,
             'flag'              => DataContainer::SORT_YEAR_DESC,
             'eval'              => ['submitOnChange' => true, 'rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w33 wizard'],
-            'sql'               => "bigint(20) NULL"
+            'sql'               => "int unsigned NULL"
         ],
         'nextCheckDate'     => [
             'inputType'         => 'text',
@@ -198,7 +198,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'filter'            => true,
             'flag'              => DataContainer::SORT_YEAR_DESC,
             'eval'              => ['submitOnChange' => true,'rgxp'=>'date', 'doNotCopy'=>false, 'datepicker'=>true, 'tl_class'=>'w33 wizard'],
-            'sql'               => "bigint(20) NULL"
+            'sql'               => "int unsigned NULL"
         ],
         'lastOrder'         => [
             'inputType'         => 'text',

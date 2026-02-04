@@ -19,20 +19,15 @@ class SetRegNextCheckDateCallback
         $this->logger = $logger;
     }
 
-    public function __invoke($value, DataContainer $dc)
+    public function __invoke($value, DataContainer $dc): mixed
     {
         //$this->logger = System::getContainer()->get('monolog.logger.contao.general');
         $this->logger->info('__invoke: Actual Check Date: ' . $value);
         $actualCheckDate = $value;
 
-        // Konvertiere in Unix-Timestamp, falls erforderlich
-        if (!is_numeric($value) && strtotime($value) !== false && !empty($value)) {
-            $actualCheckDate = strtotime($value);
-        }
-
         // Überprüfen, ob der Wert leer oder ungültig ist
-        if (!$actualCheckDate || !is_numeric($actualCheckDate) ) {
-            throw new \Exception('actualCheckDate is, gelle invalid: expected a Unix-Timestamp or a valid date format.');
+        if (empty($actualCheckDate) || !is_numeric($actualCheckDate) ) {
+            return $value;
         }
 
         // Erstelle ein DateTime-Objekt aus dem übergebenen Unix-Timestamp

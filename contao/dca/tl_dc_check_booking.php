@@ -109,7 +109,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_booking'] = [
             'flag' => DataContainer::SORT_DESC,
             'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
-            'sql' => "int unsigned NOT NULL default 0"
+            'sql' => "int unsigned NULL"
         ],
         'totalPrice' => [
             'exclude' => true,

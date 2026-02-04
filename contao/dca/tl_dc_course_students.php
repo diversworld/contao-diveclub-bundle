@@ -112,7 +112,7 @@ $GLOBALS['TL_DCA']['tl_dc_course_students'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_students']['registered_on'],
             'inputType' => 'text',
             'eval' => ['rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w25 wizard'],
-            'sql' => "varchar(16) NOT NULL default ''",
+            'sql' => "int unsigned NULL",
         ],
         'payed' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_students']['payed'],
@@ -130,7 +130,7 @@ $GLOBALS['TL_DCA']['tl_dc_course_students'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_students']['dateBrevet'],
             'inputType' => 'text',
             'eval' => ['rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w25 wizard'],
-            'sql' => "varchar(16) NOT NULL default ''",
+            'sql' => "int unsigned NULL",
         ],
         'notes' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_students']['notes'],

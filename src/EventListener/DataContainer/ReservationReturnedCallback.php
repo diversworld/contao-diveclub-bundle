@@ -21,7 +21,7 @@ class ReservationReturnedCallback
         $this->logger = $logger;
     }
 
-    public function __invoke($value, DataContainer $dc): string
+    public function __invoke($value, DataContainer $dc): mixed
     {
         if (!$dc->activeRecord) {
             return '-';

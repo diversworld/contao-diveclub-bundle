@@ -120,7 +120,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'flag' => DataContainer::SORT_YEAR_DESC,
             'eval' => ['submitOnChange' => true, 'rgxp' => 'date', 'doNotCopy' => false, 'datepicker' => true, 'tl_class' => 'w25 wizard'],
             'onsubmit_callback' => [SetRegNextCheckDateCallback::class, '__invoke'],
-            'sql' => "bigint(20) NULL"
+            'sql' => "int unsigned NULL"
         ],
         'price' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['articlePriceNetto'],
@@ -136,7 +136,7 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'filter' => true,
             'flag' => DataContainer::SORT_YEAR_DESC,
             'eval' => ['submitOnChange' => true, 'rgxp' => 'date', 'doNotCopy' => false, 'datepicker' => true, 'tl_class' => 'w25 wizard'],
-            'sql' => "bigint(20) NULL"
+            'sql' => "int unsigned NULL"
         ],
         'midPressurePre30' => [
             'inputType' => 'text',

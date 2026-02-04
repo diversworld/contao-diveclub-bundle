@@ -135,13 +135,13 @@ $GLOBALS['TL_DCA']['tl_dc_dive_course'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_dive_course']['dateStart'],
             'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
-            'sql' => "varchar(16) NOT NULL default ''",
+            'sql' => "int unsigned NULL",
         ],
         'dateEnd' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_dive_course']['dateEnd'],
             'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
-            'sql' => "varchar(16) NOT NULL default ''",
+            'sql' => "int unsigned NULL",
         ],
         'instructor' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_dive_course']['instructor'],

@@ -19,6 +19,7 @@ use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
 use Diversworld\ContaoDiveclubBundle\DataContainer\DcReservation;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationLabelCallback;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationMemberIdCallbackListener;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationPickedUpCallback;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationReturnedCallback;
@@ -55,6 +56,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'fields' => ['title', 'member_id', 'reservedFor', 'reservation_status', 'reserved_at', 'rentalFee'],
             'format' => '%s - %s/%s - %s %s - (%s)',
             'showColumns' => true,
+            'label_callback' => [ReservationLabelCallback::class, '__invoke'],
         ],
         'global_operations' => [
             'all' => [
@@ -135,21 +137,21 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_reservation']['reserved_at'],
             'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 clr wizard'],
-            'sql' => "varchar(10) NOT NULL default ''"
+            'sql' => "int(10) unsigned NULL"
         ],
         'picked_up_at' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_reservation']['picked_up_at'],
             'inputType' => 'text',
             'save_callback' => [[ReservationPickedUpCallback::class, '__invoke']],
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
-            'sql' => "varchar(10) NOT NULL default ''"
+            'sql' => "int(10) unsigned NULL"
         ],
         'returned_at' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_reservation']['returned_at'],
             'inputType' => 'text',
             'save_callback' => [[ReservationReturnedCallback::class, '__invoke']],
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
-            'sql' => "varchar(10) NOT NULL default ''"
+            'sql' => "int(10) unsigned NULL"
         ],
         'rejected_reason' => [
             'inputType' => 'textarea',
