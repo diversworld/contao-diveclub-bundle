@@ -26,7 +26,7 @@ class SetRegNextCheckDateCallback
         $actualCheckDate = $value;
 
         // Überprüfen, ob der Wert leer oder ungültig ist
-        if (empty($actualCheckDate) || !is_numeric($actualCheckDate) ) {
+        if (empty($actualCheckDate) || !is_numeric($actualCheckDate)) {
             return $value;
         }
 

@@ -1,12 +1,16 @@
 # Twig-Templates und Anpassungsmöglichkeiten
 
-Das `ContaoDiveclubBundle` nutzt moderne Contao 5 Twig-Templates. Die Darstellung der Frontend-Module kann flexibel über Twig-Template-Vererbung angepasst werden.
+Das `ContaoDiveclubBundle` nutzt moderne Contao 5 Twig-Templates. Die Darstellung der Frontend-Module kann flexibel über
+Twig-Template-Vererbung angepasst werden.
 
 ## Allgemeine Anpassung via Vererbung
 
-Um ein Template anzupassen, erstellen Sie eine neue Datei im Contao-Verzeichnis `templates/` (z. B. `mod_dc_course_events_list_custom.html.twig`) und erben Sie vom Original-Template. Dank der flachen Block-Struktur können Sie gezielt einzelne Bereiche überschreiben.
+Um ein Template anzupassen, erstellen Sie eine neue Datei im Contao-Verzeichnis `templates/` (z. B.
+`mod_dc_course_events_list_custom.html.twig`) und erben Sie vom Original-Template. Dank der flachen Block-Struktur
+können Sie gezielt einzelne Bereiche überschreiben.
 
 **Beispiel:**
+
 ```twig
 {% extends "@Contao/frontend_module/mod_dc_course_events_list" %}
 
@@ -20,9 +24,11 @@ Um ein Template anzupassen, erstellen Sie eine neue Datei im Contao-Verzeichnis 
 ## Übersicht der Templates
 
 ### Kurs-Event-Liste (`dc_course_events_list`)
+
 Zeigt eine Übersicht aller veröffentlichten Kurs-Events an.
 
 **Template:** `mod_dc_course_events_list.html.twig`
+
 ```twig
 {% block content %}
     {% set container_attributes = attrs().addClass('dc-events-list').mergeWith(container_attributes|default) %}
@@ -36,7 +42,9 @@ Zeigt eine Übersicht aller veröffentlichten Kurs-Events an.
     </div>
 {% endblock %}
 ```
+
 **Verfügbare Variablen:**
+
 - `events`: Array der anzuzeigenden Events. Jedes Element enthält:
     - `id`: Interne ID.
     - `title`: Titel des Events.
@@ -53,6 +61,7 @@ Zeigt eine Übersicht aller veröffentlichten Kurs-Events an.
 - `hasJumpTo`: Boolean, ob eine Reader-Seite konfiguriert wurde.
 
 **Wichtige Blöcke:**
+
 - `events_list`: Container für die Liste.
 - `event_item`: Ein einzelner Listeneintrag.
 - `event_title`: Der Titel des Events.
@@ -63,6 +72,7 @@ Zeigt eine Übersicht aller veröffentlichten Kurs-Events an.
 ---
 
 ### Kurs-Event-Reader (`dc_course_event_reader`)
+
 Zeigt die Details eines einzelnen Kurs-Events inklusive Zeitplan und Anmeldeformular.
 
 **Template:** `mod_dc_course_event_reader.html.twig`
@@ -84,7 +94,9 @@ Zeigt die Details eines einzelnen Kurs-Events inklusive Zeitplan und Anmeldeform
     </div>
 {% endblock %}
 ```
+
 **Verfügbare Variablen:**
+
 - `event`: Objekt/Array mit den Details des Events:
     - `title`, `description`, `dateStart`, `dateEnd`, `price`, `instructor`.
 - `schedule`: Array mit den Terminen des Zeitplans:
@@ -97,6 +109,7 @@ Zeigt die Details eines einzelnen Kurs-Events inklusive Zeitplan und Anmeldeform
 - `request_token`: CSRF-Token für das Formular.
 
 **Wichtige Blöcke:**
+
 - `event_title`: Titel des Events.
 - `event_details`: Basisinfos (Start, Ende, Preis, Kursleiter).
 - `event_description`: Ausführliche Beschreibung.
@@ -109,9 +122,11 @@ Zeigt die Details eines einzelnen Kurs-Events inklusive Zeitplan und Anmeldeform
 ---
 
 ### Kurs-Zeitplan / Kalender (`dc_course_event_calendar`)
+
 Stellt die Termine eines Events in einer Kalenderansicht dar.
 
 **Template:** `mod_dc_course_event_calendar.html.twig`
+
 ```twig
 {% block content %}
     {% set container_attributes = attrs().addClass('dc-course-calendar').mergeWith(container_attributes|default) %}
@@ -127,7 +142,9 @@ Stellt die Termine eines Events in einer Kalenderansicht dar.
     </div>
 {% endblock %}
 ```
+
 **Verfügbare Variablen:**
+
 - `weeks`: Array der Wochen, die wiederum Arrays der Tage enthalten:
     - `label`: Tag des Monats.
     - `events`: Array der Termine an diesem Tag (`title`, `time`, `location`, `instructor`, `notes`).
@@ -138,6 +155,7 @@ Stellt die Termine eines Events in einer Kalenderansicht dar.
 - `hasEvents`: Boolean, ob Termine vorhanden sind.
 
 **Wichtige Blöcke:**
+
 - `calendar_table`: Der Tabellencontainer.
 - `calendar_nav`: Vor/Zurück Navigation.
 - `calendar_day_labels`: Wochentagsnamen.
@@ -147,9 +165,11 @@ Stellt die Termine eines Events in einer Kalenderansicht dar.
 ---
 
 ### Flaschen-Check / TÜV (`dc_tank_check`)
+
 Ermöglicht Mitgliedern und Gästen die Anmeldung von Tauchflaschen für eine TÜV-Prüfung.
 
 **Template:** `mod_dc_tank_check.html.twig`
+
 ```twig
 {% block content %}
     {% if success %}
@@ -161,7 +181,9 @@ Ermöglicht Mitgliedern und Gästen die Anmeldung von Tauchflaschen für eine T�
     {% endif %}
 {% endblock %}
 ```
+
 **Verfügbare Variablen:**
+
 - `proposals`: Liste verfügbarer TÜV-Termine (für die Listenansicht).
 - `isBooking`: Boolean, ob gerade eine Buchung durchgeführt wird.
 - `proposal`: Das aktuell gewählte TÜV-Angebot.
@@ -172,6 +194,7 @@ Ermöglicht Mitgliedern und Gästen die Anmeldung von Tauchflaschen für eine T�
 - `success`: Boolean, ob die Buchung erfolgreich abgeschlossen wurde.
 
 **Wichtige Blöcke:**
+
 - `proposal_list`: Liste der verfügbaren TÜV-Termine.
 - `booking_view`: Die Ansicht während des Buchungsvorgangs.
 - `form_add_tank`: Formular zum Hinzufügen einer Flasche.
@@ -182,9 +205,11 @@ Ermöglicht Mitgliedern und Gästen die Anmeldung von Tauchflaschen für eine T�
 ---
 
 ### Kurs-Fortschritt (`dc_course_progress`)
+
 Zeigt den aktuellen Ausbildungsstand eines Tauchschülers an.
 
 **Template:** `mod_dc_course_progress.html.twig`
+
 ```twig
 {% block content %}
     {% set container_attributes = attrs().addClass('mod_dc_course_progress').mergeWith(container_attributes|default) %}
@@ -202,7 +227,9 @@ Zeigt den aktuellen Ausbildungsstand eines Tauchschülers an.
     </div>
 {% endblock %}
 ```
+
 **Verfügbare Variablen:**
+
 - `assignment`: Infos zur Kurszuordnung (`id`, `status`, `course_title`).
 - `exercises`: Liste der Übungen:
     - `title`, `module`, `status`, `status_label`, `instructor`, `dateCompleted`.
@@ -210,6 +237,7 @@ Zeigt den aktuellen Ausbildungsstand eines Tauchschülers an.
 - `labels`: Übersetzungen für die Ansicht.
 
 **Wichtige Blöcke:**
+
 - `course_info`: Infos zum gewählten Kurs.
 - `progress_summary`: Zusammenfassung der erledigten Übungen.
 - `modules_list`: Liste der Kursmodule.
@@ -220,8 +248,11 @@ Zeigt den aktuellen Ausbildungsstand eines Tauchschülers an.
 ### Weitere Templates
 
 #### Buchungsübersicht (`dc_booking`)
+
 **Template:** `mod_dc_booking.html.twig`
+
 - `items`: Liste der Buchungen.
+
 ```twig
 {% block content %}
   {% set assets = assets ?? [] %} {# Standardwert setzen, falls assets nicht existiert #}
@@ -234,26 +265,39 @@ Zeigt den aktuellen Ausbildungsstand eines Tauchschülers an.
 ```
 
 #### Ausrüstungs-Auflistung (`dc_equipment_listing`)
+
 **Template:** `mod_dc_equipment_listing.html.twig`
+
 - `data`: Array mit Ausrüstungstypen (`id`, `title`, `type`).
 
 #### Vereinsflaschen (`dc_tanks_listing`)
+
 **Template:** `mod_dc_tanks_listing.html.twig`
+
 - `tanks`: Array mit Flaschendaten (Seriennummer, Größe, TÜV-Datum etc.).
 
 #### Kursübersicht Schüler (`dc_student_courses`)
+
 **Template:** `mod_dc_student_courses.html.twig`
+
 - `courses`: Liste der Kurse eines Schülers.
 
 #### Allgemeine Auflistung (`dc_listing`)
+
 **Template:** `mod_dc_listing.html.twig`
+
 - `event`, `proposal`, `articles`: Verknüpfte Daten eines Events.
 
 ---
 
 ## Best Practices für Anpassungen
 
-1. **Nicht das Original ändern:** Ändern Sie niemals Dateien direkt im `vendor/`-Verzeichnis oder im Bundle-Ordner selbst (außer Sie entwickeln das Bundle). Nutzen Sie immer das Contao `templates/`-Verzeichnis.
-2. **Dateinamen:** Wenn Sie ein Template für alle Instanzen eines Moduls ändern wollen, nutzen Sie den gleichen Namen (z. B. `mod_dc_course_events_list.html.twig`). Wenn Sie eine Variante erstellen wollen, hängen Sie ein Suffix an (z. B. `_custom`) und wählen Sie dieses im Contao-Backend beim Modul aus.
-3. **Debugging:** Nutzen Sie `{{ dump() }}`, um alle verfügbaren Variablen in einem Template einzusehen (erfordert den Debug-Modus von Contao).
-4. **Mehrsprachigkeit:** Verwenden Sie nach Möglichkeit die bereitgestellten `labels`-Variablen oder den `trans`-Filter für eigene Texte, um die Mehrsprachigkeit zu erhalten.
+1. **Nicht das Original ändern:** Ändern Sie niemals Dateien direkt im `vendor/`-Verzeichnis oder im Bundle-Ordner
+   selbst (außer Sie entwickeln das Bundle). Nutzen Sie immer das Contao `templates/`-Verzeichnis.
+2. **Dateinamen:** Wenn Sie ein Template für alle Instanzen eines Moduls ändern wollen, nutzen Sie den gleichen Namen (
+   z. B. `mod_dc_course_events_list.html.twig`). Wenn Sie eine Variante erstellen wollen, hängen Sie ein Suffix an (z.
+   B. `_custom`) und wählen Sie dieses im Contao-Backend beim Modul aus.
+3. **Debugging:** Nutzen Sie `{{ dump() }}`, um alle verfügbaren Variablen in einem Template einzusehen (erfordert den
+   Debug-Modus von Contao).
+4. **Mehrsprachigkeit:** Verwenden Sie nach Möglichkeit die bereitgestellten `labels`-Variablen oder den `trans`-Filter
+   für eigene Texte, um die Mehrsprachigkeit zu erhalten.

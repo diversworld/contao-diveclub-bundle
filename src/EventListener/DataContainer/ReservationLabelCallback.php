@@ -10,6 +10,7 @@ use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcTanksModel;
 use Doctrine\DBAL\Connection;
+
 #[AsCallback(table: 'tl_dc_reservation_items', target: 'list.label.label')]
 class ReservationLabelCallback
 {
