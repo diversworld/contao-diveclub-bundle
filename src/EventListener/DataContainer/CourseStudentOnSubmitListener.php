@@ -195,7 +195,7 @@ class CourseStudentOnSubmitListener
         } else {
             // Falls er existiert, aber vielleicht das Datum noch fehlt/anders ist, synchronisieren
             $this->connection->executeStatement(
-                "UPDATE tl_dc_student_exercises SET dateCompleted=?, instructor=? WHERE id=? AND (dateCompleted=0 OR dateCompleted='' OR dateCompleted IS NULL)",
+                "UPDATE tl_dc_student_exercises SET dateCompleted=?, instructor=? WHERE id=? AND (dateCompleted=0 OR dateCompleted IS NULL)",
                 [(int)$plannedAt, $instructor, (int)$checkId]
             );
         }

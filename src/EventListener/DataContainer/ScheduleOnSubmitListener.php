@@ -42,7 +42,7 @@ class ScheduleOnSubmitListener
 
         // 0. Übungen im Zeitplan synchronisieren
         $this->connection->executeStatement(
-            "UPDATE tl_dc_event_schedule_exercises SET planned_at=?, instructor=? WHERE pid=? AND (planned_at=0 OR planned_at='' OR planned_at IS NULL)",
+            "UPDATE tl_dc_event_schedule_exercises SET planned_at=?, instructor=? WHERE pid=? AND (planned_at=0 OR planned_at IS NULL)",
             [(int)$plannedAt, $instructor, $scheduleId]
         );
 

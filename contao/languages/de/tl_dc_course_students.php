@@ -27,5 +27,6 @@ $GLOBALS['TL_LANG']['tl_dc_course_students']['itemStatus'] = [
     'registered' => 'Registriert',
     'active' => 'Aktiv',
     'completed' => 'Absolviert',
-    'dropped' => 'Nicht erreicht'
+    'dropped' => 'Nicht erreicht',
+    'waitlist' => 'Warteliste'
 ];
