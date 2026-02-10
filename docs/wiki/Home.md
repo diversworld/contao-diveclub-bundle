@@ -16,11 +16,14 @@ TÜV-Prüfungen für Tauchflaschen sowie die Organisation von Tauchkursen.
     - Verwaltung vereinseigener Flaschen
     - Planung von TÜV-Sammelterminen
     - Buchungsprozess für Mitglieder
-4. **[Kursverwaltung](Kursverwaltung)**
+4. **[Equipment-Verleih](Equipment-Verleih)**
+    - Ablauf von Reservierung bis Rückgabe
+    - Status-Definitionen
+5. **[Kursverwaltung](Kursverwaltung)**
     - Erstellung von Kursen und Modulen
     - Fortschrittskontrolle für Schüler
     - Kurskalender
-5. **[Anpassungen & Templates](Templates)**
+6. **[Anpassungen & Templates](Templates)**
     - Verwendung von Insert-Tags
     - Anpassung der Twig-Templates
 
