@@ -47,9 +47,10 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
         ],
     ],
     'palettes' => [ // Definition der Eingabemasken (Paletten)
-        '__selector__' => ['addManufacturer', 'addRegulators', 'addEquipment', 'addSizes', 'addCourses', 'addReservations', 'addChecks'], // Selektoren für Subpaletten
+        '__selector__' => ['activateApi', 'addManufacturer', 'addRegulators', 'addEquipment', 'addSizes', 'addCourses', 'addReservations', 'addChecks'], // Selektoren für Subpaletten
         // Standardpalette mit verschiedenen Legenden und Feldern
         'default' => '{title_legend},title,alias;
+                            {api_legend},activateApi;
                             {manufacturer_legend},addManufacturer;
                             {equipment_legend},addEquipment;
                             {sizes_legend},addSizes;
@@ -63,6 +64,7 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
                             {publish_legend},published,start,stop;'
     ],
     'subpalettes' => [ // Definition der Subpaletten (eingeblendet bei Checkbox-Aktivierung)
+        'activateApi' => 'apiLogo,apiText,apiNewsArchive',
         'addManufacturer' => 'manufacturersFile', // Erscheint wenn addManufacturer aktiv ist
         'addEquipment' => 'typesFile,subTypesFile', // Erscheint wenn addEquipment aktiv ist
         'addSizes' => 'sizesFile', // Erscheint wenn addSizes aktiv ist
@@ -95,6 +97,35 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
                 ['tl_dc_config', 'generateAlias'] // Generiert den Alias automatisch
             ],
             'sql' => "varchar(255) NOT NULL default ''" // SQL-Typ
+        ],
+        'activateApi' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_config']['activateApi'],
+            'exclude' => true,
+            'inputType' => 'checkbox',
+            'eval' => ['submitOnChange' => true],
+            'sql' => ['type' => 'boolean', 'default' => false]
+        ],
+        'apiLogo' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_config']['apiLogo'],
+            'exclude' => true,
+            'inputType' => 'fileTree',
+            'eval' => ['fieldType' => 'radio', 'files' => true, 'extensions' => '%contao.image.valid_extensions%', 'mandatory' => false, 'tl_class' => 'clr'],
+            'sql' => "binary(16) NULL"
+        ],
+        'apiText' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_config']['apiText'],
+            'exclude' => true,
+            'inputType' => 'textarea',
+            'eval' => ['style' => 'height:60px', 'decodeEntities' => true, 'rte' => 'tinyMCE', 'basicEntities' => true, 'tl_class' => 'clr'],
+            'sql' => "text NULL"
+        ],
+        'apiNewsArchive' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_config']['apiNewsArchive'],
+            'exclude' => true,
+            'inputType' => 'select',
+            'foreignKey' => 'tl_news_archive.title',
+            'eval' => ['chosen' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'],
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'addManufacturer' => [ // Checkbox zum Aktivieren von Herstellern
             'label' => &$GLOBALS['TL_LANG']['tl_dc_config']['addManufacturer'], // Label

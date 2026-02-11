@@ -17,6 +17,7 @@ $GLOBALS['TL_LANG']['tl_dc_config']['check_legend'] = 'Prüfungen';
 $GLOBALS['TL_LANG']['tl_dc_config']['invoice_legend'] = 'Rechnungseinstellungen';
 $GLOBALS['TL_LANG']['tl_dc_config']['tuv_legend'] = 'TÜV-Einstellungen';
 $GLOBALS['TL_LANG']['tl_dc_config']['conditions_legend'] = 'Bedingungen';
+$GLOBALS['TL_LANG']['tl_dc_config']['api_legend'] = 'API-Einstellungen';
 
 /**
  * Global operations
@@ -57,6 +58,10 @@ $GLOBALS['TL_LANG']['tl_dc_config']['addSizes'] = ['Größen hinzufügen', 'Grö
 $GLOBALS['TL_LANG']['tl_dc_config']['addTypes'] = ['Typen hinzufügen', 'Typen im Template hinzufügen'];
 $GLOBALS['TL_LANG']['tl_dc_config']['addCourses'] = ['Kurse hinzufügen', 'Kurse im Template hinzufügen'];
 $GLOBALS['TL_LANG']['tl_dc_config']['addRegulators'] = ['Atemregler hinzufügen', 'Atemregler im Template hinzufügen'];
+$GLOBALS['TL_LANG']['tl_dc_config']['activateApi'] = ['API aktivieren', 'Die Nutzung der API für die iOS App aktivieren.'];
+$GLOBALS['TL_LANG']['tl_dc_config']['apiLogo'] = ['App-Logo', 'Bitte wählen Sie ein Logo aus, das in der App angezeigt werden soll.'];
+$GLOBALS['TL_LANG']['tl_dc_config']['apiText'] = ['Info-Text App', 'Dieser Text wird auf der Startseite der App angezeigt.'];
+$GLOBALS['TL_LANG']['tl_dc_config']['apiNewsArchive'] = ['News-Archiv', 'Bitte wählen Sie das News-Archiv aus, dessen Nachrichten in der App angezeigt werden sollen.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['instructor_groups'] = ['Instruktoren-Gruppen', 'Bitte wählen Sie die Mitgliedergruppen aus, die als Instruktoren gelten.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['addReservations'] = ['Reservierungen hinzufügen', 'Das Modul Reservierungen im Backend anzeigen'];
 $GLOBALS['TL_LANG']['tl_dc_config']['addChecks'] = ['Prüfungen hinzufügen', 'Das Modul Prüfungen im Backend anzeigen'];

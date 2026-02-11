@@ -17,6 +17,7 @@ $GLOBALS['TL_LANG']['tl_dc_config']['check_legend'] = 'Checks';
 $GLOBALS['TL_LANG']['tl_dc_config']['invoice_legend'] = 'Invoice settings';
 $GLOBALS['TL_LANG']['tl_dc_config']['tuv_legend'] = 'TÜV settings';
 $GLOBALS['TL_LANG']['tl_dc_config']['conditions_legend'] = 'Conditions';
+$GLOBALS['TL_LANG']['tl_dc_config']['api_legend'] = 'API settings';
 
 /**
  * Global operations
@@ -57,6 +58,10 @@ $GLOBALS['TL_LANG']['tl_dc_config']['addSizes'] = ['Add sizes', 'Add sizes in th
 $GLOBALS['TL_LANG']['tl_dc_config']['addTypes'] = ['Add types', 'Add types in the template.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['addCourses'] = ['Add courses', 'Add courses in the template.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['addRegulators'] = ['Add regulators', 'Add regulators in the template.'];
+$GLOBALS['TL_LANG']['tl_dc_config']['activateApi'] = ['Activate API', 'Enable the use of the API for the iOS app.'];
+$GLOBALS['TL_LANG']['tl_dc_config']['apiLogo'] = ['App logo', 'Please select a logo to be displayed in the app.'];
+$GLOBALS['TL_LANG']['tl_dc_config']['apiText'] = ['Info text app', 'This text will be displayed on the home screen of the app.'];
+$GLOBALS['TL_LANG']['tl_dc_config']['apiNewsArchive'] = ['News archive', 'Please select the news archive whose news should be displayed in the app.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['addReservations'] = ['Add reservations', 'Show the reservations module in the backend.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['addChecks'] = ['Add checks', 'Show the checks module in the backend.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['default'] = ['Default template', 'Select the default template configuration.'];
