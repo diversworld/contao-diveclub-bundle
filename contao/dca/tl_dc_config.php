@@ -64,7 +64,7 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
                             {publish_legend},published,start,stop;'
     ],
     'subpalettes' => [ // Definition der Subpaletten (eingeblendet bei Checkbox-Aktivierung)
-        'activateApi' => 'apiLogo,apiText,apiNewsArchive',
+        'activateApi' => 'apiLogo,apiText,apiNewsArchive,apiImprint,apiPrivacy,apiTerms',
         'addManufacturer' => 'manufacturersFile', // Erscheint wenn addManufacturer aktiv ist
         'addEquipment' => 'typesFile,subTypesFile', // Erscheint wenn addEquipment aktiv ist
         'addSizes' => 'sizesFile', // Erscheint wenn addSizes aktiv ist
@@ -126,6 +126,27 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
             'foreignKey' => 'tl_news_archive.title',
             'eval' => ['chosen' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'],
             'sql' => "int unsigned NOT NULL default 0"
+        ],
+        'apiImprint' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_config']['apiImprint'],
+            'exclude' => true,
+            'inputType' => 'textarea',
+            'eval' => ['style' => 'height:60px', 'decodeEntities' => true, 'rte' => 'tinyMCE', 'basicEntities' => true, 'tl_class' => 'clr'],
+            'sql' => "text NULL"
+        ],
+        'apiPrivacy' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_config']['apiPrivacy'],
+            'exclude' => true,
+            'inputType' => 'textarea',
+            'eval' => ['style' => 'height:60px', 'decodeEntities' => true, 'rte' => 'tinyMCE', 'basicEntities' => true, 'tl_class' => 'clr'],
+            'sql' => "text NULL"
+        ],
+        'apiTerms' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_config']['apiTerms'],
+            'exclude' => true,
+            'inputType' => 'textarea',
+            'eval' => ['style' => 'height:60px', 'decodeEntities' => true, 'rte' => 'tinyMCE', 'basicEntities' => true, 'tl_class' => 'clr'],
+            'sql' => "text NULL"
         ],
         'addManufacturer' => [ // Checkbox zum Aktivieren von Herstellern
             'label' => &$GLOBALS['TL_LANG']['tl_dc_config']['addManufacturer'], // Label

@@ -28,7 +28,6 @@ $GLOBALS['TL_DCA']['tl_dc_course_exercises'] = [
             ],
         ],
     ],
-
     'list' => [
         'sorting' => [
             'mode' => DataContainer::MODE_PARENT,
@@ -58,14 +57,12 @@ $GLOBALS['TL_DCA']['tl_dc_course_exercises'] = [
             'show',
         ],
     ],
-
     'palettes' => [
         'default' => '{title_legend},title,alias;
                       {detail_legend},description,required,duration;
                       {notes_legend},notes;
                       {publish_legend},published,start,stop'
     ],
-
     'fields' => [
         'id' => [
             'sql' => "int unsigned NOT NULL auto_increment"
@@ -134,6 +131,7 @@ $GLOBALS['TL_DCA']['tl_dc_course_exercises'] = [
         'published' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_exercises']['published'],
             'inputType' => 'checkbox',
+            'toggle' => true,
             'eval' => ['tl_class' => 'w50 clr'],
             'sql' => ['type' => 'boolean', 'default' => false],
         ],

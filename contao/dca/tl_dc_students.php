@@ -226,6 +226,7 @@ $GLOBALS['TL_DCA']['tl_dc_students'] = [
         'published' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_students']['published'],
             'inputType' => 'checkbox',
+            'toggle' => true,
             'eval' => ['tl_class' => 'w50 clr'],
             'sql' => ['type' => 'boolean', 'default' => true],
         ],

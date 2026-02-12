@@ -133,5 +133,17 @@ $GLOBALS['TL_DCA']['tl_dc_event_schedule_exercises'] = [
             'eval' => ['doNotCopy' => true, 'tl_class' => 'w50'],
             'sql' => ['type' => 'boolean', 'default' => true]
         ],
+        'start' => [
+            'inputType' => 'text',
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_equipment']['start'],
+            'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 clr wizard'],
+            'sql' => "varchar(10) NOT NULL default ''"
+        ],
+        'stop' => [
+            'inputType' => 'text',
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_equipment']['stop'],
+            'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
+            'sql' => "varchar(10) NOT NULL default ''"
+        ]
     ],
 ];

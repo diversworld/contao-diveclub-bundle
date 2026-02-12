@@ -143,6 +143,7 @@ $GLOBALS['TL_DCA']['tl_dc_course_modules'] = [
             'search' => true,
             'filter' => true,
             'sorting' => true,
+            'toggle' => true,
             'eval' => ['tl_class' => 'w50 clr'],
             'sql' => ['type' => 'boolean', 'default' => false],
         ],
