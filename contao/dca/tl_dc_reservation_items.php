@@ -52,7 +52,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
             'panelLayout' => 'filter;sort,search,limit'
         ],
         'label' => [
-            'fields' => ['item_type', 'item_id', 'types', 'subType', 'reservation_status', 'created_at', 'updated_at'],
+            'fields' => ['item_type', 'item_id', 'types', 'sub_type', 'reservation_status', 'created_at', 'updated_at'],
             'showColumns' => true,
             'format' => '%s, %s - %s | %s - %s - %s - %s!',
             'label_callback' => [ReservationItemsLabelCallback::class, '__invoke'],
@@ -352,7 +352,7 @@ class tl_dc_reservation_items extends Backend
         return $options;
     }
 
-    public function setCreatedAt(string $value, DataContainer $dc): int
+    public function setCreatedAt(?string $value, DataContainer $dc): int
     {
         // Prüfen, ob der Wert bereits gesetzt ist
         if (!empty($value)) {
@@ -364,7 +364,7 @@ class tl_dc_reservation_items extends Backend
 
     }
 
-    public function setUpdatedAt(string $value, DataContainer $dc): int
+    public function setUpdatedAt(?string $value, DataContainer $dc): int
     {
         //$actualTimeStamp = date($datimFormat);
         $actualTimeStamp = time();
