@@ -158,7 +158,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_check_proposal']['proposalDate'],
             'inputType' => 'text',
             'eval' => ['rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w25 clr wizard'],
-            'sql' => "int unsigned NULL"
+            'sql' => "int NULL"
         ],
         'vendorName' => [
             'exclude' => true,

@@ -153,7 +153,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'reference'         => &$GLOBALS['TL_LANG']['tl_dc_tanks']['sizes'],
             'options'           => &$GLOBALS['TL_LANG']['tl_dc_tanks']['sizes'],
             'eval'              => ['includeBlankOption' => true, 'tl_class' => 'w25'],
-            'sql'               => "varchar(20) NOT NULL default ''",
+            'sql'               => "varchar(10) NOT NULL default ''",
         ],
         'o2clean'           => [
             'inputType'         => 'checkbox',
@@ -188,7 +188,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'filter'            => true,
             'flag'              => DataContainer::SORT_YEAR_DESC,
             'eval'              => ['submitOnChange' => true, 'rgxp'=>'date', 'mandatory'=>false, 'doNotCopy'=>true, 'datepicker'=>true, 'tl_class'=>'w33 wizard'],
-            'sql' => "int unsigned NULL"
+            'sql' => "int NULL"
         ],
         'nextCheckDate'     => [
             'inputType'         => 'text',
@@ -198,7 +198,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'filter'            => true,
             'flag'              => DataContainer::SORT_YEAR_DESC,
             'eval'              => ['submitOnChange' => true,'rgxp'=>'date', 'doNotCopy'=>false, 'datepicker'=>true, 'tl_class'=>'w33 wizard'],
-            'sql' => "int unsigned NULL"
+            'sql' => "int NULL"
         ],
         'lastOrder'         => [
             'inputType'         => 'text',

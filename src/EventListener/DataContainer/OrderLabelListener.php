@@ -13,23 +13,26 @@ class OrderLabelListener // Listener zur Anpassung der Label-Anzeige für Bestel
 {
     public function __invoke(array $row, string $label, DataContainer $dc, ?array $args = null): array|string // Methode zur Formatierung des Labels
     {
+        $sizeLabel = $GLOBALS['TL_LANG']['tl_dc_check_order']['sizes'][$row['size']] ?? $row['size'];
+        $statusLabel = $GLOBALS['TL_LANG']['tl_dc_check_order']['status_reference'][$row['status']] ?? $row['status'];
+
         if (null === $args) { // Fallback für die Standard-Anzeige (wenn keine Spalten genutzt werden)
             return sprintf(
-                '%s (%sL) - %s € [%s]',
+                '%s (%s) - %s € [%s]',
                 $row['serialNumber'], // Seriennummer
-                $row['size'], // Flaschengröße
+                $sizeLabel, // Flaschengröße (lokalisierte Bezeichnung)
                 number_format((float)$row['totalPrice'], 2, ',', '.'), // Gesamtpreis formatiert
-                $row['status'] // Status-Code
+                $statusLabel // Status (lokalisiert)
             ); // Gib den formatierten String zurück
         }
 
         $args[0] = sprintf( // Spalte 1: Gerät und Größe
-            '%s (%sL)',
+            '%s (%s)',
             $row['serialNumber'],
-            $row['size']
+            $sizeLabel
         );
         $args[1] = number_format((float)$row['totalPrice'], 2, ',', '.') . ' €'; // Spalte 2: Preis formatiert
-        $args[2] = $GLOBALS['TL_LANG']['tl_dc_check_order'][$row['status']]; // Spalte 3: Übersetzter Status
+        $args[2] = $statusLabel; // Spalte 3: Übersetzter Status
 
         return $args; // Gib die aktualisierten Argumente zurück
     }

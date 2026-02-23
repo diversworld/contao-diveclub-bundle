@@ -137,21 +137,21 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_reservation']['reserved_at'],
             'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 clr wizard'],
-            'sql' => "int(10) unsigned NULL"
+            'sql' => "int NULL"
         ],
         'picked_up_at' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_reservation']['picked_up_at'],
             'inputType' => 'text',
             'save_callback' => [[ReservationPickedUpCallback::class, '__invoke']],
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
-            'sql' => "int(10) unsigned NULL"
+            'sql' => "int NULL"
         ],
         'returned_at' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_reservation']['returned_at'],
             'inputType' => 'text',
             'save_callback' => [[ReservationReturnedCallback::class, '__invoke']],
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
-            'sql' => "int(10) unsigned NULL"
+            'sql' => "int NULL"
         ],
         'rejected_reason' => [
             'inputType' => 'textarea',

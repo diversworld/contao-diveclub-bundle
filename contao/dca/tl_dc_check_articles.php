@@ -111,10 +111,15 @@ $GLOBALS['TL_DCA']['tl_dc_check_articles'] = [
         ],
         'articleSize'       => [
             'label'         => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['articleSize'],
-            'inputType'     => 'select',
-            'options'       => ['2','3','5','7','8','10','12','15','18','20','40','80'],
+            'inputType'     => 'text',
+            'exclude'           => true,
+            'search'            => true,
+            'filter'            => true,
+            'sorting'           => true,
+            //'options'       => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['sizes'],
+            //'reference'     => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['sizes'],
             'eval'          => ['includeBlankOption' => true, 'groupStyle' => 'width:60px', 'tl_class'=>'w25'],
-            'sql'           => "varchar(20) NOT NULL default ''",
+            'sql'           => "varchar(10) NOT NULL default ''",
         ],
         'articlePriceNetto' => [
             'label'         => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['articlePriceNetto'],

@@ -117,7 +117,7 @@ $GLOBALS['TL_DCA']['tl_dc_student_exercises'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_student_exercises']['dateCompleted'],
             'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
-            'sql' => "int unsigned NULL",
+            'sql' => "int NULL",
         ],
         'instructor' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_student_exercises']['instructor'],

@@ -140,10 +140,10 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
-            'reference'         => &$GLOBALS['TL_LANG']['tl_dc_tanks']['sizes'],
-            'options'           => &$GLOBALS['TL_LANG']['tl_dc_tanks']['sizes'],
+            'reference'         => &$GLOBALS['TL_LANG']['tl_dc_check_order']['sizes'],
+            'options_callback'  => ['tl_dc_check_order', 'getSizeOptions'],
             'eval'              => ['includeBlankOption' => true, 'tl_class' => 'w25'],
-            'sql'               => "varchar(20) NOT NULL default ''",
+            'sql'               => "varchar(10) NOT NULL default ''",
         ],
         'o2clean'           => [
             'inputType'         => 'checkbox',
@@ -161,9 +161,9 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
         ],
         'selectedArticles' => [
             'exclude' => true,
-            'inputType' => 'checkbox',
+            'inputType' => 'checkboxWizard',
             'options_callback' => [OrderArticleOptionsListener::class, '__invoke'],
-            'eval' => ['multiple' => true],
+            'eval' => ['multiple' => true, 'tl_class' => 'clr'],
             'sql' => "blob NULL"
         ],
         'totalPrice' => [
@@ -192,6 +192,22 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
 
 class tl_dc_check_order extends Backend
 {
+    /**
+     * Provide size options based on language file keys without triggering early access errors
+     */
+    public static function getSizeOptions(): array
+    {
+        // Ensure language file is loaded
+        System::loadLanguageFile('tl_dc_check_order');
+
+        $sizes = $GLOBALS['TL_LANG']['tl_dc_check_order']['sizes'] ?? null;
+        if (\is_array($sizes)) {
+            return array_keys($sizes);
+        }
+
+        // Fallback to a safe default set to avoid runtime errors if language is not initialized
+        return ['2','3','4','5','7','8','10','12','15','18','20','11','22'];
+    }
     public function generatePdfButton($row, $href, $label, $title, $icon, $attributes)
     {
         // For orders, we use the parent booking ID to generate the full PDF

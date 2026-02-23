@@ -19,10 +19,25 @@ class OrderArticleOptionsListener
             return $options;
         }
 
-        $articles = Database::getInstance()->prepare("SELECT id, title, articlePriceBrutto FROM tl_dc_check_articles WHERE pid=?")->execute($dc->activeRecord->pid);
+        // tl_dc_check_order.pid → verweist auf tl_dc_check_booking.id
+        $booking = Database::getInstance()
+            ->prepare("SELECT pid FROM tl_dc_check_booking WHERE id=?")
+            ->execute($dc->activeRecord->pid);
+
+        if ($booking->numRows < 1) {
+            return $options; // keine zugehörige Buchung gefunden
+        }
+
+        // tl_dc_check_booking.pid → verweist auf tl_dc_check_proposal.id
+        $proposalId = (int) $booking->pid;
+
+        // Artikel zum passenden Vorschlag laden
+        $articles = Database::getInstance()
+            ->prepare("SELECT id, title, articlePriceBrutto FROM tl_dc_check_articles WHERE pid=?")
+            ->execute($proposalId);
 
         while ($articles->next()) {
-            $options[$articles->id] = $articles->title . ' (' . $articles->articlePriceBrutto . ' €)';
+            $options[$articles->id] = $articles->title . ' (' . number_format((float)$articles->articlePriceBrutto, 2, ',', '.') . ' €)';
         }
 
         return $options;

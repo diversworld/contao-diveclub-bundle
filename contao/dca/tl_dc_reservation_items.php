@@ -167,33 +167,33 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_reservation_items']['reserved_at'],
             'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 clr wizard'],
-            'sql' => "int(10) unsigned NULL"
+            'sql' => "int NULL"
         ],
         'picked_up_at' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_reservation_items']['picked_up_at'],
             'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'submitOnChange' => true, 'datepicker' => true, 'tl_class' => 'w33 wizard'],
-            'sql' => "int(10) unsigned NULL"
+            'sql' => "int NULL"
         ],
         'returned_at' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_reservation_items']['returned_at'],
             'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'submitOnChange' => true, 'datepicker' => true, 'tl_class' => 'w33 wizard'],
-            'sql' => "int(10) unsigned NULL"
+            'sql' => "int NULL"
         ],
         'created_at' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_reservation_items']['created_at'],
             'inputType' => 'text',
             'save_callback' => [['tl_dc_reservation_items', 'setCreatedAt']],
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
-            'sql' => "int(10) unsigned NULL"
+            'sql' => "int NULL"
         ],
         'updated_at' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_reservation_items']['updated_at'],
             'inputType' => 'text',
             'save_callback' => [['tl_dc_reservation_items', 'setUpdatedAt']],
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
-            'sql' => "int(10) unsigned NULL"
+            'sql' => "int NULL"
         ],
         'addNotes' => [
             'inputType' => 'checkbox',
