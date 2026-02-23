@@ -29,7 +29,7 @@ class OrderArticleOptionsListener
         }
 
         // tl_dc_check_booking.pid → verweist auf tl_dc_check_proposal.id
-        $proposalId = (int) $booking->pid;
+        $proposalId = (int)$booking->pid;
 
         // Artikel zum passenden Vorschlag laden
         $articles = Database::getInstance()

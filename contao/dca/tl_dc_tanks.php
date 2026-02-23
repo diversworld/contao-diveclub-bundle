@@ -153,7 +153,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'reference'         => &$GLOBALS['TL_LANG']['tl_dc_tanks']['sizes'],
             'options'           => &$GLOBALS['TL_LANG']['tl_dc_tanks']['sizes'],
             'eval'              => ['includeBlankOption' => true, 'tl_class' => 'w25'],
-            'sql'               => "varchar(10) NOT NULL default ''",
+            'sql' => "varchar(10) NOT NULL default ''",
         ],
         'o2clean'           => [
             'inputType'         => 'checkbox',

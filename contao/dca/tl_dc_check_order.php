@@ -140,10 +140,10 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
-            'reference'         => &$GLOBALS['TL_LANG']['tl_dc_check_order']['sizes'],
-            'options_callback'  => ['tl_dc_check_order', 'getSizeOptions'],
+            'reference' => &$GLOBALS['TL_LANG']['tl_dc_check_order']['sizes'],
+            'options_callback' => ['tl_dc_check_order', 'getSizeOptions'],
             'eval'              => ['includeBlankOption' => true, 'tl_class' => 'w25'],
-            'sql'               => "varchar(10) NOT NULL default ''",
+            'sql' => "varchar(10) NOT NULL default ''",
         ],
         'o2clean'           => [
             'inputType'         => 'checkbox',
@@ -206,7 +206,7 @@ class tl_dc_check_order extends Backend
         }
 
         // Fallback to a safe default set to avoid runtime errors if language is not initialized
-        return ['2','3','4','5','7','8','10','12','15','18','20','11','22'];
+        return ['2', '3', '4', '5', '7', '8', '10', '12', '15', '18', '20', '11', '22'];
     }
     public function generatePdfButton($row, $href, $label, $title, $icon, $attributes)
     {
