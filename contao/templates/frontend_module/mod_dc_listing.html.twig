@@ -5,6 +5,13 @@
 #}
 {% extends "@Contao/frontend_module/_base.html.twig" %}
 
+{# Override headline to avoid dependency on theme's optional data.subline #}
+{% block headline_component %}
+    {% set headline = headline|default(_context) %}
+    {% set tag_name = headline.tag_name|default('h1') %}
+    <{{ tag_name }}>{{ headline.text }}</{{ tag_name }}>
+{% endblock %}
+
 {% block content %}
     {% set container_attributes = attrs().addClass('dc-generic-listing').mergeWith(container_attributes|default) %}
     <div{{ container_attributes }}>

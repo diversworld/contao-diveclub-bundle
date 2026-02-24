@@ -52,7 +52,8 @@ class DcListingController extends AbstractFrontendModuleController
         if (is_array($headline) && isset($headline['value']) && $headline['value'] !== '') {
             $template->headline = [
                 'text' => $headline['value'],
-                'tag_name' => $headline['unit'] ?? 'h1'
+                'tag_name' => $headline['unit'] ?? 'h1',
+                'subline' => ''
             ];
         }
 
