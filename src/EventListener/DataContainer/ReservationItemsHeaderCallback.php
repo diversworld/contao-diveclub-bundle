@@ -23,7 +23,7 @@ class ReservationItemsHeaderCallback
     public function __invoke(array $labels, DataContainer $dc): array
     {
         // Parent (reservation) id from URL context
-        $parentId = (int) (Input::get('id') ?? 0);
+        $parentId = (int)(Input::get('id') ?? 0);
         if ($parentId <= 0) {
             return $labels;
         }
@@ -41,18 +41,18 @@ class ReservationItemsHeaderCallback
         // Resolve members
         $memberIds = [];
         if (!empty($reservation['member_id'])) {
-            $memberIds[] = (int) $reservation['member_id'];
+            $memberIds[] = (int)$reservation['member_id'];
         }
         if (!empty($reservation['reservedFor']) && (int)$reservation['reservedFor'] !== (int)$reservation['member_id']) {
-            $memberIds[] = (int) $reservation['reservedFor'];
+            $memberIds[] = (int)$reservation['reservedFor'];
         }
 
         $members = [];
         if ($memberIds) {
             $in = implode(',', array_fill(0, count($memberIds), '?'));
-            $rows = $this->db->fetchAllAssociative('SELECT id, firstname, lastname FROM tl_member WHERE id IN ('.$in.')', $memberIds);
+            $rows = $this->db->fetchAllAssociative('SELECT id, firstname, lastname FROM tl_member WHERE id IN (' . $in . ')', $memberIds);
             foreach ($rows as $row) {
-                $members[(int)$row['id']] = trim((string)$row['firstname'].' '.(string)$row['lastname']);
+                $members[(int)$row['id']] = trim((string)$row['firstname'] . ' ' . (string)$row['lastname']);
             }
         }
 
