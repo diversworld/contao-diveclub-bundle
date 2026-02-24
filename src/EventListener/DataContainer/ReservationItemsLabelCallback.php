@@ -26,28 +26,14 @@ class ReservationItemsLabelCallback
 
     public function __invoke(array $row, string $label, DataContainer $dc, ?array $args = null): array|string
     {
-        if (null !== $args) {
-            // If it's a column view, we might want to return $args,
-            // but the original code was returning a string regardless of showColumns.
-            // Contao says: "If the DCA uses showColumns then the return value must be an array of strings. Otherwise just the label as a string."
-            // Since tl_dc_reservation_items HAS showColumns => true, it SHOULD return an array.
-
-            // Let's adapt it to return an array if $args is provided.
-            $labels = $args;
-            $labels[0] = $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes'][$row['item_type']] ?? $row['item_type'];
-            $labels[1] = $row['item_id']; // This is a bit simplified compared to the string version
-            $labels[4] = $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$row['reservation_status']] ?? $row['reservation_status'];
-            $labels[5] = !empty($row['created_at']) ? date($GLOBALS['TL_CONFIG']['datimFormat'], (int)$row['created_at']) : '-';
-            $labels[6] = !empty($row['updated_at']) ? date($GLOBALS['TL_CONFIG']['datimFormat'], (int)$row['updated_at']) : '-';
-
-            return $labels;
-        }
         // Fallback-Werte definieren
         $typeLabel = $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes'][$row['item_type']] ?? 'Unbekannter Typ';
         $reservedAt = !empty($row['reserved_at']) ? date($GLOBALS['TL_CONFIG']['datimFormat'], (int)$row['reserved_at']) : 'Unbekannt';
         $createdAt = !empty($row['created_at']) ? date($GLOBALS['TL_CONFIG']['datimFormat'], (int)$row['created_at']) : 'Unbekannt';
+        $updatedAt = !empty($row['updated_at']) ? date($GLOBALS['TL_CONFIG']['datimFormat'], (int)$row['updated_at']) : 'Unbekannt';
 
         $sizes = $this->helper->getSizes();
+        $assetIdLabel = $row['item_id'];
 
         // Daten basierend auf dem Typ laden
         switch ($row['item_type']) {
@@ -55,15 +41,13 @@ class ReservationItemsLabelCallback
                 $dbResult = DcTanksModel::findById((int)$row['item_id']);
                 if ($dbResult) {
                     $result = $dbResult->row();
-                    $row['asset_type'] = $typeLabel;
-                    $row['asset_id'] = sprintf('%sL - %s, (Miete: %s €)',
+                    $assetIdLabel = sprintf('%sL - %s, (Miete: %s €)',
                         $result['size'] ?? '-',
                         $result['title'] ?? 'Kein Titel',
                         number_format((float)$result['rentalFee'], 2, ',', '.')
                     );
                 } else {
-                    $row['asset_type'] = $typeLabel;
-                    $row['asset_id'] = 'Tank nicht gefunden';
+                    $assetIdLabel = 'Tank nicht gefunden';
                 }
                 break;
 
@@ -72,8 +56,7 @@ class ReservationItemsLabelCallback
                 if ($dbResult) {
                     $result = $dbResult->row();
                     $manufacturerName = $this->helper->getManufacturers()[$result['manufacturer']] ?? 'Unbekannter Hersteller';
-                    $row['asset_type'] = $typeLabel;
-                    $row['asset_id'] = sprintf('%s - %s, 1.Stufe: %s, 2.Stufe Pri.: %s, 2.Stufe Sec.: %s, (Miete: %s €)',
+                    $assetIdLabel = sprintf('%s - %s, 1.Stufe: %s, 2.Stufe Pri.: %s, 2.Stufe Sec.: %s, (Miete: %s €)',
                         $result['title'] ?? 'Kein Titel',
                         $manufacturerName,
                         $result['regModel1st'] ?? '-',
@@ -82,8 +65,7 @@ class ReservationItemsLabelCallback
                         number_format((float)$result['rentalFee'], 2, ',', '.')
                     );
                 } else {
-                    $row['asset_type'] = $typeLabel;
-                    $row['asset_id'] = 'Regulator nicht gefunden';
+                    $assetIdLabel = 'Regulator nicht gefunden';
                 }
                 break;
 
@@ -91,31 +73,41 @@ class ReservationItemsLabelCallback
                 $dbResult = DcEquipmentModel::findById((int)$row['item_id']);
                 if ($dbResult) {
                     $result = $dbResult->row();
-                    $row['asset_type'] = $typeLabel;
-                    $row['asset_id'] = sprintf('%s, %s - %s, (Miete: %s €)',
+                    $assetIdLabel = sprintf('%s, %s - %s, (Miete: %s €)',
                         $result['model'] ?? 'Kein Modell',
                         $sizes[$result['size']] ?? '-',
                         $result['title'] ?? 'Kein Titel',
                         number_format((float)$result['rentalFee'], 2, ',', '.')
                     );
                 } else {
-                    $row['asset_type'] = $typeLabel;
-                    $row['asset_id'] = 'Equipment nicht gefunden';
+                    $assetIdLabel = 'Equipment nicht gefunden';
                 }
                 break;
         }
 
         $statusLabel = $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$row['reservation_status']] ?? $row['reservation_status'];
 
-        // Format müssen wir entsprechend den Anforderungen anpassen
+        if (null !== $args) {
+            $labels = $args;
+            $labels[0] = $typeLabel;
+            $labels[1] = $assetIdLabel;
+            $labels[2] = $row['types'] ? ($this->helper->getEquipmentFlatTypes()[$row['types']] ?? $row['types']) : '-';
+            $labels[3] = $row['sub_type'] ?: '-';
+            $labels[4] = $statusLabel;
+            $labels[5] = $createdAt;
+            $labels[6] = $updatedAt;
+
+            return $labels;
+        }
+
+        // Format für Listenansicht (ohne Spalten)
         return sprintf(
             '%s, %s - %s - %s - %s',
-            $row['asset_type'],    // Typ des Assets
-            $row['asset_id'],      // ID bzw. Titel des Assets
-            $statusLabel,          // Status der Reservierung
-            $reservedAt,           // Zeitpunkt der Reservierung
-            $createdAt,            // Zeitpunkt der Erstellung
+            $typeLabel,
+            $assetIdLabel,
+            $statusLabel,
+            $reservedAt,
+            $createdAt
         );
-
     }
 }
