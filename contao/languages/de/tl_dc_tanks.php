@@ -87,6 +87,7 @@ $GLOBALS['TL_LANG']['tl_dc_tanks']['itemStatus'] = [
     'lost' => 'verloren',
     'damaged' => 'defekt',
     'missing' => 'vermisst',
+    'owned' => 'privateigentum'
 ];
 
 
