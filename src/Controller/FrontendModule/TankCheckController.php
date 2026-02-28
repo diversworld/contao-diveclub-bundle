@@ -327,7 +327,7 @@ class TankCheckController extends AbstractFrontendModuleController
                         $tank->o2clean = isset($tankData['o2clean']) ? '1' : '0';
                         $tank->owner = $user->id;
                         $tank->published = '1';
-                        $tank->status = 'active';
+                        $tank->status = 'owned';
                         $tank->save();
 
                         $order->tankId = $tank->id;
