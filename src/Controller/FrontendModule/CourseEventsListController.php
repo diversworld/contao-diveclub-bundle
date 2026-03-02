@@ -134,7 +134,7 @@ class CourseEventsListController extends AbstractFrontendModuleController
                     $detailUrl = '';
                     if (null !== $tankCheckJumpToPage) {
                         $item = $proposal->alias ?: (string)$proposal->id;
-                        $params = '/' . ($useAutoItem ? '' : 'items/') . $item;
+                        $params = '/' . ($useAutoItem ? '' : '') . $item;
                         $detailUrl = $tankCheckJumpToPage->getFrontendUrl($params);
                     } else {
                         // Fallback-Suche (alt), falls kein Sprungziel definiert ist
@@ -152,7 +152,7 @@ class CourseEventsListController extends AbstractFrontendModuleController
                                 $pageModel = PageModel::findByPk($page->id);
                                 if (null !== $pageModel) {
                                     $item = $proposal->alias ?: (string)$proposal->id;
-                                    $detailUrl = $pageModel->getFrontendUrl('/' . ($useAutoItem ? '' : 'items/') . $item);
+                                    $detailUrl = $pageModel->getFrontendUrl('/' . ($useAutoItem ? '' : '') . $item);
                                 }
                             }
                         }
