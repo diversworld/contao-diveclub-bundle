@@ -109,7 +109,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['showTankChecks'] = [
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['courseJumpTo'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_module']['tankCheckJumpTo'],
+    'label' => &$GLOBALS['TL_LANG']['tl_module']['courseJumpTo'],
     'exclude' => true,
     'inputType' => 'pageTree',
     'foreignKey' => 'tl_page.title',

@@ -27,7 +27,7 @@ class OrderLabelListener // Listener zur Anpassung der Label-Anzeige für Bestel
         }
 
         $args[0] = sprintf( // Spalte 1: Gerät und Größe
-            '%s (%s)',
+            '%s (%s) xy',
             $row['serialNumber'],
             $sizeLabel
         );

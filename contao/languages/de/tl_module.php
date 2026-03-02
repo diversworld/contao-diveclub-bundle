@@ -12,8 +12,9 @@ $GLOBALS['TL_LANG']['tl_module']['reg_text']         = ['E-Mail-Text', 'Geben Si
 $GLOBALS['TL_LANG']['tl_module']['confirmation_text'] = ['Bestätigungstext', 'Geben Sie den Text ein, der auf der Bestätigungsseite angezeigt werden soll. Sie können Insert-Tags verwenden.'];
 $GLOBALS['TL_LANG']['tl_module']['showCourseEvents']  = ['Tauchkurse anzeigen', 'Wählen Sie diese Option, um Tauchkurse in der Liste anzuzeigen.'];
 $GLOBALS['TL_LANG']['tl_module']['showTankChecks']   = ['TÜV-Prüfungen Liste', 'Wählen Sie diese Option, um TÜV-Prüfungen in der Liste anzuzeigen.'];
-$GLOBALS['TL_LANG']['tl_module']['tankCheckJumpTo']  = ['TÜV-Reader-Seite', 'Wählen Sie die Seite aus, auf der das Modul für die TÜV-Prüfung (Tank-Check) eingebunden ist.'];
-$GLOBALS['TL_LANG']['tl_module']['courseJumpTo'] = ['Reader Seite', 'Wählen Sie die Seite aus, auf der das Kurs-Reader Modul eingebunden ist.'];
+$GLOBALS['TL_LANG']['tl_module']['jumpTo'] = ['Weiterleitungsseite', 'Wählen Sie die Seite aus, zu der der Benutzer nach einer erfolgreichen Anmeldung weitergeleitet werden soll.'];
+$GLOBALS['TL_LANG']['tl_module']['tankCheckJumpTo'] = ['Zielseite TÜV-Prüfung', 'Wählen Sie die Seite aus, auf der das Modul für die TÜV-Prüfung (Tank-Check) eingebunden ist.'];
+$GLOBALS['TL_LANG']['tl_module']['courseJumpTo'] = ['Zielseite Kurs-Reader', 'Wählen Sie die Seite aus, auf der das Kurs-Reader Modul eingebunden ist.'];
 
 $GLOBALS['TL_LANG']['tl_module']['dc_calendar_view'] = ['Standardansicht', 'Wählen Sie die Standardansicht für den Kalender.'];
 $GLOBALS['TL_LANG']['tl_module']['dc_calendar_view_options'] = [

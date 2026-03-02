@@ -45,8 +45,8 @@ class CourseEventsListController extends AbstractFrontendModuleController
         $dateFormat = Config::get('datimFormat');
         $useAutoItem = (bool)Config::get('useAutoItem');
 
-        // Ziel-Seite (Reader) wie im Kalender über jumpTo auswählen
-        $jumpTo = (int)($model->jumpTo ?? 0);
+        // Ziel-Seite (Reader) über courseJumpTo auswählen
+        $jumpTo = (int)($model->courseJumpTo ?? 0);
         $jumpToPage = $jumpTo > 0 ? PageModel::findByPk($jumpTo) : null;
 
         $list = [];
