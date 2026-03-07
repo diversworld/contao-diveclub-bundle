@@ -41,53 +41,69 @@ class CourseEventCalendarController extends AbstractFrontendModuleController
 
         // Aktuelles Event ermitteln (analog zum Reader)
         $identifier = Input::get('event') ?: Input::get('items');
-        if (!$identifier) {
-            // Nur im Frontend-Kontext verstecken, im Backend (Preview/Edit) Info anzeigen
+        $event = null;
+
+        if ($identifier) {
+            if (is_numeric($identifier)) {
+                $event = DcCourseEventModel::findByPk((int)$identifier);
+            } else {
+                $event = DcCourseEventModel::findOneBy(['alias=?', 'published=?'], [$identifier, 1]);
+            }
+        }
+
+        // --- Zeitplan-Daten laden ---
+        $db = System::getContainer()->get('database_connection');
+        $schedule = [];
+
+        if ($event && (int)$event->published === 1) {
+            // Nur Zeitplan für DIESES Event
+            $schedule = $db->fetchAllAssociative(
+                'SELECT s.id, s.planned_at, s.location, s.instructor, s.notes, m.title AS module_title, e.title AS event_title
+                 FROM tl_dc_course_event_schedule s
+                 INNER JOIN tl_dc_course_modules m ON m.id = s.module_id
+                 INNER JOIN tl_dc_course_event e ON e.id = s.pid
+                 WHERE s.pid = ?
+                 ORDER BY s.planned_at',
+                [(int)$event->id]
+            );
+        } else {
+            // Wenn kein spezifisches Event gewählt ist: Im Backend (Preview/Edit) Info anzeigen
             if (System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest($request)) {
                 $template->hasEvents = false;
                 $template->be_message = 'Dieses Modul zeigt den Zeitplan an, wenn es zusammen mit einem Reader auf einer Seite platziert wird.';
                 return $template->getResponse();
             }
-            return new Response('', Response::HTTP_NO_CONTENT);
-        }
 
-        if (is_numeric($identifier)) {
-            $event = DcCourseEventModel::findByPk((int)$identifier);
-        } else {
-            $event = DcCourseEventModel::findOneBy(['alias=?', 'published=?'], [$identifier, 1]);
-        }
-
-        if (!$event || (int)$event->published !== 1) {
-            return new Response('', Response::HTTP_NO_CONTENT);
+            // Wenn im Frontend kein Event gewählt ist, laden wir ALLE Zeitplan-Einträge
+            // für VERÖFFENTLICHTE Events, um eine Gesamtübersicht im Kalender zu ermöglichen.
+            $schedule = $db->fetchAllAssociative(
+                'SELECT s.id, s.planned_at, s.location, s.instructor, s.notes, m.title AS module_title, e.title AS event_title
+                 FROM tl_dc_course_event_schedule s
+                 INNER JOIN tl_dc_course_modules m ON m.id = s.module_id
+                 INNER JOIN tl_dc_course_event e ON e.id = s.pid
+                 WHERE e.published = ?
+                 ORDER BY s.planned_at',
+                [1]
+            );
         }
 
         // --- Contao Calendar Logic ---
         $month = Input::get('month');
+        // Create current date object
+        $objDate = new Date();
+
         try {
             if ($month) {
                 $objDate = new Date((string)$month, 'Ym');
-            } else {
-                $objDate = new Date();
             }
         } catch (\Exception $e) {
-            $objDate = new Date();
+            // Fallback to current date already set
         }
 
         $intYear = (int) date('Y', $objDate->tstamp);
         $intMonth = (int) date('m', $objDate->tstamp);
         $monthBegin = $objDate->monthBegin;
         $monthEnd = $objDate->monthEnd;
-
-        // Zeitplan-Daten für dieses Event laden
-        $db = System::getContainer()->get('database_connection');
-        $schedule = $db->fetchAllAssociative(
-            'SELECT s.id, s.planned_at, s.location, s.instructor, s.notes, m.title AS module_title
-             FROM tl_dc_course_event_schedule s
-             INNER JOIN tl_dc_course_modules m ON m.id = s.module_id
-             WHERE s.pid = ?
-             ORDER BY s.planned_at',
-            [(int)$event->id]
-        );
 
         // Group events by date (Ymd)
         $eventsByDate = [];
@@ -104,6 +120,7 @@ class CourseEventCalendarController extends AbstractFrontendModuleController
                 'location' => $row['location'],
                 'instructor' => $row['instructor'],
                 'notes' => $row['notes'],
+                'event_title' => $row['event_title'] ?? null
             ];
         }
 
@@ -155,6 +172,10 @@ class CourseEventCalendarController extends AbstractFrontendModuleController
         $intNumberOfRows = (int) ceil(($intDaysInMonth + $intFirstDayOffset) / 7);
         $intColumnCount = -1;
 
+        // Current month and year for mktime
+        $intCurrentYear = (int)date('Y', $monthBegin);
+        $intCurrentMonth = (int)date('m', $monthBegin);
+
         for ($i=1; $i<=($intNumberOfRows * 7); $i++) {
             $intWeek = (int) floor(++$intColumnCount / 7);
             $dayInMonth = $i - $intFirstDayOffset;
@@ -170,7 +191,10 @@ class CourseEventCalendarController extends AbstractFrontendModuleController
                 continue;
             }
 
-            $dateKey = date('Ym', $objDate->tstamp) . str_pad((string)$dayInMonth, 2, '0', STR_PAD_LEFT);
+            // Use the actual date for the key to correctly handle days from previous/next month
+            $currentDayTimestamp = mktime(12, 0, 0, $intCurrentMonth, $dayInMonth, $intCurrentYear);
+            $dateKey = date('Ymd', $currentDayTimestamp);
+
             if ($dateKey == date('Ymd')) $class .= ' today';
 
             $weeks[$intWeek][] = [

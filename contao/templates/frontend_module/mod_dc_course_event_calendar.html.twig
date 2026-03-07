@@ -81,7 +81,7 @@
          style="cursor: pointer;">
         <span class="time">{{ event.time }}</span>
         <span class="title" title="{{ event.title }}">
-            {{ event.title }}
+            {% if event.event_title %}{{ event.event_title }}: {% endif %}{{ event.title }}
         </span>
         {{ block('calendar_event_details') }}
     </div>
