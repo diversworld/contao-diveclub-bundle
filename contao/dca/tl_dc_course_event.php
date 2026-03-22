@@ -70,9 +70,15 @@ $GLOBALS['TL_DCA']['tl_dc_course_event'] = [
     'palettes' => [
         'default' => '{title_legend},title,alias,course_id;
                       {time_legend},dateStart,dateEnd,location;
+                      {image_legend},addImage,;
                       {details_legend},instructor,max_participants,price,description;
                       {publish_legend},published,start,stop'
     ],
+    'subpalettes' => [
+        'addImage' => 'singleSRC,fullsize,size,floating,overwriteMeta',
+        'overwriteMeta' => 'alt,imageTitle,imageUrl,caption'
+    ],
+
     'fields' => [
         'id' => [
             'sql' => "int unsigned NOT NULL auto_increment"
@@ -119,6 +125,83 @@ $GLOBALS['TL_DCA']['tl_dc_course_event'] = [
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
             'sql' => "int NULL",
         ],
+        'addImage' => array
+        (
+            'inputType' => 'checkbox',
+            'eval' => array('submitOnChange' => true),
+            'sql' => array('type' => 'boolean', 'default' => false)
+        ),
+        'singleSRC' => array
+        (
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_event']['singleSRC'],
+            'inputType' => 'fileTree',
+            'eval' => array('filesOnly' => true, 'fieldType' => 'radio', 'extensions' => '%contao.image.valid_extensions%', 'mandatory' => true),
+            'sql' => "binary(16) NULL"
+        ),
+        'fullsize' => array
+        (
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_event']['fullsize'],
+            'inputType' => 'checkbox',
+            'eval' => array('tl_class' => 'w50'),
+            'sql' => array('type' => 'boolean', 'default' => false)
+        ),
+        'size' => array
+        (
+            'label' => &$GLOBALS['TL_LANG']['MSC']['imgSize'],
+            'inputType' => 'imageSize',
+            'reference' => &$GLOBALS['TL_LANG']['MSC'],
+            'eval' => array('rgxp' => 'natural', 'includeBlankOption' => true, 'nospace' => true, 'helpwizard' => true, 'tl_class' => 'w50 clr'),
+            'options_callback' => array('contao.listener.image_size_options', '__invoke'),
+            'sql' => array('type' => 'string', 'length' => 255, 'default' => '', 'customSchemaOptions' => array('collation' => 'ascii_bin'))
+        ),
+        'floating' => array
+        (
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_event']['floating'],
+            'inputType' => 'radioTable',
+            'options' => array('above', 'left', 'right', 'below'),
+            'eval' => array('cols' => 4, 'tl_class' => 'w50'),
+            'reference' => &$GLOBALS['TL_LANG']['MSC'],
+            'sql' => "varchar(32) NOT NULL default 'above'"
+        ),
+        'overwriteMeta' => array
+        (
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_event']['overwriteMeta'],
+            'inputType' => 'checkbox',
+            'eval' => array('submitOnChange' => true, 'tl_class' => 'w50 clr'),
+            'sql' => array('type' => 'boolean', 'default' => false)
+        ),
+        'alt' => array
+        (
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_event']['alt'],
+            'search' => true,
+            'inputType' => 'text',
+            'eval' => array('maxlength' => 255, 'tl_class' => 'w50'),
+            'sql' => "text NULL"
+        ),
+        'imageTitle' => array
+        (
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_event']['imageTitle'],
+            'search' => true,
+            'inputType' => 'text',
+            'eval' => array('maxlength' => 255, 'tl_class' => 'w50'),
+            'sql' => "text NULL"
+        ),
+        'imageUrl' => array
+        (
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_event']['imageUrl'],
+            'search' => true,
+            'inputType' => 'text',
+            'eval' => array('rgxp' => 'url', 'decodeEntities' => true, 'maxlength' => 2048, 'dcaPicker' => true, 'tl_class' => 'w50 wizard'),
+            'sql' => "text NULL"
+        ),
+        'caption' => array
+        (
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_course_event']['caption'],
+            'search' => true,
+            'inputType' => 'text',
+            'eval' => array('maxlength' => 255, 'allowHtml' => true, 'tl_class' => 'w50'),
+            'sql' => "text NULL"
+        ),
         'location' => [
             'inputType' => 'text',
             'search' => true,
