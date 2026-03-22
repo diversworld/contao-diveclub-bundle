@@ -68,11 +68,12 @@ $GLOBALS['TL_DCA']['tl_dc_course_event'] = [
         ],
     ],
     'palettes' => [
+        '__selector__' => ['addImage', 'overwriteMeta'],
         'default' => '{title_legend},title,alias,course_id;
-                      {time_legend},dateStart,dateEnd,location;
-                      {image_legend},addImage,;
-                      {details_legend},instructor,max_participants,price,description;
-                      {publish_legend},published,start,stop'
+                            {time_legend},dateStart,dateEnd,location;
+                            {image_legend},addImage;
+                            {details_legend},instructor,max_participants,price,description;
+                            {publish_legend},published,start,stop'
     ],
     'subpalettes' => [
         'addImage' => 'singleSRC,fullsize,size,floating,overwriteMeta',
@@ -125,83 +126,73 @@ $GLOBALS['TL_DCA']['tl_dc_course_event'] = [
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
             'sql' => "int NULL",
         ],
-        'addImage' => array
-        (
+        'addImage' => [
             'inputType' => 'checkbox',
-            'eval' => array('submitOnChange' => true),
-            'sql' => array('type' => 'boolean', 'default' => false)
-        ),
-        'singleSRC' => array
-        (
+            'eval' => ['submitOnChange' => true],
+            'sql' => ['type' => 'boolean', 'default' => false]
+        ],
+        'singleSRC' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_event']['singleSRC'],
             'inputType' => 'fileTree',
-            'eval' => array('filesOnly' => true, 'fieldType' => 'radio', 'extensions' => '%contao.image.valid_extensions%', 'mandatory' => true),
+            'eval' => ['filesOnly' => true, 'fieldType' => 'radio', 'extensions' => '%contao.image.valid_extensions%', 'mandatory' => true],
             'sql' => "binary(16) NULL"
-        ),
-        'fullsize' => array
-        (
+        ],
+        'fullsize' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_event']['fullsize'],
             'inputType' => 'checkbox',
-            'eval' => array('tl_class' => 'w50'),
-            'sql' => array('type' => 'boolean', 'default' => false)
-        ),
-        'size' => array
-        (
+            'eval' => ['tl_class' => 'w50'],
+            'sql' => ['type' => 'boolean', 'default' => false]
+        ],
+        'size' => [
             'label' => &$GLOBALS['TL_LANG']['MSC']['imgSize'],
             'inputType' => 'imageSize',
             'reference' => &$GLOBALS['TL_LANG']['MSC'],
-            'eval' => array('rgxp' => 'natural', 'includeBlankOption' => true, 'nospace' => true, 'helpwizard' => true, 'tl_class' => 'w50 clr'),
-            'options_callback' => array('contao.listener.image_size_options', '__invoke'),
-            'sql' => array('type' => 'string', 'length' => 255, 'default' => '', 'customSchemaOptions' => array('collation' => 'ascii_bin'))
-        ),
-        'floating' => array
-        (
+            'eval' => ['rgxp' => 'natural', 'includeBlankOption' => true, 'nospace' => true, 'helpwizard' => true, 'tl_class' => 'w50 clr'],
+            'options_callback' => ['contao.listener.image_size_options', '__invoke'],
+            'sql' => ['type' => 'string', 'length' => 255, 'default' => '', 'customSchemaOptions' => ['collation' => 'ascii_bin']]
+        ],
+        'floating' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_event']['floating'],
             'inputType' => 'radioTable',
-            'options' => array('above', 'left', 'right', 'below'),
-            'eval' => array('cols' => 4, 'tl_class' => 'w50'),
+            'options' => ['above', 'left', 'right', 'below'],
+            'eval' => ['cols' => 4, 'tl_class' => 'w50'],
             'reference' => &$GLOBALS['TL_LANG']['MSC'],
             'sql' => "varchar(32) NOT NULL default 'above'"
-        ),
-        'overwriteMeta' => array
-        (
+        ],
+        'overwriteMeta' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_event']['overwriteMeta'],
             'inputType' => 'checkbox',
-            'eval' => array('submitOnChange' => true, 'tl_class' => 'w50 clr'),
-            'sql' => array('type' => 'boolean', 'default' => false)
-        ),
-        'alt' => array
-        (
+            'eval' => ['submitOnChange' => true, 'tl_class' => 'w50 clr'],
+            'sql' => ['type' => 'boolean', 'default' => false]
+        ],
+        'alt' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_event']['alt'],
             'search' => true,
             'inputType' => 'text',
-            'eval' => array('maxlength' => 255, 'tl_class' => 'w50'),
+            'eval' => ['maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => "text NULL"
-        ),
-        'imageTitle' => array
-        (
+        ],
+        'imageTitle' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_event']['imageTitle'],
             'search' => true,
             'inputType' => 'text',
-            'eval' => array('maxlength' => 255, 'tl_class' => 'w50'),
+            'eval' => ['maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => "text NULL"
-        ),
-        'imageUrl' => array
-        (
+        ],
+        'imageUrl' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_event']['imageUrl'],
             'search' => true,
             'inputType' => 'text',
-            'eval' => array('rgxp' => 'url', 'decodeEntities' => true, 'maxlength' => 2048, 'dcaPicker' => true, 'tl_class' => 'w50 wizard'),
+            'eval' => ['rgxp' => 'url', 'decodeEntities' => true, 'maxlength' => 2048, 'dcaPicker' => true, 'tl_class' => 'w50 wizard'],
             'sql' => "text NULL"
-        ),
-        'caption' => array
-        (
+        ],
+        'caption' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_event']['caption'],
             'search' => true,
             'inputType' => 'text',
-            'eval' => array('maxlength' => 255, 'allowHtml' => true, 'tl_class' => 'w50'),
+            'eval' => ['maxlength' => 255, 'allowHtml' => true, 'tl_class' => 'w50'],
             'sql' => "text NULL"
-        ),
+        ],
         'location' => [
             'inputType' => 'text',
             'search' => true,
