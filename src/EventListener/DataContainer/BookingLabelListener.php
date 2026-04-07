@@ -12,16 +12,6 @@ class BookingLabelListener // Listener zur Anpassung der Label-Anzeige in der Ba
 {
     public function __invoke(array $row, string $label, DataContainer $dc, ?array $args = null): string|array // Methode zur Formatierung des Labels
     {
-        if (null !== $args && isset($args[0])) { // Falls Argumente für die Spaltendarstellung übergeben wurden
-            $args[0] = $row['bookingNumber']; // Spalte 1: Buchungsnummer
-            $args[1] = $row['lastname']; // Spalte 2: Nachname
-            $args[2] = $row['firstname']; // Spalte 3: Vorname
-            $args[3] = number_format((float) $row['totalPrice'], 2, ',', '.') . ' €'; // Spalte 4: Gesamtpreis formatiert
-            $args[4] = $GLOBALS['TL_LANG']['tl_dc_check_booking']['status_reference'][$row['status']]; // Spalte 5: Status aus Sprachdatei
-
-            return $args; // Gib die aktualisierten Argumente zurück
-        }
-
         return sprintf( // Fallback für die Standard-Anzeige (wenn keine Spalten genutzt werden)
             '[%s] %s, %s - %s € - %s',
             $row['bookingNumber'],
