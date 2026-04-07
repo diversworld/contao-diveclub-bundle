@@ -26,14 +26,16 @@ class OrderLabelListener // Listener zur Anpassung der Label-Anzeige für Bestel
             ); // Gib den formatierten String zurück
         }
 
-        $args[0] = sprintf( // Spalte 1: Gerät und Größe
-            '%s (%s) xy',
-            $row['serialNumber'],
-            $sizeLabel
-        );
+
         $args[1] = number_format((float)$row['totalPrice'], 2, ',', '.') . ' €'; // Spalte 2: Preis formatiert
         $args[2] = $statusLabel; // Spalte 3: Übersetzter Status
-
+        $args[0] = sprintf( // Spalte 1: Gerät und Größe
+            '%s (%s) -%s - %s€',
+            $row['serialNumber'],
+            $sizeLabel,
+            $args[2],
+            $args[1]
+        );
         return $args; // Gib die aktualisierten Argumente zurück
     }
 }
