@@ -114,7 +114,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_booking'] = [
         'totalPrice' => [
             'exclude' => true,
             'inputType' => 'text',
-            'eval' => ['rgxp' => 'digit', 'tl_class' => 'w50'],
+            'eval' => ['readonly' => true, 'rgxp' => 'digit', 'tl_class' => 'w50'],
             'sql' => "decimal(10,2) NOT NULL default '0.00'"
         ],
         'status' => [
@@ -138,7 +138,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_booking'] = [
             'filter' => true,
             'inputType' => 'select',
             'options_callback' => [MemberOptionsListener::class, '__invoke'],
-            'eval' => ['chosen' => true, 'includeBlankOption' => true, 'tl_class' => 'w50 clr'],
+            'eval' => ['chosen' => true, 'includeBlankOption' => true, 'tl_class' => 'w50 clr', 'submitOnChange' => true],
             'sql' => "int unsigned NOT NULL default 0",
             'foreignKey' => 'tl_member.id',
             'relation' => ['type' => 'hasOne', 'load' => 'lazy']

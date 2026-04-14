@@ -19,6 +19,7 @@ use Contao\DC_Table;
 use Contao\Image;
 use Contao\StringUtil;
 use Contao\System;
+use \Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\TankOptionsListener;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\OrderArticleOptionsListener;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\OrderLabelListener;
 
@@ -75,7 +76,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
     ],
     'palettes' => [
         'default' => '{booking_legend},bookingId;
-                      {tank_legend},tankData,serialNumber,manufacturer,bazNumber,size,o2clean;
+                      {tank_legend},tankId,serialNumber,manufacturer,bazNumber,size,o2clean;
                       {order_legend},selectedArticles,totalPrice,status;{notes_legend},notes;'
     ],
     'fields' => [
@@ -97,8 +98,15 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
             'exclude' => true,
             'search' => true,
             'inputType' => 'text',
-            'eval' => ['maxlength' => 64, 'tl_class' => 'w50'],
+            'eval' => ['readonly' => true, 'maxlength' => 64, 'tl_class' => 'w33'],
             'sql' => "varchar(64) NOT NULL default ''"
+        ],
+        'tankId' => [
+            'exclude' => true,
+            'inputType' => 'select',
+            'options_callback' => [TankOptionsListener::class, '__invoke'],
+            'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w25 clr', 'submitOnChange' => true],
+            'sql' => "int unsigned NOT NULL default 0"
         ],
         'serialNumber'      => [
             'inputType'         => 'text',
@@ -108,7 +116,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
             'filter'            => true,
             'sorting'           => true,
             'flag'              => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'eval'              => ['mandatory' => true, 'maxlength' => 50, 'tl_class' => 'w25'],
+            'eval' => ['mandatory' => false, 'maxlength' => 50, 'tl_class' => 'w25'],
             'sql'               => "varchar(50) NOT NULL default ''"
         ],
         'manufacturer'      => [
@@ -142,7 +150,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
             'sorting'           => true,
             'reference' => &$GLOBALS['TL_LANG']['tl_dc_check_order']['sizes'],
             'options_callback' => ['tl_dc_check_order', 'getSizeOptions'],
-            'eval'              => ['includeBlankOption' => true, 'tl_class' => 'w25'],
+            'eval' => ['includeBlankOption' => true, 'submitOnChange' => true, 'tl_class' => 'w25'],
             'sql' => "varchar(10) NOT NULL default ''",
         ],
         'o2clean'           => [
@@ -151,7 +159,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
             'exclude'           => true,
             'filter'            => true,
             'eval'              => ['submitOnChange' => true, 'tl_class' => 'w50'],
-            'sql'               => ['type' => 'boolean', 'default' => false]
+            'sql' => "char(1) NOT NULL default ''"
         ],
         'tankData' => [
             'exclude' => true,
@@ -163,13 +171,13 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
             'exclude' => true,
             'inputType' => 'checkboxWizard',
             'options_callback' => [OrderArticleOptionsListener::class, '__invoke'],
-            'eval' => ['multiple' => true, 'tl_class' => 'clr'],
+            'eval' => ['multiple' => true, 'tl_class' => 'clr', 'submitOnChange' => true],
             'sql' => "blob NULL"
         ],
         'totalPrice' => [
             'exclude' => true,
             'inputType' => 'text',
-            'eval' => ['rgxp' => 'digit', 'tl_class' => 'w50'],
+            'eval' => ['readonly' => true, 'rgxp' => 'digit', 'tl_class' => 'w50'],
             'sql' => "decimal(10,2) NOT NULL default '0.00'"
         ],
         'status' => [
@@ -206,7 +214,7 @@ class tl_dc_check_order extends Backend
         }
 
         // Fallback to a safe default set to avoid runtime errors if language is not initialized
-        return ['2', '3', '4', '5', '7', '8', '10', '12', '15', '18', '20', '11', '22'];
+        return ['1', '2', '3', '4', '5', '6', '7', '8', '10', '12', '15', '18', '20', '11', '22'];
     }
     public function generatePdfButton($row, $href, $label, $title, $icon, $attributes)
     {

@@ -35,10 +35,12 @@ $GLOBALS['TL_LANG']['tl_dc_check_order']['status']           = ['Status', 'Statu
 $GLOBALS['TL_LANG']['tl_dc_check_order']['notes']            = ['Interne Notizen', 'Zusätzliche Anmerkungen zur Prüfung.'];
 
 $GLOBALS['TL_LANG']['tl_dc_check_order']['sizes'] = [
+    '1' => '1 L',
     '2' => '2 L',
     '3' => '3 L',
     '4' => '4 L',
     '5' => '5 L',
+    '6' => '6 L',
     '7' => '7 L',
     '8' => '8 L',
     '10' => '10 L',
