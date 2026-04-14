@@ -10,6 +10,7 @@ use Contao\Database;
 use Contao\Input;
 use Contao\Controller;
 use Contao\StringUtil;
+use Contao\System;
 
 #[AsCallback(table: 'tl_dc_check_order', target: 'config.onload')]
 class OrderSizeArticleListener
@@ -79,6 +80,13 @@ class OrderSizeArticleListener
 
             $db->prepare("UPDATE tl_dc_check_order SET selectedArticles=? WHERE id=?")
                 ->execute(serialize($selectedArticles), $dc->id);
+
+            // Den Preislistener triggern, damit die Preise in tl_dc_check_order und tl_dc_check_booking aktuell sind
+            $priceListener = System::getContainer()->get(BookingPriceUpdateListener::class);
+            if ($priceListener instanceof BookingPriceUpdateListener) {
+                // Ein temporäres DataContainer-Objekt erstellen, da wir im onload sind
+                $priceListener->onOrderSubmit($dc);
+            }
 
             // Seite neu laden, damit die Checkbox im Formular markiert ist
             Controller::reload();

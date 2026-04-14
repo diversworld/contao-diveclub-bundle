@@ -7,6 +7,7 @@ namespace Diversworld\ContaoDiveclubBundle\EventListener\DataContainer;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\DataContainer;
 use Contao\Database;
+use Contao\Input;
 use Contao\StringUtil;
 
 class BookingPriceUpdateListener
@@ -14,8 +15,31 @@ class BookingPriceUpdateListener
     #[AsCallback(table: 'tl_dc_check_order', target: 'config.onsubmit')]
     public function onOrderSubmit(DataContainer $dc): void
     {
+        // Wenn kein activeRecord vorhanden ist (z.B. bei manuellem Aufruf aus onload), laden wir ihn
         if (!$dc->activeRecord) {
-            return;
+            $objOrder = Database::getInstance()
+                ->prepare("SELECT * FROM tl_dc_check_order WHERE id=?")
+                ->limit(1)
+                ->execute($dc->id);
+
+            if ($objOrder->numRows < 1) {
+                return;
+            }
+
+            $dc->activeRecord = $objOrder;
+        }
+
+        // Falls wir im onload sind und Daten per POST kommen, aktualisieren wir den activeRecord für die Preisberechnung
+        if (null !== Input::post('size')) {
+            $dc->activeRecord->size = Input::post('size');
+        }
+
+        if (null !== Input::post('selectedArticles')) {
+            $selected = Input::post('selectedArticles');
+            // Checkboxen senden ein Array
+            if (\is_array($selected)) {
+                $dc->activeRecord->selectedArticles = serialize($selected);
+            }
         }
 
         $this->updateOrderPrice($dc);
