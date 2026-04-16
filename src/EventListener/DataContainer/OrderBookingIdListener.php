@@ -24,14 +24,16 @@ class OrderBookingIdListener
             ->limit(1)
             ->execute($insertId);
 
-        if ($objOrder->numRows < 1) {
+        $pid = $objOrder->pid ?: ($set['pid'] ?? 0);
+
+        if (!$pid) {
             return;
         }
 
         // Buchungsnummer aus tl_dc_check_booking holen
         $objBooking = $db->prepare("SELECT bookingNumber FROM tl_dc_check_booking WHERE id=?")
             ->limit(1)
-            ->execute($objOrder->pid);
+            ->execute($pid);
 
         if ($objBooking->numRows > 0 && $objBooking->bookingNumber) {
             // bookingId in tl_dc_check_order mit der bookingNumber aktualisieren

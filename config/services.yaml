@@ -44,4 +44,3 @@ services:
             - _diversworld_contao_diveclub_attributes
         calls:
             - [ setName, [ diversworld_contao_diveclub ] ]
-

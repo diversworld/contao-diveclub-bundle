@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ContaoDiveclubBundle\EventListener\DataContainer;
+namespace Diversworld\ContaoDiveclubBundle\EventListener\DataContainer;
 
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\DataContainer;

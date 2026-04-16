@@ -53,6 +53,14 @@ class BookingPriceUpdateListener
             $dc->activeRecord->selectedArticles = $objCurrent->selectedArticles;
         }
 
+        // Sicherheitsprüfung pid
+        if (!$dc->activeRecord->pid) {
+            $objPid = Database::getInstance()->prepare("SELECT pid FROM tl_dc_check_order WHERE id=?")->execute($dc->id);
+            if ($objPid->pid) {
+                $dc->activeRecord->pid = $objPid->pid;
+            }
+        }
+
         $this->updateOrderPrice($dc);
         $this->updateBookingPrice((int)$dc->activeRecord->pid);
     }

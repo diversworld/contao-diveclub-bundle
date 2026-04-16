@@ -12,17 +12,12 @@ declare(strict_types=1);
  * @link https://github.com/diversworld/contao-diveclub-bundle
  */
 
-use Contao\Backend;
-use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
-use Contao\Image;
-use Contao\StringUtil;
-use Contao\System;
-use \Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\TankOptionsListener;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\TankOptionsListener;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\OrderArticleOptionsListener;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\OrderLabelListener;
-use ContaoDiveclubBundle\EventListener\DataContainer\OrderSizeOptionsListener;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\OrderSizeOptionsListener;
 
 /**
  * Table tl_dc_check_order
@@ -32,6 +27,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
         'dataContainer' => DC_Table::class,
         'ptable' => 'tl_dc_check_booking',
         'enableVersioning' => true,
+        'oncreate_callback' => [],
         'sql' => [
             'keys' => [
                 'id' => 'primary',

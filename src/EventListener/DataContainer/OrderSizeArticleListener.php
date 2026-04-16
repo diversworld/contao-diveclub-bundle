@@ -95,10 +95,13 @@ class OrderSizeArticleListener
 
         if ($hasChanges) {
             // Den Preislistener triggern, damit die Preise in tl_dc_check_order und tl_dc_check_booking aktuell sind
-            $priceListener = System::getContainer()->get(BookingPriceUpdateListener::class);
-            if ($priceListener instanceof BookingPriceUpdateListener) {
-                // Ein temporäres DataContainer-Objekt erstellen, da wir im onload sind
-                $priceListener->onOrderSubmit($dc);
+            $container = System::getContainer();
+            if ($container->has(BookingPriceUpdateListener::class)) {
+                $priceListener = $container->get(BookingPriceUpdateListener::class);
+                if ($priceListener instanceof BookingPriceUpdateListener) {
+                    // Ein temporäres DataContainer-Objekt erstellen, da wir im onload sind
+                    $priceListener->onOrderSubmit($dc);
+                }
             }
 
             // Seite neu laden, damit die Checkbox im Formular markiert ist
