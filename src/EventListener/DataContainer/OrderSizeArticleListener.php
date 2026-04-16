@@ -51,16 +51,46 @@ class OrderSizeArticleListener
 
         $proposalId = (int)$booking->pid;
 
-        // Passenden Artikel für diese Größe in diesem Angebot finden
-        $baseArticle = $db->prepare("SELECT id FROM tl_dc_check_articles WHERE pid=? AND articleSize=?")
-            ->execute($proposalId, $size);
+        // Alle Artikel für dieses Angebot laden, um Basisartikel und Pflichtartikel zu identifizieren
+        $articles = $db->prepare("SELECT id, articleSize, `default` FROM tl_dc_check_articles WHERE pid=?")
+            ->execute($proposalId);
 
-        if (!$baseArticle->next()) {
-            return;
+        $articleIdsToSelect = [];
+        $sizeArticleIds = [];
+        $bestMatchingArticleId = null;
+        $minMatchingSize = 999999;
+
+        while ($articles->next()) {
+            $currentArticleSize = (float)str_replace(',', '.', $articles->articleSize);
+            $targetSize = (float)str_replace(',', '.', $size);
+
+            // 1. Identifiziere alle größenabhängigen Artikel
+            if ($articles->articleSize !== '') {
+                $sizeArticleIds[] = (int)$articles->id;
+
+                // 2. Suche den bestmöglichen Basisartikel (kleinste articleSize >= targetSize)
+                if ($currentArticleSize >= $targetSize && $currentArticleSize < $minMatchingSize) {
+                    $minMatchingSize = $currentArticleSize;
+                    $bestMatchingArticleId = (int)$articles->id;
+                }
+            }
+
+            // 3. Pflichtartikel (default) vormerken
+            if ($articles->default) {
+                $articleIdsToSelect[] = (int)$articles->id;
+            }
         }
 
-        $articleId = (int)$baseArticle->id;
+        // Falls kein exakt passender gefunden wurde, nehmen wir den größten verfügbaren als Fallback?
+        // Oder die Anforderung sagt: "Der Preis bis 10L gilt für die Volumen größer gleich 10 Liter."
+        // Das ist etwas widersprüchlich zum Beispiel davor: "bis 8 Liter gilt für alle volumen bis 8Liter".
+        // Meistens ist es: "Nimm den kleinsten Artikel, dessen 'Größe bis' >= gewählte Größe ist".
+        if ($bestMatchingArticleId) {
+            $articleIdsToSelect[] = $bestMatchingArticleId;
+        }
+
         $selectedArticles = StringUtil::deserialize($objOrder->selectedArticles, true);
+        $originalSelectedArticles = $selectedArticles;
 
         $hasChanges = false;
 
@@ -71,22 +101,23 @@ class OrderSizeArticleListener
             $hasChanges = true;
         }
 
-        // Prüfen, ob der Artikel bereits ausgewählt ist
-        if (!\in_array($articleId, $selectedArticles, true)) {
+        // Berechne die neue Auswahl
+        // a) Entferne alle alten größenabhängigen Artikel, die NICHT der neue bestMatchingArticleId sind
+        $selectedArticles = array_diff($selectedArticles, $sizeArticleIds);
 
-            // Optional: Alte Größen-Artikel entfernen?
-            // Da wir nicht wissen, welche Artikel "Größen-Artikel" sind, außer durch erneutes Suchen:
-            $sizeArticles = $db->prepare("SELECT id FROM tl_dc_check_articles WHERE pid=? AND articleSize != ''")
-                ->execute($proposalId);
+        // b) Füge die neuen gewünschten Artikel hinzu (Basisartikel + Pflichtartikel)
+        foreach ($articleIdsToSelect as $id) {
+            if (!\in_array($id, $selectedArticles, true)) {
+                $selectedArticles[] = $id;
+            }
+        }
 
-            $sizeArticleIds = $sizeArticles->fetchEach('id');
+        // Sortierung beibehalten oder normalisieren
+        sort($selectedArticles);
+        $oldSorted = $originalSelectedArticles;
+        sort($oldSorted);
 
-            // Entferne alle anderen Größen-Artikel aus der Auswahl
-            $selectedArticles = array_diff($selectedArticles, $sizeArticleIds);
-
-            // Füge den neuen hinzu
-            $selectedArticles[] = $articleId;
-
+        if ($selectedArticles !== $oldSorted) {
             $db->prepare("UPDATE tl_dc_check_order SET selectedArticles=? WHERE id=?")
                 ->execute(serialize($selectedArticles), $dc->id);
 
