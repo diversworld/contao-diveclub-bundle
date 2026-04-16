@@ -116,7 +116,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
             'filter'            => true,
             'sorting'           => true,
             'flag'              => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'eval' => ['mandatory' => false, 'maxlength' => 50, 'tl_class' => 'w25'],
+            'eval' => ['mandatory' => false, 'maxlength' => 50, 'tl_class' => 'w25 clr'],
             'sql'               => "varchar(50) NOT NULL default ''"
         ],
         'manufacturer'      => [

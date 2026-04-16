@@ -42,6 +42,17 @@ class BookingPriceUpdateListener
             }
         }
 
+        // Falls wir bereits Änderungen in der DB gespeichert haben (z.B. im OrderSizeArticleListener), laden wir den aktuellen Stand
+        $objCurrent = Database::getInstance()
+            ->prepare("SELECT size, selectedArticles FROM tl_dc_check_order WHERE id=?")
+            ->limit(1)
+            ->execute($dc->id);
+
+        if ($objCurrent->numRows > 0) {
+            $dc->activeRecord->size = $objCurrent->size;
+            $dc->activeRecord->selectedArticles = $objCurrent->selectedArticles;
+        }
+
         $this->updateOrderPrice($dc);
         $this->updateBookingPrice((int)$dc->activeRecord->pid);
     }

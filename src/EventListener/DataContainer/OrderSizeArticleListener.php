@@ -62,6 +62,15 @@ class OrderSizeArticleListener
         $articleId = (int)$baseArticle->id;
         $selectedArticles = StringUtil::deserialize($objOrder->selectedArticles, true);
 
+        $hasChanges = false;
+
+        // Falls size im POST anders ist als in der DB, müssen wir size auch speichern
+        if (Input::post('size') !== null && Input::post('size') !== $objOrder->size) {
+            $db->prepare("UPDATE tl_dc_check_order SET size=? WHERE id=?")
+                ->execute(Input::post('size'), $dc->id);
+            $hasChanges = true;
+        }
+
         // Prüfen, ob der Artikel bereits ausgewählt ist
         if (!\in_array($articleId, $selectedArticles, true)) {
 
@@ -81,6 +90,10 @@ class OrderSizeArticleListener
             $db->prepare("UPDATE tl_dc_check_order SET selectedArticles=? WHERE id=?")
                 ->execute(serialize($selectedArticles), $dc->id);
 
+            $hasChanges = true;
+        }
+
+        if ($hasChanges) {
             // Den Preislistener triggern, damit die Preise in tl_dc_check_order und tl_dc_check_booking aktuell sind
             $priceListener = System::getContainer()->get(BookingPriceUpdateListener::class);
             if ($priceListener instanceof BookingPriceUpdateListener) {
