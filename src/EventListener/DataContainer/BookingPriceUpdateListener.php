@@ -72,26 +72,6 @@ class BookingPriceUpdateListener
         $db = Database::getInstance();
         $totalPrice = 0.0;
 
-        // 1. Basispreis für die Flaschengröße (size) ermitteln
-        if ($dc->activeRecord->size) {
-            // Die zugehörige Buchung finden, um die proposalId (pid) zu erhalten
-            $booking = $db->prepare("SELECT pid FROM tl_dc_check_booking WHERE id=?")
-                ->execute($dc->activeRecord->pid);
-
-            if ($booking->next()) {
-                $proposalId = (int)$booking->pid;
-
-                // Passenden Artikel für diese Größe in diesem Angebot finden
-                // Wir suchen nach einem Artikel, dessen articleSize mit der size der Order übereinstimmt
-                $baseArticle = $db->prepare("SELECT articlePriceBrutto FROM tl_dc_check_articles WHERE pid=? AND articleSize=?")
-                    ->execute($proposalId, $dc->activeRecord->size);
-
-                if ($baseArticle->next()) {
-                    $totalPrice += (float)$baseArticle->articlePriceBrutto;
-                }
-            }
-        }
-
         // 2. Preise der zusätzlich gewählten Artikel addieren
         $selected = StringUtil::deserialize($dc->activeRecord->selectedArticles, true);
 

@@ -22,6 +22,7 @@ use Contao\System;
 use \Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\TankOptionsListener;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\OrderArticleOptionsListener;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\OrderLabelListener;
+use ContaoDiveclubBundle\EventListener\DataContainer\OrderSizeOptionsListener;
 
 /**
  * Table tl_dc_check_order
@@ -149,7 +150,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
             'filter'            => true,
             'sorting'           => true,
             'reference' => &$GLOBALS['TL_LANG']['tl_dc_check_order']['sizes'],
-            'options_callback' => ['tl_dc_check_order', 'getSizeOptions'],
+            'options_callback' => [OrderSizeOptionsListener::class, '__invoke'],
             'eval' => ['includeBlankOption' => true, 'submitOnChange' => true, 'tl_class' => 'w25'],
             'sql' => "varchar(10) NOT NULL default ''",
         ],
@@ -197,30 +198,3 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
         ]
     ]
 ];
-
-class tl_dc_check_order extends Backend
-{
-    /**
-     * Provide size options based on language file keys without triggering early access errors
-     */
-    public static function getSizeOptions(): array
-    {
-        // Ensure language file is loaded
-        System::loadLanguageFile('tl_dc_check_order');
-
-        $sizes = $GLOBALS['TL_LANG']['tl_dc_check_order']['sizes'] ?? null;
-        if (\is_array($sizes)) {
-            return array_keys($sizes);
-        }
-
-        // Fallback to a safe default set to avoid runtime errors if language is not initialized
-        return ['1', '2', '3', '4', '5', '6', '7', '8', '10', '12', '15', '18', '20', '11', '22'];
-    }
-    public function generatePdfButton($row, $href, $label, $title, $icon, $attributes)
-    {
-        // For orders, we use the parent booking ID to generate the full PDF
-        $url = System::getContainer()->get('router')->generate('dc_check_order_pdf', ['id' => $row['pid']]);
-
-        return '<a href="' . $url . '" title="' . StringUtil::specialchars($title) . '" ' . $attributes . ' target="_blank">' . Image::getHtml($icon, $label) . '</a> ';
-    }
-}
