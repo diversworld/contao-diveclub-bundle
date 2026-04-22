@@ -39,9 +39,10 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
     'list' => [
         'sorting' => [
             'mode' => DataContainer::MODE_PARENT,
-            'fields' => ['id'],
+            'fields' => ['size'],
             'headerFields' => ['bookingNumber', 'lastname', 'firstname', 'bookingDate'],
             'flag' => DataContainer::SORT_ASC,
+            'disableGrouping' => false,
             'panelLayout' => 'filter;sort,search,limit'
         ],
         'label' => [

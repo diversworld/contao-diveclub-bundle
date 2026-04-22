@@ -156,6 +156,10 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
         ],
         'proposalDate' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_check_proposal']['proposalDate'],
+            'exclude' => true,
+            'filter' => true,
+            'sorting' => true,
+            'flag' => DataContainer::SORT_DAY_DESC,
             'inputType' => 'text',
             'eval' => ['rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w25 clr wizard'],
             'sql' => "int NULL"

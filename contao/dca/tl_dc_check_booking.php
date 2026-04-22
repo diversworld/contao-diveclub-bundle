@@ -45,7 +45,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_booking'] = [
             'mode' => DataContainer::MODE_PARENT,
             'fields' => ['bookingDate DESC'],
             'headerFields' => ['title', 'vendorName', 'proposalDate'],
-            'flag' => DataContainer::SORT_DESC,
+            'flag' => DataContainer::SORT_DAY_DESC,
             'panelLayout' => 'filter;sort,search,limit'
         ],
         'label' => [
@@ -103,10 +103,11 @@ $GLOBALS['TL_DCA']['tl_dc_check_booking'] = [
             'sql' => "varchar(32) NOT NULL default ''"
         ],
         'bookingDate' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_check_booking']['bookingDate'],
             'exclude' => true,
             'filter' => true,
             'sorting' => true,
-            'flag' => DataContainer::SORT_DESC,
+            'flag' => DataContainer::SORT_DAY_DESC,
             'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
             'sql' => "int unsigned NULL"

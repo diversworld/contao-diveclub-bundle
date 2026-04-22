@@ -16,6 +16,7 @@ $GLOBALS['TL_LANG']['tl_dc_check_order']['member_legend'] = 'Mitglied-Informatio
 $GLOBALS['TL_LANG']['tl_dc_check_order']['tank_legend']   = 'Flaschen-Informationen';
 $GLOBALS['TL_LANG']['tl_dc_check_order']['order_legend']  = 'Bestell-Details';
 $GLOBALS['TL_LANG']['tl_dc_check_order']['notes_legend']  = 'Anmerkungen';
+$GLOBALS['TL_LANG']['tl_dc_check_order']['id'] = ['ID', 'Die ID der Bestellposition'];
 
 $GLOBALS['TL_LANG']['tl_dc_check_order']['memberId']         = ['Mitglied', 'Bitte wählen Sie das Mitglied aus.'];
 $GLOBALS['TL_LANG']['tl_dc_check_order']['firstname']        = ['Vorname', 'Vorname des Kunden (falls kein Mitglied).'];

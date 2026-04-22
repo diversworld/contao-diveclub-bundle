@@ -38,4 +38,13 @@ class OrderLabelListener // Listener zur Anpassung der Label-Anzeige für Bestel
 
         return $args; // Gib die aktualisierten Argumente zurück
     }
+
+    public function generateGroupLabel(string $group, string $mode, string $field, array $row, DataContainer $dc): string
+    {
+        return sprintf(
+            '%s: %s',
+            $GLOBALS['TL_LANG']['tl_dc_check_order']['id'][0] ?? 'ID',
+            $group
+        );
+    }
 }
