@@ -21,7 +21,9 @@ use Contao\DC_Table;
 use Contao\Image;
 use Contao\StringUtil;
 use Contao\System;
-use Diversworld\ContaoDiveclubBundle\DataContainer\DcCheckProposal;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ProposalAliasListener;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ProposalEventVendorInfoListener;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ProposalTuvListButtonListener;
 
 /**
  * Table tl_dc_check_proposal
@@ -78,7 +80,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
                 'href' => 'key=tuv_list',
                 'icon' => 'bundles/diversworldcontaodiveclub/icons/pdf.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()"',
-                'button_callback' => [tl_dc_check_proposal::class, 'generateTuvListButton'],
+                'button_callback' => [ProposalTuvListButtonListener::class, '__invoke'],
                 'primary' => true,
                 'showInHeader' => true
             ],
@@ -125,7 +127,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
             'search' => true,
             'inputType' => 'text',
             'eval' => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w33'],
-            'save_callback' => [['tl_dc_check_proposal', 'generateAlias']],
+            'save_callback' => [[ProposalAliasListener::class, '__invoke']],
             'sql' => "varchar(255) NOT NULL default ''"
         ],
         'checkId' => [
@@ -144,7 +146,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
                 return $options;
             },
             'save_callback' => [
-                ['tl_dc_check_proposal', 'updateEventVendorInfo']
+                [ProposalEventVendorInfoListener::class, '__invoke']
             ], // Spezifische Callback-Methode
             'eval' => [
                 'includeBlankOption' => true, // Ermöglicht eine leere Auswahl als Standardvalue
@@ -266,96 +268,3 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
     ]
 ];
 
-/**
- * Provide miscellaneous methods that are used by the data configuration array.
- *
- * @property DcCheckProposal $dcCheckProposal
- *
- * @internal
- */
-class tl_dc_check_proposal extends Backend
-{
-    /**
-     * Auto-generate the event alias if it has not been set yet
-     *
-     * @param mixed $varValue
-     * @param DataContainer $dc
-     *
-     * @return mixed
-     *
-     * @throws Exception
-     */
-    public function generateAlias(mixed $varValue, DataContainer $dc): mixed
-    {
-        $aliasExists = static function (string $alias) use ($dc): bool {
-            $result = Database::getInstance()
-                ->prepare("SELECT id FROM tl_dc_check_proposal WHERE alias=? AND id!=?")
-                ->execute($alias, $dc->id);
-
-            return $result->numRows > 0;
-        };
-
-        // Generate the alias if there is none
-        if (!$varValue) {
-            $varValue = System::getContainer()->get('contao.slug')->generate(
-                $dc->activeRecord->title,
-                [],
-                $aliasExists
-            );
-        } elseif (preg_match('/^[1-9]\d*$/', $varValue)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
-        } elseif ($aliasExists($varValue)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
-        }
-
-        return $varValue;
-    }
-
-    /**
-     * Funktion, um die Vendor-Info in das zugehörige Event zu schreiben
-     *
-     * @param mixed $varValue Der neue Wert des Feldes (checkId)
-     * @param DataContainer $dc Das DataContainer-Objekt des aktuellen Datensatzes
-     *
-     * @return mixed
-     */
-    public function updateEventVendorInfo(mixed $varValue, DataContainer $dc): mixed
-    {
-        // Prüfe, ob der Wert gesetzt ist (keine leere Auswahl)
-        if (!empty($varValue)) {
-            // Hole die Datenbank-Instanz
-            $db = Database::getInstance();
-
-            // Lade die vorhandenen Event-Daten aus der Tabelle tl_calendar_events
-            $event = $db->prepare("SELECT * FROM tl_calendar_events WHERE id = ?")
-                ->execute($varValue);
-
-            if ($event->numRows > 0) {
-                // Hole den Vendor-Namen aus dem aktuellen tl_dc_check_proposal-Datensatz
-                $vendor = $dc->activeRecord->id;
-
-                // Update der Vendor-Info für das Event
-                $db->prepare("UPDATE tl_calendar_events SET addVendorInfo = ? WHERE id = ?")
-                    ->execute($vendor, $varValue);
-
-                // Optional: Protokollieren, dass der Vendor eingetragen wurde
-                $logger = System::getContainer()->get('monolog.logger.contao');
-                $logger->info(
-                    'Vendor-Info für Event-ID ' . $varValue . ' aktualisiert: ' . $vendor,
-                    ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)]
-                );
-            } else {
-                throw new RuntimeException(sprintf('Das Event mit der ID %d existiert nicht.', $varValue));
-            }
-        }
-        // Rückgabe des gespeicherten Wertes
-        return $varValue;
-    }
-
-    public function generateTuvListButton($row, $href, $label, $title, $icon, $attributes)
-    {
-        $url = System::getContainer()->get('router')->generate('dc_tuv_list_export', ['id' => $row['id']]);
-
-        return '<a href="' . $url . '" title="' . StringUtil::specialchars($title) . '" ' . $attributes . ' target="_blank">' . Image::getHtml($icon, $label) . '</a> ';
-    }
-}

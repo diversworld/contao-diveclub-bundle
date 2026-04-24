@@ -104,9 +104,6 @@ $GLOBALS['TL_DCA']['tl_dc_check_articles'] = [
             'search'        => true,
             'inputType'     => 'text',
             'eval'          => ['rgxp'=>'alias', 'doNotCopy'=>true, 'unique'=>true, 'maxlength'=>255, 'tl_class'=>'w33'],
-            'save_callback' => [
-                ['tl_dc_check_articles', 'generateAlias']
-            ],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'articleSize'       => [
@@ -124,18 +121,12 @@ $GLOBALS['TL_DCA']['tl_dc_check_articles'] = [
         'articlePriceNetto' => [
             'label'         => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['articlePriceNetto'],
             'inputType'     => 'text',
-            'save_callback' => [
-                ['tl_dc_check_articles', 'calculatePrices']
-            ],
             'eval'          => ['submitOnChange' => true, 'tl_class'=>'w25'],
             'sql'           => "DECIMAL(10,2) NOT NULL default '0.00'",
         ],
         'articlePriceBrutto'=> [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_check_articles']['articlePriceBrutto'],
             'inputType'         => 'text',
-            'save_callback'     => [
-                ['tl_dc_check_articles', 'calculatePrices']
-            ],
             'eval'          => ['submitOnChange' => true, 'tl_class'=>'w25'],
             'sql'           => "DECIMAL(10,2) NOT NULL default '0.00'",
         ],
@@ -182,79 +173,3 @@ $GLOBALS['TL_DCA']['tl_dc_check_articles'] = [
         ]
     ]
 ];
-
-/**
- * Provide miscellaneous methods that are used by the data configuration array.
- *
- * @internal
- */
-class tl_dc_check_articles extends Backend
-{
-    /**
-     * Auto-generate the event alias if it has not been set yet
-     *
-     * @param mixed $varValue
-     * @param DataContainer $dc
-     *
-     * @return mixed
-     *
-     * @throws Exception
-     */
-    public function generateAlias(mixed $varValue, DataContainer $dc): mixed
-    {
-        $aliasExists = static function (string $alias) use ($dc): bool {
-            $result = Database::getInstance()
-                ->prepare("SELECT id FROM tl_dc_check_articles WHERE alias=? AND id!=?")
-                ->execute($alias, $dc->id);
-            return $result->numRows > 0;
-        };
-
-        // Generate the alias if there is none
-        if (!$varValue) {
-            $varValue = System::getContainer()->get('contao.slug')->generate(
-                $dc->activeRecord->title,
-                [],
-                $aliasExists
-            );
-        } elseif (preg_match('/^[1-9]\d*$/', $varValue)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
-        } elseif ($aliasExists($varValue)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
-        }
-
-        return $varValue;
-    }
-
-    public function calculatePrices(mixed $varValue, DataContainer $dc): mixed
-    {
-        // Fall: Netto-Wert wurde eingegeben
-        if ($dc->field === 'articlePriceNetto') {
-            $priceNetto = (float) $varValue; // Netto-Wert speichern
-            $priceBrutto = round($priceNetto * 1.19, 2); // Brutto berechnen
-
-            // Synchronisierung über activeRecord
-            $dc->activeRecord->articlePriceBrutto = $priceBrutto;
-
-            // Preise speichern
-            Database::getInstance()
-                ->prepare("UPDATE tl_dc_check_articles SET articlePriceBrutto=? WHERE id=?")
-                ->execute($priceBrutto, $dc->id);
-
-        } elseif ($dc->field === 'articlePriceBrutto') {
-            // Fall: Brutto-Wert wurde eingegeben
-            $priceBrutto = (float) $varValue; // Brutto-Wert speichern
-            $priceNetto = round($priceBrutto / 1.19, 2); // Netto berechnen
-
-            // Synchronisierung über activeRecord
-            $dc->activeRecord->articlePriceNetto = $priceNetto;
-
-            // Preise speichern
-            Database::getInstance()
-                ->prepare("UPDATE tl_dc_check_articles SET articlePriceNetto=? WHERE id=?")
-                ->execute($priceNetto, $dc->id);
-        }
-
-        // Rückgabe des aktuellen Feldes: Immer den eingegebenen Wert zurückgeben
-        return $varValue;
-    }
-}
