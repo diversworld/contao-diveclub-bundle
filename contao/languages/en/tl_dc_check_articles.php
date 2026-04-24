@@ -45,3 +45,20 @@ $GLOBALS['TL_LANG']['tl_dc_check_articles']['notes'] = ["Notes", "Enter a note"]
 $GLOBALS['TL_LANG']['tl_dc_check_articles']['published'] = ["Publish", "Publish the record."];
 $GLOBALS['TL_LANG']['tl_dc_check_articles']['start'] = ["Show from", "From when should the record be displayed."];
 $GLOBALS['TL_LANG']['tl_dc_check_articles']['stop'] = ["Show until", "Until when should the record be displayed."];
+
+$GLOBALS['TL_LANG']['tl_dc_check_articles']['sizes'] = [
+    '1' => '1 L',
+    '2' => '2 L',
+    '3' => '3 L',
+    '4' => '4 L',
+    '5' => '5 L',
+    '7' => '7 L',
+    '8' => '8 L',
+    '10' => '10 L',
+    '12' => '12 L',
+    '15' => '15 L',
+    '18' => '18 L',
+    '20' => '20 L',
+    '11' => '40 cft',
+    '22' => '80 cft'
+];

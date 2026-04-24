@@ -48,6 +48,7 @@ $GLOBALS['TL_LANG']['tl_dc_check_articles']['start'] = ["Anzeigen ab", "Ab wann 
 $GLOBALS['TL_LANG']['tl_dc_check_articles']['stop'] = ["Anzeigen bis", "Bis wann soll der Datensatz angezeigt werden."];
 
 $GLOBALS['TL_LANG']['tl_dc_check_articles']['sizes'] = [
+    '1' => '1 L',
     '2' => '2 L',
     '3' => '3 L',
     '4' => '4 L',
