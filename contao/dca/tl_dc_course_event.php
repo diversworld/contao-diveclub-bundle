@@ -7,15 +7,8 @@ declare(strict_types=1);
  * Kursveranstaltung: konkrete Durchführung einer Kurs‑Vorlage (tl_dc_dive_course)
  */
 
-use Contao\Backend;
-use Contao\Database;
 use Contao\DataContainer;
-use Contao\Date;
 use Contao\DC_Table;
-use Contao\StringUtil;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseEventLabelListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseEventOnSubmitListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\InstructorOptionsListener;
 
 $GLOBALS['TL_DCA']['tl_dc_course_event'] = [
     'config' => [

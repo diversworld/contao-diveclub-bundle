@@ -12,15 +12,8 @@ declare(strict_types=1);
  * @link https://github.com/diversworld/contao-diveclub-bundle
  */
 
-use Contao\Backend;
 use Contao\DataContainer;
 use Contao\DC_Table;
-use Contao\Image;
-use Contao\StringUtil;
-use Contao\System;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\BookingLabelListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\MemberOptionsListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\BookingPdfButtonListener;
 
 /**
  * Table tl_dc_check_booking
@@ -51,7 +44,6 @@ $GLOBALS['TL_DCA']['tl_dc_check_booking'] = [
         'label' => [
             'fields' => ['bookingNumber', 'lastname', 'firstname', 'totalPrice', 'status'],
             'format' => '[%s] %s, %s - %s €',
-            'label_callback' => [BookingLabelListener::class, '__invoke'],
         ],
         'global_operations' => [
             'all' => [
@@ -68,7 +60,6 @@ $GLOBALS['TL_DCA']['tl_dc_check_booking'] = [
                 'href' => 'key=pdf',
                 'icon' => 'bundles/diversworldcontaodiveclub/icons/pdf.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()"',
-                'button_callback' => [BookingPdfButtonListener::class, '__invoke']
             ],
             'copy',
             'cut',
@@ -138,7 +129,6 @@ $GLOBALS['TL_DCA']['tl_dc_check_booking'] = [
             'exclude' => true,
             'filter' => true,
             'inputType' => 'select',
-            'options_callback' => [MemberOptionsListener::class, '__invoke'],
             'eval' => ['chosen' => true, 'includeBlankOption' => true, 'tl_class' => 'w50 clr', 'submitOnChange' => true],
             'sql' => "int unsigned NOT NULL default 0",
             'foreignKey' => 'tl_member.id',

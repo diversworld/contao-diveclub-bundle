@@ -12,18 +12,10 @@ declare(strict_types=1);
  * @link https://github.com/diversworld/contao-diveclub-bundle
  */
 
-use Contao\Backend;
 use Contao\CoreBundle\EventListener\Widget\HttpUrlListener;
-use Contao\CoreBundle\Monolog\ContaoContext;
-use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
-use Contao\Image;
-use Contao\StringUtil;
-use Contao\System;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ProposalAliasListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ProposalEventVendorInfoListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ProposalTuvListButtonListener;
+
 
 /**
  * Table tl_dc_check_proposal
@@ -80,8 +72,6 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
                 'href' => 'key=tuv_list',
                 'icon' => 'bundles/diversworldcontaodiveclub/icons/pdf.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()"',
-                'button_callback' => [ProposalTuvListButtonListener::class, '__invoke'],
-                'primary' => true,
                 'showInHeader' => true
             ],
             'new_after' => [
@@ -127,27 +117,11 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
             'search' => true,
             'inputType' => 'text',
             'eval' => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w33'],
-            'save_callback' => [[ProposalAliasListener::class, '__invoke']],
             'sql' => "varchar(255) NOT NULL default ''"
         ],
         'checkId' => [
             'inputType' => 'select', // 'select' für Dropdown
             'foreignKey' => 'tl_calendar_events.title',
-            //'options_callback'  => [['tl_dc_check_proposal', 'getCalenarOptions']],
-            'options_callback' => function () {
-                $options = [];
-                $db = Database::getInstance();
-                $result = $db->execute("SELECT id, title FROM tl_calendar_events WHERE addCheckInfo = '1'");
-
-                if ($result->numRows > 0) {
-                    $data = $result->fetchAllAssoc();
-                    $options = array_column($data, 'title', 'id');
-                }
-                return $options;
-            },
-            'save_callback' => [
-                [ProposalEventVendorInfoListener::class, '__invoke']
-            ], // Spezifische Callback-Methode
             'eval' => [
                 'includeBlankOption' => true, // Ermöglicht eine leere Auswahl als Standardvalue
                 'mandatory' => false,

@@ -1,11 +1,7 @@
 <?php
 
-use Contao\Backend;
-use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
-use Contao\System;
-use Psr\Log\LoggerInterface;
 
 $GLOBALS['TL_DCA']['tl_dc_config'] = [
     'config' => [ // Konfiguration des Data Containers
@@ -93,9 +89,6 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
             'search' => true, // Suchbar
             'inputType' => 'text', // Text-Eingabe
             'eval' => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w50'], // Validierung als Alias
-            'save_callback' => [ // Callback-Funktion vor dem Speichern
-                ['tl_dc_config', 'generateAlias'] // Generiert den Alias automatisch
-            ],
             'sql' => "varchar(255) NOT NULL default ''" // SQL-Typ
         ],
         'activateApi' => [
@@ -313,33 +306,3 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
         ]
     ],
 ];
-
-class tl_dc_config extends Backend
-{
-    public LoggerInterface $logger;
-
-    public function generateAlias(mixed $varValue, DataContainer $dc): mixed
-    {
-        $aliasExists = static function (string $alias) use ($dc): bool {
-            $result = Database::getInstance()
-                ->prepare("SELECT id FROM tl_dc_config WHERE alias=? AND id!=?")
-                ->execute($alias, $dc->id);
-            return $result->numRows > 0;
-        };
-
-        // Generate the alias if there is none
-        if (!$varValue) {
-            $varValue = System::getContainer()->get('contao.slug')->generate(
-                $dc->activeRecord->title,
-                [],
-                $aliasExists
-            );
-        } elseif (preg_match('/^[1-9]\d*$/', $varValue)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
-        } elseif ($aliasExists($varValue)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
-        }
-
-        return $varValue;
-    }
-}

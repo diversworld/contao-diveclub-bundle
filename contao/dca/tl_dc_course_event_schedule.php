@@ -7,15 +7,8 @@ declare(strict_types=1);
  * Zeitplan‑Einträge (geplante Übungen) pro Kursveranstaltung
  */
 
-use Contao\Backend;
-use Contao\Config;
-use Contao\Database;
 use Contao\DataContainer;
-use Contao\Date;
 use Contao\DC_Table;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\InstructorOptionsListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ScheduleLabelListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ScheduleOnSubmitListener;
 
 $GLOBALS['TL_DCA']['tl_dc_course_event_schedule'] = [
     'config' => [

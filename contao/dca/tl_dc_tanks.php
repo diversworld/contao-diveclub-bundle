@@ -13,18 +13,9 @@ declare(strict_types=1);
  */
 
 use Contao\Backend;
-use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
-use Contao\Input;
-use Contao\CoreBundle\Monolog\ContaoContext;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\TankLabelListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\MemberOptionsListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\TankAliasListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\TankCheckDateListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\TankCalendarOptionsListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\TankPriceListener;
 
 /**
  * Table tl_dc_tanks
@@ -55,7 +46,6 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'fields'            => ['title','owner','serialNumber','manufacturer','size','o2clean','lastCheckDate','nextCheckDate','status'],
             'showColumns'       => true,
             'format'            => '%s',
-            'label_callback'    => [TankLabelListener::class, '__invoke'],
         ],
         'global_operations' => [
             'all'               => [
@@ -105,9 +95,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_tanks']['alias'],
             'search'            => true,
             'eval'              => ['rgxp'=>'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
-            'save_callback' => [
-                [TankAliasListener::class, '__invoke']
-            ],
+            'save_callback' => [],
             'sql' => "varchar(255) NOT NULL default ''"
         ],
         'serialNumber'      => [
@@ -168,10 +156,6 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_tanks']['checkId'],
             'foreignKey'        => 'tl_calendar_events.title',      // Zeigt den Titel des Events als Auswahl
             'relation'          => ['type' => 'hasOne', 'load' => 'lazy'], // Relationstyp
-            'options_callback'  => [TankCalendarOptionsListener::class, '__invoke'],  // Option Callback
-            'save_callback'     => [
-                [TankCheckDateListener::class, '__invoke']
-            ],
             'eval'              => [
                 'includeBlankOption'=> true,                      // Option "Bitte wählen" hinzufügen
                 'chosen'            => true,                       // Dropdown mit Suchfunktion
@@ -216,13 +200,11 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'search'            => false,
             'filter'            => true,
             'sorting'           => true,
-            'save_callback'     => [[TankPriceListener::class, '__invoke']],
             'eval'              => [ 'mandatory'=>false, 'tl_class' => 'w25'], // Beachten Sie "rgxp" für Währungsangaben
             'sql'               => "DECIMAL(10,2) NOT NULL default '0.00'"
         ],
         'owner'             => [
             'inputType'         => 'select',                                        // Typ ist "select"
-            'options_callback'  => [MemberOptionsListener::class, '__invoke'],              // Optionen über Callback holen
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_tanks']['owner'],
             'exclude'           => true,
             'search'            => true,

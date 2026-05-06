@@ -17,12 +17,6 @@ use Contao\BackendUser;
 use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
-use Diversworld\ContaoDiveclubBundle\DataContainer\DcDiveCourse;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseCategoryOptionsCallback;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseTypeOptionsCallback;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\DiveCourseAliasListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\InstructorOptionsListener;
-use Diversworld\ContaoDiveclubBundle\Model\DcDiveCourseModel;
 
 /**
  * Table tl_dc_dive_course
@@ -127,7 +121,6 @@ $GLOBALS['TL_DCA']['tl_dc_dive_course'] = [
         'course_type' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_dive_course']['course_type'],
             'inputType' => 'select',
-            'options_callback' => [CourseTypeOptionsCallback::class, '__invoke'],
             'eval' => ['mandatory' => true, 'tl_class' => 'w33'],
             'sql' => "varchar(32) NOT NULL default ''",
         ],
@@ -184,7 +177,6 @@ $GLOBALS['TL_DCA']['tl_dc_dive_course'] = [
             'search' => true,
             'filter' => true,
             'sorting' => true,
-            'options_callback' => [CourseCategoryOptionsCallback::class, '__invoke'],
             'eval' => ['includeBlankOption' => true, 'tl_class' => 'w33'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],

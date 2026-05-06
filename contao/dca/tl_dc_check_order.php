@@ -14,10 +14,6 @@ declare(strict_types=1);
 
 use Contao\DataContainer;
 use Contao\DC_Table;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\TankOptionsListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\OrderArticleOptionsListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\OrderLabelListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\OrderSizeOptionsListener;
 
 /**
  * Table tl_dc_check_order
@@ -48,7 +44,6 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
         'label' => [
             'fields' => ['serialNumber', 'size', 'totalPrice', 'status'],
             'format' => '%s (%sL) - %s € [%s]',
-            'label_callback' => [OrderLabelListener::class, '__invoke'],
         ],
         'global_operations' => [
             'all' => [
@@ -102,7 +97,6 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
         'tankId' => [
             'exclude' => true,
             'inputType' => 'select',
-            'options_callback' => [TankOptionsListener::class, '__invoke'],
             'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w25 clr', 'submitOnChange' => true],
             'sql' => "int unsigned NOT NULL default 0"
         ],
@@ -147,7 +141,6 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
             'filter'            => true,
             'sorting'           => true,
             'reference' => &$GLOBALS['TL_LANG']['tl_dc_check_order']['sizes'],
-            'options_callback' => [OrderSizeOptionsListener::class, '__invoke'],
             'eval' => ['includeBlankOption' => true, 'submitOnChange' => true, 'tl_class' => 'w25'],
             'sql' => "varchar(10) NOT NULL default ''",
         ],
@@ -168,7 +161,6 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
         'selectedArticles' => [
             'exclude' => true,
             'inputType' => 'checkboxWizard',
-            'options_callback' => [OrderArticleOptionsListener::class, '__invoke'],
             'eval' => ['multiple' => true, 'tl_class' => 'clr', 'submitOnChange' => true],
             'sql' => "blob NULL"
         ],

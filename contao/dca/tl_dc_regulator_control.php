@@ -12,14 +12,8 @@ declare(strict_types=1);
  * @link https://github.com/diversworld/contao-diveclub-bundle
  */
 
-use Contao\Backend;
-use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
-use Contao\System;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\RegControlHeaderCallback;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\RegulatorControlLabelListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\SetRegNextCheckDateCallback;
 
 /**
  * Table tl_dc_check_articles
@@ -44,7 +38,6 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'mode' => DataContainer::MODE_PARENT,
             'fields' => ['actualCheckDate'],
             'headerFields' => ['title', 'manufacturer', 'regModel1st', 'regModel2ndPri', 'regModel2ndSec'],
-            'header_callback' => [RegControlHeaderCallback::class, '__invoke'],
             'flag' => DataContainer::SORT_YEAR_DESC,
             'panelLayout' => 'filter;sort,search,limit',
         ],
@@ -52,7 +45,6 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'fields' => ['title', 'actualCheckDate', 'midPressurePost30', 'midPressurePost200', 'inhalePressurePost', 'exhalePressurePost'],
             'headerFields' => ['title', 'regModel1st', 'regModel2ndPri', 'regModel2ndSec'],
             'format' => &$GLOBALS['TL_LANG']['tl_dc_regulator_control']['label_format'],
-            'label_callback' => [RegulatorControlLabelListener::class, '__invoke'],
         ],
         'global_operations' => [
             'all' => [
@@ -106,9 +98,6 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'search' => true,
             'inputType' => 'text',
             'eval' => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
-            'save_callback' => [
-                ['tl_dc_regulator_control', 'generateAlias']
-            ],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'actualCheckDate' => [
@@ -119,7 +108,6 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
             'filter' => true,
             'flag' => DataContainer::SORT_YEAR_DESC,
             'eval' => ['submitOnChange' => true, 'rgxp' => 'date', 'doNotCopy' => false, 'datepicker' => true, 'tl_class' => 'w25 wizard'],
-            'onsubmit_callback' => [SetRegNextCheckDateCallback::class, '__invoke'],
             'sql' => "int NULL"
         ],
         'price' => [
@@ -257,41 +245,3 @@ $GLOBALS['TL_DCA']['tl_dc_regulator_control'] = [
         ]
     ]
 ];
-
-class tl_dc_regulator_control extends Backend
-{
-    /**
-     * Auto-generate the event alias if it has not been set yet
-     *
-     * @param mixed $varValue
-     * @param DataContainer $dc
-     *
-     * @return mixed
-     *
-     * @throws Exception
-     */
-    public function generateAlias(mixed $varValue, DataContainer $dc): mixed
-    {
-        $aliasExists = static function (string $alias) use ($dc): bool {
-            $result = Database::getInstance()
-                ->prepare("SELECT id FROM tl_dc_regulator_control WHERE alias=? AND id!=?")
-                ->execute($alias, $dc->id);
-            return $result->numRows > 0;
-        };
-
-        // Generate the alias if there is none
-        if (!$varValue) {
-            $varValue = System::getContainer()->get('contao.slug')->generate(
-                $dc->activeRecord->title,
-                [],
-                $aliasExists
-            );
-        } elseif (preg_match('/^[1-9]\d*$/', $varValue)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
-        } elseif ($aliasExists($varValue)) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
-        }
-
-        return $varValue;
-    }
-}

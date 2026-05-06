@@ -14,14 +14,8 @@ declare(strict_types=1);
  */
 
 use Contao\Backend;
-use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
-use Diversworld\ContaoDiveclubBundle\DataContainer\DcReservation;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ItemReservationCallbackListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationItemsHeaderCallback;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationItemsLabelCallback;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationItemsSubTypeOptionsCallback;
 use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
 use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorsModel;
@@ -49,7 +43,6 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
             'mode' => DataContainer::MODE_PARENT,
             'fields' => ['item_type', 'reservation_status', 'created_at', 'updated_at'],
             'headerFields' => ['title', 'member_id', 'reservedFor', 'reservation_status', 'created_at', 'updated_at'],
-            'header_callback' => [ReservationItemsHeaderCallback::class, '__invoke'],
             'flag' => DataContainer::SORT_ASC,
             'panelLayout' => 'filter;sort,search,limit'
         ],

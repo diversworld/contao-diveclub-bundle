@@ -11,11 +11,8 @@ declare(strict_types=1);
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/diversworld/contao-diveclub-bundle
  */
-use Contao\Backend;
-use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
-use Contao\System;
 
 /**
  * Table tl_dc_check_articles

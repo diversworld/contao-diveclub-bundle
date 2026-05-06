@@ -2,16 +2,20 @@
 
 namespace Diversworld\ContaoDiveclubBundle\Helper;
 
-use Contao\Database;
 use Contao\DataContainer;
 use Contao\FilesModel;
 use Contao\StringUtil;
 use Contao\System;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception as DBALException;
 use Exception;
-use RuntimeException;
 
 class DcaTemplateHelper // Hilfsklasse zum Laden von Template-Daten für DCA-Dropdowns
 {
+    public function __construct(private readonly Connection $db)
+    {
+    }
+
     public function getManufacturers() // Holt Hersteller-Optionen
     {
         return $this->getTemplateOptions('manufacturersFile'); // Ruft Optionen für Hersteller-Template ab
@@ -53,24 +57,26 @@ class DcaTemplateHelper // Hilfsklasse zum Laden von Template-Daten für DCA-Dro
 
         // Lade die erforderlichen Felder aus der Tabelle tl_dc_config
         try {
-            $result = Database::getInstance()->execute("
+            $row = $this->db->fetchAssociative("
                 SELECT manufacturersFile, typesFile, regulatorsFile, sizesFile, courseTypesFile, courseCategoriesFile
                 FROM tl_dc_config
                 LIMIT 1"
             ); // Führe SQL-Abfrage auf die Konfigurationstabelle aus
-        } catch (\Exception $e) { // Falls Tabelle nicht existiert
+        } catch (DBALException $e) { // Falls Tabelle nicht existiert oder DB-Fehler auftritt
             return null; // Gib null zurück
+        } catch (\Exception $e) { // Andere Exceptions abfangen
+            return null;
         }
 
-        if ($result->numRows > 0) { // Wenn ein Konfigurationsdatensatz existiert
+        if ($row) { // Wenn ein Konfigurationsdatensatz existiert
             // Für jedes Feld die UUID verarbeiten
             $files = [
-                'manufacturersFile' => $result->manufacturersFile,
-                'typesFile' => $result->typesFile,
-                'regulatorsFile' => $result->regulatorsFile,
-                'sizesFile' => $result->sizesFile,
-                'courseTypesFile' => $result->courseTypesFile,
-                'courseCategoriesFile' => $result->courseCategoriesFile,
+                'manufacturersFile' => $row['manufacturersFile'],
+                'typesFile' => $row['typesFile'],
+                'regulatorsFile' => $row['regulatorsFile'],
+                'sizesFile' => $row['sizesFile'],
+                'courseTypesFile' => $row['courseTypesFile'],
+                'courseCategoriesFile' => $row['courseCategoriesFile'],
             ]; // Sammle die binären UUIDs aus der DB
 
             // UUIDs in Pfade umwandeln

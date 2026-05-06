@@ -14,12 +14,6 @@ declare(strict_types=1);
 
 use Contao\DataContainer;
 use Contao\DC_Table;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentAliasListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentLabelCallback;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentManufacturerOptionsCallback;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentSizeOptionsCallback;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentSubTypeOptionsCallback;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentTypeOptionsCallback;
 
 /**
  * Table tl_dc_tanks
@@ -46,7 +40,6 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
         ],
         'label' => [
             'fields' => ['type', 'subType', 'title', 'manufacturer', 'model', 'size', 'rentalFee', 'status'],
-            'label_callback' => [EquipmentLabelCallback::class, '__invoke'],
             'showColumns' => true,
             'format' => '%s',
         ],
@@ -101,9 +94,6 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
             'search' => true,
             'inputType' => 'text',
             'eval' => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w33 clr'],
-            'save_callback' => [
-                [EquipmentAliasListener::class, '__invoke']
-            ],
             'sql' => "varchar(255) NOT NULL default ''"
         ],
         'type' => [
@@ -113,7 +103,6 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
             'search' => true,
             'filter' => true,
             'sorting' => true,
-            'options_callback' => [EquipmentTypeOptionsCallback::class, '__invoke'],
             'flag' => DataContainer::SORT_INITIAL_LETTERS_ASC,
             'eval' => array('includeBlankOption' => true, 'submitOnChange' => true, 'mandatory' => true, 'tl_class' => 'w25 clr'),
             'sql' => "int unsigned NOT NULL default 0",
@@ -122,7 +111,6 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
             'inputType' => 'select',
             'label' => &$GLOBALS['TL_LANG']['tl_dc_equipment']['subType'],
             'exclude' => true,
-            'options_callback' => [EquipmentSubTypeOptionsCallback::class, '__invoke'],
             'eval' => ['includeBlankOption' => true, 'mandatory' => true, 'tl_class' => 'w25',],
             'sql' => "int unsigned NOT NULL default 0",
         ],
@@ -143,7 +131,6 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
             'search' => true,
             'filter' => true,
             'sorting' => true,
-            'options_callback' => [EquipmentManufacturerOptionsCallback::class, '__invoke'],
             'eval' => ['mandatory' => true, 'tl_class' => 'w25 clr'],
             'sql' => "int unsigned NOT NULL default 0",
         ],
@@ -174,7 +161,6 @@ $GLOBALS['TL_DCA']['tl_dc_equipment'] = [
             'search' => true,
             'filter' => true,
             'sorting' => true,
-            'options_callback' => [EquipmentSizeOptionsCallback::class, '__invoke'],
             'eval' => ['mandatory' => false, 'includeBlankOption' => true, 'tl_class' => 'w25'],
             'sql' => "int unsigned NOT NULL default 0",
         ],

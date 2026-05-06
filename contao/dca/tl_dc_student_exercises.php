@@ -8,15 +8,11 @@ declare(strict_types=1);
  */
 
 use Contao\Backend;
-use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\Image;
 use Contao\Input;
 use Contao\StringUtil;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\InstructorOptionsListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\StudentExerciseLabelListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\StudentExerciseListener;
 
 $GLOBALS['TL_DCA']['tl_dc_student_exercises'] = [
     'config' => [
@@ -56,7 +52,6 @@ $GLOBALS['TL_DCA']['tl_dc_student_exercises'] = [
             'edit',
             '!complete' => [
                 'label' => ['Übung abschließen', 'Status auf OK setzen und Datum eintragen'],
-                'button_callback' => [StudentExerciseListener::class, 'showCompleteButton'],
                 'icon' => 'ok.svg',
                 'primary' => true,
                 'showInHeader' => true

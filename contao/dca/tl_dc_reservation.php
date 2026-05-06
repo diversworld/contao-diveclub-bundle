@@ -14,19 +14,9 @@ declare(strict_types=1);
  */
 
 use Contao\Backend;
-use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
-use Diversworld\ContaoDiveclubBundle\DataContainer\DcReservation;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationLabelCallback;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationMemberIdCallbackListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationPickedUpCallback;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationReturnedCallback;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationStatusCallback;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationTitleCallback;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationAliasListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\MemberOptionsListener;
 
 /**
  * Table tl_dc_reservation
@@ -56,7 +46,6 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'fields' => ['title', 'member_id', 'reservedFor', 'reservation_status', 'reserved_at', 'rentalFee'],
             'format' => '%s - %s/%s - %s %s - (%s)',
             'showColumns' => true,
-            'label_callback' => [ReservationLabelCallback::class, '__invoke'],
         ],
         'global_operations' => [
             'all' => [
@@ -101,7 +90,6 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'search' => true,
             'filter' => true,
             'sorting' => true,
-            'save_callback' => [[ReservationTitleCallback::class, '__invoke']],
             'flag' => DataContainer::SORT_INITIAL_LETTER_ASC,
             'eval' => ['mandatory' => false, 'maxlength' => 25, 'tl_class' => 'w33'],
             'sql' => "varchar(255) NOT NULL default ''"
@@ -110,7 +98,6 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'search' => true,
             'inputType' => 'text',
             'eval' => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w33'],
-            'save_callback' => [[ReservationAliasListener::class, '__invoke']],
             'sql' => "varchar(255) NOT NULL default ''"
         ],
         'reservation_status' => [
@@ -121,7 +108,6 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'filter' => true,
             'sorting' => true,
             'options' => &$GLOBALS['TL_LANG']['tl_dc_reservation']['itemStatus'],
-            'save_callback' => [[ReservationStatusCallback::class, '__invoke']],
             'reference' => &$GLOBALS['TL_LANG']['tl_dc_reservation']['itemStatus'],
             'eval' => ['includeBlankOption' => true, 'submitOnChange' => false, 'chosen' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql' => "varchar(255) NOT NULL default ''"
@@ -142,14 +128,12 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
         'picked_up_at' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_reservation']['picked_up_at'],
             'inputType' => 'text',
-            'save_callback' => [[ReservationPickedUpCallback::class, '__invoke']],
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
             'sql' => "int NULL"
         ],
         'returned_at' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_reservation']['returned_at'],
             'inputType' => 'text',
-            'save_callback' => [[ReservationReturnedCallback::class, '__invoke']],
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
             'sql' => "int NULL"
         ],
@@ -169,8 +153,6 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'search' => true,
             'filter' => false,
             'sorting' => true,
-            'save_callback' => [[ReservationMemberIdCallbackListener::class, '__invoke']],
-            'options_callback' => [MemberOptionsListener::class, '__invoke'],
             'eval' => array('submitOnChange' => true, 'includeBlankOption' => true, 'tl_class' => 'w25 clr'),
             'sql' => "int unsigned NOT NULL default 0", // Speichert eine ID (Int)
             'foreignKey' => 'tl_member.id',
@@ -183,7 +165,6 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'search' => true,
             'filter' => false,
             'sorting' => true,
-            'options_callback' => [MemberOptionsListener::class, '__invoke'],
             'eval' => array('submitOnChange' => true, 'includeBlankOption' => true, 'tl_class' => 'w25'),
             'sql' => "int unsigned NOT NULL default 0", // Speichert eine ID (Int)
             'foreignKey' => 'tl_member.id',

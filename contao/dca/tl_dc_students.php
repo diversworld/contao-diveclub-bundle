@@ -10,10 +10,6 @@ declare(strict_types=1);
 use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\StudentLabelListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\StudentLoadMemberDataCallback;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\StudentSyncCallback;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\MemberOptionsListener;
 
 $GLOBALS['TL_DCA']['tl_dc_students'] = [
     'config' => [
@@ -21,9 +17,6 @@ $GLOBALS['TL_DCA']['tl_dc_students'] = [
         'ctable' => ['tl_dc_course_students'],
         'enableVersioning' => true,
         'markAsCopy' => 'headline',
-        'onsubmit_callback' => [
-            [StudentSyncCallback::class, '__invoke']
-        ],
         'sql' => [
             'keys' => [
                 'id' => 'primary',
@@ -211,7 +204,6 @@ $GLOBALS['TL_DCA']['tl_dc_students'] = [
             'exclude' => true,
             'search' => true,
             'inputType' => 'select',
-            'options_callback' => [MemberOptionsListener::class, '__invoke'],
             'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50', 'submitOnChange' => true],
             'sql' => "int unsigned NOT NULL default 0",
             'foreignKey' => 'tl_member.id',

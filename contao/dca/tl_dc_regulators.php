@@ -14,11 +14,6 @@ declare(strict_types=1);
 
 use Contao\DataContainer;
 use Contao\DC_Table;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\EquipmentManufacturerOptionsCallback;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\RegulatorsAliasListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\RegulatorsLabelListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\RegulatorsOptionsCallback;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\RegulatorsPriceListener;
 
 /**
  * Table tl_dc_regulators
@@ -48,7 +43,6 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'fields' => ['title', 'manufacturer', 'regModel1st', 'regModel2ndPri', 'regModel2ndSec', 'status', 'id'],
             'showColumns' => true,
             'format' => '%s - %s - %s %s %s %s (Letzte Revision: %s)',
-            'label_callback' => [RegulatorsLabelListener::class, '__invoke']
         ],
         'global_operations' => [
             'all' => [
@@ -99,7 +93,6 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'search' => true,
             'inputType' => 'text',
             'eval' => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
-            'save_callback' => [[RegulatorsAliasListener::class, '__invoke']],
             'sql' => "varchar(255) NOT NULL default ''"
         ],
         'manufacturer' => [
@@ -109,7 +102,6 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'search' => true,
             'filter' => true,
             'sorting' => true,
-            'options_callback' => [EquipmentManufacturerOptionsCallback::class, '__invoke'],
             'reference' => &$GLOBALS['TL_LANG']['tl_dc_regulators']['manufacturer'],
             'eval' => ['includeBlankOption' => true, 'submitOnChange' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql' => "varchar(255) NOT NULL default ''",
@@ -132,7 +124,6 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'search' => true,
             'filter' => true,
             'sorting' => true,
-            'options_callback' => [RegulatorsOptionsCallback::class, 'getRegModels1st'],
             'eval' => ['submitOnChange' => true, 'includeBlankOption' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql' => "varchar(255) NOT NULL default ''"
         ],
@@ -154,7 +145,6 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'search' => true,
             'filter' => true,
             'sorting' => true,
-            'options_callback' => [RegulatorsOptionsCallback::class, 'getRegModels2ndPri'],
             'eval' => ['includeBlankOption' => true, 'submitOnChange' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql' => "varchar(255) NOT NULL default ''"
         ],
@@ -175,7 +165,6 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'search' => true,
             'filter' => true,
             'sorting' => true,
-            'options_callback' => [RegulatorsOptionsCallback::class, 'getRegModels2ndSec'],
             'eval' => ['includeBlankOption' => true, 'submitOnChange' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w25'],
             'sql' => "varchar(255) NOT NULL default ''"
         ],
@@ -198,7 +187,6 @@ $GLOBALS['TL_DCA']['tl_dc_regulators'] = [
             'search' => false,
             'filter' => true,
             'sorting' => false,
-            'save_callback' => [[RegulatorsPriceListener::class, '__invoke']],
             'eval' => ['rgxp' => 'digit', 'mandatory' => false, 'tl_class' => 'w25'], // Beachten Sie "rgxp" für Währungsangaben
             'sql' => "DECIMAL(10,2) NOT NULL default '0.00'"
         ],
