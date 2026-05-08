@@ -18,7 +18,9 @@ class TuvListExportController
 {
     public function __construct(
         private readonly TuvListGenerator $generator
-    ) {}
+    )
+    {
+    }
 
     public function __invoke(Request $request): Response
     {
@@ -29,7 +31,7 @@ class TuvListExportController
 
             // 🔥 Contao Filter korrekt aus Input (WICHTIG!)
             $filters = Input::get('filter', true) ?? [];
-            $search  = Input::get('search', true) ?? [];
+            $search = Input::get('search', true) ?? [];
             $sorting = [
                 'field' => Input::get('sort'),
                 'direction' => Input::get('order')

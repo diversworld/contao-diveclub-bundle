@@ -213,7 +213,7 @@ class ReservationListener
         $returnedAt = $dc->activeRecord->returned_at;
         $reservationStatus = $dc->activeRecord->reservation_status;
         $itemType = $dc->activeRecord->item_type;           // Z. B. `tl_dc_tanks`, `tl_dc_regulators`, `tl_dc_equipment`
-        $assetId = (int) $dc->activeRecord->item_id;        // Das ausgewählte Asset
+        $assetId = (int)$dc->activeRecord->item_id;        // Das ausgewählte Asset
 
         if ($reservationStatus === 'returned' || $reservationStatus === 'cancelled') {
             $status = 'available';
@@ -252,7 +252,7 @@ class ReservationListener
             $this->db->update(
                 'tl_dc_reservation_items', // Reservierungs-Tabelle
                 ['reservation_status' => $reservationStatus],
-                ['id' => (int) $dc->id]
+                ['id' => (int)$dc->id]
             );
 
             return; // Keine weitere Verarbeitung erforderlich
@@ -271,12 +271,12 @@ class ReservationListener
         $this->db->update(
             $itemType,                  // Tabelle aus item_type
             ['status' => $status],      // Zu setzende Spalten
-            ['id'  => $assetId]         // Bedingung (ID des Assets)
+            ['id' => $assetId]         // Bedingung (ID des Assets)
         );
         $this->db->update(
             'tl_dc_reservation_items',
             ['reservation_status' => $reservationStatus],
-            ['id' => (int) $dc->id]
+            ['id' => (int)$dc->id]
         );
     }
 

@@ -133,9 +133,9 @@ class TuvListGenerator
                     foreach ($orders as $order) {
                         $data[] = [
                             'member_name' => $booking->firstname . ' ' . $booking->lastname,
-                            'serialNumber' => (string) $order->serialNumber,
+                            'serialNumber' => (string)$order->serialNumber,
                             'size' => $order->size . ' L',
-                            'manufacturer' => (string) $order->manufacturer,
+                            'manufacturer' => (string)$order->manufacturer,
                             'o2clean' => $order->o2clean ? 'Ja' : 'Nein'
                         ];
                     }

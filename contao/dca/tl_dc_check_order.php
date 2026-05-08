@@ -15,6 +15,7 @@ declare(strict_types=1);
 use Contao\DataContainer;
 use Contao\DC_Table;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\BookingListener;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\OrderListener;
 
 /**
  * Table tl_dc_check_order
@@ -24,6 +25,9 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
         'dataContainer' => DC_Table::class,
         'ptable' => 'tl_dc_check_booking',
         'enableVersioning' => true,
+        'onload_callback' => [
+            [OrderListener::class, 'onLoadCallback']
+        ],
         'oncreate_callback' => [],
         'sql' => [
             'keys' => [
@@ -98,6 +102,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
         'tankId' => [
             'exclude' => true,
             'inputType' => 'select',
+            'options_callback' => [\Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\TanksListener::class, 'onOrderTankIdOptions'],
             'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w25 clr', 'submitOnChange' => true],
             'sql' => "int unsigned NOT NULL default 0"
         ],

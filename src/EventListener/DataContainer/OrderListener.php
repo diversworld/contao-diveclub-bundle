@@ -167,8 +167,8 @@ class OrderListener
                 if ($isNewTank || !$rowOrder['manufacturer']) {
                     $set['manufacturer'] = $rowTank['manufacturer'];
                 }
-                if ($isNewTank || !$rowOrder['bazNumber']) {
-                    $set['bazNumber'] = $rowTank['bazNumber'];
+                if ($isNewTank || ($rowTank['bazNumber'] !== $rowOrder['bazNumber'])) {
+                    $set['bazNumber'] = $rowTank['bazNumber'] ?: '';
                 }
                 if ($isNewTank || !$rowOrder['size']) {
                     $set['size'] = $rowTank['size'];

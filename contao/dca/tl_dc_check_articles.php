@@ -77,9 +77,9 @@ $GLOBALS['TL_DCA']['tl_dc_check_articles'] = [
             'sql' => "int unsigned NOT NULL auto_increment"
         ],
         'pid'               => [
-            'options_callback'  => [ProposalListener::class, 'getCheckIdOptions'],
+            'options_callback' => [ProposalListener::class, 'getCheckIdOptions'],
             'sql' => "int unsigned NOT NULL default 0",
-            'relation'          => ['type' => 'belongsTo', 'load' => 'lazy', 'table' => 'tl_dc_check_proposal'], // Typ anpassen, falls notwendig
+            'relation' => ['type' => 'belongsTo', 'load' => 'lazy', 'table' => 'tl_dc_check_proposal'], // Typ anpassen, falls notwendig
         ],
         'sorting' => [
             'sql' => "int unsigned NOT NULL default 0"

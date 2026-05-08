@@ -119,14 +119,18 @@ class TanksListener
 
         $memberId = (int)$this->db->fetchOne("SELECT memberId FROM tl_dc_check_booking WHERE id=?", [$dc->activeRecord->pid]);
 
-        if (!$memberId) {
-            return $options;
+        // 1. Privatflaschen des Mitglieds
+        if ($memberId) {
+            $rows = $this->db->fetchAllAssociative("SELECT id, title, serialNumber FROM tl_dc_tanks WHERE owner=? ORDER BY title", [$memberId]);
+            foreach ($rows as $row) {
+                $options['Mitgliedsflaschen'][$row['id']] = sprintf('%s (SN: %s)', $row['title'], $row['serialNumber']);
+            }
         }
 
-        $rows = $this->db->fetchAllAssociative("SELECT id, title, serialNumber FROM tl_dc_tanks WHERE owner=? ORDER BY title", [$memberId]);
-
-        foreach ($rows as $row) {
-            $options[$row['id']] = sprintf('%s (SN: %s)', $row['title'], $row['serialNumber']);
+        // 2. Vereinsflaschen (owner = 0 oder ein spezielles Admin-Mitglied, hier nehmen wir owner = 0 als Verein)
+        $clubTanks = $this->db->fetchAllAssociative("SELECT id, title, serialNumber FROM tl_dc_tanks WHERE owner=0 OR owner IS NULL ORDER BY title");
+        foreach ($clubTanks as $row) {
+            $options['Vereinsflaschen'][$row['id']] = sprintf('%s (SN: %s)', $row['title'], $row['serialNumber']);
         }
 
         return $options;

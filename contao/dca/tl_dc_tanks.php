@@ -96,7 +96,7 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_tanks']['alias'],
             'search'            => true,
             'eval'              => ['rgxp'=>'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w25'],
-            'save_callback'     => [
+            'save_callback' => [
                 [TanksListener::class, 'onAliasSave']
             ],
             'sql' => "varchar(255) NOT NULL default ''"
@@ -157,11 +157,11 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
         'checkId'           => [
             'inputType'         => 'select',                        // Typ ist "select"
             'label'             => &$GLOBALS['TL_LANG']['tl_dc_tanks']['checkId'],
-            'options_callback'  => [TanksListener::class, 'onCheckIdOptions'],
-            'save_callback'     => [
+            'options_callback' => [TanksListener::class, 'onCheckIdOptions'],
+            'save_callback' => [
                 [TanksListener::class, 'onCheckIdSave']
             ],
-            'relation'          => ['type' => 'hasOne', 'load' => 'lazy', 'table' => 'tl_calendar_events'], // Relationstyp
+            'relation' => ['type' => 'hasOne', 'load' => 'lazy', 'table' => 'tl_calendar_events'], // Relationstyp
             'eval'              => [
                 'includeBlankOption'=> true,                      // Option "Bitte wählen" hinzufügen
                 'chosen'            => true,                       // Dropdown mit Suchfunktion
@@ -216,8 +216,8 @@ $GLOBALS['TL_DCA']['tl_dc_tanks'] = [
             'search'            => true,
             'filter'            => true,
             'sorting'           => true,
-            'options_callback'  => [TanksListener::class, 'onOwnerOptionsCallback'],
-            'relation'          => ['type' => 'belongsTo', 'load' => 'lazy', 'table' => 'tl_member'],       // Relationstyp
+            'options_callback' => [TanksListener::class, 'onOwnerOptionsCallback'],
+            'relation' => ['type' => 'belongsTo', 'load' => 'lazy', 'table' => 'tl_member'],       // Relationstyp
             'eval'              => [
                 'includeBlankOption'=> true,                                        // Option "Bitte wählen" hinzufügen
                 'chosen'            => true,                                        // Dropdown mit Suchfunktion
