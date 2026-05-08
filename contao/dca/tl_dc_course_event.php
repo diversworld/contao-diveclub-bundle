@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 use Contao\DataContainer;
 use Contao\DC_Table;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseListener;
 
 $GLOBALS['TL_DCA']['tl_dc_course_event'] = [
     'config' => [
@@ -99,9 +100,10 @@ $GLOBALS['TL_DCA']['tl_dc_course_event'] = [
         'course_id' => [
             'label' => ['Kurs‑Vorlage', 'Referenz auf tl_dc_dive_course'],
             'inputType' => 'select',
-            'foreignKey' => 'tl_dc_dive_course.title',
+            'options_callback' => [CourseListener::class, 'onModuleCourseOptions'],
             'eval' => ['mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w33 clr'],
             'sql' => "int unsigned NOT NULL default 0",
+            'relation' => ['type' => 'hasOne', 'load' => 'lazy', 'table' => 'tl_dc_dive_course']
         ],
         'dateStart' => [
             'inputType' => 'text',

@@ -243,10 +243,13 @@ class CourseListener
         return $this->generateAliasWithValidation($this->connection, $this->slug, $varValue, $dc, 'tl_dc_course_modules');
     }
 
+    #[AsCallback(table: 'tl_dc_course_modules', target: 'fields.pid.options')]
     #[AsCallback(table: 'tl_dc_course_modules', target: 'fields.course_id.options')]
+    #[AsCallback(table: 'tl_dc_course_students', target: 'fields.dive_course_id.options')]
+    #[AsCallback(table: 'tl_dc_course_event', target: 'fields.dive_course_id.options')]
     public function onModuleCourseOptions(): array
     {
-        $rows = $this->connection->fetchAllAssociative("SELECT id, title FROM tl_dc_dive_course ORDER BY title LIMIT 500");
+        $rows = $this->connection->fetchAllAssociative("SELECT id, title FROM tl_dc_dive_course ORDER BY title");
         $options = [];
         foreach ($rows as $row) {
             $options[$row['id']] = $row['title'];
@@ -254,10 +257,60 @@ class CourseListener
         return $options;
     }
 
+    #[AsCallback(table: 'tl_dc_course_exercises', target: 'fields.pid.options')]
     #[AsCallback(table: 'tl_dc_course_exercises', target: 'fields.module_id.options')]
+    #[AsCallback(table: 'tl_dc_course_event_schedule', target: 'fields.module_id.options')]
+    #[AsCallback(table: 'tl_dc_student_exercises', target: 'fields.module_id.options')]
     public function onExerciseModuleOptions(): array
     {
-        $rows = $this->connection->fetchAllAssociative("SELECT id, title FROM tl_dc_course_modules ORDER BY title LIMIT 500");
+        $rows = $this->connection->fetchAllAssociative("SELECT id, title FROM tl_dc_course_modules ORDER BY title");
+        $options = [];
+        foreach ($rows as $row) {
+            $options[$row['id']] = $row['title'];
+        }
+        return $options;
+    }
+
+    #[AsCallback(table: 'tl_dc_course_event_schedule', target: 'fields.pid.options')]
+    #[AsCallback(table: 'tl_dc_course_event_schedule', target: 'fields.event_id.options')]
+    #[AsCallback(table: 'tl_dc_course_students', target: 'fields.event_id.options')]
+    public function onEventOptions(): array
+    {
+        $rows = $this->connection->fetchAllAssociative("SELECT id, title FROM tl_dc_course_event ORDER BY title");
+        $options = [];
+        foreach ($rows as $row) {
+            $options[$row['id']] = $row['title'];
+        }
+        return $options;
+    }
+
+    #[AsCallback(table: 'tl_dc_event_schedule_exercises', target: 'fields.pid.options')]
+    public function onScheduleOptions(): array
+    {
+        $rows = $this->connection->fetchAllAssociative("SELECT id FROM tl_dc_course_event_schedule ORDER BY id DESC");
+        $options = [];
+        foreach ($rows as $row) {
+            $options[$row['id']] = (string)$row['id'];
+        }
+        return $options;
+    }
+
+    #[AsCallback(table: 'tl_dc_event_schedule_exercises', target: 'fields.exercise_id.options')]
+    #[AsCallback(table: 'tl_dc_student_exercises', target: 'fields.exercise_id.options')]
+    public function onExerciseOptions(): array
+    {
+        $rows = $this->connection->fetchAllAssociative("SELECT id, title FROM tl_dc_course_exercises ORDER BY title");
+        $options = [];
+        foreach ($rows as $row) {
+            $options[$row['id']] = $row['title'];
+        }
+        return $options;
+    }
+
+    #[AsCallback(table: 'tl_dc_reservation_items', target: 'fields.pid.options')]
+    public function getReservationOptions(): array
+    {
+        $rows = $this->connection->fetchAllAssociative("SELECT id, title FROM tl_dc_reservation ORDER BY title DESC");
         $options = [];
         foreach ($rows as $row) {
             $options[$row['id']] = $row['title'];

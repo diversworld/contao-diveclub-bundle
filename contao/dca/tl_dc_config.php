@@ -2,6 +2,7 @@
 
 use Contao\DataContainer;
 use Contao\DC_Table;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ConfigListener;
 
 $GLOBALS['TL_DCA']['tl_dc_config'] = [
     'config' => [ // Konfiguration des Data Containers
@@ -116,9 +117,10 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_config']['apiNewsArchive'],
             'exclude' => true,
             'inputType' => 'select',
-            'foreignKey' => 'tl_news_archive.title',
+            'options_callback' => [ConfigListener::class, 'getNewsArchiveOptions'],
             'eval' => ['chosen' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'],
-            'sql' => "int unsigned NOT NULL default 0"
+            'sql' => "int unsigned NOT NULL default 0",
+            'relation' => ['type' => 'hasOne', 'load' => 'lazy', 'table' => 'tl_news_archive']
         ],
         'apiImprint' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_config']['apiImprint'],
@@ -214,9 +216,10 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_config']['instructor_groups'],
             'exclude' => true,
             'inputType' => 'checkboxWizard',
-            'foreignKey' => 'tl_member_group.name',
+            'options_callback' => [Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ConfigListener::class, 'getMemberGroupOptions'],
             'eval' => ['multiple' => true, 'tl_class' => 'clr'],
-            'sql' => "blob NULL"
+            'sql' => "blob NULL",
+            'relation' => ['type' => 'hasMany', 'load' => 'lazy', 'table' => 'tl_member_group']
         ],
         'invoiceTemplate' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_config']['invoiceTemplate'],

@@ -13,6 +13,7 @@ use Contao\DC_Table;
 use Contao\Image;
 use Contao\Input;
 use Contao\StringUtil;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseListener;
 
 $GLOBALS['TL_DCA']['tl_dc_student_exercises'] = [
     'config' => [
@@ -77,8 +78,9 @@ $GLOBALS['TL_DCA']['tl_dc_student_exercises'] = [
             'sql' => "int unsigned NOT NULL auto_increment"
         ],
         'pid' => [
-            'foreignKey' => 'tl_dc_course_students.id',
-            'sql' => "int unsigned NOT NULL default 0"
+            'options_callback' => [CourseListener::class, 'onCourseStudentOptions'],
+            'sql' => "int unsigned NOT NULL default 0",
+            'relation' => ['type' => 'belongsTo', 'load' => 'lazy', 'table' => 'tl_dc_course_students']
         ],
         'sorting' => [
             'sql' => "int unsigned NOT NULL default 0"
@@ -89,16 +91,18 @@ $GLOBALS['TL_DCA']['tl_dc_student_exercises'] = [
         'exercise_id' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_student_exercises']['exercise_id'],
             'inputType' => 'select',
-            'foreignKey' => 'tl_dc_course_exercises.title',
+            'options_callback' => [CourseListener::class, 'onExerciseOptions'],
             'eval' => ['mandatory' => false, 'includeBlankOption' => true, 'tl_class' => 'w50'],
             'sql' => "int unsigned NOT NULL default 0",
+            'relation' => ['type' => 'hasOne', 'load' => 'lazy', 'table' => 'tl_dc_course_exercises']
         ],
         'module_id' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_modules']['title'],
             'inputType' => 'select',
-            'foreignKey' => 'tl_dc_course_modules.title',
+            'options_callback' => [CourseListener::class, 'onExerciseModuleOptions'],
             'eval' => ['includeBlankOption' => true, 'tl_class' => 'w50', 'readonly' => true],
             'sql' => "int unsigned NOT NULL default 0",
+            'relation' => ['type' => 'hasOne', 'load' => 'lazy', 'table' => 'tl_dc_course_modules']
         ],
         'status' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_student_exercises']['status'],

@@ -16,6 +16,8 @@ declare(strict_types=1);
 use Contao\Backend;
 use Contao\DataContainer;
 use Contao\DC_Table;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseListener;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ReservationListener;
 use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
 use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcRegulatorsModel;
@@ -29,7 +31,9 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
         'dataContainer' => DC_Table::class,
         'ptable' => 'tl_dc_reservation',
         'enableVersioning' => true,
-        'onsubmit_callback' => [ItemReservationCallbackListener::class, '__invoke'],
+        'onsubmit_callback' => [
+            [ReservationListener::class, 'onItemSubmit'],
+        ],
         'sql' => [
             'keys' => [
                 'id' => 'primary',
@@ -88,9 +92,9 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
             'sql' => "int unsigned NOT NULL default 0"
         ],
         'pid' => [
-            'foreignKey' => 'tl_dc_reservation.title',
+            'options_callback' => [CourseListener::class, 'getReservationOptions'],
             'sql' => "int unsigned NOT NULL default 0",
-            'relation' => ['type' => 'belongsTo', 'load' => 'lazy'],
+            'relation' => ['type' => 'belongsTo', 'load' => 'lazy', 'table' => 'tl_dc_reservation'],
         ],
         'item_type' => [
             'inputType' => 'select',

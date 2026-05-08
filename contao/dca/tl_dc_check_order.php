@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 use Contao\DataContainer;
 use Contao\DC_Table;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\BookingListener;
 
 /**
  * Table tl_dc_check_order
@@ -77,9 +78,9 @@ $GLOBALS['TL_DCA']['tl_dc_check_order'] = [
             'sql' => "int unsigned NOT NULL auto_increment"
         ],
         'pid' => [
-            'foreignKey' => 'tl_dc_check_booking.bookingNumber',
+            'options_callback' => [BookingListener::class, 'getBookingOptions'],
             'sql' => "int unsigned NOT NULL default 0",
-            'relation' => ['type' => 'belongsTo', 'load' => 'lazy']
+            'relation' => ['type' => 'belongsTo', 'load' => 'lazy', 'table' => 'tl_dc_check_booking']
         ],
         'sorting' => [
             'sql' => "int unsigned NOT NULL default 0"

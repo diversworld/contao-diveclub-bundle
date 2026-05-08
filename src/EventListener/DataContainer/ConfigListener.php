@@ -25,4 +25,31 @@ class ConfigListener
     {
         return $this->generateAliasWithValidation($this->db, $this->slug, $varValue, $dc, 'tl_dc_config');
     }
+
+    #[AsCallback(table: 'tl_dc_config', target: 'fields.apiNewsArchive.options')]
+    public function getNewsArchiveOptions(): array
+    {
+        $options = [];
+        $result = $this->db->fetchAllAssociative("SELECT id, title FROM tl_news_archive ORDER BY title");
+
+        foreach ($result as $row) {
+            $options[$row['id']] = $row['title'];
+        }
+
+        return $options;
+    }
+
+    #[AsCallback(table: 'tl_dc_config', target: 'fields.instructor_groups.options')]
+    #[AsCallback(table: 'tl_dc_students', target: 'fields.instructor_groups.options')]
+    public function getMemberGroupOptions(): array
+    {
+        $options = [];
+        $result = $this->db->fetchAllAssociative("SELECT id, name FROM tl_member_group ORDER BY name");
+
+        foreach ($result as $row) {
+            $options[$row['id']] = $row['name'];
+        }
+
+        return $options;
+    }
 }

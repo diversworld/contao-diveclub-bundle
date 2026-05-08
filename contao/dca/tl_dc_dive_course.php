@@ -17,6 +17,7 @@ use Contao\BackendUser;
 use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ProposalListener;
 
 /**
  * Table tl_dc_dive_course
@@ -95,8 +96,8 @@ $GLOBALS['TL_DCA']['tl_dc_dive_course'] = [
             'sql' => "int unsigned NOT NULL auto_increment"
         ],
         'pid' => [
-            'foreignKey' => 'tl_calendar_events.title',
-            'relation' => ['type' => 'belongsTo', 'load' => 'lazy'],
+            'options_callback' => [ProposalListener::class, 'getEventOptions'],
+            'relation' => ['type' => 'belongsTo', 'load' => 'lazy', 'table' => 'tl_calendar_events'],
             'sql' => "int unsigned NOT NULL default 0",
         ],
         'sorting' => [

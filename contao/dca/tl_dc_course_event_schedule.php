@@ -71,8 +71,9 @@ $GLOBALS['TL_DCA']['tl_dc_course_event_schedule'] = [
             'sql' => "int unsigned NOT NULL auto_increment"
         ],
         'pid' => [
-            'foreignKey' => 'tl_dc_course_event.title',
-            'sql' => "int unsigned NOT NULL default 0"
+            'options_callback' => [Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseListener::class, 'onEventOptions'],
+            'sql' => "int unsigned NOT NULL default 0",
+            'relation' => ['type' => 'belongsTo', 'load' => 'lazy', 'table' => 'tl_dc_course_event']
         ],
         'sorting' => [
             'sql' => "int unsigned NOT NULL default 0"
@@ -82,9 +83,10 @@ $GLOBALS['TL_DCA']['tl_dc_course_event_schedule'] = [
         ],
         'module_id' => [
             'inputType' => 'select',
-            'foreignKey' => 'tl_dc_course_modules.title',
+            'options_callback' => [Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseListener::class, 'onExerciseModuleOptions'],
             'eval' => ['mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
             'sql' => "int unsigned NOT NULL default 0",
+            'relation' => ['type' => 'hasOne', 'load' => 'lazy', 'table' => 'tl_dc_course_modules']
         ],
         'planned_at' => [
             'inputType' => 'text',

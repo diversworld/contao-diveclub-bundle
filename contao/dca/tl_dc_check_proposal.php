@@ -15,7 +15,7 @@ declare(strict_types=1);
 use Contao\CoreBundle\EventListener\Widget\HttpUrlListener;
 use Contao\DataContainer;
 use Contao\DC_Table;
-
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ProposalListener;
 
 /**
  * Table tl_dc_check_proposal
@@ -50,7 +50,7 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
                 'href' => 'act=select',
                 'class' => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"'
-            ]
+            ],
         ],
         'operations' => [
             'edit',
@@ -62,18 +62,17 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
                 'primary' => true,
                 'showInHeader' => true
             ],
-            'copy',
-            'cut',
-            'delete',
-            'toggle',
-            'show',
             '!tuv_list' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_dc_check_proposal']['tuv_list'],
                 'href' => 'key=tuv_list',
                 'icon' => 'bundles/diversworldcontaodiveclub/icons/pdf.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()"',
-                'showInHeader' => true
             ],
+            'copy',
+            'cut',
+            'delete',
+            'toggle',
+            'show',
             'new_after' => [
                 'label' => ['Neu danach', 'Neue Zuordnung hinzufügen'],
                 'href' => 'act=create&amp;mode=1',
@@ -121,7 +120,11 @@ $GLOBALS['TL_DCA']['tl_dc_check_proposal'] = [
         ],
         'checkId' => [
             'inputType' => 'select', // 'select' für Dropdown
-            'foreignKey' => 'tl_calendar_events.title',
+            'options_callback' => [ProposalListener::class, 'getEventOptions'],
+            'save_callback' => [
+                [ProposalListener::class, 'updateEventVendorInfo']
+            ],
+            'relation' => ['type' => 'hasOne', 'load' => 'lazy', 'table' => 'tl_calendar_events'],
             'eval' => [
                 'includeBlankOption' => true, // Ermöglicht eine leere Auswahl als Standardvalue
                 'mandatory' => false,

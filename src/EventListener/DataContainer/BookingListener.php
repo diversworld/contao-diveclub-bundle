@@ -39,6 +39,19 @@ class BookingListener
         );
     }
 
+    #[AsCallback(table: 'tl_dc_check_order', target: 'fields.pid.options')]
+    public function getBookingOptions(): array
+    {
+        $options = [];
+        $result = $this->db->fetchAllAssociative("SELECT id, bookingNumber FROM tl_dc_check_booking ORDER BY bookingNumber DESC");
+
+        foreach ($result as $row) {
+            $options[$row['id']] = $row['bookingNumber'];
+        }
+
+        return $options;
+    }
+
     #[AsCallback(table: 'tl_dc_check_booking', target: 'config.onload')]
     public function onLoadCallback(DataContainer $dc): void
     {

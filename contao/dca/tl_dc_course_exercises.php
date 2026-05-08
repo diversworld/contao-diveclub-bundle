@@ -13,6 +13,7 @@ use Contao\DataContainer;
 use Contao\DC_Table;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseExerciseAliasListener;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseExerciseOptionsListener;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseListener;
 
 $GLOBALS['TL_DCA']['tl_dc_course_exercises'] = [
     'config' => [
@@ -68,8 +69,9 @@ $GLOBALS['TL_DCA']['tl_dc_course_exercises'] = [
             'sql' => "int unsigned NOT NULL auto_increment"
         ],
         'pid' => [
-            'foreignKey' => 'tl_dc_course_modules.title',
-            'sql' => "int unsigned NOT NULL default 0"
+            'options_callback' => [CourseListener::class, 'onExerciseModuleOptions'],
+            'sql' => "int unsigned NOT NULL default 0",
+            'relation' => ['type' => 'belongsTo', 'load' => 'lazy', 'table' => 'tl_dc_course_modules']
         ],
         'sorting' => [
             'sql' => "int unsigned NOT NULL default 0"

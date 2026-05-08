@@ -132,6 +132,12 @@ class TanksListener
         return $options;
     }
 
+    #[AsCallback(table: 'tl_dc_tanks', target: 'fields.owner.options')]
+    public function onOwnerOptionsCallback(): array
+    {
+        return $this->getOwnerOptions();
+    }
+
     private function getOwnerOptions(): array
     {
         $owners = $this->db->fetchAllAssociative("SELECT id, CONCAT(firstname, ' ', lastname) as name FROM tl_member ORDER BY lastname, firstname");

@@ -10,6 +10,8 @@ declare(strict_types=1);
 use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ConfigListener;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\MemberOptionsListener;
 
 $GLOBALS['TL_DCA']['tl_dc_students'] = [
     'config' => [
@@ -195,19 +197,20 @@ $GLOBALS['TL_DCA']['tl_dc_students'] = [
         'memberGroups' => [
             'label' => &$GLOBALS['TL_LANG']['tl_member']['groups'],
             'inputType' => 'checkbox',
-            'foreignKey' => 'tl_member_group.name',
+            'options_callback' => [ConfigListener::class, 'getMemberGroupOptions'],
             'eval' => ['multiple' => true, 'mandatory' => true, 'tl_class' => 'clr'],
-            'sql' => "blob NULL"
+            'sql' => "blob NULL",
+            'relation' => ['type' => 'hasMany', 'load' => 'lazy', 'table' => 'tl_member_group']
         ],
         'memberId' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_students']['memberId'],
             'exclude' => true,
             'search' => true,
             'inputType' => 'select',
+            'options_callback' => [MemberOptionsListener::class, '__invoke'],
             'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50', 'submitOnChange' => true],
             'sql' => "int unsigned NOT NULL default 0",
-            'foreignKey' => 'tl_member.id',
-            'relation' => ['type' => 'hasOne', 'load' => 'lazy']
+            'relation' => ['type' => 'hasOne', 'load' => 'lazy', 'table' => 'tl_member']
         ],
         'notes' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_students']['notes'],

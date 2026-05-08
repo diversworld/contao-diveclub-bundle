@@ -77,8 +77,9 @@ $GLOBALS['TL_DCA']['tl_dc_course_modules'] = [
             'sql' => "int unsigned NOT NULL auto_increment",
         ],
         'pid' => [
-            'foreignKey' => 'tl_dc_dive_course.title',
+            'options_callback' => [Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseListener::class, 'onModuleCourseOptions'],
             'sql' => "int unsigned NOT NULL default 0",
+            'relation' => ['type' => 'belongsTo', 'load' => 'lazy', 'table' => 'tl_dc_dive_course']
         ],
         'sorting' => [
             'sql' => "int unsigned NOT NULL default 0"

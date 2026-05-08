@@ -153,10 +153,10 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'search' => true,
             'filter' => false,
             'sorting' => true,
+            'options_callback' => [Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\MemberOptionsListener::class, '__invoke'],
             'eval' => array('submitOnChange' => true, 'includeBlankOption' => true, 'tl_class' => 'w25 clr'),
             'sql' => "int unsigned NOT NULL default 0", // Speichert eine ID (Int)
-            'foreignKey' => 'tl_member.id',
-            'relation' => array('type' => 'hasOne', 'load' => 'lazy')
+            'relation' => array('type' => 'hasOne', 'load' => 'lazy', 'table' => 'tl_member')
         ],
         'reservedFor' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_reservation']['reservedFor'],
@@ -165,10 +165,10 @@ $GLOBALS['TL_DCA']['tl_dc_reservation'] = [
             'search' => true,
             'filter' => false,
             'sorting' => true,
+            'options_callback' => [Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\MemberOptionsListener::class, '__invoke'],
             'eval' => array('submitOnChange' => true, 'includeBlankOption' => true, 'tl_class' => 'w25'),
             'sql' => "int unsigned NOT NULL default 0", // Speichert eine ID (Int)
-            'foreignKey' => 'tl_member.id',
-            'relation' => array('type' => 'hasOne', 'load' => 'lazy')
+            'relation' => array('type' => 'hasOne', 'load' => 'lazy', 'table' => 'tl_member')
         ],
         'rentalFee' => [
             'inputType' => 'text',

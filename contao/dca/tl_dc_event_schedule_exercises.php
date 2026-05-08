@@ -11,6 +11,7 @@ use Contao\Backend;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseListener;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\InstructorOptionsListener;
 
 $GLOBALS['TL_DCA']['tl_dc_event_schedule_exercises'] = [
@@ -63,8 +64,9 @@ $GLOBALS['TL_DCA']['tl_dc_event_schedule_exercises'] = [
             'sql' => "int unsigned NOT NULL auto_increment"
         ],
         'pid' => [
-            'foreignKey' => 'tl_dc_course_event_schedule.id',
-            'sql' => "int unsigned NOT NULL default 0"
+            'options_callback' => [CourseListener::class, 'onScheduleOptions'],
+            'sql' => "int unsigned NOT NULL default 0",
+            'relation' => ['type' => 'belongsTo', 'load' => 'lazy', 'table' => 'tl_dc_course_event_schedule']
         ],
         'sorting' => [
             'sql' => "int unsigned NOT NULL default 0"
@@ -84,9 +86,10 @@ $GLOBALS['TL_DCA']['tl_dc_event_schedule_exercises'] = [
         'exercise_id' => [
             'label' => ['Original-Übung', 'Referenz auf die Stammdaten-Übung'],
             'inputType' => 'select',
-            'foreignKey' => 'tl_dc_course_exercises.title',
+            'options_callback' => [CourseListener::class, 'onExerciseOptions'],
             'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
             'sql' => "int unsigned NOT NULL default 0",
+            'relation' => ['type' => 'hasOne', 'load' => 'lazy', 'table' => 'tl_dc_course_exercises']
         ],
         'description' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_exercises']['description'],

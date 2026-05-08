@@ -15,7 +15,7 @@ use Doctrine\DBAL\Connection;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class CheckProposalListener
+class ProposalListener
 {
     use AliasHandlerTrait;
 
@@ -30,10 +30,27 @@ class CheckProposalListener
     }
 
     #[AsCallback(table: 'tl_dc_check_proposal', target: 'fields.checkId.options')]
+    #[AsCallback(table: 'tl_dc_check_articles', target: 'fields.pid.options')]
+    #[AsCallback(table: 'tl_dc_check_booking', target: 'fields.pid.options')]
+    #[AsCallback(table: 'tl_dc_regulator_control', target: 'fields.pid.options')]
     public function getCheckIdOptions(): array
     {
         $options = [];
-        $result = $this->db->fetchAllAssociative("SELECT id, title FROM tl_calendar_events WHERE addCheckInfo = '1' ORDER BY title LIMIT 500");
+        $result = $this->db->fetchAllAssociative("SELECT id, title FROM tl_dc_check_proposal ORDER BY title");
+
+        foreach ($result as $row) {
+            $options[$row['id']] = $row['title'];
+        }
+
+        return $options;
+    }
+
+    #[AsCallback(table: 'tl_dc_check_proposal', target: 'fields.eventId.options')]
+    #[AsCallback(table: 'tl_dc_dive_course', target: 'fields.eventId.options')]
+    public function getEventOptions(): array
+    {
+        $options = [];
+        $result = $this->db->fetchAllAssociative("SELECT id, title FROM tl_calendar_events ORDER BY title");
 
         foreach ($result as $row) {
             $options[$row['id']] = $row['title'];
@@ -76,10 +93,18 @@ class CheckProposalListener
     }
 
     #[AsCallback(table: 'tl_dc_check_proposal', target: 'list.operations.tuv_list.button')]
-    public function generateTuvListButton(array $row, string $href, string $label, string $title, string $icon, string $attributes): string
+    public function generateTuvListButton(array $row, ?string $href, ?string $label, ?string $title, ?string $icon, ?string $attributes): string
     {
         $url = $this->router->generate('dc_tuv_list_export', ['id' => $row['id']]);
 
-        return '<a href="' . $url . '" title="' . StringUtil::specialchars($title) . '" ' . $attributes . ' target="_blank">' . Image::getHtml($icon, $label) . '</a> ';
+        // Always use the language strings to ensure correct label and title
+        $labelValue = $GLOBALS['TL_LANG']['tl_dc_check_proposal']['tuv_list'][0] ?? 'TÜV-Liste';
+        $titleValue = $GLOBALS['TL_LANG']['tl_dc_check_proposal']['tuv_list'][1] ?? 'TÜV-Liste';
+
+        if ($icon === null) {
+            $icon = 'bundles/diversworldcontaodiveclub/icons/pdf.svg';
+        }
+
+        return '<a href="' . $url . '" title="' . StringUtil::specialchars($labelValue) . '" ' . ($attributes ?? '') . ' target="_blank">' . Image::getHtml($icon, $titleValue) . '</a> ';
     }
 }

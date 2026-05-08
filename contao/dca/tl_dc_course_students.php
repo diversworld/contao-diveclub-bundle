@@ -11,6 +11,7 @@ use Contao\Backend;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseListener;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseStudentLabelCallback;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseStudentOnSubmitListener;
 
@@ -77,8 +78,9 @@ $GLOBALS['TL_DCA']['tl_dc_course_students'] = [
             'sql' => "int unsigned NOT NULL auto_increment"
         ],
         'pid' => [
-            'foreignKey' => 'tl_dc_students.lastname',
+            'options_callback' => [CourseListener::class, 'getStudentOptions'],
             'sql' => "int unsigned NOT NULL default 0",
+            'relation' => ['type' => 'belongsTo', 'load' => 'lazy', 'table' => 'tl_dc_students']
         ],
         'sorting' => [
             'sql' => "int unsigned NOT NULL default 0"
@@ -89,16 +91,18 @@ $GLOBALS['TL_DCA']['tl_dc_course_students'] = [
         'course_id' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_students']['course_id'],
             'inputType' => 'select',
-            'foreignKey' => 'tl_dc_dive_course.title',
+            'options_callback' => [CourseListener::class, 'onModuleCourseOptions'],
             'eval' => ['mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'w33'],
             'sql' => "int unsigned NOT NULL default 0",
+            'relation' => ['type' => 'hasOne', 'load' => 'lazy', 'table' => 'tl_dc_dive_course']
         ],
         'event_id' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_students']['event_id'],
             'inputType' => 'select',
-            'foreignKey' => 'tl_dc_course_event.title',
+            'options_callback' => [CourseListener::class, 'onEventOptions'],
             'eval' => ['includeBlankOption' => true, 'tl_class' => 'w33'],
             'sql' => "int unsigned NOT NULL default 0",
+            'relation' => ['type' => 'hasOne', 'load' => 'lazy', 'table' => 'tl_dc_course_event']
         ],
         'status' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_students']['status'],

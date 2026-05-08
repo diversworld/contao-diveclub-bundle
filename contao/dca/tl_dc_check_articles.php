@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 use Contao\DataContainer;
 use Contao\DC_Table;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ProposalListener;
 
 /**
  * Table tl_dc_check_articles
@@ -76,9 +77,9 @@ $GLOBALS['TL_DCA']['tl_dc_check_articles'] = [
             'sql' => "int unsigned NOT NULL auto_increment"
         ],
         'pid'               => [
-            'foreignKey'        => 'tl_dc_check_proposal.title',
+            'options_callback'  => [ProposalListener::class, 'getCheckIdOptions'],
             'sql' => "int unsigned NOT NULL default 0",
-            'relation'          => ['type' => 'belongsTo', 'load' => 'lazy'], // Typ anpassen, falls notwendig
+            'relation'          => ['type' => 'belongsTo', 'load' => 'lazy', 'table' => 'tl_dc_check_proposal'], // Typ anpassen, falls notwendig
         ],
         'sorting' => [
             'sql' => "int unsigned NOT NULL default 0"
