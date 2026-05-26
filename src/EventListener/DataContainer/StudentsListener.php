@@ -79,6 +79,10 @@ class StudentsListener
                     $this->connection->update('tl_dc_students', ['memberId' => $postMemberId], ['id' => $dc->id]);
                     $rowStudent['memberId'] = $postMemberId;
                 }
+            } elseif ($postMemberId === 0 && (int)$rowStudent['memberId'] > 0) {
+                // Unlink member
+                $this->connection->update('tl_dc_students', ['memberId' => 0], ['id' => $dc->id]);
+                $rowStudent['memberId'] = 0;
             }
         }
 
