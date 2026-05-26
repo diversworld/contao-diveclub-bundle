@@ -40,4 +40,47 @@ class MemberOptionsListener
 
         return $options;
     }
+
+    #[AsCallback(table: 'tl_dc_course_event', target: 'fields.instructor.options')]
+    #[AsCallback(table: 'tl_dc_course_event_schedule', target: 'fields.instructor.options')]
+    #[AsCallback(table: 'tl_dc_dive_course', target: 'fields.instructor.options')]
+    #[AsCallback(table: 'tl_dc_event_schedule_exercises', target: 'fields.instructor.options')]
+    #[AsCallback(table: 'tl_dc_student_exercises', target: 'fields.instructor.options')]
+    #[AsCallback(table: 'tl_dc_students', target: 'fields.instructor_groups.options')]
+    public function getInstructorOptions(?DataContainer $dc = null): array
+    {
+        $options = [];
+        try {
+            $instructorGroups = [];
+            $config = $this->db->fetchAssociative("SELECT instructor_groups FROM tl_dc_config WHERE published='1' OR published=1 LIMIT 1");
+
+            if ($config && !empty($config['instructor_groups'])) {
+                $instructorGroups = array_filter((array)unserialize($config['instructor_groups']));
+            }
+
+            $query = "SELECT id, firstname, lastname FROM tl_member";
+            $params = [];
+
+            if (!empty($instructorGroups)) {
+                $query .= " WHERE (";
+                $groupConditions = [];
+                foreach ($instructorGroups as $groupId) {
+                    $groupConditions[] = "groups LIKE ?";
+                    $params[] = '%"' . $groupId . '"%';
+                }
+                $query .= implode(' OR ', $groupConditions) . ")";
+            }
+
+            $query .= " ORDER BY lastname, firstname";
+            $members = $this->db->fetchAllAssociative($query, $params);
+
+            foreach ($members as $member) {
+                $options[$member['id']] = $member['firstname'] . ' ' . $member['lastname'];
+            }
+        } catch (\Exception $e) {
+            $this->logger->error('DB Error in getInstructorOptions: ' . $e->getMessage());
+        }
+
+        return $options;
+    }
 }

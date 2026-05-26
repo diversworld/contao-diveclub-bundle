@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 use Contao\DataContainer;
 use Contao\DC_Table;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseListener;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\MemberOptionsListener;
 
 $GLOBALS['TL_DCA']['tl_dc_course_event_schedule'] = [
     'config' => [
@@ -71,7 +73,7 @@ $GLOBALS['TL_DCA']['tl_dc_course_event_schedule'] = [
             'sql' => "int unsigned NOT NULL auto_increment"
         ],
         'pid' => [
-            'options_callback' => [Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseListener::class, 'onEventOptions'],
+            'options_callback' => [CourseListener::class, 'onEventOptions'],
             'sql' => "int unsigned NOT NULL default 0",
             'relation' => ['type' => 'belongsTo', 'load' => 'lazy', 'table' => 'tl_dc_course_event']
         ],
@@ -83,7 +85,7 @@ $GLOBALS['TL_DCA']['tl_dc_course_event_schedule'] = [
         ],
         'module_id' => [
             'inputType' => 'select',
-            'options_callback' => [Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseListener::class, 'onExerciseModuleOptions'],
+            'options_callback' => [CourseListener::class, 'onExerciseModuleOptions'],
             'eval' => ['mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
             'sql' => "int unsigned NOT NULL default 0",
             'relation' => ['type' => 'hasOne', 'load' => 'lazy', 'table' => 'tl_dc_course_modules']
@@ -101,6 +103,7 @@ $GLOBALS['TL_DCA']['tl_dc_course_event_schedule'] = [
         'instructor' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_event_schedule']['instructor'],
             'inputType' => 'select',
+            'options_callback' => [MemberOptionsListener::class, 'getInstructorOptions'],
             'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w25'],
             'sql' => "int unsigned NOT NULL default 0",
         ],
