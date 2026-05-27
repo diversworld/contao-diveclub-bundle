@@ -9,7 +9,6 @@ use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Date;
-use Contao\FrontendTemplate;
 use Contao\Input;
 use Contao\ModuleModel;
 use Contao\PageModel;
