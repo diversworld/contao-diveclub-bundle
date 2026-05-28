@@ -36,7 +36,7 @@ $GLOBALS['TL_DCA']['tl_dc_event_schedule_exercises'] = [
         ],
         'label' => [
             'fields' => ['title', 'exercise_id'],
-            'format' => '%s gude <span style="color:#b3b3b3; padding-left:8px;">[ID: %s]</span>',
+            'format' => '%s <span style="color:#b3b3b3; padding-left:8px;">[ID: %s]</span>',
         ],
         'global_operations' => [
             'all' => [

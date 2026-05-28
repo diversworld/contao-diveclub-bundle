@@ -11,7 +11,6 @@ use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Date;
 use Contao\Input;
 use Contao\ModuleModel;
-use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\System;
 use Diversworld\ContaoDiveclubBundle\Model\DcCourseEventModel;
