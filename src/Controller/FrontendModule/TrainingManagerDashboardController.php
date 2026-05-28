@@ -37,9 +37,11 @@ class TrainingManagerDashboardController extends AbstractFrontendModuleControlle
 
         $options = StringUtil::deserialize($config->dashboard_options, true);
         $template->options = $options;
+        $template->noOptions = empty($options);
+        $template->courses = [];
+        $template->workload = [];
 
-        if (empty($options)) {
-            $template->noOptions = true;
+        if ($template->noOptions) {
             return $template->getResponse();
         }
 
