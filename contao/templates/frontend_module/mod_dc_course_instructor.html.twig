@@ -156,18 +156,23 @@
     <tr class="exercise-row status--{{ studentEx.status|default('pending') }}">
         <td>{{ studentEx.title }}</td>
         <td>
-            {% set fieldKey = studentEx.id ?: 'new:' ~ course.assignment_id ~ ':' ~ studentEx.module_id ~ ':' ~ studentEx.exercise_id %}
-            <select name="exercises[{{ fieldKey }}][status]" class="status-select">
-                {% for key, label in statusOptions %}
-                    <option value="{{ key }}" {% if studentEx.status == key %}selected{% endif %}>
-                        {{ label }}
-                    </option>
-                {% endfor %}
-            </select>
+            {% if studentEx.id %}
+                <select name="exercises[{{ studentEx.id }}][status]" class="status-select">
+                    {% for key, label in statusOptions %}
+                        <option value="{{ key }}" {% if studentEx.status == key %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            {% else %}
+                <span class="text-muted">Nicht zugewiesen</span>
+            {% endif %}
         </td>
         <td>
-            <textarea name="exercises[{{ fieldKey }}][notes]"
-                      class="notes-field">{{ studentEx.notes }}</textarea>
+            {% if studentEx.id %}
+                <textarea name="exercises[{{ studentEx.id }}][notes]"
+                          class="notes-field">{{ studentEx.notes }}</textarea>
+            {% endif %}
         </td>
     </tr>
 {% endblock %}

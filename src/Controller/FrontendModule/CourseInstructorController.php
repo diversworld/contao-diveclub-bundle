@@ -115,58 +115,25 @@ class CourseInstructorController extends AbstractFrontendModuleController
         $db = Database::getInstance();
         System::loadLanguageFile('tl_dc_student_exercises');
 
-        foreach ($exercises as $key => $data) {
-            $isNew = str_starts_with((string)$key, 'new:');
-            $exerciseId = 0;
-            $assignmentId = 0;
-            $moduleId = 0;
-            $realExerciseId = 0;
-
-            if ($isNew) {
-                $parts = explode(':', (string)$key);
-                if (count($parts) !== 4) {
-                    continue;
-                }
-                $assignmentId = (int)$parts[1];
-                $moduleId = (int)$parts[2];
-                $realExerciseId = (int)$parts[3];
-            } else {
-                $exerciseId = (int)$key;
-            }
-
-            if (!$isNew && $exerciseId < 1) {
+        foreach ($exercises as $exerciseId => $data) {
+            $exerciseId = (int)$exerciseId;
+            if ($exerciseId < 1) {
                 continue;
             }
 
             // Check access
-            if ($isNew) {
-                $access = $db->prepare(
-                    "SELECT cs.id
-                     FROM tl_dc_course_students cs
-                     LEFT JOIN tl_dc_course_event ce ON ce.id = cs.event_id
-                     LEFT JOIN tl_dc_course_event_schedule ces ON ces.pid = ce.id
-                     LEFT JOIN tl_dc_event_schedule_exercises ese ON ese.pid = ces.id
-                     WHERE cs.id = ?
-                       AND cs.status = 'active'
-                       AND cs.published = '1'
-                       AND (ce.id IS NULL OR ce.published = '1')
-                       AND (ce.instructor = ? OR ese.instructor = ?)"
-                )->execute($assignmentId, $user->id, $user->id);
-            } else {
-                $access = $db->prepare(
-                    "SELECT se.id
-                     FROM tl_dc_student_exercises se
-                     INNER JOIN tl_dc_course_students cs ON cs.id = se.pid
-                     LEFT JOIN tl_dc_course_event ce ON ce.id = cs.event_id
-                     LEFT JOIN tl_dc_course_event_schedule ces ON ces.pid = ce.id
-                     LEFT JOIN tl_dc_event_schedule_exercises ese ON ese.pid = ces.id
-                     WHERE se.id = ?
-                       AND cs.status = 'active'
-                       AND cs.published = '1'
-                       AND (ce.id IS NULL OR ce.published = '1')
-                       AND (ce.instructor = ? OR se.instructor = ? OR ese.instructor = ?)"
-                )->execute($exerciseId, $user->id, $user->id, $user->id);
-            }
+            $access = $db->prepare(
+                "SELECT se.id
+                 FROM tl_dc_student_exercises se
+                 INNER JOIN tl_dc_course_students cs ON cs.id = se.pid
+                 LEFT JOIN tl_dc_course_event ce ON ce.id = cs.event_id
+                 WHERE se.id = ?
+                   AND cs.status = 'active'
+                   AND cs.published = '1'
+                   AND (ce.id IS NULL OR ce.published = '1')
+                   AND (ce.instructor = ? OR se.instructor = ?)
+                 LIMIT 1"
+            )->execute($exerciseId, $user->id, $user->id);
 
             if ($access->numRows < 1) {
                 continue;
@@ -178,28 +145,19 @@ class CourseInstructorController extends AbstractFrontendModuleController
             }
             $notes = $data['notes'] ?? '';
 
-            if ($isNew) {
-                if ($newStatus === 'pending' && empty($notes)) {
-                    continue; // Nichts zu tun für neue Übung im Status pending ohne Notiz
+            $current = $db->prepare("SELECT status, dateCompleted FROM tl_dc_student_exercises WHERE id=?")->execute($exerciseId);
+            $completedAt = $current->numRows > 0 ? $current->dateCompleted : '0';
+
+            if ($newStatus === 'ok') {
+                if ($completedAt === null || $completedAt === '' || $completedAt === '0' || $completedAt === 0) {
+                    $completedAt = time();
                 }
-                $completedAt = ($newStatus === 'ok') ? time() : 0;
-                $db->prepare("INSERT INTO tl_dc_student_exercises (pid, module_id, exercise_id, status, notes, dateCompleted, instructor, tstamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
-                    ->execute($assignmentId, $moduleId, $realExerciseId, $newStatus, $notes, $completedAt, $user->id, time());
             } else {
-                $current = $db->prepare("SELECT status, dateCompleted FROM tl_dc_student_exercises WHERE id=?")->execute($exerciseId);
-                $completedAt = $current->numRows > 0 ? $current->dateCompleted : '0';
-
-                if ($newStatus === 'ok') {
-                    if ($completedAt === null || $completedAt === '' || $completedAt === '0' || $completedAt === 0) {
-                        $completedAt = time();
-                    }
-                } else {
-                    $completedAt = 0;
-                }
-
-                $db->prepare("UPDATE tl_dc_student_exercises SET status=?, notes=?, dateCompleted=?, instructor=?, tstamp=? WHERE id=?")
-                    ->execute($newStatus, $notes, $completedAt, $user->id, time(), $exerciseId);
+                $completedAt = 0;
             }
+
+            $db->prepare("UPDATE tl_dc_student_exercises SET status=?, notes=?, dateCompleted=?, instructor=?, tstamp=? WHERE id=?")
+                ->execute($newStatus, $notes, $completedAt, $user->id, time(), $exerciseId);
         }
     }
 
@@ -216,14 +174,12 @@ class CourseInstructorController extends AbstractFrontendModuleController
              LEFT JOIN tl_dc_course_event ce ON ce.id = cs.event_id
              LEFT JOIN tl_dc_dive_course c ON c.id = cs.course_id
              LEFT JOIN tl_dc_student_exercises se ON se.pid = cs.id
-             LEFT JOIN tl_dc_course_event_schedule ces ON ces.pid = ce.id
-             LEFT JOIN tl_dc_event_schedule_exercises ese ON ese.pid = ces.id
              WHERE cs.status = 'active'
                AND cs.published = 1
                AND (ce.id IS NULL OR ce.published = 1)
-               AND (ce.instructor = ? OR se.instructor = ? OR ese.instructor = ?)
+               AND (ce.instructor = ? OR se.instructor = ?)
              ORDER BY s.lastname, s.firstname, ce.dateStart DESC, c.title"
-        )->execute($user->id, $user->id, $user->id);
+        )->execute($user->id, $user->id);
 
         $students = [];
 
@@ -262,98 +218,75 @@ class CourseInstructorController extends AbstractFrontendModuleController
                     'dateEnd' => $this->formatTimestamp($assignments->dateEnd, $datimFormat),
                     'instructor' => $this->resolveInstructorName($db, (int)$assignments->event_instructor),
                 ],
-                'modules' => $this->loadStudentModules($db, (int)$assignments->assignment_id, (int)$assignments->course_id, (int)$user->id, $canEditAll),
+                'modules' => $this->loadStudentModules($db, (int)$assignments->assignment_id, (int)$user->id, $canEditAll),
             ];
         }
 
         return $students;
     }
 
-    private function loadStudentModules(Database $db, int $assignmentId, int $courseId, int $userId, bool $canEditAll): array
+    private function loadStudentModules(Database $db, int $assignmentId, int $userId, bool $canEditAll): array
     {
-        // 1. Alle Module und Übungen des Kurses laden
-        $exercisesResult = $db->prepare(
-            "SELECT m.id AS module_id, m.title AS module_title, ex.id AS exercise_id, ex.title AS exercise_title
-             FROM tl_dc_course_modules m
-             LEFT JOIN tl_dc_course_exercises ex ON ex.pid = m.id AND ex.published = '1'
-             WHERE m.pid = ? AND m.published = '1'
-             ORDER BY m.sorting, ex.sorting"
-        )->execute($courseId);
+        $filterSql = $canEditAll ? '' : ' AND se.instructor = ?';
+        $params = [$assignmentId];
 
-        $courseStructure = [];
-        while ($exercisesResult->next()) {
-            $mId = (int)$exercisesResult->module_id;
-            if (!isset($courseStructure[$mId])) {
-                $courseStructure[$mId] = [
-                    'id' => $mId,
-                    'title' => (string)$exercisesResult->module_title,
-                    'exercises' => []
-                ];
-            }
-            if ($exercisesResult->exercise_id) {
-                $courseStructure[$mId]['exercises'][(int)$exercisesResult->exercise_id] = [
-                    'exercise_id' => (int)$exercisesResult->exercise_id,
-                    'title' => (string)$exercisesResult->exercise_title,
-                ];
-            }
+        if (!$canEditAll) {
+            $params[] = $userId;
         }
 
-        // 2. Bestehende Fortschritte laden
-        $progressResult = $db->prepare(
-            "SELECT se.id, se.exercise_id, se.module_id, se.status, se.notes, se.instructor
-             FROM tl_dc_student_exercises se
-             WHERE se.pid = ?"
-        )->execute($assignmentId);
-
-        $progress = [];
-        while ($progressResult->next()) {
-            if ($progressResult->exercise_id > 0) {
-                $progress['ex_' . $progressResult->exercise_id] = $progressResult->row();
-            } else {
-                $progress['mod_' . $progressResult->module_id] = $progressResult->row();
-            }
+        try {
+            $result = $db->prepare(
+                "SELECT se.id, se.exercise_id, se.status, se.notes, se.instructor, se.module_id AS student_module_id,
+                        ex.title AS exercise_title, m.id AS module_id, m.title AS module_title
+                 FROM tl_dc_student_exercises se
+                 LEFT JOIN tl_dc_course_exercises ex ON ex.id = se.exercise_id
+                 LEFT JOIN tl_dc_course_modules m ON m.id = se.module_id
+                 WHERE se.pid = ?{$filterSql}
+                 ORDER BY m.sorting, ex.sorting, se.sorting"
+            )->execute(...$params);
+        } catch (\Exception $e) {
+            $result = $db->prepare(
+                "SELECT se.id, se.exercise_id, se.status, se.notes, se.instructor, NULL AS student_module_id,
+                        ex.title AS exercise_title, m.id AS module_id, m.title AS module_title
+                 FROM tl_dc_student_exercises se
+                 LEFT JOIN tl_dc_course_exercises ex ON ex.id = se.exercise_id
+                 LEFT JOIN tl_dc_course_modules m ON m.id = ex.pid
+                 WHERE se.pid = ?{$filterSql}
+                 ORDER BY m.sorting, ex.sorting, se.sorting"
+            )->execute(...$params);
         }
 
-        // 3. Kombinieren
         $modules = [];
-        foreach ($courseStructure as $mId => $mDetails) {
-            $moduleData = [
-                'id' => $mId,
-                'title' => $mDetails['title'],
-                'exercises' => []
-            ];
 
-            // Übungen des Moduls
-            foreach ($mDetails['exercises'] as $exId => $exDetails) {
-                $prog = $progress['ex_' . $exId] ?? null;
+        while ($result->next()) {
+            $moduleId = (int)($result->module_id ?: ($result->student_module_id ?? 0));
+            $moduleTitle = (string)$result->module_title ?: 'Allgemein';
 
-                $moduleData['exercises'][] = [
-                    'id' => $prog ? (int)$prog['id'] : 0,
-                    'exercise_id' => $exId,
-                    'module_id' => $mId,
-                    'title' => $exDetails['title'],
-                    'status' => $prog ? (string)$prog['status'] : 'pending',
-                    'notes' => $prog ? (string)$prog['notes'] : '',
-                    'instructor' => $prog ? $this->resolveInstructorName($db, (int)$prog['instructor']) : '',
+            if (!isset($modules[$moduleId])) {
+                $modules[$moduleId] = [
+                    'id' => $moduleId,
+                    'title' => $moduleTitle,
+                    'exercises' => [],
                 ];
             }
 
-            // Modul-Abschluss hinzufügen
-            $prog = $progress['mod_' . $mId] ?? null;
-            $moduleData['exercises'][] = [
-                'id' => $prog ? (int)$prog['id'] : 0,
-                'exercise_id' => 0,
-                'module_id' => $mId,
-                'title' => 'Modul-Abschluss',
-                'status' => $prog ? (string)$prog['status'] : 'pending',
-                'notes' => $prog ? (string)$prog['notes'] : '',
-                'instructor' => $prog ? $this->resolveInstructorName($db, (int)$prog['instructor']) : '',
-            ];
+            $title = (string)$result->exercise_title;
+            if ((int)$result->exercise_id === 0) {
+                $title = 'Modul-Abschluss';
+            }
 
-            $modules[] = $moduleData;
+            $modules[$moduleId]['exercises'][] = [
+                'id' => (int)$result->id,
+                'exercise_id' => (int)$result->exercise_id,
+                'module_id' => $moduleId,
+                'title' => $title,
+                'status' => (string)$result->status,
+                'notes' => (string)$result->notes,
+                'instructor' => $this->resolveInstructorName($db, (int)$result->instructor),
+            ];
         }
 
-        return $modules;
+        return array_values($modules);
     }
 
     private function resolveInstructorName(Database $db, int $memberId): string
