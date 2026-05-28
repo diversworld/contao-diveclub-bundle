@@ -52,7 +52,7 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
                             {equipment_legend},addEquipment;
                             {sizes_legend},addSizes;
                             {types_legend},addTypes;
-                            {course_legend},addCourses,instructor_groups;
+                            {course_legend},addCourses,instructor_groups,training_manager,dashboard_options;
                             {regulator_legend},addRegulators;
                             {invoice_legend},invoiceTemplate,invoiceText,pdfFolder;
                             {tuv_legend},tuvListFormat,tuvListFolder;
@@ -220,6 +220,24 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
             'eval' => ['multiple' => true, 'tl_class' => 'clr'],
             'sql' => "blob NULL",
             'relation' => ['type' => 'hasMany', 'load' => 'lazy', 'table' => 'tl_member_group']
+        ],
+        'training_manager' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_config']['training_manager'],
+            'exclude' => true,
+            'inputType' => 'select',
+            'options_callback' => [Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ConfigListener::class, 'getMemberOptions'],
+            'eval' => ['chosen' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'],
+            'sql' => "int unsigned NOT NULL default 0",
+            'relation' => ['type' => 'hasOne', 'load' => 'lazy', 'table' => 'tl_member']
+        ],
+        'dashboard_options' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_dc_config']['dashboard_options'],
+            'exclude' => true,
+            'inputType' => 'checkboxWizard',
+            'options' => ['courses', 'instructors', 'progress', 'workload'],
+            'reference' => &$GLOBALS['TL_LANG']['tl_dc_config']['dashboard_options_ref'],
+            'eval' => ['multiple' => true, 'tl_class' => 'clr'],
+            'sql' => "blob NULL"
         ],
         'invoiceTemplate' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_config']['invoiceTemplate'],

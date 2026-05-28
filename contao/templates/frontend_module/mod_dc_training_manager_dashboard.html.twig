@@ -1,0 +1,107 @@
+{% extends "@Contao/fragment/_base.html.twig" %}
+
+{% block content %}
+    <div class="training-manager-dashboard">
+        <h1>Ausbildungsleiter Dashboard</h1>
+
+        {% if noOptions %}
+            <p>Keine Dashboard-Optionen in der Konfiguration ausgewählt.</p>
+        {% else %}
+
+            {% if 'workload' in options and workload is not empty %}
+                <section class="workload-overview">
+                    <h2>Instructor-Auslastung (Laufende Kurse)</h2>
+                    <table class="workload-table">
+                        <thead>
+                        <tr>
+                            <th>Instructor</th>
+                            <th>Anzahl Kurse</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for name, count in workload %}
+                            <tr>
+                                <td>{{ name }}</td>
+                                <td>{{ count }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </section>
+            {% endif %}
+
+            {% if 'courses' in options or 'instructors' in options or 'progress' in options %}
+                <section class="courses-overview">
+                    <h2>Laufende Kurse</h2>
+                    {% for course in courses %}
+                        <div class="course-card" style="border: 1px solid #ccc; margin-bottom: 20px; padding: 10px;">
+                            <h3>{{ course.title }} ({{ course.course_title }})</h3>
+                            <p>
+                                <strong>Beginn:</strong> {{ course.dateStart|date('d.m.Y H:i') }}<br>
+                                {% if 'instructors' in options %}
+                                    <strong>Instructor:</strong> {{ course.instructor_name ?: 'Nicht zugewiesen' }}
+                                {% endif %}
+                            </p>
+
+                            {% if course.students is not empty %}
+                                <h4>Schüler und Fortschritt</h4>
+                                <table class="students-table" style="width: 100%;">
+                                    <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Status</th>
+                                        {% if 'progress' in options %}
+                                            <th>Fortschritt</th>
+                                        {% endif %}
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for student in course.students %}
+                                        <tr>
+                                            <td>{{ student.name }}</td>
+                                            <td>{{ student.status }}</td>
+                                            {% if 'progress' in options %}
+                                                <td>
+                                                    <div class="progress-bar-container"
+                                                         style="background: #eee; width: 100px; height: 10px; display: inline-block;">
+                                                        <div class="progress-bar"
+                                                             style="background: green; width: {{ student.progress }}%; height: 10px;"></div>
+                                                    </div>
+                                                    {{ student.progress }}% ({{ student.completed }}/{{ student.total }}
+                                                    Übungen)
+
+                                                    <details>
+                                                        <summary>Details</summary>
+                                                        <ul>
+                                                            {% for module in student.details %}
+                                                                <li>
+                                                                    <strong>{{ module.title }}</strong>
+                                                                    <ul>
+                                                                        {% for exercise in module.exercises %}
+                                                                            <li style="color: {{ exercise.status == 'ok' ? 'green' : 'red' }}">
+                                                                                {{ exercise.title }}
+                                                                                : {{ exercise.status }}
+                                                                            </li>
+                                                                        {% endfor %}
+                                                                    </ul>
+                                                                </li>
+                                                            {% endfor %}
+                                                        </ul>
+                                                    </details>
+                                                </td>
+                                            {% endif %}
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            {% else %}
+                                <p>Keine Schüler angemeldet.</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </section>
+            {% endif %}
+
+        {% endif %}
+    </div>
+{% endblock %}

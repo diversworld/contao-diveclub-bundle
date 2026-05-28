@@ -91,6 +91,12 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['dc_course_instructor'] =
     '{protected_legend:hide},protected;' .
     '{expert_legend:hide},guests,cssID';
 
+$GLOBALS['TL_DCA']['tl_module']['palettes']['dc_training_manager_dashboard'] =
+    '{title_legend},name,headline,type;' .
+    '{template_legend:hide},customTpl;' .
+    '{protected_legend:hide},protected;' .
+    '{expert_legend:hide},guests,cssID';
+
 // Felder für die Kursliste
 $GLOBALS['TL_DCA']['tl_module']['fields']['showCourseEvents'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_module']['showCourseEvents'],

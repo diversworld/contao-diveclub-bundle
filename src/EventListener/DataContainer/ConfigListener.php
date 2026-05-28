@@ -52,4 +52,17 @@ class ConfigListener
 
         return $options;
     }
+
+    #[AsCallback(table: 'tl_dc_config', target: 'fields.training_manager.options')]
+    public function getMemberOptions(): array
+    {
+        $options = [];
+        $result = $this->db->fetchAllAssociative("SELECT id, firstname, lastname FROM tl_member ORDER BY lastname, firstname");
+
+        foreach ($result as $row) {
+            $options[$row['id']] = $row['firstname'] . ' ' . $row['lastname'];
+        }
+
+        return $options;
+    }
 }

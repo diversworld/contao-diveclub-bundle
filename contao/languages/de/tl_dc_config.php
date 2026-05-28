@@ -66,6 +66,14 @@ $GLOBALS['TL_LANG']['tl_dc_config']['apiImprint'] = ['Impressum (App)', 'Dieser 
 $GLOBALS['TL_LANG']['tl_dc_config']['apiPrivacy'] = ['Datenschutzhinweise (App)', 'Dieser Text wird in der App im Bereich Datenschutz angezeigt.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['apiTerms'] = ['Nutzungsbedingungen (App)', 'Dieser Text wird in der App im Bereich Nutzungsbedingungen angezeigt.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['instructor_groups'] = ['Instruktoren-Gruppen', 'Bitte wählen Sie die Mitgliedergruppen aus, die als Instruktoren gelten.'];
+$GLOBALS['TL_LANG']['tl_dc_config']['training_manager'] = ['Ausbildungsleiter', 'Bitte wählen Sie das Mitglied aus, das als Ausbildungsleiter fungiert.'];
+$GLOBALS['TL_LANG']['tl_dc_config']['dashboard_options'] = ['Dashboard-Optionen', 'Wählen Sie aus, welche Informationen im Dashboard angezeigt werden sollen.'];
+$GLOBALS['TL_LANG']['tl_dc_config']['dashboard_options_ref'] = [
+    'courses' => 'Laufende Kurse',
+    'instructors' => 'Instructor-Zuweisung',
+    'progress' => 'Kursfortschritt',
+    'workload' => 'Instructor-Auslastung'
+];
 $GLOBALS['TL_LANG']['tl_dc_config']['addReservations'] = ['Reservierungen hinzufügen', 'Das Modul Reservierungen im Backend anzeigen'];
 $GLOBALS['TL_LANG']['tl_dc_config']['addChecks'] = ['Prüfungen hinzufügen', 'Das Modul Prüfungen im Backend anzeigen'];
 $GLOBALS['TL_LANG']['tl_dc_config']['default'] = ['Default-Template', 'Eine neue Template-Konfiguration anlegen'];
