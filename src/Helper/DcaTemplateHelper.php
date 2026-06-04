@@ -12,7 +12,7 @@ use Exception;
 
 class DcaTemplateHelper // Hilfsklasse zum Laden von Template-Daten für DCA-Dropdowns
 {
-    public function __construct(private readonly ?Connection $db = null)
+    public function __construct(private readonly Connection $db)
     {
     }
 
@@ -52,7 +52,7 @@ class DcaTemplateHelper // Hilfsklasse zum Laden von Template-Daten für DCA-Dro
 
     private function getDb(): Connection
     {
-        return $this->db ?? System::getContainer()->get(Connection::class);
+        return $this->db;
     }
 
     private function getTemplateFromConfig($templateName): ?string // Ermittelt den absoluten Dateipfad aus der Konfiguration
