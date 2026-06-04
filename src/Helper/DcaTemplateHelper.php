@@ -12,7 +12,7 @@ use Exception;
 
 class DcaTemplateHelper // Hilfsklasse zum Laden von Template-Daten für DCA-Dropdowns
 {
-    public function __construct(private readonly Connection $db)
+    public function __construct(private readonly ?Connection $db = null)
     {
     }
 
@@ -50,6 +50,11 @@ class DcaTemplateHelper // Hilfsklasse zum Laden von Template-Daten für DCA-Dro
         return $options; // Gib das geladene Array zurück
     }
 
+    private function getDb(): Connection
+    {
+        return $this->db ?? System::getContainer()->get(Connection::class);
+    }
+
     private function getTemplateFromConfig($templateName): ?string // Ermittelt den absoluten Dateipfad aus der Konfiguration
     {
         $rootDir = System::getContainer()->getParameter('kernel.project_dir'); // Projekt-Wurzelverzeichnis
@@ -57,7 +62,7 @@ class DcaTemplateHelper // Hilfsklasse zum Laden von Template-Daten für DCA-Dro
 
         // Lade die erforderlichen Felder aus der Tabelle tl_dc_config
         try {
-            $row = $this->db->fetchAssociative("
+            $row = $this->getDb()->fetchAssociative("
                 SELECT manufacturersFile, typesFile, regulatorsFile, sizesFile, courseTypesFile, courseCategoriesFile
                 FROM tl_dc_config
                 LIMIT 1"

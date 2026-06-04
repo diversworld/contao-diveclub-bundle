@@ -12,7 +12,7 @@ services:
         exclude: ../src/{DependencyInjection,Model,Session,Controller/Backend/TankCheckPdfController.php}
 
     diversworld.template.helper:
-        class: Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper
+        alias: Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper
         public: true
 
     # Make the FQCN service explicitly public to allow fetching via container by class name
