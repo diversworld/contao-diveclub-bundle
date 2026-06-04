@@ -230,14 +230,13 @@ class BookingController extends AbstractFrontendModuleController
                 if (!$asset) {
                     return null;
                 }
-                $helper = new DcaTemplateHelper();
-                $manufacturerMapping = $helper->getManufacturers();
+                $manufacturerMapping = $this->helper->getManufacturers();
                 $manufacturerText = $manufacturerMapping[$asset->manufacturer] ?? 'Unbekannter Hersteller';
 
-                $regModel1stMapping = $helper->getRegModels1st((int)$asset->manufacturer);
+                $regModel1stMapping = $this->helper->getRegModels1st((int)$asset->manufacturer);
                 $regModel1stText = $regModel1stMapping[$asset->regModel1st] ?? 'N/A';
 
-                $regModel2ndMapping = $helper->getRegModels2nd((int)$asset->manufacturer);
+                $regModel2ndMapping = $this->helper->getRegModels2nd((int)$asset->manufacturer);
                 $regModel2ndPriText = $regModel2ndMapping[$asset->regModel2ndPri] ?? 'N/A';
                 $regModel2ndSecText = $regModel2ndMapping[$asset->regModel2ndSec] ?? 'N/A';
 
@@ -259,10 +258,9 @@ class BookingController extends AbstractFrontendModuleController
                     return null;
                 }
 
-                $helper = new DcaTemplateHelper();
-                $sizeMapping = $helper->getSizes();
-                $types = $helper->getEquipmentTypes();
-                $subTypes = $helper->getSubTypes($asset->type);
+                $sizeMapping = $this->helper->getSizes();
+                $types = $this->helper->getEquipmentTypes();
+                $subTypes = $this->helper->getSubTypes($asset->type);
                 $sizeText = $sizeMapping[$asset->size] ?? 'Unbekannte Größe';
 
                 $info = sprintf(
