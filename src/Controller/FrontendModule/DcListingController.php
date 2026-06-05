@@ -39,8 +39,9 @@ class DcListingController extends AbstractFrontendModuleController
 
     public function __construct(
         private readonly ScopeMatcher $scopeMatcher,
-        private readonly Twig $twig,
-    ) {
+        private readonly Twig         $twig,
+    )
+    {
     }
 
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response

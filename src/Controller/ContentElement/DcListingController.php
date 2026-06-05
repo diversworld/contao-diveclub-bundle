@@ -30,7 +30,8 @@ class DcListingController extends AbstractContentElementController
 
     public function __construct(
         private readonly Twig $twig,
-    ) {
+    )
+    {
     }
 
     protected function getResponse(FragmentTemplate $template, ContentModel $model, Request $request): Response

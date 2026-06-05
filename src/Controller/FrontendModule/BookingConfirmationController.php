@@ -32,7 +32,8 @@ class BookingConfirmationController extends AbstractFrontendModuleController
 {
     public function __construct(
         private readonly Twig $twig,
-    ) {
+    )
+    {
     }
 
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response

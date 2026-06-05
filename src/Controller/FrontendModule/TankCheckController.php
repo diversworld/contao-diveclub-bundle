@@ -45,7 +45,8 @@ class TankCheckController extends AbstractFrontendModuleController
 {
     public function __construct(
         private readonly Twig $twig,
-    ) {
+    )
+    {
     }
 
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
@@ -224,7 +225,7 @@ class TankCheckController extends AbstractFrontendModuleController
                 $tankIds = $request->request->all('tankIds');
 
                 // Hilfsfunktion zum Hinzufügen zur Session
-                $addToSession = function($data) use (&$sessionTanks, $templateData) {
+                $addToSession = function ($data) use (&$sessionTanks, $templateData) {
                     $selectedArticles = $data['articles'] ?? [];
                     // Sicherstellen, dass alle Default-Artikel enthalten sind
                     foreach ($templateData['articles'] as $art) {

@@ -25,7 +25,8 @@ class CourseProgressController extends AbstractFrontendModuleController
 {
     public function __construct(
         private readonly Twig $twig,
-    ) {
+    )
+    {
         error_log('DEBUG: CourseProgressController::__construct');
         // Wir nutzen hier System::getContainer() da wir noch nicht wissen ob DI funktioniert
         try {

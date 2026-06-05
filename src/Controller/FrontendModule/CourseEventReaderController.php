@@ -38,7 +38,8 @@ class CourseEventReaderController extends AbstractFrontendModuleController
 {
     public function __construct(
         private readonly Twig $twig,
-    ) {
+    )
+    {
     }
 
     /**

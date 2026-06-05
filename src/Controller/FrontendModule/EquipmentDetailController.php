@@ -35,8 +35,9 @@ class EquipmentDetailController extends AbstractFrontendModuleController
 
     public function __construct(
         private readonly DcaTemplateHelper $helper,
-        private readonly Twig $twig,
-    ) {
+        private readonly Twig              $twig,
+    )
+    {
     }
 
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
