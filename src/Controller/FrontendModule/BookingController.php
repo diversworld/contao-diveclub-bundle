@@ -56,10 +56,10 @@ class BookingController extends AbstractFrontendModuleController
     private Connection $db;
 
     public function __construct(
-        DcaTemplateHelper     $helper,
-        Connection            $db,
-        RequestStack          $requestStack,
-        ContaoFramework       $framework,
+        DcaTemplateHelper $helper,
+        Connection        $db,
+        RequestStack      $requestStack,
+        ContaoFramework   $framework,
         private readonly Twig $twig,
     )
     {

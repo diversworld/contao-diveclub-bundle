@@ -35,7 +35,7 @@ class EquipmentDetailController extends AbstractFrontendModuleController
 
     public function __construct(
         private readonly DcaTemplateHelper $helper,
-        private readonly Twig              $twig,
+        private readonly Twig $twig,
     )
     {
     }

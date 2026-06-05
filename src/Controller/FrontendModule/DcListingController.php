@@ -39,7 +39,7 @@ class DcListingController extends AbstractFrontendModuleController
 
     public function __construct(
         private readonly ScopeMatcher $scopeMatcher,
-        private readonly Twig         $twig,
+        private readonly Twig $twig,
     )
     {
     }
