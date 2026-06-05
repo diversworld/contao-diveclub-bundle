@@ -26,32 +26,41 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Csrf\CsrfToken;
+use Twig\Environment as Twig;
 use function is_array;
 
 /**
  * Controller für das Frontend-Modul "Kurs-Termin-Reader".
  * Zeigt Details zu einem spezifischen Kurstermin an und ermöglicht die Anmeldung.
  */
-#[AsFrontendModule('dc_course_event_reader', category: 'dc_manager', template: 'frontend_module/mod_dc_course_event_reader')]
+#[AsFrontendModule('dc_course_event_reader', category: 'dc_manager', template: 'mod_dc_course_event_reader')]
 class CourseEventReaderController extends AbstractFrontendModuleController
 {
+    public function __construct(
+        private readonly Twig $twig,
+    ) {
+    }
+
     /**
      * Verarbeitet die Anfrage und gibt die Antwort zurück.
      */
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
-        $template->notFound = false;
-        $template->hasProgress = false;
-        $template->studentProgress = [];
-        $template->element_html_id = 'mod_' . $model->id;
-        $template->element_css_classes = trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? ''));
-        $template->class = $template->element_css_classes;
-        $template->cssID = $model->cssID[0] ?? '';
+        $templateData = [
+            'notFound' => false,
+            'hasProgress' => false,
+            'studentProgress' => [],
+            'element_html_id' => 'mod_' . $model->id,
+            'element_css_classes' => trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')),
+            'class' => trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')),
+            'cssID' => $model->cssID[0] ?? '',
+            'type' => $model->type,
+        ];
 
         // Headline korrekt aufbereiten
         $headline = StringUtil::deserialize($model->headline);
         if (is_array($headline) && isset($headline['value']) && $headline['value'] !== '') {
-            $template->headline = [
+            $templateData['headline'] = [
                 'text' => $headline['value'],
                 'tag_name' => $headline['unit'] ?? 'h1'
             ];
@@ -59,8 +68,11 @@ class CourseEventReaderController extends AbstractFrontendModuleController
 
         $identifier = Input::get('event') ?: Input::get('items');
         if (!$identifier) {
-            $template->notFound = true;
-            return $template->getResponse();
+            $templateData['notFound'] = true;
+            return new Response($this->twig->render(
+                '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_event_reader.html.twig',
+                $templateData
+            ));
         }
 
         // Per ID oder Alias laden
@@ -71,12 +83,15 @@ class CourseEventReaderController extends AbstractFrontendModuleController
         }
 
         if (!$event || (int)$event->published !== 1) {
-            $template->notFound = true;
-            return $template->getResponse();
+            $templateData['notFound'] = true;
+            return new Response($this->twig->render(
+                '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_event_reader.html.twig',
+                $templateData
+            ));
         }
 
         $dateFormat = Config::get('datimFormat');
-        $template->event = [
+        $templateData['event'] = [
             'id' => (int)$event->id,
             'title' => (string)$event->title,
             'alias' => (string)$event->alias,
@@ -91,20 +106,20 @@ class CourseEventReaderController extends AbstractFrontendModuleController
         if ($event->course_id > 0) {
             $course = DcDiveCourseModel::findByPk($event->course_id);
             if (null !== $course) {
-                if ($template->event['title'] === '') {
-                    $template->event['title'] = (string)$course->title;
+                if ($templateData['event']['title'] === '') {
+                    $templateData['event']['title'] = (string)$course->title;
                 }
-                if ($template->event['price'] === '') {
-                    $template->event['price'] = (string)$course->price;
+                if ($templateData['event']['price'] === '') {
+                    $templateData['event']['price'] = (string)$course->price;
                 }
-                if ($template->event['description'] === '') {
-                    $template->event['description'] = (string)$course->description;
+                if ($templateData['event']['description'] === '') {
+                    $templateData['event']['description'] = (string)$course->description;
                 }
             }
         }
 
         // Request Token für Twig bereitstellen
-        $template->request_token = System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue();
+        $templateData['request_token'] = System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue();
 
         // Zeitplan laden (mit Modulnamen)
         $schedule = System::getContainer()->get('database_connection')->fetchAllAssociative(
@@ -165,12 +180,12 @@ class CourseEventReaderController extends AbstractFrontendModuleController
                 'isModule' => true
             ];
         }
-        $template->schedule = $rows;
-        $template->hasSchedule = !empty($rows);
+        $templateData['schedule'] = $rows;
+        $templateData['hasSchedule'] = !empty($rows);
 
         // Labels für das Anmeldeformular bereitstellen
         $signupLabels = $GLOBALS['TL_LANG']['MSC']['dc_event_signup'] ?? null;
-        $template->signup = $signupLabels ?: [
+        $templateData['signup'] = $signupLabels ?: [
             'headline' => 'Anmeldung zur Kursveranstaltung',
             'gender' => 'Anrede',
             'firstname' => 'Vorname',
@@ -188,16 +203,16 @@ class CourseEventReaderController extends AbstractFrontendModuleController
         // Anmeldung: eingeloggte Member (bestehend) ODER Gäste (neu)
         /** @var FrontendUser|null $user */
         $user = System::getContainer()->get('security.helper')->getUser();
-        $template->isLoggedIn = ($user instanceof FrontendUser);
+        $templateData['isLoggedIn'] = ($user instanceof FrontendUser);
 
         $studentId = null;
-        if ($template->isLoggedIn) {
+        if ($templateData['isLoggedIn']) {
             $student = DcStudentsModel::findOneByMemberId((int)$user->id);
             if ($student !== null) {
                 $studentId = (int)$student->id;
             }
         }
-        $template->hasStudent = $studentId !== null;
+        $templateData['hasStudent'] = $studentId !== null;
 
         // Prüfen, ob bereits angemeldet
         $alreadyRegistered = false;
@@ -209,8 +224,8 @@ class CourseEventReaderController extends AbstractFrontendModuleController
                 $assignmentId = (int)$check->id;
             }
         }
-        $template->alreadyRegistered = $alreadyRegistered;
-        $template->assignmentId = $assignmentId;
+        $templateData['alreadyRegistered'] = $alreadyRegistered;
+        $templateData['assignmentId'] = $assignmentId;
 
         // Falls angemeldet, Übungen (Kursfortschritt) laden
         if ($assignmentId) {
@@ -254,8 +269,8 @@ class CourseEventReaderController extends AbstractFrontendModuleController
                     'instructor' => $se['instructor']
                 ];
             }
-            $template->studentProgress = $progress;
-            $template->hasProgress = !empty($progress);
+            $templateData['studentProgress'] = $progress;
+            $templateData['hasProgress'] = !empty($progress);
         }
 
         // Debug-Log
@@ -272,17 +287,23 @@ class CourseEventReaderController extends AbstractFrontendModuleController
             if (!$isValidToken) {
                 System::getContainer()->get('monolog.logger.contao.general')->error('CSRF-Token Validierung fehlgeschlagen für dc_event_signup. Token: ' . substr($tokenValue, 0, 8) . '...');
                 $this->addHtml5Message('Ungültiges Request-Token. Bitte Seite neu laden und erneut versuchen.', 'error');
-                return $template->getResponse();
+                return new Response($this->twig->render(
+                    '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_event_reader.html.twig',
+                    $templateData
+                ));
             }
 
             // Honeypot (Spam) – wenn gefüllt, abbrechen
             if (trim((string)Input::post('website')) !== '') {
                 $this->addHtml5Message('Ihre Anmeldung konnte nicht verarbeitet werden.', 'error');
-                return $template->getResponse();
+                return new Response($this->twig->render(
+                    '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_event_reader.html.twig',
+                    $templateData
+                ));
             }
 
             $currentStudentId = $studentId; // kann null sein (Gast)
-            $isGuest = !$template->isLoggedIn || Input::post('mode') === 'guest';
+            $isGuest = !$templateData['isLoggedIn'] || Input::post('mode') === 'guest';
 
             if ($isGuest) {
                 // Gastfelder einlesen und validieren
@@ -324,7 +345,10 @@ class CourseEventReaderController extends AbstractFrontendModuleController
                     foreach ($errors as $err) {
                         $this->addHtml5Message($err, 'error');
                     }
-                    return $template->getResponse();
+                    return new Response($this->twig->render(
+                        '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_event_reader.html.twig',
+                        $templateData
+                    ));
                 }
 
                 // Dublettenprüfung: existiert Schüler mit gleicher E‑Mail?
@@ -332,7 +356,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
                 if ($existingStudent !== null) {
                     $currentStudentId = (int)$existingStudent->id;
                     // Falls eingeloggt und Schüler hat noch keine memberId, jetzt verknüpfen
-                    if ($template->isLoggedIn && (int)$existingStudent->memberId === 0) {
+                    if ($templateData['isLoggedIn'] && (int)$existingStudent->memberId === 0) {
                         $existingStudent->memberId = (int)$user->id;
                         $existingStudent->save();
                     }
@@ -352,7 +376,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
                         $newStudent->email = $email;
                         $newStudent->phone = $phone;
                         $newStudent->dateOfBirth = $birthdateTs ? (string)$birthdateTs : '';
-                        $newStudent->memberId = $template->isLoggedIn ? (int)$user->id : 0;
+                        $newStudent->memberId = $templateData['isLoggedIn'] ? (int)$user->id : 0;
                         $newStudent->published = '1';
                         $newStudent->save();
 
@@ -361,7 +385,10 @@ class CourseEventReaderController extends AbstractFrontendModuleController
                     } catch (Exception $e) {
                         System::getContainer()->get('monolog.logger.contao.general')->error('Fehler beim Anlegen des Gast-Schülers: ' . $e->getMessage());
                         $this->addHtml5Message('Fehler beim Speichern Ihrer Daten.', 'error');
-                        return $template->getResponse();
+                        return new Response($this->twig->render(
+                            '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_event_reader.html.twig',
+                            $templateData
+                        ));
                     }
                 }
             } else {
@@ -400,16 +427,22 @@ class CourseEventReaderController extends AbstractFrontendModuleController
             // WICHTIG: Prüfung, ob die ID jetzt gesetzt ist
             if (!$currentStudentId) {
                 $this->addHtml5Message('Fehler beim Erstellen des Schüler-Profils.', 'error');
-                return $template->getResponse();
+                return new Response($this->twig->render(
+                    '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_event_reader.html.twig',
+                    $templateData
+                ));
             }
 
             // Falls bereits zugewiesen (Rennbedingungen), nochmal prüfen
             $check2 = DcCourseStudentsModel::findOneBy(['pid=?', 'event_id=?'], [(int)$currentStudentId, (int)$event->id]);
             if ($check2 !== null) {
-                $template->alreadyRegistered = true;
-                $template->assignmentId = (int)$check2->id;
+                $templateData['alreadyRegistered'] = true;
+                $templateData['assignmentId'] = (int)$check2->id;
                 $this->addHtml5Message('Sie sind bereits für diese Veranstaltung angemeldet.', 'info');
-                return $template->getResponse();
+                return new Response($this->twig->render(
+                    '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_event_reader.html.twig',
+                    $templateData
+                ));
             }
             // Zuweisung anlegen
             try {
@@ -440,7 +473,10 @@ class CourseEventReaderController extends AbstractFrontendModuleController
             } catch (Exception $e) {
                 System::getContainer()->get('monolog.logger.contao.general')->error('Fehler beim Anlegen der Kurs-Zuweisung: ' . $e->getMessage());
                 $this->addHtml5Message('Fehler bei der Kursanmeldung.', 'error');
-                return $template->getResponse();
+                return new Response($this->twig->render(
+                    '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_event_reader.html.twig',
+                    $templateData
+                ));
             }
 
             // Debug-Log
@@ -490,14 +526,17 @@ class CourseEventReaderController extends AbstractFrontendModuleController
             }
 
             // Refresh Status für das aktuelle Template (falls kein Redirect zu anderer Seite erfolgt)
-            $template->alreadyRegistered = true;
-            $template->assignmentId = $newAssignmentId;
+            $templateData['alreadyRegistered'] = true;
+            $templateData['assignmentId'] = $newAssignmentId;
 
             // Redirect auf die aktuelle Seite um POST-Resubmission zu verhindern und Nachrichten anzuzeigen
             return new RedirectResponse($request->getUri());
         }
 
-        return $template->getResponse();
+        return new Response($this->twig->render(
+            '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_event_reader.html.twig',
+            $templateData
+        ));
     }
 
     private function getInstructorName(int $instructorId): string

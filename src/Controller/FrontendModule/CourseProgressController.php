@@ -18,12 +18,14 @@ use Contao\System;
 use Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment as Twig;
 
-#[AsFrontendModule('dc_course_progress', category: 'dc_manager', template: 'frontend_module/mod_dc_course_progress')]
+#[AsFrontendModule('dc_course_progress', category: 'dc_manager', template: 'mod_dc_course_progress')]
 class CourseProgressController extends AbstractFrontendModuleController
 {
-    public function __construct()
-    {
+    public function __construct(
+        private readonly Twig $twig,
+    ) {
         error_log('DEBUG: CourseProgressController::__construct');
         // Wir nutzen hier System::getContainer() da wir noch nicht wissen ob DI funktioniert
         try {
@@ -96,32 +98,38 @@ class CourseProgressController extends AbstractFrontendModuleController
             $logger->error('CourseProgressController: DB Check failed: ' . $e->getMessage());
         }
 
-        $template->element_html_id = 'mod_' . $model->id;
-        $template->element_css_classes = trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? ''));
-        $template->class = $template->element_css_classes;
-        $template->cssID = $model->cssID[0] ?? '';
-        $template->notFound = false;
-        $template->hasProgress = false;
-        $template->studentProgress = [];
-        $template->exercises = [];
-        $template->schedule = [];
-        $template->labels = [];
+        $templateData = [
+            'element_html_id' => 'mod_' . $model->id,
+            'element_css_classes' => trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')),
+            'class' => trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')),
+            'cssID' => $model->cssID[0] ?? '',
+            'type' => $model->type,
+            'notFound' => false,
+            'hasProgress' => false,
+            'studentProgress' => [],
+            'exercises' => [],
+            'schedule' => [],
+            'labels' => [],
+        ];
 
         // Headline korrekt aufbereiten
         $headline = StringUtil::deserialize($model->headline);
         if (is_array($headline) && isset($headline['value']) && $headline['value'] !== '') {
-            $template->headline = [
+            $templateData['headline'] = [
                 'text' => $headline['value'],
                 'unit' => $headline['unit'] ?? 'h1'
             ];
         }
 
         if (!$user instanceof FrontendUser) {
-            $template->isLoggedIn = false;
-            return $template->getResponse();
+            $templateData['isLoggedIn'] = false;
+            return new Response($this->twig->render(
+                '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_progress.html.twig',
+                $templateData
+            ));
         }
 
-        $template->isLoggedIn = true;
+        $templateData['isLoggedIn'] = true;
 
         $assignmentId = (int)$request->query->get('assignment');
         if (!$assignmentId) {
@@ -137,8 +145,11 @@ class CourseProgressController extends AbstractFrontendModuleController
 
         if (!$assignmentId) {
             $logger->warning('CourseProgressController: No assignment ID found in request.');
-            $template->notFound = true;
-            return $template->getResponse();
+            $templateData['notFound'] = true;
+            return new Response($this->twig->render(
+                '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_progress.html.twig',
+                $templateData
+            ));
         }
 
         $db = Database::getInstance();
@@ -158,8 +169,11 @@ class CourseProgressController extends AbstractFrontendModuleController
 
         if ($assignmentResult->numRows < 1) {
             $logger->error('CourseProgressController: Assignment ID ' . $assignmentId . ' not found in database.');
-            $template->notFound = true;
-            return $template->getResponse();
+            $templateData['notFound'] = true;
+            return new Response($this->twig->render(
+                '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_progress.html.twig',
+                $templateData
+            ));
         }
 
         $assignmentRow = $assignmentResult->fetchAssoc();
@@ -195,16 +209,19 @@ class CourseProgressController extends AbstractFrontendModuleController
 
         if (!$hasAccess) {
             $logger->warning('CourseProgressController: Access denied for User ' . $user->id . ' to Assignment ' . $assignmentId);
-            $template->notFound = true;
-            return $template->getResponse();
+            $templateData['notFound'] = true;
+            return new Response($this->twig->render(
+                '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_progress.html.twig',
+                $templateData
+            ));
         }
 
-        $template->assignment = [
+        $templateData['assignment'] = [
             'id' => (int)$assignmentRow['id'],
             'status' => (string)$assignmentRow['status'],
             'course_title' => (string)$assignmentRow['course_title'],
         ];
-        $template->isInstructor = $isInstructor;
+        $templateData['isInstructor'] = $isInstructor;
 
         // 2. Alle Module des Kurses laden (um sicherzustellen, dass alle Module angezeigt werden)
         $courseId = (int)$assignmentRow['course_id'];
@@ -268,8 +285,8 @@ class CourseProgressController extends AbstractFrontendModuleController
                 $modules[$mId]['exercises'][] = $exData;
             }
         }
-        $template->exercises = $exerciseList;
-        $template->modules = $modules;
+        $templateData['exercises'] = $exerciseList;
+        $templateData['modules'] = $modules;
         $logger->info('CourseProgressController: Loaded ' . count($exerciseList) . ' exercises in ' . count($modules) . ' modules.');
 
         // Falls wir im Logger sehen wollen, was genau geladen wurde:
@@ -388,8 +405,8 @@ class CourseProgressController extends AbstractFrontendModuleController
                     $modules[$mId]['exercises'][] = $exData;
                 }
             }
-            $template->exercises = $exerciseList;
-            $template->modules = $modules;
+            $templateData['exercises'] = $exerciseList;
+            $templateData['modules'] = $modules;
         }
 
         // 3. Zeitplan laden (über das Event der Zuweisung)
@@ -419,16 +436,19 @@ class CourseProgressController extends AbstractFrontendModuleController
                 ];
             }
         }
-        $template->schedule = $schedule;
+        $templateData['schedule'] = $schedule;
         $logger->info('CourseProgressController: Loaded ' . count($schedule) . ' schedule entries.');
 
         // Labels
-        $template->labels = [
+        $templateData['labels'] = [
             'headline' => 'Kursfortschritt: ' . ($assignmentRow['course_title'] ?: 'Kurs'),
             'exercises' => 'Übersicht Übungen',
             'schedule' => 'Zeitplan / Termine',
         ];
 
-        return $template->getResponse();
+        return new Response($this->twig->render(
+            '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_progress.html.twig',
+            $templateData
+        ));
     }
 }

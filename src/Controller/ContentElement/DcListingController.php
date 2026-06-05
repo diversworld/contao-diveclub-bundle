@@ -15,21 +15,42 @@ declare(strict_types=1);
 namespace Diversworld\ContaoDiveclubBundle\Controller\ContentElement;
 
 use Contao\ContentModel;
+use Contao\StringUtil;
 use Contao\CoreBundle\Controller\ContentElement\AbstractContentElementController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsContentElement;
 use Contao\CoreBundle\Twig\FragmentTemplate;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment as Twig;
 
 #[AsContentElement(category: 'dc_equipment', template: 'ce_dc_listing')]
 class DcListingController extends AbstractContentElementController
 {
     public const TYPE = 'dc_listing';
 
+    public function __construct(
+        private readonly Twig $twig,
+    ) {
+    }
+
     protected function getResponse(FragmentTemplate $template, ContentModel $model, Request $request): Response
     {
-        $template->text = $model->text;
+        $headline = StringUtil::deserialize($model->headline);
+        $headlineData = null;
+        if (is_array($headline) && isset($headline['value']) && $headline['value'] !== '') {
+            $headlineData = [
+                'text' => $headline['value'],
+                'tag_name' => $headline['unit'] ?? 'h1',
+            ];
+        }
 
-        return $template->getResponse();
+        return new Response($this->twig->render(
+            '@DiversworldContaoDiveclub/content_element/ce_dc_listing.html.twig',
+            [
+                'text' => $model->text,
+                'headline' => $headlineData,
+                'type' => $model->type,
+            ]
+        ));
     }
 }

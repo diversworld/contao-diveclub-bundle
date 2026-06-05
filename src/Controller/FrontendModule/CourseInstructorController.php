@@ -17,14 +17,20 @@ use Contao\StringUtil;
 use Contao\System;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment as Twig;
 
 /**
  * Controller für das Frontend-Modul "Kurslehrer-Übersicht".
  * Ermöglicht es Ausbildern, den Fortschritt ihrer Schüler zu sehen und Übungen abzuzeichnen.
  */
-#[AsFrontendModule('dc_course_instructor', category: 'dc_manager', template: 'frontend_module/mod_dc_course_instructor')]
+#[AsFrontendModule('dc_course_instructor', category: 'dc_manager', template: 'mod_dc_course_instructor')]
 class CourseInstructorController extends AbstractFrontendModuleController
 {
+    public function __construct(
+        private readonly Twig $twig,
+    ) {
+    }
+
     /**
      * Verarbeitet die Anfrage und gibt die Antwort zurück.
      */
@@ -51,20 +57,34 @@ class CourseInstructorController extends AbstractFrontendModuleController
             ? $this->loadActiveCoursesByStudent($db, $user, $dateFormat, $datimFormat)
             : [];
 
+        $templateData = [
+            'element_html_id' => 'mod_' . $model->id,
+            'element_css_classes' => trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')),
+            'class' => trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')),
+            'cssID' => $model->cssID[0] ?? '',
+            'type' => $model->type,
+        ];
+
         if (empty($students)) {
-            $template->notFound = true;
-            return $template->getResponse();
+            $templateData['notFound'] = true;
+            return new Response($this->twig->render(
+                '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_instructor.html.twig',
+                $templateData
+            ));
         }
 
-        $template->notFound = false;
-        $template->students = array_values($students);
-        $template->isInstructor = $isInstructor;
+        $templateData['notFound'] = false;
+        $templateData['students'] = array_values($students);
+        $templateData['isInstructor'] = $isInstructor;
         System::loadLanguageFile('tl_dc_student_exercises');
-        $template->statusOptions = $GLOBALS['TL_LANG']['tl_dc_student_exercises']['itemStatus'] ?? [];
-        $template->request_token = System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue();
-        $template->action = $request->getUri();
+        $templateData['statusOptions'] = $GLOBALS['TL_LANG']['tl_dc_student_exercises']['itemStatus'] ?? [];
+        $templateData['request_token'] = System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue();
+        $templateData['action'] = $request->getUri();
 
-        return $template->getResponse();
+        return new Response($this->twig->render(
+            '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_instructor.html.twig',
+            $templateData
+        ));
     }
 
     /**

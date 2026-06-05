@@ -17,23 +17,33 @@ use Contao\StringUtil;
 use Contao\System;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment as Twig;
 use function is_array;
 
-#[AsFrontendModule('dc_student_courses', category: 'dc_manager', template: 'frontend_module/mod_dc_student_courses')]
+#[AsFrontendModule('dc_student_courses', category: 'dc_manager', template: 'mod_dc_student_courses')]
 class StudentCoursesController extends AbstractFrontendModuleController
 {
+    public function __construct(
+        private readonly Twig $twig,
+    ) {
+    }
+
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         System::getContainer()->get('monolog.logger.contao.general')->info('StudentCoursesController::getResponse start. REQUEST_URI: ' . $request->getUri());
-        $template->element_html_id = 'mod_' . $model->id;
-        $template->element_css_classes = trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? ''));
-        $template->class = $template->element_css_classes;
-        $template->cssID = $model->cssID[0] ?? '';
+
+        $templateData = [
+            'element_html_id' => 'mod_' . $model->id,
+            'element_css_classes' => trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')),
+            'class' => trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')),
+            'cssID' => $model->cssID[0] ?? '',
+            'type' => $model->type,
+        ];
 
         // Headline korrekt aufbereiten
         $headline = StringUtil::deserialize($model->headline);
         if (is_array($headline) && isset($headline['value']) && $headline['value'] !== '') {
-            $template->headline = [
+            $templateData['headline'] = [
                 'text' => $headline['value'],
                 'unit' => $headline['unit'] ?? 'h1'
             ];
@@ -51,7 +61,7 @@ class StudentCoursesController extends AbstractFrontendModuleController
             System::getContainer()->get('monolog.logger.contao.general')->error('StudentCoursesController: Labels for dc_student_courses not found in $GLOBALS[\'TL_LANG\'][\'MSC\']');
         }
 
-        $template->labels = $labels ?? [
+        $templateData['labels'] = $labels ?? [
             'headline' => 'Meine Tauchkurse',
             'noStudent' => 'Kein verknüpfter Tauchschüler gefunden.',
             'noCourses' => 'Für Sie sind derzeit keine Tauchkurse gespeichert.',
@@ -70,12 +80,15 @@ class StudentCoursesController extends AbstractFrontendModuleController
         $user = System::getContainer()->get('security.helper')->getUser();
 
         if (!$user instanceof FrontendUser) {
-            $template->isLoggedIn = false;
-            $template->courses = [];
-            return $template->getResponse();
+            $templateData['isLoggedIn'] = false;
+            $templateData['courses'] = [];
+            return new Response($this->twig->render(
+                '@DiversworldContaoDiveclub/frontend_module/mod_dc_student_courses.html.twig',
+                $templateData
+            ));
         }
 
-        $template->isLoggedIn = true;
+        $templateData['isLoggedIn'] = true;
 
         $db = Database::getInstance();
 
@@ -85,13 +98,16 @@ class StudentCoursesController extends AbstractFrontendModuleController
             ->execute((int)$user->id);
 
         if ($student->numRows < 1) {
-            $template->studentFound = false;
-            $template->courses = [];
-            return $template->getResponse();
+            $templateData['studentFound'] = false;
+            $templateData['courses'] = [];
+            return new Response($this->twig->render(
+                '@DiversworldContaoDiveclub/frontend_module/mod_dc_student_courses.html.twig',
+                $templateData
+            ));
         }
 
-        $template->studentFound = true;
-        $template->student = [
+        $templateData['studentFound'] = true;
+        $templateData['student'] = [
             'id' => (int)$student->id,
             'firstname' => (string)$student->firstname,
             'lastname' => (string)$student->lastname,
@@ -174,9 +190,12 @@ class StudentCoursesController extends AbstractFrontendModuleController
             ];
         }
 
-        $template->courses = $courses;
-        $template->hasCourses = !empty($courses);
+        $templateData['courses'] = $courses;
+        $templateData['hasCourses'] = !empty($courses);
 
-        return $template->getResponse();
+        return new Response($this->twig->render(
+            '@DiversworldContaoDiveclub/frontend_module/mod_dc_student_courses.html.twig',
+            $templateData
+        ));
     }
 }

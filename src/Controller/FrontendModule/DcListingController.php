@@ -28,29 +28,28 @@ use Diversworld\ContaoDiveclubBundle\Model\DcCheckProposalModel;
 use Doctrine\DBAL\Result;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment as Twig;
 
-#[AsFrontendModule(DcListingController::TYPE, category: 'dc_manager', template: 'frontend_module/mod_dc_listing')]
+#[AsFrontendModule(DcListingController::TYPE, category: 'dc_manager', template: 'mod_dc_listing')]
 class DcListingController extends AbstractFrontendModuleController
 {
     public const TYPE = 'dc_listing';
 
     protected ?PageModel $page;
 
-    public function __construct(private readonly ScopeMatcher $scopeMatcher)
-    {
+    public function __construct(
+        private readonly ScopeMatcher $scopeMatcher,
+        private readonly Twig $twig,
+    ) {
     }
 
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
-        $template->element_html_id = 'mod_' . $model->id;
-        $template->element_css_classes = trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? ''));
-        $template->class = $template->element_css_classes;
-        $template->cssID = $model->cssID[0] ?? '';
-
         // Headline korrekt aufbereiten
         $headline = StringUtil::deserialize($model->headline);
+        $headlineData = null;
         if (is_array($headline) && isset($headline['value']) && $headline['value'] !== '') {
-            $template->headline = [
+            $headlineData = [
                 'text' => $headline['value'],
                 'tag_name' => $headline['unit'] ?? 'h1',
                 'subline' => ''
@@ -70,16 +69,29 @@ class DcListingController extends AbstractFrontendModuleController
                 $articles = [];
             }
 
-            // Daten vorbereiten und ans Template übergeben
-            $template->event = $event;
-            $template->proposal = $proposal;
-            $template->articles = $articles;
+            // Daten vorbereiten
+            $eventData = $event;
+            $proposalData = $proposal;
+            $articlesData = $articles;
         } else {
-            $template->event = null;
-            $template->proposal = null;
-            $template->articles = [];
+            $eventData = null;
+            $proposalData = null;
+            $articlesData = [];
         }
 
-        return $template->getResponse();
+        return new Response($this->twig->render(
+            '@DiversworldContaoDiveclub/frontend_module/mod_dc_listing.html.twig',
+            [
+                'event' => $eventData,
+                'proposal' => $proposalData,
+                'articles' => $articlesData,
+                'element_html_id' => 'mod_' . $model->id,
+                'element_css_classes' => trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')),
+                'class' => trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')),
+                'cssID' => $model->cssID[0] ?? '',
+                'type' => $model->type,
+                'headline' => $headlineData,
+            ]
+        ));
     }
 }

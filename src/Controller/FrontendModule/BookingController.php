@@ -40,10 +40,11 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment as Twig;
 use function is_array;
 
 
-#[AsFrontendModule(BookingController::TYPE, category: 'dc_manager', template: 'frontend_module/mod_dc_booking')]
+#[AsFrontendModule(BookingController::TYPE, category: 'dc_manager', template: 'mod_dc_booking')]
 class BookingController extends AbstractFrontendModuleController
 {
     public const TYPE = 'dc_booking';
@@ -54,8 +55,13 @@ class BookingController extends AbstractFrontendModuleController
     private RequestStack $requestStack;
     private Connection $db;
 
-    public function __construct(DcaTemplateHelper $helper, Connection $db, RequestStack $requestStack, ContaoFramework $framework)
-    {
+    public function __construct(
+        DcaTemplateHelper $helper,
+        Connection $db,
+        RequestStack $requestStack,
+        ContaoFramework $framework,
+        private readonly Twig $twig,
+    ) {
         $this->helper = $helper;
         $this->db = $db;
         $this->framework = $framework;
@@ -67,15 +73,17 @@ class BookingController extends AbstractFrontendModuleController
      */
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
-        $template->element_html_id = 'mod_' . $model->id;
-        $template->element_css_classes = trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? ''));
-        $template->class = $template->element_css_classes;
-        $template->cssID = $model->cssID[0] ?? '';
+        $templateData = [
+            'element_html_id' => 'mod_' . $model->id,
+            'element_css_classes' => trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')),
+            'class' => trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')),
+            'cssID' => $model->cssID[0] ?? '',
+        ];
 
         // Headline korrekt aufbereiten
         $headline = StringUtil::deserialize($model->headline);
         if (is_array($headline) && isset($headline['value']) && $headline['value'] !== '') {
-            $template->headline = [
+            $templateData['headline'] = [
                 'text' => $headline['value'],
                 'unit' => $headline['unit'] ?? 'h1'
             ];
@@ -84,47 +92,47 @@ class BookingController extends AbstractFrontendModuleController
         System::loadLanguageFile('tl_dc_reservation_items');
 
         // Request Token für Twig bereitstellen
-        $template->request_token = System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue();
+        $templateData['request_token'] = System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue();
 
         $sessionData = $this->getSessionData();
         $equipmentTypes = $this->helper->getEquipmentTypes(); // Typen/Subtypen laden
-        $template->equipmentTypes = $equipmentTypes;
+        $templateData['equipmentTypes'] = $equipmentTypes;
 
         $category = $request->get('category');
 
         // NEU: Gesamtpreis berechnen und ans Template übergeben
         $totalPrice = $this->calculateTotalPrice($sessionData);
-        $template->totalPrice = $totalPrice;
+        $templateData['totalPrice'] = $totalPrice;
 
         // NEW: Vorgemerkte Reservierungen abrufen
-        $template->storedAssets = $this->loadStoredAssets($sessionData);
+        $templateData['storedAssets'] = $this->loadStoredAssets($sessionData);
 
         // Member Liste an das Template übergeben
         $memberResult = $this->db->executeQuery('SELECT id, firstname, lastname FROM tl_member ORDER BY lastname, firstname');
         // Ergebnisse in ein assoziatives Array umwandeln
-        $template->memberList = $memberResult->fetchAllAssociative();
+        $templateData['memberList'] = $memberResult->fetchAllAssociative();
 
         // Session-Daten und ausgewählte Kategorie behandeln
         $totalPrice = $this->calculateTotalPrice($sessionData);
-        $template->totalPrice = $totalPrice;
-        $template->totalRentalFee = $totalPrice; // Konsistenz für das Template
-        $template->selectedCategory = $category;
-        $template->currentUser = $this->getCurrentUser();
+        $templateData['totalPrice'] = $totalPrice;
+        $templateData['totalRentalFee'] = $totalPrice; // Konsistenz für das Template
+        $templateData['selectedCategory'] = $category;
+        $templateData['currentUser'] = $this->getCurrentUser();
 
         // Verfügbarkeit und Kategorienauswahl
         if ($category) {
             $availableAssets = $this->updateAssets($category);
 
-            $template->reservationCheckboxes = $this->generateReservationCheckboxes($availableAssets);
+            $templateData['reservationCheckboxes'] = $this->generateReservationCheckboxes($availableAssets);
             $availableAssets = $this->combineAssetsWithSession($category, $availableAssets);
 
             // Zugehörige Assets finden und gruppieren
             if ($category === 'tl_dc_equipment') {
                 //$availableAssets = $this->updateAssets($category); // Assets für die Kategorie abrufen
                 $groupedAssets = $this->groupAssetsByType($availableAssets, $equipmentTypes); // Assets nach Typ gruppieren
-                $template->groupedAssets = $groupedAssets; // Gruppierte Assets ans Template übergeben
+                $templateData['groupedAssets'] = $groupedAssets; // Gruppierte Assets ans Template übergeben
             } else {
-                $template->assets = $availableAssets; // Leeres Array, falls die Kategorie nicht zutrifft
+                $templateData['assets'] = $availableAssets; // Leeres Array, falls die Kategorie nicht zutrifft
             }
         }
 
@@ -137,11 +145,11 @@ class BookingController extends AbstractFrontendModuleController
             $bag->set('selectedMember', $selectedMember);
         }
 
-        $template->selectedMember = $selectedMember; // Ins Template laden
+        $templateData['selectedMember'] = $selectedMember; // Ins Template laden
 
         // Verarbeitung von POST-Daten
         if ($request->isMethod('POST')) {
-            $response = $this->handlePostRequest($request, $template, $sessionData, (int)$selectedMember);
+            $response = $this->handlePostRequest($request, $templateData, $sessionData, (int)$selectedMember);
             if ($response instanceof Response) {
                 // Wenn handlePostRequest eine RedirectResponse oder ähnliches zurückgibt, wird dies ausgeführt
                 return $response;
@@ -149,20 +157,23 @@ class BookingController extends AbstractFrontendModuleController
         }
 
         $result = $this->db->fetchAssociative('SELECT rentalConditions FROM tl_dc_config LIMIT 1');
-        $template->rentalConditions = $result['rentalConditions'] ?? null;
+        $templateData['rentalConditions'] = $result['rentalConditions'] ?? null;
 
         // Kategorienauswahl und weiterleiten
-        $template->categories = $this->getCategories();
-        $template->action = $request->getUri();
+        $templateData['categories'] = $this->getCategories();
+        $templateData['action'] = $request->getUri();
 
         // Vorgemerkte Assets immer laden
         $storedAssets = $this->loadStoredAssets($this->getSessionData());
 
-        $template->storedAssets = $storedAssets;
-        $template->totalPrice = $this->calculateTotalPrice($this->getSessionData());
-        $template->totalRentalFee = $template->totalPrice;
+        $templateData['storedAssets'] = $storedAssets;
+        $templateData['totalPrice'] = $this->calculateTotalPrice($this->getSessionData());
+        $templateData['totalRentalFee'] = $templateData['totalPrice'];
 
-        return $template->getResponse();
+        return new Response($this->twig->render(
+            '@DiversworldContaoDiveclub/frontend_module/mod_dc_booking.html.twig',
+            $templateData
+        ));
     }
 
     /**
@@ -553,7 +564,7 @@ class BookingController extends AbstractFrontendModuleController
     /**
      * POST-Anfrage verarbeiten.
      */
-    private function handlePostRequest(Request $request, FragmentTemplate $template, array $sessionData, int $selectedMember): RedirectResponse
+    private function handlePostRequest(Request $request, array &$templateData, array $sessionData, int $selectedMember): RedirectResponse
     {
         $formType = $request->request->get('FORM_SUBMIT', null);
         $action = $request->request->get('action', ''); // Der Wert des gedrückten Buttons
@@ -614,12 +625,12 @@ class BookingController extends AbstractFrontendModuleController
 
             case 'reserve':
                 // Logik für "Reservieren"
-                $this->saveSessionData($request->request->all(), $template);
+                $this->saveSessionData($request->request->all(), $templateData);
                 Message::addConfirmation('Ausrüstung vorgemerkt.');
                 return new RedirectResponse($seite);  // Zurück zum Template
         }
 
-        $template->messages = Message::generate();
+        $templateData['messages'] = Message::generate();
 
         // 3. Standardverarbeitung: Falls keine Aktion erkannt wurde
         Message::addError('Ungültige Aktion.');
@@ -905,12 +916,12 @@ class BookingController extends AbstractFrontendModuleController
     /**
      * Speichert Reservierungsdaten in der Session.
      */
-    private function saveSessionData(array $data, FragmentTemplate $template): void
+    private function saveSessionData(array $data, array &$templateData): void
     {
         try {
             $this->saveDataToSession($data);
             $storedAssets = $this->loadStoredAssets($this->getSessionData());
-            $this->displaySuccessMessage($storedAssets, $template);
+            $this->displaySuccessMessage($storedAssets, $templateData);
         } catch (Exception $e) {
             Message::addError('Es gab ein Problem beim Speichern der Reservierungsdaten in der Session.');
             System::getContainer()->get('monolog.logger.contao.general')->error($e->getMessage());
@@ -1075,7 +1086,7 @@ class BookingController extends AbstractFrontendModuleController
     /**
      * Erfolgsmeldung für gespeicherte Assets anzeigen.
      */
-    private function displaySuccessMessage(array $storedAssets, FragmentTemplate $template): void
+    private function displaySuccessMessage(array $storedAssets, array &$templateData): void
     {
         if (!empty($storedAssets)) {
             $message = sprintf(
@@ -1087,7 +1098,7 @@ class BookingController extends AbstractFrontendModuleController
             Message::addError('Keine Auswahl getroffen.');
         }
 
-        $template->messages = Message::generate();
+        $templateData['messages'] = Message::generate();
     }
 
     /**

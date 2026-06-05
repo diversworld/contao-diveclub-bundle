@@ -18,28 +18,37 @@ use Diversworld\ContaoDiveclubBundle\Model\DcCheckProposalModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCourseEventModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment as Twig;
 
 use function is_array;
 
-#[AsFrontendModule('dc_course_events_list', category: 'dc_manager', template: 'frontend_module/mod_dc_course_events_list')]
+#[AsFrontendModule('dc_course_events_list', category: 'dc_manager', template: 'mod_dc_course_events_list')]
 class CourseEventsListController extends AbstractFrontendModuleController
 {
+    public function __construct(
+        private readonly Twig $twig,
+    ) {
+    }
+
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
-        $template->element_html_id = 'mod_' . $model->id;
-        $template->element_css_classes = trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? ''));
-        $template->class = $template->element_css_classes;
-        $template->cssID = $model->cssID[0] ?? '';
+        $templateData = [
+            'element_html_id' => 'mod_' . $model->id,
+            'element_css_classes' => trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')),
+            'class' => trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')),
+            'cssID' => $model->cssID[0] ?? '',
+            'type' => $model->type,
+        ];
 
         // Headline korrekt aufbereiten
         $headline = StringUtil::deserialize($model->headline);
         if (is_array($headline) && isset($headline['value']) && $headline['value'] !== '') {
-            $template->headline = [
+            $templateData['headline'] = [
                 'text' => $headline['value'],
                 'tag_name' => $headline['unit'] ?? 'h1',
             ];
         } else {
-            $template->headline = ['text' => '', 'tag_name' => 'h1'];
+            $templateData['headline'] = ['text' => '', 'tag_name' => 'h1'];
         }
 
         $dateFormat = (string)Config::get('datimFormat');
@@ -193,11 +202,14 @@ class CourseEventsListController extends AbstractFrontendModuleController
         }
         unset($row);
 
-        $template->events = $list;
-        $template->hasEvents = !empty($list);
-        $template->hasJumpTo = $hasJumpTo;
+        $templateData['events'] = $list;
+        $templateData['hasEvents'] = !empty($list);
+        $templateData['hasJumpTo'] = $hasJumpTo;
 
-        return $template->getResponse();
+        return new Response($this->twig->render(
+            '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_events_list.html.twig',
+            $templateData
+        ));
     }
 
     /**

@@ -24,32 +24,35 @@ use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
 use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment as Twig;
 
-#[AsFrontendModule(EquipmentDetailController::TYPE, category: 'dc_manager', template: 'frontend_module/mod_dc_equipment_listing')]
+#[AsFrontendModule(EquipmentDetailController::TYPE, category: 'dc_manager', template: 'mod_dc_equipment_listing')]
 class EquipmentDetailController extends AbstractFrontendModuleController
 {
     public const TYPE = 'dc_equipment_listing';
 
     protected ?PageModel $page;
 
-    private DcaTemplateHelper $helper;
-
-    public function __construct(DcaTemplateHelper $helper)
-    {
-        $this->helper = $helper;
+    public function __construct(
+        private readonly DcaTemplateHelper $helper,
+        private readonly Twig $twig,
+    ) {
     }
 
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
-        $template->element_html_id = 'mod_' . $model->id;
-        $template->element_css_classes = trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? ''));
-        $template->class = $template->element_css_classes;
-        $template->cssID = $model->cssID[0] ?? '';
+        $templateData = [
+            'element_html_id' => 'mod_' . $model->id,
+            'element_css_classes' => trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')),
+            'class' => trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')),
+            'cssID' => $model->cssID[0] ?? '',
+            'type' => $model->type,
+        ];
 
         // Headline korrekt aufbereiten
         $headline = StringUtil::deserialize($model->headline);
         if (is_array($headline) && isset($headline['value']) && $headline['value'] !== '') {
-            $template->headline = [
+            $templateData['headline'] = [
                 'text' => $headline['value'],
                 'unit' => $headline['unit'] ?? 'h1'
             ];
@@ -73,7 +76,10 @@ class EquipmentDetailController extends AbstractFrontendModuleController
             }
         }
 
-        $template->data = $data; // Daten dem Template übergeben
-        return $template->getResponse();
+        $templateData['data'] = $data; // Daten dem Template übergeben
+        return new Response($this->twig->render(
+            '@DiversworldContaoDiveclub/frontend_module/mod_dc_equipment_listing.html.twig',
+            $templateData
+        ));
     }
 }

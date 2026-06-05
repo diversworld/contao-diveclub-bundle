@@ -25,10 +25,16 @@ use Diversworld\ContaoDiveclubBundle\Model\DcCheckBookingModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckOrderModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment as Twig;
 
-#[AsFrontendModule('dc_check_confirmation', category: 'dc_manager', template: 'frontend_module/mod_dc_check_confirmation')]
+#[AsFrontendModule('dc_check_confirmation', category: 'dc_manager', template: 'mod_dc_check_confirmation')]
 class BookingConfirmationController extends AbstractFrontendModuleController
 {
+    public function __construct(
+        private readonly Twig $twig,
+    ) {
+    }
+
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         $session = $request->getSession();
@@ -64,28 +70,32 @@ class BookingConfirmationController extends AbstractFrontendModuleController
                 $orderData[] = $data;
             }
         }
-        $template->booking = $booking->row();
-        $template->orders = $orderData;
 
         // Parse confirmation text with insert tags
         $parser = System::getContainer()->get('contao.insert_tag.parser');
-        $template->confirmation_text = $parser->replace($model->confirmation_text ?: '');
-
-        // Basic template data
-        $template->element_html_id = 'mod_' . $model->id;
-        $template->element_css_classes = trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? ''));
-        $template->class = $template->element_css_classes;
-        $template->cssID = $model->cssID[0] ?? '';
-        $template->type = $model->type;
 
         $headline = StringUtil::deserialize($model->headline);
+        $headlineData = null;
         if (is_array($headline) && isset($headline['value']) && $headline['value'] !== '') {
-            $template->headline = [
+            $headlineData = [
                 'text' => $headline['value'],
                 'tag_name' => $headline['unit'] ?? 'h1'
             ];
         }
 
-        return $template->getResponse();
+        return new Response($this->twig->render(
+            '@DiversworldContaoDiveclub/frontend_module/mod_dc_check_confirmation.html.twig',
+            [
+                'booking' => $booking->row(),
+                'orders' => $orderData,
+                'confirmation_text' => $parser->replace($model->confirmation_text ?: ''),
+                'element_html_id' => 'mod_' . $model->id,
+                'element_css_classes' => trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')),
+                'class' => trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')),
+                'cssID' => $model->cssID[0] ?? '',
+                'type' => $model->type,
+                'headline' => $headlineData,
+            ]
+        ));
     }
 }

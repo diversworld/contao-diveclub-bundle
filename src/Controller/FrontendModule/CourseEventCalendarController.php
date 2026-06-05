@@ -16,22 +16,31 @@ use Contao\System;
 use Diversworld\ContaoDiveclubBundle\Model\DcCourseEventModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment as Twig;
 
-#[AsFrontendModule('dc_course_event_calendar', category: 'dc_manager', template: 'frontend_module/mod_dc_course_event_calendar')]
+#[AsFrontendModule('dc_course_event_calendar', category: 'dc_manager', template: 'mod_dc_course_event_calendar')]
 class CourseEventCalendarController extends AbstractFrontendModuleController
 {
+    public function __construct(
+        private readonly Twig $twig,
+    ) {
+    }
+
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
-        $template->id = $model->id;
-        $template->element_html_id = 'mod_' . $model->id;
-        $template->element_css_classes = trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? ''));
-        $template->class = $template->element_css_classes;
-        $template->cssID = $model->cssID[0] ?? '';
+        $templateData = [
+            'id' => $model->id,
+            'element_html_id' => 'mod_' . $model->id,
+            'element_css_classes' => trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')),
+            'class' => trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')),
+            'cssID' => $model->cssID[0] ?? '',
+            'type' => $model->type,
+        ];
 
         // Headline
         $headline = StringUtil::deserialize($model->headline);
         if (is_array($headline) && isset($headline['value']) && $headline['value'] !== '') {
-            $template->headline = [
+            $templateData['headline'] = [
                 'text' => $headline['value'],
                 'tag_name' => $headline['unit'] ?? 'h1'
             ];
@@ -67,9 +76,12 @@ class CourseEventCalendarController extends AbstractFrontendModuleController
         } else {
             // Wenn kein spezifisches Event gewählt ist: Im Backend (Preview/Edit) Info anzeigen
             if (System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest($request)) {
-                $template->hasEvents = false;
-                $template->be_message = 'Dieses Modul zeigt den Zeitplan an, wenn es zusammen mit einem Reader auf einer Seite platziert wird.';
-                return $template->getResponse();
+                $templateData['hasEvents'] = false;
+                $templateData['be_message'] = 'Dieses Modul zeigt den Zeitplan an, wenn es zusammen mit einem Reader auf einer Seite platziert wird.';
+                return new Response($this->twig->render(
+                    '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_event_calendar.html.twig',
+                    $templateData
+                ));
             }
 
             // Wenn im Frontend kein Event gewählt ist, laden wir ALLE Zeitplan-Einträge
@@ -134,17 +146,15 @@ class CourseEventCalendarController extends AbstractFrontendModuleController
         $nextYear = ($intMonth == 12) ? ($intYear + 1) : $intYear;
         $intNextYm = $nextYear . str_pad((string)$nextMonth, 2, '0', STR_PAD_LEFT);
 
-        $template->prevHref = $strUrl . '?' . http_build_query(array_merge($queryParams, ['month' => $intPrevYm]));
-        $template->prevTitle = $GLOBALS['TL_LANG']['MONTHS'][$prevMonth - 1] . ' ' . $prevYear;
-        $template->prevLabel = $GLOBALS['TL_LANG']['MSC']['cal_previous'];
+        $templateData['prevHref'] = $strUrl . '?' . http_build_query(array_merge($queryParams, ['month' => $intPrevYm]));
+        $templateData['prevTitle'] = $GLOBALS['TL_LANG']['MONTHS'][$prevMonth - 1] . ' ' . $prevYear;
+        $templateData['prevLabel'] = $GLOBALS['TL_LANG']['MSC']['cal_previous'];
 
-        $template->nextHref = $strUrl . '?' . http_build_query(array_merge($queryParams, ['month' => $intNextYm]));
-        $template->nextTitle = $GLOBALS['TL_LANG']['MONTHS'][$nextMonth - 1] . ' ' . $nextYear;
-        $template->nextLabel = $GLOBALS['TL_LANG']['MSC']['cal_next'];
+        $templateData['nextHref'] = $strUrl . '?' . http_build_query(array_merge($queryParams, ['month' => $intNextYm]));
+        $templateData['nextTitle'] = $GLOBALS['TL_LANG']['MONTHS'][$nextMonth - 1] . ' ' . $nextYear;
+        $templateData['nextLabel'] = $GLOBALS['TL_LANG']['MSC']['cal_next'];
 
-        $template->currentMonth = $GLOBALS['TL_LANG']['MONTHS'][$intMonth - 1] . ' ' . $intYear;
-
-        $template->id = $model->id; // Ensure ID is passed for potential JS or CSS targeting
+        $templateData['currentMonth'] = $GLOBALS['TL_LANG']['MONTHS'][$intMonth - 1] . ' ' . $intYear;
 
         // Compile Days & Weeks
         $startDay = 0; // Sunday
@@ -160,7 +170,7 @@ class CourseEventCalendarController extends AbstractFrontendModuleController
                 'name' => $GLOBALS['TL_LANG']['DAYS'][$dayNum]
             ];
         }
-        $template->days = $days;
+        $templateData['days'] = $days;
 
         $weeks = [];
         $intDaysInMonth = (int) date('t', $monthBegin);
@@ -201,9 +211,12 @@ class CourseEventCalendarController extends AbstractFrontendModuleController
                 'events' => $eventsByDate[$dateKey] ?? []
             ];
         }
-        $template->weeks = $weeks;
-        $template->hasEvents = !empty($schedule);
+        $templateData['weeks'] = $weeks;
+        $templateData['hasEvents'] = !empty($schedule);
 
-        return $template->getResponse();
+        return new Response($this->twig->render(
+            '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_event_calendar.html.twig',
+            $templateData
+        ));
     }
 }

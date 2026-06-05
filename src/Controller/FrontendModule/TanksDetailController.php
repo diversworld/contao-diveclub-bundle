@@ -23,25 +23,34 @@ use Contao\StringUtil;
 use Diversworld\ContaoDiveclubBundle\Model\DcTanksModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment as Twig;
 
-#[AsFrontendModule(TanksDetailController::TYPE, category: 'dc_manager', template: 'frontend_module/mod_dc_tanks_listing')]
+#[AsFrontendModule(TanksDetailController::TYPE, category: 'dc_manager', template: 'mod_dc_tanks_listing')]
 class TanksDetailController extends AbstractFrontendModuleController
 {
     public const TYPE = 'dc_tanks_listing';
 
     protected ?PageModel $page;
 
+    public function __construct(
+        private readonly Twig $twig,
+    ) {
+    }
+
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
-        $template->element_html_id = 'mod_' . $model->id;
-        $template->element_css_classes = trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? ''));
-        $template->class = $template->element_css_classes;
-        $template->cssID = $model->cssID[0] ?? '';
+        $templateData = [
+            'element_html_id' => 'mod_' . $model->id,
+            'element_css_classes' => trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')),
+            'class' => trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')),
+            'cssID' => $model->cssID[0] ?? '',
+            'type' => $model->type,
+        ];
 
         // Headline korrekt aufbereiten
         $headline = StringUtil::deserialize($model->headline);
         if (is_array($headline) && isset($headline['value']) && $headline['value'] !== '') {
-            $template->headline = [
+            $templateData['headline'] = [
                 'text' => $headline['value'],
                 'unit' => $headline['unit'] ?? 'h1'
             ];
@@ -56,9 +65,12 @@ class TanksDetailController extends AbstractFrontendModuleController
                 $tankList[] = $tank->row();
             }
         }
-        $template->tanks = $tankList;
-        $template->items = $tankList;
+        $templateData['tanks'] = $tankList;
+        $templateData['items'] = $tankList;
 
-        return $template->getResponse();
+        return new Response($this->twig->render(
+            '@DiversworldContaoDiveclub/frontend_module/mod_dc_tanks_listing.html.twig',
+            $templateData
+        ));
     }
 }

@@ -37,47 +37,52 @@ use Diversworld\ContaoDiveclubBundle\Session\Attribute\ArrayAttributeBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Twig\Environment as Twig;
 use function is_array;
 
-#[AsFrontendModule('dc_tank_check', category: 'dc_manager', template: 'frontend_module/mod_dc_tank_check')]
+#[AsFrontendModule('dc_tank_check', category: 'dc_manager', template: 'mod_dc_tank_check')]
 class TankCheckController extends AbstractFrontendModuleController
 {
+    public function __construct(
+        private readonly Twig $twig,
+    ) {
+    }
+
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         /** @var FrontendUser|null $user */
         $user = System::getContainer()->get('security.helper')->getUser();
 
-        $template->element_html_id = 'mod_' . $model->id;
-        $template->element_css_classes = trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? ''));
-        $template->class = $template->element_css_classes;
-        $template->cssID = $model->cssID[0] ?? '';
-        $template->type = $model->type;
+        $templateData = [
+            'element_html_id' => 'mod_' . $model->id,
+            'element_css_classes' => trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')),
+            'class' => trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')),
+            'cssID' => $model->cssID[0] ?? '',
+            'type' => $model->type,
+            'user' => $user,
+            'isLoggedIn' => ($user instanceof FrontendUser),
+            'success' => false,
+            'isBooking' => false,
+            'order' => null,
+            'proposal' => null,
+            'tanks' => [],
+            'articles' => [],
+            'basePricesJson' => json_encode([]),
+            'userTanksJson' => json_encode([]),
+            'proposals' => [],
+            'request_token' => System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue(),
+        ];
 
         // Headline korrekt aufbereiten
         $headline = StringUtil::deserialize($model->headline);
         if (is_array($headline) && isset($headline['value']) && $headline['value'] !== '') {
-            $template->headline = [
+            $templateData['headline'] = [
                 'text' => $headline['value'],
                 'tag_name' => $headline['unit'] ?? 'h1'
             ];
         } else {
-            $template->headline = ['text' => '', 'tag_name' => 'h1'];
+            $templateData['headline'] = ['text' => '', 'tag_name' => 'h1'];
         }
-
-        $template->user = $user;
-        $template->isLoggedIn = ($user instanceof FrontendUser);
-        $template->success = false;
-        $template->isBooking = false;
-        $template->order = null;
-        $template->proposal = null;
-        $template->tanks = [];
-        $template->articles = [];
-        $template->basePricesJson = json_encode([]);
-        $template->userTanksJson = json_encode([]);
-        $template->proposals = [];
-
-        // Request Token für Twig bereitstellen
-        $template->request_token = System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue();
 
         // Detailansicht (Buchungsformular)
         $proposalAlias = Input::get('auto_item') ?: $request->get('item');
@@ -85,7 +90,7 @@ class TankCheckController extends AbstractFrontendModuleController
         if ($proposalAlias) {
             $proposal = DcCheckProposalModel::findByIdOrAlias($proposalAlias);
             if ($proposal) {
-                return $this->handleBooking($template, $proposal, $user, $request, $model);
+                return $this->handleBooking($templateData, $proposal, $user, $request, $model);
             }
         }
 
@@ -125,22 +130,23 @@ class TankCheckController extends AbstractFrontendModuleController
             }
         }
 
-        $template->proposals = $proposalList;
+        $templateData['proposals'] = $proposalList;
 
         // Sprachdatei laden und Labels an das Template für die Liste übergeben
         System::loadLanguageFile('default');
-        $template->labels = $GLOBALS['TL_LANG']['MSC']['dc_tank_check'] ?? [];
+        $templateData['labels'] = $GLOBALS['TL_LANG']['MSC']['dc_tank_check'] ?? [];
 
-        return $template->getResponse();
+        return new Response($this->twig->render(
+            '@DiversworldContaoDiveclub/frontend_module/mod_dc_tank_check.html.twig',
+            $templateData
+        ));
     }
 
-    private function handleBooking(FragmentTemplate $template, DcCheckProposalModel $proposal, ?FrontendUser $user, Request $request, ModuleModel $model): Response
+    private function handleBooking(array $templateData, DcCheckProposalModel $proposal, ?FrontendUser $user, Request $request, ModuleModel $model): Response
     {
-        $template->isBooking = true;
-        $template->proposal = $proposal;
-        $template->user = $user;
-        // Request Token für Twig bereitstellen
-        $template->request_token = System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue();
+        $templateData['isBooking'] = true;
+        $templateData['proposal'] = $proposal;
+        $templateData['user'] = $user;
 
         $session = $request->getSession();
         $bag = $session->getBag(ArrayAttributeBag::ATTRIBUTE_NAME);
@@ -157,14 +163,14 @@ class TankCheckController extends AbstractFrontendModuleController
                 }
             }
 
-            $template->tanks = $memberTanks;
+            $templateData['tanks'] = $memberTanks;
             // Tank-Daten für JS-Preisberechnung
             $db = Database::getInstance();
             $userTanks = $db->prepare("SELECT id, size FROM tl_dc_tanks WHERE owner=?")->execute($user->id)->fetchAllAssoc();
-            $template->userTanksJson = json_encode($userTanks);
+            $templateData['userTanksJson'] = json_encode($userTanks);
         } else {
-            $template->tanks = [];
-            $template->userTanksJson = '[]';
+            $templateData['tanks'] = [];
+            $templateData['userTanksJson'] = '[]';
         }
 
         // Artikel aus dem Angebot laden
@@ -188,16 +194,16 @@ class TankCheckController extends AbstractFrontendModuleController
                 $articleList[] = $articleData;
             }
         }
-        $template->articles = $articleList;
-        $template->basePricesJson = json_encode($basePrices);
+        $templateData['articles'] = $articleList;
+        $templateData['basePricesJson'] = json_encode($basePrices);
 
         // Flaschengrößen für das Formular
         System::loadLanguageFile('tl_dc_tanks');
-        $template->tankSizes = $GLOBALS['TL_LANG']['tl_dc_tanks']['sizes'] ?? [];
+        $templateData['tankSizes'] = $GLOBALS['TL_LANG']['tl_dc_tanks']['sizes'] ?? [];
 
         // Sprachdatei laden und Labels an das Template übergeben
         System::loadLanguageFile('default');
-        $template->labels = $GLOBALS['TL_LANG']['MSC']['dc_tank_check'] ?? [];
+        $templateData['labels'] = $GLOBALS['TL_LANG']['MSC']['dc_tank_check'] ?? [];
 
         // Aktion: Flasche entfernen
         if ($request->get('act') === 'remove' && $request->get('idx') !== null) {
@@ -218,10 +224,10 @@ class TankCheckController extends AbstractFrontendModuleController
                 $tankIds = $request->request->all('tankIds');
 
                 // Hilfsfunktion zum Hinzufügen zur Session
-                $addToSession = function($data) use (&$sessionTanks, $template) {
+                $addToSession = function($data) use (&$sessionTanks, $templateData) {
                     $selectedArticles = $data['articles'] ?? [];
                     // Sicherstellen, dass alle Default-Artikel enthalten sind
-                    foreach ($template->articles as $art) {
+                    foreach ($templateData['articles'] as $art) {
                         if ($art['default'] && !in_array((string)$art['id'], array_map('strval', $selectedArticles), true)) {
                             $selectedArticles[] = (string)$art['id'];
                         }
@@ -395,10 +401,10 @@ class TankCheckController extends AbstractFrontendModuleController
                     }
                 }
 
-                $template->success = true;
-                $template->totalPrice = $totalOrderPrice;
-                $template->orders = $orders;
-                $template->order = $orders[0];
+                $templateData['success'] = true;
+                $templateData['totalPrice'] = $totalOrderPrice;
+                $templateData['orders'] = $orders;
+                $templateData['order'] = $orders[0];
             }
         }
 
@@ -417,9 +423,12 @@ class TankCheckController extends AbstractFrontendModuleController
             }
             $displayTanks[] = $st;
         }
-        $template->sessionTanks = $displayTanks;
+        $templateData['sessionTanks'] = $displayTanks;
 
-        return $template->getResponse();
+        return new Response($this->twig->render(
+            '@DiversworldContaoDiveclub/frontend_module/mod_dc_tank_check.html.twig',
+            $templateData
+        ));
     }
 
     private function getTankSizeFromId($tankId): string

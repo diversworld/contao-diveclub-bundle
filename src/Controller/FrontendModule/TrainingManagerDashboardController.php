@@ -14,13 +14,19 @@ use Contao\StringUtil;
 use Contao\System;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment as Twig;
 
 /**
  * Controller für das Frontend-Modul "Ausbildungsleiter Dashboard".
  */
-#[AsFrontendModule('dc_training_manager_dashboard', category: 'dc_manager', template: 'frontend_module/mod_dc_training_manager_dashboard')]
+#[AsFrontendModule('dc_training_manager_dashboard', category: 'dc_manager', template: 'mod_dc_training_manager_dashboard')]
 class TrainingManagerDashboardController extends AbstractFrontendModuleController
 {
+    public function __construct(
+        private readonly Twig $twig,
+    ) {
+    }
+
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         $user = System::getContainer()->get('security.helper')->getUser();
@@ -36,23 +42,37 @@ class TrainingManagerDashboardController extends AbstractFrontendModuleControlle
         }
 
         $options = StringUtil::deserialize($config->dashboard_options, true);
-        $template->options = $options;
-        $template->noOptions = empty($options);
-        $template->courses = [];
-        $template->workload = [];
 
-        if ($template->noOptions) {
-            return $template->getResponse();
+        $templateData = [
+            'element_html_id' => 'mod_' . $model->id,
+            'element_css_classes' => trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')),
+            'class' => trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')),
+            'cssID' => $model->cssID[0] ?? '',
+            'type' => $model->type,
+            'options' => $options,
+            'noOptions' => empty($options),
+            'courses' => [],
+            'workload' => [],
+        ];
+
+        if ($templateData['noOptions']) {
+            return new Response($this->twig->render(
+                '@DiversworldContaoDiveclub/frontend_module/mod_dc_training_manager_dashboard.html.twig',
+                $templateData
+            ));
         }
 
         $courses = $this->loadActiveCourses($db);
-        $template->courses = $courses;
+        $templateData['courses'] = $courses;
 
         if (in_array('workload', $options, true)) {
-            $template->workload = $this->calculateWorkload($courses);
+            $templateData['workload'] = $this->calculateWorkload($courses);
         }
 
-        return $template->getResponse();
+        return new Response($this->twig->render(
+            '@DiversworldContaoDiveclub/frontend_module/mod_dc_training_manager_dashboard.html.twig',
+            $templateData
+        ));
     }
 
     private function loadActiveCourses(Database $db): array

@@ -1,0 +1,15 @@
+{% extends "@DiversworldContaoDiveclub/frontend_module/mod_dc_listing.html.twig" %}
+
+{% block content %}
+    <div class="ce_dc_listing">
+        {% if headline is defined and headline %}
+            {{ block('headline_component') }}
+        {% endif %}
+
+        {% if text is defined and text %}
+            <div class="rte">
+                {{ text|raw }}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
