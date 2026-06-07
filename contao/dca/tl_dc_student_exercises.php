@@ -40,7 +40,6 @@ $GLOBALS['TL_DCA']['tl_dc_student_exercises'] = [
         'label' => [
             'fields' => ['exercise_id', 'status'],
             'format' => '%s — <span style="color:#b3b3b3; padding-left:8px;">%s</span>',
-            //'label_callback' => [StudentExerciseLabelListener::class, '__invoke'],
         ],
         'global_operations' => [
             'all' => [
@@ -51,11 +50,11 @@ $GLOBALS['TL_DCA']['tl_dc_student_exercises'] = [
         ],
         'operations' => [
             'edit',
-            '!complete' => [
+            'complete' => [
                 'label' => ['Übung abschließen', 'Status auf OK setzen und Datum eintragen'],
+                'href' => 'key=completeExercise',
                 'icon' => 'ok.svg',
                 'primary' => true,
-                'showInHeader' => true
             ],
             'children',
             'copy',

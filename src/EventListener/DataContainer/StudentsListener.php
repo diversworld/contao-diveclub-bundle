@@ -38,13 +38,13 @@ class StudentsListener
     public function onStudentLabel(array $row, string $label, DataContainer $dc, ?array $args = null): array|string
     {
         if (null !== $args) {
-            if ($args[2]) {
+            if ($args[2] && is_numeric($args[2])) {
                 $args[2] = Date::parse(Config::get('dateFormat'), (int)$args[2]);
             }
             return $args;
         }
 
-        $dob = $row['dateOfBirth'] ? Date::parse(Config::get('dateFormat'), (int)$row['dateOfBirth']) : '-';
+        $dob = ($row['dateOfBirth'] && is_numeric($row['dateOfBirth'])) ? Date::parse(Config::get('dateFormat'), (int)$row['dateOfBirth']) : ($row['dateOfBirth'] ?: '-');
         return sprintf('%s, %s (%s)', $row['lastname'], $row['firstname'], $dob);
     }
 
@@ -219,13 +219,15 @@ class StudentsListener
         $courseTitle = $this->connection->fetchOne("SELECT title FROM tl_dc_dive_course WHERE id = ?", [$row['course_id']]) ?: '-';
         $statusLabel = $GLOBALS['TL_LANG']['tl_dc_course_students']['itemStatus'][$row['status']] ?? (string)$row['status'];
         $dateLabel = (!empty($row['registered_on']) && is_numeric($row['registered_on'])) ? Date::parse(Config::get('dateFormat'), (int)$row['registered_on']) : '-';
+        //$birthDateLabel = (!empty($row['birthDate']) && is_numeric($row['birthDate'])) ? Date::parse(Config::get('dateFormat'), (int)$row['birthDate']) : '-';
         $payedLabel = !empty($row['payed']) ? 'ja' : 'nein';
 
         if (is_array($args)) {
             $args[0] = $courseTitle;
             $args[1] = $statusLabel;
-            $args[2] = $dateLabel;
-            $args[3] = $payedLabel;
+            //$args[2] = $birthDateLabel;
+            $args[2] = $payedLabel;
+            $args[3] = $dateLabel;
             return $args;
         }
 
@@ -387,41 +389,45 @@ class StudentsListener
     {
         $tokenManager = System::getContainer()->get('contao.csrf.token_manager');
         $tokenId = (string)System::getContainer()->getParameter('contao.csrf_token_name');
-        $rt = (string)Input::get('rt');
+        $rt = (string)Input::get($tokenId) ?: (string)Input::get('rt');
 
         if ($rt === '' || !$tokenManager->isTokenValid(new CsrfToken($tokenId, $rt))) {
             throw new AccessDeniedException('Invalid request token.');
         }
 
-        $this->connection->executeStatement("UPDATE tl_dc_student_exercises SET status='ok', dateCompleted=?, tstamp=? WHERE id=?", [time(), time(), $id]);
+        $exercise = $this->connection->fetchAssociative('SELECT pid,status FROM tl_dc_student_exercises WHERE id=?', [$id]);
 
-        $request = $this->requestStack->getCurrentRequest();
-        if (null === $request) {
+        if (!$exercise) {
             Backend::redirect('contao');
         }
 
-        $params = $request->query->all();
-        unset($params['key'], $params['rid'], $params['rt']);
-        Backend::redirect($request->getBaseUrl() . $request->getPathInfo() . (empty($params) ? '' : '?' . http_build_query($params)));
-    }
+        $currentStatus = (string)$exercise['status'];
+        $time = time();
 
-    #[AsCallback(table: 'tl_dc_student_exercises', target: 'operations.complete.button')]
-    public function showCompleteButton(array $row, ?string $href, string $label, string $title, ?string $icon, string $attributes): string
-    {
-        if (($row['status'] ?? '') === 'ok') {
-            return Image::getHtml(str_replace('.svg', '_1.svg', (string)$icon), $label, 'class="disabled"');
+        if ($currentStatus === 'ok') {
+            $this->connection->executeStatement("UPDATE tl_dc_student_exercises SET status='pending', dateCompleted=0, tstamp=? WHERE id=?", [$time, $id]);
+        } else {
+            $this->connection->executeStatement("UPDATE tl_dc_student_exercises SET status='ok', dateCompleted=?, tstamp=? WHERE id=?", [$time, $time, $id]);
         }
 
-        $rt = System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue();
-        $request = $this->requestStack->getCurrentRequest();
+        if (null === $this->requestStack->getCurrentRequest()) {
+            Backend::redirect('contao');
+        }
 
-        $params = $request ? $request->query->all() : [];
-        $params['key'] = 'completeExercise';
-        $params['rid'] = (int)$row['id'];
-        $params['rt'] = $rt;
+        Backend::redirect(Backend::addToUrl('', true, ['key', 'rid', 'rt', $tokenId]));
+    }
 
-        $url = ($request ? $request->getBaseUrl() . $request->getPathInfo() : Backend::addToUrl('')) . '?' . http_build_query($params);
+    #[AsCallback(table: 'tl_dc_student_exercises', target: 'list.operations.complete.button')]
+    public function showCompleteButton(array $row, ?string $href, string $label, string $title, ?string $icon, string $attributes): string
+    {
+        $tokenManager = System::getContainer()->get('contao.csrf.token_manager');
+        $tokenId = (string)System::getContainer()->getParameter('contao.csrf_token_name');
+        $url = Backend::addToUrl('id=' . (int)$row['pid'] . '&key=completeExercise&rid=' . (int)$row['id'] . '&' . $tokenId . '=' . $tokenManager->getDefaultTokenValue(), true, ['id', 'rid', $tokenId]);
+        $isCompleted = ($row['status'] ?? '') === 'ok';
+        $buttonLabel = $isCompleted ? 'Übung zurücksetzen' : 'Übung abschließen';
+        $buttonTitle = $isCompleted ? 'Status auf Wartend zurücksetzen und Abschlussdatum entfernen' : 'Status auf OK setzen und Datum eintragen';
+        $buttonIcon = $isCompleted ? 'undo.svg' : (string)$icon;
 
-        return sprintf('<a href="%s" title="%s"%s>%s</a> ', $url, StringUtil::specialchars($title), $attributes, Image::getHtml((string)$icon, $label));
+        return sprintf('<a href="%s" title="%s"%s>%s</a> ', $url, StringUtil::specialchars($buttonTitle), $attributes, Image::getHtml($buttonIcon, $buttonLabel));
     }
 }
