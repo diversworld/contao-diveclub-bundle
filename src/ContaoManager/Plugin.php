@@ -47,7 +47,6 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface
     {
         return $resolver
             ->resolve(__DIR__ . '/../Controller', 'attribute')
-            ->load(__DIR__ . '/../Controller', 'attribute')
-            ;
+            ->load(__DIR__ . '/../Controller', 'attribute');
     }
 }
