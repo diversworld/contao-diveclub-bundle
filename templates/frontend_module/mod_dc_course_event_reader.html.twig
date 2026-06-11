@@ -143,7 +143,9 @@
 
 {% block event_signup %}
     <h3>Anmeldung</h3>
-    {% if isLoggedIn and not hasStudent %}
+    {% if not registrationPossible %}
+        <p class="info">{{ registrationError }}</p>
+    {% elseif isLoggedIn and not hasStudent %}
         <p>Für Ihr Mitgliedskonto ist kein Tauchschüler hinterlegt.</p>
     {% elseif alreadyRegistered %}
         <p>Sie sind für diese Veranstaltung bereits angemeldet. (Zuweisungs-ID: {{ assignmentId }})</p>

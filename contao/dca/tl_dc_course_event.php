@@ -63,14 +63,14 @@ $GLOBALS['TL_DCA']['tl_dc_course_event'] = [
     ],
     'palettes' => [
         '__selector__' => ['addImage', 'overwriteMeta'],
-        'default' => '{title_legend},title,alias,course_id;
-                            {time_legend},dateStart,dateEnd,location;
-                            {image_legend},addImage;
-                            {details_legend},instructor,max_participants,price,description;
-                            {publish_legend},published,start,stop'
+        'default'     => '{title_legend},title,alias,course_id;
+                          {time_legend},dateStart,dateEnd,registration_start,registration_end,location;
+                          {image_legend},addImage;
+                          {details_legend},instructor,max_participants,price,description;
+                          {publish_legend},published,start,stop'
     ],
     'subpalettes' => [
-        'addImage' => 'singleSRC,fullsize,size,floating,overwriteMeta',
+        'addImage'      => 'singleSRC,fullsize,size,floating,overwriteMeta',
         'overwriteMeta' => 'alt,imageTitle,imageUrl,caption'
     ],
 
@@ -118,6 +118,16 @@ $GLOBALS['TL_DCA']['tl_dc_course_event'] = [
             'search' => true,
             'filter' => true,
             'sorting' => true,
+            'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
+            'sql' => "int NULL",
+        ],
+        'registration_start' => [
+            'inputType' => 'text',
+            'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 clr wizard'],
+            'sql' => "int NULL",
+        ],
+        'registration_end' => [
+            'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
             'sql' => "int NULL",
         ],

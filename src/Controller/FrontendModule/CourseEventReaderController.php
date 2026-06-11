@@ -277,8 +277,35 @@ class CourseEventReaderController extends AbstractFrontendModuleController
         // Debug-Log
         System::getContainer()->get('monolog.logger.contao.general')->info('CourseEventReaderController::getResponse called. Method: ' . $request->getMethod() . ', FORM_SUBMIT: ' . Input::post('FORM_SUBMIT'));
 
+        // Check registration possibility
+        $registrationPossible = true;
+        $registrationError = '';
+
+        if ($event->dateStart && (int)$event->dateStart < time()) {
+            $registrationPossible = false;
+            $registrationError = 'Die Anmeldung ist nicht mehr möglich, da der Kurs bereits gestartet ist.';
+        } elseif ($event->registration_start && (int)$event->registration_start > time()) {
+            $registrationPossible = false;
+            $registrationError = 'Der Anmeldezeitraum hat noch nicht begonnen.';
+        } elseif ($event->registration_end && (int)$event->registration_end < time()) {
+            $registrationPossible = false;
+            $registrationError = 'Der Anmeldezeitraum ist bereits abgelaufen.';
+        }
+
+        $templateData['registrationPossible'] = $registrationPossible;
+        $templateData['registrationError'] = $registrationError;
+
+        if (!$registrationPossible && !$alreadyRegistered && Input::post('FORM_SUBMIT') !== 'dc_event_signup' && $event->dateStart) {
+            $this->addHtml5Message($registrationError, 'info');
+        }
+
         // Verarbeitung der Anmeldung (mit CSRF-Validierung)
         if (Input::post('FORM_SUBMIT') === 'dc_event_signup' && !$alreadyRegistered) {
+            if (!$registrationPossible) {
+                $this->addHtml5Message($registrationError, 'error');
+                return new RedirectResponse($request->getUri());
+            }
+
             // CSRF prüfen – bei ungültigem Token abbrechen und Meldung setzen
             $tokenValue = (string)Input::post('REQUEST_TOKEN');
             $container = System::getContainer();

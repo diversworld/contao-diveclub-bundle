@@ -50,7 +50,7 @@ class CourseListener
     public function onCourseEventLabel(array $row, string $label, DataContainer $dc, ?array $args = null): array|string
     {
         if (null !== $args) {
-            $args[1] = $args[1] ? Date::parse(Config::get('datimFormat'), (int)$args[1]) : 'kein Datum';
+            //$args[1] = $args[1] ? Date::parse(Config::get('datimFormat'), (int)$args[1]) : 'kein Datum';
             return $args;
         }
 
