@@ -18,16 +18,16 @@ use Diversworld\ContaoDiveclubBundle\Model\DcCheckProposalModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCourseEventModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Twig\Environment as Twig;
+
 
 use function is_array;
 
-#[AsFrontendModule('dc_course_events_list', category: 'dc_manager', template: 'mod_dc_course_events_list')]
+#[AsFrontendModule(CourseEventsListController::TYPE, category: 'dc_manager')]
 class CourseEventsListController extends AbstractFrontendModuleController
 {
-    public function __construct(
-        private readonly Twig $twig,
-    )
+    public const TYPE = 'dc_course_events_list';
+
+    public function __construct()
     {
     }
 
@@ -207,10 +207,11 @@ class CourseEventsListController extends AbstractFrontendModuleController
         $templateData['hasEvents'] = !empty($list);
         $templateData['hasJumpTo'] = $hasJumpTo;
 
-        return new Response($this->twig->render(
-            '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_events_list.html.twig',
-            $templateData
-        ));
+        foreach ($templateData as $key => $value) {
+            $template->set($key, $value);
+        }
+
+        return $template->getResponse();
     }
 
     /**

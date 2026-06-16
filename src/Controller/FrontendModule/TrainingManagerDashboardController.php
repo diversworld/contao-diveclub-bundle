@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Diversworld\ContaoDiveclubBundle\Controller\FrontendModule;
 
+use Cgoit\LeadsOptinBundle\Controller\Module\LeadsOptInModule;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Twig\FragmentTemplate;
@@ -14,19 +15,15 @@ use Contao\StringUtil;
 use Contao\System;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Twig\Environment as Twig;
+
 
 /**
  * Controller für das Frontend-Modul "Ausbildungsleiter Dashboard".
  */
-#[AsFrontendModule('dc_training_manager_dashboard', category: 'dc_manager', template: 'mod_dc_training_manager_dashboard')]
+#[AsFrontendModule(type: TrainingManagerDashboardController::TYPE, category: 'dc_manager')]
 class TrainingManagerDashboardController extends AbstractFrontendModuleController
 {
-    public function __construct(
-        private readonly Twig $twig,
-    )
-    {
-    }
+    public const TYPE = 'dc_training_manager_dashboard';
 
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
@@ -57,10 +54,7 @@ class TrainingManagerDashboardController extends AbstractFrontendModuleControlle
         ];
 
         if ($templateData['noOptions']) {
-            return new Response($this->twig->render(
-                '@DiversworldContaoDiveclub/frontend_module/mod_dc_training_manager_dashboard.html.twig',
-                $templateData
-            ));
+            return $template->getResponse();
         }
 
         $courses = $this->loadActiveCourses($db);
@@ -70,10 +64,11 @@ class TrainingManagerDashboardController extends AbstractFrontendModuleControlle
             $templateData['workload'] = $this->calculateWorkload($courses);
         }
 
-        return new Response($this->twig->render(
-            '@DiversworldContaoDiveclub/frontend_module/mod_dc_training_manager_dashboard.html.twig',
-            $templateData
-        ));
+        foreach ($templateData as $key => $value) {
+            $template->set($key, $value);
+        }
+
+        return $template->getResponse();
     }
 
     private function loadActiveCourses(Database $db): array

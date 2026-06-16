@@ -28,21 +28,14 @@ use Diversworld\ContaoDiveclubBundle\Model\DcCheckProposalModel;
 use Doctrine\DBAL\Result;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Twig\Environment as Twig;
 
-#[AsFrontendModule(DcListingController::TYPE, category: 'dc_manager', template: 'mod_dc_listing')]
+
+#[AsFrontendModule(DcListingController::TYPE, category: 'dc_manager')]
 class DcListingController extends AbstractFrontendModuleController
 {
     public const TYPE = 'dc_listing';
 
     protected ?PageModel $page;
-
-    public function __construct(
-        private readonly ScopeMatcher $scopeMatcher,
-        private readonly Twig $twig,
-    )
-    {
-    }
 
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
@@ -80,19 +73,16 @@ class DcListingController extends AbstractFrontendModuleController
             $articlesData = [];
         }
 
-        return new Response($this->twig->render(
-            '@DiversworldContaoDiveclub/frontend_module/mod_dc_listing.html.twig',
-            [
-                'event' => $eventData,
-                'proposal' => $proposalData,
-                'articles' => $articlesData,
-                'element_html_id' => 'mod_' . $model->id,
-                'element_css_classes' => trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')),
-                'class' => trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')),
-                'cssID' => $model->cssID[0] ?? '',
-                'type' => $model->type,
-                'headline' => $headlineData,
-            ]
-        ));
+        $template->set('event', $eventData);
+        $template->set('proposal', $proposalData);
+        $template->set('articles', $articlesData);
+        $template->set('element_html_id', 'mod_' . $model->id);
+        $template->set('element_css_classes', trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')));
+        $template->set('class', trim('mod_' . $model->type . ' ' . ($model->cssID[1] ?? '')));
+        $template->set('cssID', $model->cssID[0] ?? '');
+        $template->set('type', $model->type);
+        $template->set('headline', $headlineData);
+
+        return $template->getResponse();
     }
 }

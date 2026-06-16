@@ -17,18 +17,18 @@ use Contao\StringUtil;
 use Contao\System;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Twig\Environment as Twig;
+
 
 /**
  * Controller für das Frontend-Modul "Kurslehrer-Übersicht".
  * Ermöglicht es Ausbildern, den Fortschritt ihrer Schüler zu sehen und Übungen abzuzeichnen.
  */
-#[AsFrontendModule('dc_course_instructor', category: 'dc_manager', template: 'mod_dc_course_instructor')]
+#[AsFrontendModule(CourseInstructorController::TYPE, category: 'dc_manager')]
 class CourseInstructorController extends AbstractFrontendModuleController
 {
-    public function __construct(
-        private readonly Twig $twig,
-    )
+    public const TYPE = 'dc_course_instructor';
+
+    public function __construct()
     {
     }
 
@@ -69,7 +69,7 @@ class CourseInstructorController extends AbstractFrontendModuleController
         if (empty($students)) {
             $templateData['notFound'] = true;
             return new Response($this->twig->render(
-                '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_instructor.html.twig',
+                '@Contao/frontend_module/dc_course_instructor.html.twig',
                 $templateData
             ));
         }
@@ -82,10 +82,11 @@ class CourseInstructorController extends AbstractFrontendModuleController
         $templateData['request_token'] = System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue();
         $templateData['action'] = $request->getUri();
 
-        return new Response($this->twig->render(
-            '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_instructor.html.twig',
-            $templateData
-        ));
+        foreach ($templateData as $key => $value) {
+            $template->set($key, $value);
+        }
+
+        return $template->getResponse();
     }
 
     /**

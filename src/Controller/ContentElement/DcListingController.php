@@ -21,18 +21,12 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsContentElement;
 use Contao\CoreBundle\Twig\FragmentTemplate;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Twig\Environment as Twig;
 
-#[AsContentElement(category: 'dc_equipment', template: 'ce_dc_listing')]
+
+#[AsContentElement(DcListingController::TYPE, category: 'dc_equipment')]
 class DcListingController extends AbstractContentElementController
 {
     public const TYPE = 'dc_listing';
-
-    public function __construct(
-        private readonly Twig $twig,
-    )
-    {
-    }
 
     protected function getResponse(FragmentTemplate $template, ContentModel $model, Request $request): Response
     {
@@ -45,13 +39,10 @@ class DcListingController extends AbstractContentElementController
             ];
         }
 
-        return new Response($this->twig->render(
-            '@DiversworldContaoDiveclub/content_element/ce_dc_listing.html.twig',
-            [
-                'text' => $model->text,
-                'headline' => $headlineData,
-                'type' => $model->type,
-            ]
-        ));
+        $template->set('text', $model->text);
+        $template->set('headline', $headlineData);
+        $template->set('type', $model->type);
+
+        return $template->getResponse();
     }
 }

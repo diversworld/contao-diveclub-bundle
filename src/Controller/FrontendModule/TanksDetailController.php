@@ -23,18 +23,16 @@ use Contao\StringUtil;
 use Diversworld\ContaoDiveclubBundle\Model\DcTanksModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Twig\Environment as Twig;
 
-#[AsFrontendModule(TanksDetailController::TYPE, category: 'dc_manager', template: 'mod_dc_tanks_listing')]
+
+#[AsFrontendModule(TanksDetailController::TYPE, category: 'dc_manager')]
 class TanksDetailController extends AbstractFrontendModuleController
 {
     public const TYPE = 'dc_tanks_listing';
 
     protected ?PageModel $page;
 
-    public function __construct(
-        private readonly Twig $twig,
-    )
+    public function __construct()
     {
     }
 
@@ -69,9 +67,10 @@ class TanksDetailController extends AbstractFrontendModuleController
         $templateData['tanks'] = $tankList;
         $templateData['items'] = $tankList;
 
-        return new Response($this->twig->render(
-            '@DiversworldContaoDiveclub/frontend_module/mod_dc_tanks_listing.html.twig',
-            $templateData
-        ));
+        foreach ($templateData as $key => $value) {
+            $template->set($key, $value);
+        }
+
+        return $template->getResponse();
     }
 }

@@ -17,17 +17,13 @@ use Contao\StringUtil;
 use Contao\System;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Twig\Environment as Twig;
+
 use function is_array;
 
-#[AsFrontendModule('dc_student_courses', category: 'dc_manager', template: 'mod_dc_student_courses')]
+#[AsFrontendModule(StudentCoursesController::TYPE, category: 'dc_manager')]
 class StudentCoursesController extends AbstractFrontendModuleController
 {
-    public function __construct(
-        private readonly Twig $twig,
-    )
-    {
-    }
+    public const TYPE = 'dc_student_courses';
 
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
@@ -84,7 +80,7 @@ class StudentCoursesController extends AbstractFrontendModuleController
             $templateData['isLoggedIn'] = false;
             $templateData['courses'] = [];
             return new Response($this->twig->render(
-                '@DiversworldContaoDiveclub/frontend_module/mod_dc_student_courses.html.twig',
+                '@Contao/frontend_module/dc_student_courses.html.twig',
                 $templateData
             ));
         }
@@ -102,7 +98,7 @@ class StudentCoursesController extends AbstractFrontendModuleController
             $templateData['studentFound'] = false;
             $templateData['courses'] = [];
             return new Response($this->twig->render(
-                '@DiversworldContaoDiveclub/frontend_module/mod_dc_student_courses.html.twig',
+                '@Contao/frontend_module/dc_student_courses.html.twig',
                 $templateData
             ));
         }
@@ -194,9 +190,10 @@ class StudentCoursesController extends AbstractFrontendModuleController
         $templateData['courses'] = $courses;
         $templateData['hasCourses'] = !empty($courses);
 
-        return new Response($this->twig->render(
-            '@DiversworldContaoDiveclub/frontend_module/mod_dc_student_courses.html.twig',
-            $templateData
-        ));
+        foreach ($templateData as $key => $value) {
+            $template->set($key, $value);
+        };
+
+        return $template->getResponse();
     }
 }

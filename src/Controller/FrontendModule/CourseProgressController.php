@@ -18,14 +18,14 @@ use Contao\System;
 use Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Twig\Environment as Twig;
 
-#[AsFrontendModule('dc_course_progress', category: 'dc_manager', template: 'mod_dc_course_progress')]
+
+#[AsFrontendModule(CourseProgressController::TYPE, category: 'dc_manager')]
 class CourseProgressController extends AbstractFrontendModuleController
 {
-    public function __construct(
-        private readonly Twig $twig,
-    )
+    public const TYPE = 'dc_course_progress';
+
+    public function __construct()
     {
         error_log('DEBUG: CourseProgressController::__construct');
         // Wir nutzen hier System::getContainer() da wir noch nicht wissen ob DI funktioniert
@@ -125,7 +125,7 @@ class CourseProgressController extends AbstractFrontendModuleController
         if (!$user instanceof FrontendUser) {
             $templateData['isLoggedIn'] = false;
             return new Response($this->twig->render(
-                '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_progress.html.twig',
+                '@Contao/frontend_module/dc_course_progress.html.twig',
                 $templateData
             ));
         }
@@ -148,7 +148,7 @@ class CourseProgressController extends AbstractFrontendModuleController
             $logger->warning('CourseProgressController: No assignment ID found in request.');
             $templateData['notFound'] = true;
             return new Response($this->twig->render(
-                '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_progress.html.twig',
+                '@Contao/frontend_module/dc_course_progress.html.twig',
                 $templateData
             ));
         }
@@ -172,7 +172,7 @@ class CourseProgressController extends AbstractFrontendModuleController
             $logger->error('CourseProgressController: Assignment ID ' . $assignmentId . ' not found in database.');
             $templateData['notFound'] = true;
             return new Response($this->twig->render(
-                '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_progress.html.twig',
+                '@Contao/frontend_module/dc_course_progress.html.twig',
                 $templateData
             ));
         }
@@ -212,7 +212,7 @@ class CourseProgressController extends AbstractFrontendModuleController
             $logger->warning('CourseProgressController: Access denied for User ' . $user->id . ' to Assignment ' . $assignmentId);
             $templateData['notFound'] = true;
             return new Response($this->twig->render(
-                '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_progress.html.twig',
+                '@Contao/frontend_module/dc_course_progress.html.twig',
                 $templateData
             ));
         }
@@ -447,9 +447,10 @@ class CourseProgressController extends AbstractFrontendModuleController
             'schedule' => 'Zeitplan / Termine',
         ];
 
-        return new Response($this->twig->render(
-            '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_progress.html.twig',
-            $templateData
-        ));
+        foreach ($templateData as $key => $value) {
+            $template->set($key, $value);
+        }
+
+        return $template->getResponse();
     }
 }

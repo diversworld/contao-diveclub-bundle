@@ -37,15 +37,15 @@ use Diversworld\ContaoDiveclubBundle\Session\Attribute\ArrayAttributeBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Twig\Environment as Twig;
+
 use function is_array;
 
-#[AsFrontendModule('dc_tank_check', category: 'dc_manager', template: 'mod_dc_tank_check')]
+#[AsFrontendModule(TankCheckController::TYPE, category: 'dc_manager')]
 class TankCheckController extends AbstractFrontendModuleController
 {
-    public function __construct(
-        private readonly Twig $twig,
-    )
+    public const TYPE = 'dc_tank_check';
+
+    public function __construct()
     {
     }
 
@@ -91,7 +91,7 @@ class TankCheckController extends AbstractFrontendModuleController
         if ($proposalAlias) {
             $proposal = DcCheckProposalModel::findByIdOrAlias($proposalAlias);
             if ($proposal) {
-                return $this->handleBooking($templateData, $proposal, $user, $request, $model);
+                return $this->handleBooking($template, $templateData, $proposal, $user, $request, $model);
             }
         }
 
@@ -137,13 +137,14 @@ class TankCheckController extends AbstractFrontendModuleController
         System::loadLanguageFile('default');
         $templateData['labels'] = $GLOBALS['TL_LANG']['MSC']['dc_tank_check'] ?? [];
 
-        return new Response($this->twig->render(
-            '@DiversworldContaoDiveclub/frontend_module/mod_dc_tank_check.html.twig',
-            $templateData
-        ));
+        foreach ($templateData as $key => $value) {
+            $template->set($key, $value);
+        }
+
+        return $template->getResponse();
     }
 
-    private function handleBooking(array $templateData, DcCheckProposalModel $proposal, ?FrontendUser $user, Request $request, ModuleModel $model): Response
+    private function handleBooking(FragmentTemplate $template, array $templateData, DcCheckProposalModel $proposal, ?FrontendUser $user, Request $request, ModuleModel $model): Response
     {
         $templateData['isBooking'] = true;
         $templateData['proposal'] = $proposal;
@@ -426,10 +427,11 @@ class TankCheckController extends AbstractFrontendModuleController
         }
         $templateData['sessionTanks'] = $displayTanks;
 
-        return new Response($this->twig->render(
-            '@DiversworldContaoDiveclub/frontend_module/mod_dc_tank_check.html.twig',
-            $templateData
-        ));
+        foreach ($templateData as $key => $value) {
+            $template->set($key, $value);
+        }
+
+        return $template->getResponse();
     }
 
     private function getTankSizeFromId($tankId): string

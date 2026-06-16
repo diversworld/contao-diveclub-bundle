@@ -40,11 +40,11 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Twig\Environment as Twig;
+
 use function is_array;
 
 
-#[AsFrontendModule(BookingController::TYPE, category: 'dc_manager', template: 'mod_dc_booking')]
+#[AsFrontendModule(BookingController::TYPE, category: 'dc_manager')]
 class BookingController extends AbstractFrontendModuleController
 {
     public const TYPE = 'dc_booking';
@@ -60,7 +60,6 @@ class BookingController extends AbstractFrontendModuleController
         Connection        $db,
         RequestStack      $requestStack,
         ContaoFramework   $framework,
-        private readonly Twig $twig,
     )
     {
         $this->helper = $helper;
@@ -100,10 +99,6 @@ class BookingController extends AbstractFrontendModuleController
         $templateData['equipmentTypes'] = $equipmentTypes;
 
         $category = $request->get('category');
-
-        // NEU: Gesamtpreis berechnen und ans Template übergeben
-        $totalPrice = $this->calculateTotalPrice($sessionData);
-        $templateData['totalPrice'] = $totalPrice;
 
         // NEW: Vorgemerkte Reservierungen abrufen
         $templateData['storedAssets'] = $this->loadStoredAssets($sessionData);
@@ -171,10 +166,11 @@ class BookingController extends AbstractFrontendModuleController
         $templateData['totalPrice'] = $this->calculateTotalPrice($this->getSessionData());
         $templateData['totalRentalFee'] = $templateData['totalPrice'];
 
-        return new Response($this->twig->render(
-            '@DiversworldContaoDiveclub/frontend_module/mod_dc_booking.html.twig',
-            $templateData
-        ));
+        foreach ($templateData as $key => $value) {
+            $template->set($key, $value);
+        }
+
+        return $template->getResponse();
     }
 
     /**

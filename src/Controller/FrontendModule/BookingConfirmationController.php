@@ -25,13 +25,13 @@ use Diversworld\ContaoDiveclubBundle\Model\DcCheckBookingModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCheckOrderModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Twig\Environment as Twig;
 
-#[AsFrontendModule('dc_check_confirmation', category: 'dc_manager', template: 'mod_dc_check_confirmation')]
+
+#[AsFrontendModule(BookingConfirmationController::TYPE, category: 'dc_manager')]
 class BookingConfirmationController extends AbstractFrontendModuleController
 {
+    public const TYPE = 'dc_check_confirmation';
     public function __construct(
-        private readonly Twig $twig,
     )
     {
     }
@@ -85,7 +85,7 @@ class BookingConfirmationController extends AbstractFrontendModuleController
         }
 
         return new Response($this->twig->render(
-            '@DiversworldContaoDiveclub/frontend_module/mod_dc_check_confirmation.html.twig',
+            '@Contao/frontend_module/dc_check_confirmation.html.twig',
             [
                 'booking' => $booking->row(),
                 'orders' => $orderData,

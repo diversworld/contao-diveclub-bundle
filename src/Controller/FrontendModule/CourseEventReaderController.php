@@ -26,19 +26,19 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Csrf\CsrfToken;
-use Twig\Environment as Twig;
+
 use function is_array;
 
 /**
  * Controller für das Frontend-Modul "Kurs-Termin-Reader".
  * Zeigt Details zu einem spezifischen Kurstermin an und ermöglicht die Anmeldung.
  */
-#[AsFrontendModule('dc_course_event_reader', category: 'dc_manager', template: 'mod_dc_course_event_reader')]
+#[AsFrontendModule(CourseEventReaderController::TYPE, category: 'dc_manager')]
 class CourseEventReaderController extends AbstractFrontendModuleController
 {
-    public function __construct(
-        private readonly Twig $twig,
-    )
+    public const TYPE = 'dc_course_event_reader';
+
+    public function __construct()
     {
     }
 
@@ -71,7 +71,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
         if (!$identifier) {
             $templateData['notFound'] = true;
             return new Response($this->twig->render(
-                '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_event_reader.html.twig',
+                '@Contao/frontend_module/dc_course_event_reader.html.twig',
                 $templateData
             ));
         }
@@ -86,7 +86,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
         if (!$event || (int)$event->published !== 1) {
             $templateData['notFound'] = true;
             return new Response($this->twig->render(
-                '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_event_reader.html.twig',
+                '@Contao/frontend_module/dc_course_event_reader.html.twig',
                 $templateData
             ));
         }
@@ -316,7 +316,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
                 System::getContainer()->get('monolog.logger.contao.general')->error('CSRF-Token Validierung fehlgeschlagen für dc_event_signup. Token: ' . substr($tokenValue, 0, 8) . '...');
                 $this->addHtml5Message('Ungültiges Request-Token. Bitte Seite neu laden und erneut versuchen.', 'error');
                 return new Response($this->twig->render(
-                    '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_event_reader.html.twig',
+                    '@Contao/frontend_module/dc_course_event_reader.html.twig',
                     $templateData
                 ));
             }
@@ -325,7 +325,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
             if (trim((string)Input::post('website')) !== '') {
                 $this->addHtml5Message('Ihre Anmeldung konnte nicht verarbeitet werden.', 'error');
                 return new Response($this->twig->render(
-                    '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_event_reader.html.twig',
+                    '@Contao/frontend_module/dc_course_event_reader.html.twig',
                     $templateData
                 ));
             }
@@ -374,7 +374,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
                         $this->addHtml5Message($err, 'error');
                     }
                     return new Response($this->twig->render(
-                        '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_event_reader.html.twig',
+                        '@Contao/frontend_module/dc_course_event_reader.html.twig',
                         $templateData
                     ));
                 }
@@ -414,7 +414,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
                         System::getContainer()->get('monolog.logger.contao.general')->error('Fehler beim Anlegen des Gast-Schülers: ' . $e->getMessage());
                         $this->addHtml5Message('Fehler beim Speichern Ihrer Daten.', 'error');
                         return new Response($this->twig->render(
-                            '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_event_reader.html.twig',
+                            '@Contao/frontend_module/dc_course_event_reader.html.twig',
                             $templateData
                         ));
                     }
@@ -456,7 +456,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
             if (!$currentStudentId) {
                 $this->addHtml5Message('Fehler beim Erstellen des Schüler-Profils.', 'error');
                 return new Response($this->twig->render(
-                    '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_event_reader.html.twig',
+                    '@Contao/frontend_module/dc_course_event_reader.html.twig',
                     $templateData
                 ));
             }
@@ -468,7 +468,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
                 $templateData['assignmentId'] = (int)$check2->id;
                 $this->addHtml5Message('Sie sind bereits für diese Veranstaltung angemeldet.', 'info');
                 return new Response($this->twig->render(
-                    '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_event_reader.html.twig',
+                    '@Contao/frontend_module/dc_course_event_reader.html.twig',
                     $templateData
                 ));
             }
@@ -502,7 +502,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
                 System::getContainer()->get('monolog.logger.contao.general')->error('Fehler beim Anlegen der Kurs-Zuweisung: ' . $e->getMessage());
                 $this->addHtml5Message('Fehler bei der Kursanmeldung.', 'error');
                 return new Response($this->twig->render(
-                    '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_event_reader.html.twig',
+                    '@Contao/frontend_module/dc_course_event_reader.html.twig',
                     $templateData
                 ));
             }
@@ -561,10 +561,11 @@ class CourseEventReaderController extends AbstractFrontendModuleController
             return new RedirectResponse($request->getUri());
         }
 
-        return new Response($this->twig->render(
-            '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_event_reader.html.twig',
-            $templateData
-        ));
+        foreach ($templateData as $key => $value) {
+            $template->set($key, $value);
+        }
+
+        return $template->getResponse();
     }
 
     private function getInstructorName(int $instructorId): string

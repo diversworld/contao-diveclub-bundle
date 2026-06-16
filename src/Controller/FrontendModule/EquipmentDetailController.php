@@ -24,19 +24,16 @@ use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
 use Diversworld\ContaoDiveclubBundle\Model\DcEquipmentModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Twig\Environment as Twig;
 
-#[AsFrontendModule(EquipmentDetailController::TYPE, category: 'dc_manager', template: 'mod_dc_equipment_listing')]
+
+#[AsFrontendModule(EquipmentDetailController::TYPE, category: 'dc_manager')]
 class EquipmentDetailController extends AbstractFrontendModuleController
 {
     public const TYPE = 'dc_equipment_listing';
 
     protected ?PageModel $page;
 
-    public function __construct(
-        private readonly DcaTemplateHelper $helper,
-        private readonly Twig $twig,
-    )
+    public function __construct()
     {
     }
 
@@ -78,9 +75,10 @@ class EquipmentDetailController extends AbstractFrontendModuleController
         }
 
         $templateData['data'] = $data; // Daten dem Template übergeben
-        return new Response($this->twig->render(
-            '@DiversworldContaoDiveclub/frontend_module/mod_dc_equipment_listing.html.twig',
-            $templateData
-        ));
+        foreach ($templateData as $key => $value) {
+            $template->set($key, $value);
+        }
+
+        return $template->getResponse();
     }
 }

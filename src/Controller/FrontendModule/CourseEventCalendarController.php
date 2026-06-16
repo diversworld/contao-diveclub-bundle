@@ -16,14 +16,14 @@ use Contao\System;
 use Diversworld\ContaoDiveclubBundle\Model\DcCourseEventModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Twig\Environment as Twig;
 
-#[AsFrontendModule('dc_course_event_calendar', category: 'dc_manager', template: 'mod_dc_course_event_calendar')]
+
+#[AsFrontendModule(CourseEventCalendarController::TYPE, category: 'dc_manager')]
 class CourseEventCalendarController extends AbstractFrontendModuleController
 {
-    public function __construct(
-        private readonly Twig $twig,
-    )
+    public const TYPE = 'dc_course_event_calendar';
+
+    public function __construct()
     {
     }
 
@@ -79,10 +79,11 @@ class CourseEventCalendarController extends AbstractFrontendModuleController
             if (System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest($request)) {
                 $templateData['hasEvents'] = false;
                 $templateData['be_message'] = 'Dieses Modul zeigt den Zeitplan an, wenn es zusammen mit einem Reader auf einer Seite platziert wird.';
-                return new Response($this->twig->render(
-                    '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_event_calendar.html.twig',
-                    $templateData
-                ));
+
+                foreach ($templateData as $key => $value) {
+                    $template->set($key, $value);
+                }
+                return $template->getResponse();
             }
 
             // Wenn im Frontend kein Event gewählt ist, laden wir ALLE Zeitplan-Einträge
@@ -215,9 +216,10 @@ class CourseEventCalendarController extends AbstractFrontendModuleController
         $templateData['weeks'] = $weeks;
         $templateData['hasEvents'] = !empty($schedule);
 
-        return new Response($this->twig->render(
-            '@DiversworldContaoDiveclub/frontend_module/mod_dc_course_event_calendar.html.twig',
-            $templateData
-        ));
+        foreach ($templateData as $key => $value) {
+            $template->set($key, $value);
+        }
+
+        return $template->getResponse();
     }
 }
