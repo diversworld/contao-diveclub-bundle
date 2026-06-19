@@ -8,7 +8,11 @@
         {% elseif not hasEvents %}
             {{ block('no_events') }}
         {% else %}
-            {{ block('calendar_table') }}
+            {% if calendarView == 'listYear' %}
+                {{ block('calendar_year_list') }}
+            {% else %}
+                {{ block('calendar_table') }}
+            {% endif %}
             {{ block('calendar_script') }}
         {% endif %}
     </div>
@@ -36,6 +40,32 @@
             {% endfor %}
         </tbody>
     </table>
+{% endblock %}
+
+{% block calendar_year_list %}
+    <div class="calendar year-list">
+        {{ block('calendar_list_nav') }}
+        {% for month in yearMonths %}
+            <section class="calendar-month">
+                <h3>{{ month.label }}</h3>
+                <ol class="events">
+                    {% for event in month.events %}
+                        <li>
+                            {{ block('calendar_event') }}
+                        </li>
+                    {% endfor %}
+                </ol>
+            </section>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block calendar_list_nav %}
+    <div class="head calendar-list-nav">
+        <a class="previous" href="{{ prevHref }}" title="{{ prevTitle }}">{{ prevLabel }}</a>
+        <strong class="current">{{ currentLabel|default(currentMonth) }}</strong>
+        <a class="next" href="{{ nextHref }}" title="{{ nextTitle }}">{{ nextLabel }}</a>
+    </div>
 {% endblock %}
 
 {% block calendar_nav %}
@@ -111,6 +141,23 @@
         }
         .dc-course-calendar .event:hover {
             background-color: rgba(0,0,0,0.05);
+        }
+
+        .dc-course-calendar .year-list .calendar-list-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .dc-course-calendar .year-list .events {
+            list-style: none;
+            margin: 0 0 1.5rem;
+            padding: 0;
+        }
+
+        .dc-course-calendar .year-list .events > li {
+            margin-bottom: 0.5rem;
         }
     </style>
 {% endblock %}

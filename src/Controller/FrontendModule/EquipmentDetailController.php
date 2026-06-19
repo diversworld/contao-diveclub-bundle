@@ -33,7 +33,9 @@ class EquipmentDetailController extends AbstractFrontendModuleController
 
     protected ?PageModel $page;
 
-    public function __construct()
+    public function __construct(
+        private readonly DcaTemplateHelper $helper,
+    )
     {
     }
 

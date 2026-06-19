@@ -70,10 +70,10 @@ class CourseEventReaderController extends AbstractFrontendModuleController
         $identifier = Input::get('event') ?: Input::get('items');
         if (!$identifier) {
             $templateData['notFound'] = true;
-            return new Response($this->twig->render(
+            return $this->render(
                 '@Contao/frontend_module/dc_course_event_reader.html.twig',
                 $templateData
-            ));
+            );
         }
 
         // Per ID oder Alias laden
@@ -85,10 +85,10 @@ class CourseEventReaderController extends AbstractFrontendModuleController
 
         if (!$event || (int)$event->published !== 1) {
             $templateData['notFound'] = true;
-            return new Response($this->twig->render(
+            return $this->render(
                 '@Contao/frontend_module/dc_course_event_reader.html.twig',
                 $templateData
-            ));
+            );
         }
 
         $dateFormat = Config::get('datimFormat');
@@ -315,19 +315,20 @@ class CourseEventReaderController extends AbstractFrontendModuleController
             if (!$isValidToken) {
                 System::getContainer()->get('monolog.logger.contao.general')->error('CSRF-Token Validierung fehlgeschlagen für dc_event_signup. Token: ' . substr($tokenValue, 0, 8) . '...');
                 $this->addHtml5Message('Ungültiges Request-Token. Bitte Seite neu laden und erneut versuchen.', 'error');
-                return new Response($this->twig->render(
+                //return new Response($this->twig->render(
+                return $this->render(
                     '@Contao/frontend_module/dc_course_event_reader.html.twig',
                     $templateData
-                ));
+                );
             }
 
             // Honeypot (Spam) – wenn gefüllt, abbrechen
             if (trim((string)Input::post('website')) !== '') {
                 $this->addHtml5Message('Ihre Anmeldung konnte nicht verarbeitet werden.', 'error');
-                return new Response($this->twig->render(
+                return $this->render(
                     '@Contao/frontend_module/dc_course_event_reader.html.twig',
                     $templateData
-                ));
+                );
             }
 
             $currentStudentId = $studentId; // kann null sein (Gast)
@@ -373,10 +374,10 @@ class CourseEventReaderController extends AbstractFrontendModuleController
                     foreach ($errors as $err) {
                         $this->addHtml5Message($err, 'error');
                     }
-                    return new Response($this->twig->render(
+                    return $this->render(
                         '@Contao/frontend_module/dc_course_event_reader.html.twig',
                         $templateData
-                    ));
+                    );
                 }
 
                 // Dublettenprüfung: existiert Schüler mit gleicher E‑Mail?
@@ -413,10 +414,10 @@ class CourseEventReaderController extends AbstractFrontendModuleController
                     } catch (Exception $e) {
                         System::getContainer()->get('monolog.logger.contao.general')->error('Fehler beim Anlegen des Gast-Schülers: ' . $e->getMessage());
                         $this->addHtml5Message('Fehler beim Speichern Ihrer Daten.', 'error');
-                        return new Response($this->twig->render(
+                        return $this->render(
                             '@Contao/frontend_module/dc_course_event_reader.html.twig',
                             $templateData
-                        ));
+                        );
                     }
                 }
             } else {
@@ -455,10 +456,10 @@ class CourseEventReaderController extends AbstractFrontendModuleController
             // WICHTIG: Prüfung, ob die ID jetzt gesetzt ist
             if (!$currentStudentId) {
                 $this->addHtml5Message('Fehler beim Erstellen des Schüler-Profils.', 'error');
-                return new Response($this->twig->render(
+                return $this->render(
                     '@Contao/frontend_module/dc_course_event_reader.html.twig',
                     $templateData
-                ));
+                );
             }
 
             // Falls bereits zugewiesen (Rennbedingungen), nochmal prüfen
@@ -467,10 +468,10 @@ class CourseEventReaderController extends AbstractFrontendModuleController
                 $templateData['alreadyRegistered'] = true;
                 $templateData['assignmentId'] = (int)$check2->id;
                 $this->addHtml5Message('Sie sind bereits für diese Veranstaltung angemeldet.', 'info');
-                return new Response($this->twig->render(
+                return $this->render(
                     '@Contao/frontend_module/dc_course_event_reader.html.twig',
                     $templateData
-                ));
+                );
             }
             // Zuweisung anlegen
             try {
@@ -501,10 +502,10 @@ class CourseEventReaderController extends AbstractFrontendModuleController
             } catch (Exception $e) {
                 System::getContainer()->get('monolog.logger.contao.general')->error('Fehler beim Anlegen der Kurs-Zuweisung: ' . $e->getMessage());
                 $this->addHtml5Message('Fehler bei der Kursanmeldung.', 'error');
-                return new Response($this->twig->render(
+                return $this->render(
                     '@Contao/frontend_module/dc_course_event_reader.html.twig',
                     $templateData
-                ));
+                );
             }
 
             // Debug-Log

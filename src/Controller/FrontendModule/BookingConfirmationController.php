@@ -84,7 +84,7 @@ class BookingConfirmationController extends AbstractFrontendModuleController
             ];
         }
 
-        return new Response($this->twig->render(
+        return $this->render(
             '@Contao/frontend_module/dc_check_confirmation.html.twig',
             [
                 'booking' => $booking->row(),
@@ -97,6 +97,6 @@ class BookingConfirmationController extends AbstractFrontendModuleController
                 'type' => $model->type,
                 'headline' => $headlineData,
             ]
-        ));
+        );
     }
 }

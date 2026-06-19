@@ -79,10 +79,10 @@ class StudentCoursesController extends AbstractFrontendModuleController
         if (!$user instanceof FrontendUser) {
             $templateData['isLoggedIn'] = false;
             $templateData['courses'] = [];
-            return new Response($this->twig->render(
+            return $this->render(
                 '@Contao/frontend_module/dc_student_courses.html.twig',
                 $templateData
-            ));
+            );
         }
 
         $templateData['isLoggedIn'] = true;
@@ -97,10 +97,10 @@ class StudentCoursesController extends AbstractFrontendModuleController
         if ($student->numRows < 1) {
             $templateData['studentFound'] = false;
             $templateData['courses'] = [];
-            return new Response($this->twig->render(
+            return $this->render(
                 '@Contao/frontend_module/dc_student_courses.html.twig',
                 $templateData
-            ));
+            );
         }
 
         $templateData['studentFound'] = true;

@@ -68,10 +68,10 @@ class CourseInstructorController extends AbstractFrontendModuleController
 
         if (empty($students)) {
             $templateData['notFound'] = true;
-            return new Response($this->twig->render(
+            return $this->render(
                 '@Contao/frontend_module/dc_course_instructor.html.twig',
                 $templateData
-            ));
+            );
         }
 
         $templateData['notFound'] = false;

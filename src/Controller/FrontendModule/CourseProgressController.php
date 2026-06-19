@@ -124,10 +124,10 @@ class CourseProgressController extends AbstractFrontendModuleController
 
         if (!$user instanceof FrontendUser) {
             $templateData['isLoggedIn'] = false;
-            return new Response($this->twig->render(
+            return $this->render(
                 '@Contao/frontend_module/dc_course_progress.html.twig',
                 $templateData
-            ));
+            );
         }
 
         $templateData['isLoggedIn'] = true;
@@ -147,10 +147,10 @@ class CourseProgressController extends AbstractFrontendModuleController
         if (!$assignmentId) {
             $logger->warning('CourseProgressController: No assignment ID found in request.');
             $templateData['notFound'] = true;
-            return new Response($this->twig->render(
+            return $this->render(
                 '@Contao/frontend_module/dc_course_progress.html.twig',
                 $templateData
-            ));
+            );
         }
 
         $db = Database::getInstance();
@@ -171,10 +171,10 @@ class CourseProgressController extends AbstractFrontendModuleController
         if ($assignmentResult->numRows < 1) {
             $logger->error('CourseProgressController: Assignment ID ' . $assignmentId . ' not found in database.');
             $templateData['notFound'] = true;
-            return new Response($this->twig->render(
+            return $this->render(
                 '@Contao/frontend_module/dc_course_progress.html.twig',
                 $templateData
-            ));
+            );
         }
 
         $assignmentRow = $assignmentResult->fetchAssoc();
@@ -211,10 +211,10 @@ class CourseProgressController extends AbstractFrontendModuleController
         if (!$hasAccess) {
             $logger->warning('CourseProgressController: Access denied for User ' . $user->id . ' to Assignment ' . $assignmentId);
             $templateData['notFound'] = true;
-            return new Response($this->twig->render(
+            return $this->render(
                 '@Contao/frontend_module/dc_course_progress.html.twig',
                 $templateData
-            ));
+            );
         }
 
         $templateData['assignment'] = [
