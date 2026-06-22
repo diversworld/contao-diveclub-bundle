@@ -36,4 +36,13 @@ $GLOBALS['TL_LANG']['tl_dc_course_event'] = [
 
     // Buttons/Operations
     'schedule' => ['Schedule', 'Edit the event schedule'],
+    'notify_students' => ['Notify dive students', 'Notify dive students about all changes in the schedule via Notification Center.'],
+    'notify_missing_notification' => 'No Notification Center notification of type "%s" was found.',
+    'notify_no_recipients' => 'No dive students with an e-mail address were found for this course event.',
+    'notify_no_schedule' => 'There are currently no schedule entries for this course event.',
+    'notify_no_changes' => 'No schedule changes have been detected since the last notification.',
+    'notify_sent' => 'The schedule update with %2$d changed appointments was sent to %1$d dive students.',
+    'notify_change_added' => 'Added',
+    'notify_change_updated' => 'Updated',
+    'notify_change_removed' => 'Removed',
 ];

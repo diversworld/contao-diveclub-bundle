@@ -53,6 +53,10 @@ $GLOBALS['TL_DCA']['tl_dc_course_event'] = [
                 'primary' => true,
                 'showInHeader' => true
             ],
+            'notify_students' => [
+                'href' => 'key=notifyStudents',
+                'icon' => 'bundles/terminal42notificationcenter/images/bell.49b754b0.svg',
+            ],
             'children',
             'copy',
             'cut',
@@ -247,6 +251,12 @@ $GLOBALS['TL_DCA']['tl_dc_course_event'] = [
             'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
             'sql' => "varchar(10) NOT NULL default ''"
+        ],
+        'schedule_notification_snapshot' => [
+            'sql' => "mediumtext NULL"
+        ],
+        'schedule_notification_sent_at' => [
+            'sql' => "int unsigned NOT NULL default 0"
         ],
     ],
 ];

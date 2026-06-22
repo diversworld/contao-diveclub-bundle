@@ -13,6 +13,8 @@ $GLOBALS['TL_LANG']['ERR']['aliasExists'] = 'The alias "%s" already exists.';
 // Misc labels
 $GLOBALS['TL_LANG']['MSC']['reservationCheckbox'] = 'reserve';
 
+$GLOBALS['TL_LANG']['tl_nc_notification']['type']['dc_course_schedule_update'] = ['Course schedule change', 'Notification to dive students after a course schedule change.'];
+
 // Frontend labels: My dive courses (module dc_student_courses)
 $GLOBALS['TL_LANG']['MSC']['dc_student_courses'] = [
     'headline' => 'My dive courses',

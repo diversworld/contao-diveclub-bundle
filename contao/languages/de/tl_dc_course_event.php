@@ -37,5 +37,13 @@ $GLOBALS['TL_LANG']['tl_dc_course_event'] = [
 
     // Buttons/Operationen (optional)
     'schedule' => ['Zeitplan', 'Zeitplan der Veranstaltung bearbeiten'],
+    'notify_students' => ['Tauchschüler informieren', 'Tauchschüler per Notification Center über alle Änderungen im Terminplan informieren.'],
+    'notify_missing_notification' => 'Es wurde keine Notification-Center-Benachrichtigung vom Typ "%s" gefunden.',
+    'notify_no_recipients' => 'Es wurden keine Tauchschüler mit E-Mail-Adresse für diese Kursveranstaltung gefunden.',
+    'notify_no_schedule' => 'Für diese Kursveranstaltung sind derzeit keine Termine im Plan vorhanden.',
+    'notify_no_changes' => 'Seit der letzten Benachrichtigung wurden keine Änderungen im Terminplan festgestellt.',
+    'notify_sent' => 'Die Terminplanänderung mit %2$d geänderten Terminen wurde an %1$d Tauchschüler gesendet.',
+    'notify_change_added' => 'Hinzugefügt',
+    'notify_change_updated' => 'Geändert',
+    'notify_change_removed' => 'Entfernt',
 ];
-

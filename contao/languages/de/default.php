@@ -28,6 +28,8 @@ $GLOBALS['TL_LANG']['ERR']['templateNotFound'] = 'Template file not found';
 
 $GLOBALS['TL_LANG']['MSC']['reservationCheckbox'] = 'reservieren';
 
+$GLOBALS['TL_LANG']['tl_nc_notification']['type']['dc_course_schedule_update'] = ['Terminplanänderung Kurs', 'Benachrichtigung an Tauchschüler nach einer Terminplanänderung.'];
+
 // Frontend-Labels: Meine Tauchkurse (Modul dc_student_courses)
 $GLOBALS['TL_LANG']['MSC']['dc_student_courses'] = [
     'headline' => 'Meine Tauchkurse',

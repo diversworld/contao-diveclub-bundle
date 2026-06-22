@@ -4,22 +4,33 @@ declare(strict_types=1);
 
 namespace Diversworld\ContaoDiveclubBundle\EventListener\DataContainer;
 
+use Contao\Backend;
 use Contao\Config;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
+use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Slug\Slug;
 use Contao\DataContainer;
 use Contao\Date;
+use Contao\Image;
+use Contao\Input;
+use Contao\Message;
+use Contao\StringUtil;
+use Contao\System;
 use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
+use Diversworld\ContaoDiveclubBundle\NotificationType\CourseScheduleUpdateNotificationType;
 use Doctrine\DBAL\Connection;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Terminal42\NotificationCenterBundle\NotificationCenter;
 
 class CourseListener
 {
     use AliasHandlerTrait;
 
     public function __construct(
-        private readonly Connection        $connection,
-        private readonly Slug              $slug,
-        private readonly DcaTemplateHelper $templateHelper
+        private readonly Connection         $connection,
+        private readonly Slug               $slug,
+        private readonly DcaTemplateHelper  $templateHelper,
+        private readonly NotificationCenter $notificationCenter
     )
     {
     }
@@ -229,6 +240,304 @@ class CourseListener
                 }
             }
         }
+
+    }
+
+    #[AsCallback(table: 'tl_dc_course_event', target: 'config.onload')]
+    public function onCourseEventLoad(DataContainer $dc): void
+    {
+        if (Input::get('key') !== 'notifyStudents' || !(int)Input::get('id')) {
+            return;
+        }
+
+        $this->sendCourseEventScheduleNotification((int)Input::get('id'));
+    }
+
+    #[AsCallback(table: 'tl_dc_course_event', target: 'list.operations.notify_students.button')]
+    public function showCourseEventNotificationButton(array $row, ?string $href, string $label, string $title, ?string $icon, string $attributes): string
+    {
+        $tokenManager = System::getContainer()->get('contao.csrf.token_manager');
+        $tokenId = (string)System::getContainer()->getParameter('contao.csrf_token_name');
+        $url = Backend::addToUrl(
+            'id=' . (int)$row['id'] . '&key=notifyStudents&' . $tokenId . '=' . $tokenManager->getDefaultTokenValue(),
+            true,
+            [$tokenId]
+        );
+
+        return sprintf('<a href="%s" title="%s"%s>%s</a> ', $url, StringUtil::specialchars($title), $attributes, Image::getHtml((string)$icon, $label));
+    }
+
+    private function sendCourseEventScheduleNotification(int $eventId): void
+    {
+        $tokenManager = System::getContainer()->get('contao.csrf.token_manager');
+        $tokenId = (string)System::getContainer()->getParameter('contao.csrf_token_name');
+        $rt = (string)Input::get($tokenId) ?: (string)Input::get('rt');
+
+        if ($rt === '' || !$tokenManager->isTokenValid(new CsrfToken($tokenId, $rt))) {
+            throw new AccessDeniedException('Invalid request token.');
+        }
+
+        $event = $this->connection->fetchAssociative(
+            "SELECT e.*, CONCAT(COALESCE(i.firstname, ''), ' ', COALESCE(i.lastname, '')) AS instructor_name
+             FROM tl_dc_course_event e
+             LEFT JOIN tl_member i ON i.id = e.instructor
+             WHERE e.id = ?",
+            [$eventId]
+        );
+
+        if (!$event) {
+            Backend::redirect('contao');
+        }
+
+        $notificationId = $this->connection->fetchOne(
+            "SELECT id FROM tl_nc_notification WHERE type = ? ORDER BY id LIMIT 1",
+            [CourseScheduleUpdateNotificationType::NAME]
+        );
+
+        if (!$notificationId) {
+            Message::addError(sprintf(
+                $GLOBALS['TL_LANG']['tl_dc_course_event']['notify_missing_notification'] ?? 'Es wurde keine Notification-Center-Benachrichtigung vom Typ "%s" gefunden.',
+                CourseScheduleUpdateNotificationType::NAME
+            ));
+            Backend::redirect(Backend::addToUrl('', true, ['key', 'rt', $tokenId]));
+        }
+
+        $scheduleRows = $this->fetchScheduleRows($eventId);
+
+        if (empty($scheduleRows)) {
+            Message::addInfo($GLOBALS['TL_LANG']['tl_dc_course_event']['notify_no_schedule'] ?? 'Für diese Kursveranstaltung sind derzeit keine Termine im Plan vorhanden.');
+            Backend::redirect(Backend::addToUrl('', true, ['key', 'rt', $tokenId]));
+        }
+
+        $students = $this->connection->fetchAllAssociative(
+            "SELECT DISTINCT s.firstname, s.lastname, s.email
+             FROM tl_dc_course_students cs
+             INNER JOIN tl_dc_students s ON s.id = cs.pid
+             WHERE cs.event_id = ?
+               AND cs.published = 1
+               AND s.email <> ''
+             ORDER BY s.lastname, s.firstname",
+            [$eventId]
+        );
+
+        if (empty($students)) {
+            Message::addInfo($GLOBALS['TL_LANG']['tl_dc_course_event']['notify_no_recipients'] ?? 'Es wurden keine Tauchschüler mit E-Mail-Adresse für diese Kursveranstaltung gefunden.');
+            Backend::redirect(Backend::addToUrl('', true, ['key', 'rt', $tokenId]));
+        }
+
+        $currentSnapshot = $this->createScheduleSnapshot($scheduleRows);
+        $previousSnapshot = $this->decodeScheduleSnapshot((string)($event['schedule_notification_snapshot'] ?? null));
+        $changedRows = $this->calculateScheduleChanges($previousSnapshot, $currentSnapshot);
+
+        if (empty($changedRows)) {
+            Message::addInfo($GLOBALS['TL_LANG']['tl_dc_course_event']['notify_no_changes'] ?? 'Seit der letzten Benachrichtigung wurden keine Änderungen im Terminplan festgestellt.');
+            Backend::redirect(Backend::addToUrl('', true, ['key', 'rt', $tokenId]));
+        }
+
+        $currentScheduleText = $this->formatScheduleText($scheduleRows);
+        $currentScheduleHtml = nl2br(StringUtil::specialchars($currentScheduleText));
+        $changedScheduleText = $this->formatScheduleChangesText($changedRows);
+        $changedScheduleHtml = nl2br(StringUtil::specialchars($changedScheduleText));
+        $primaryChange = $this->extractPrimaryChangeRow($changedRows);
+        $sent = 0;
+
+        foreach ($students as $student) {
+            $email = trim((string)$student['email']);
+            if ($email === '') {
+                continue;
+            }
+
+            $studentName = trim((string)$student['firstname'] . ' ' . (string)$student['lastname']);
+            $this->notificationCenter->sendNotification((int)$notificationId, [
+                'student_email' => $email,
+                'student_firstname' => (string)$student['firstname'],
+                'student_lastname' => (string)$student['lastname'],
+                'student_name' => $studentName,
+                'event_title' => (string)($event['title'] ?? ''),
+                'module_title' => (string)($primaryChange['module_title'] ?? ''),
+                'planned_at' => !empty($primaryChange['planned_at']) ? Date::parse(Config::get('datimFormat'), (int)$primaryChange['planned_at']) : '',
+                'location' => (string)($primaryChange['location'] ?? ''),
+                'instructor_name' => trim((string)($primaryChange['instructor_name'] ?? $event['instructor_name'] ?? '')),
+                'schedule_text' => $currentScheduleText,
+                'schedule_html' => $currentScheduleHtml,
+                'current_schedule_text' => $currentScheduleText,
+                'current_schedule_html' => $currentScheduleHtml,
+                'changed_schedule_text' => $changedScheduleText,
+                'changed_schedule_html' => $changedScheduleHtml,
+            ]);
+            ++$sent;
+        }
+
+        $this->connection->update('tl_dc_course_event', [
+            'schedule_notification_snapshot' => json_encode($currentSnapshot, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+            'schedule_notification_sent_at' => time(),
+            'tstamp' => time(),
+        ], ['id' => $eventId]);
+
+        Message::addConfirmation(sprintf(
+            $GLOBALS['TL_LANG']['tl_dc_course_event']['notify_sent'] ?? 'Die Terminplanänderung mit %2$d geänderten Terminen wurde an %1$d Tauchschüler gesendet.',
+            $sent,
+            count($changedRows)
+        ));
+        Backend::redirect(Backend::addToUrl('', true, ['key', 'rt', $tokenId]));
+    }
+
+    private function fetchScheduleRows(int $eventId): array
+    {
+        return $this->connection->fetchAllAssociative(
+            "SELECT s.id, s.planned_at, s.location, s.notes, s.published, m.title AS module_title,
+                    CONCAT(COALESCE(i.firstname, ''), ' ', COALESCE(i.lastname, '')) AS instructor_name
+             FROM tl_dc_course_event_schedule s
+             LEFT JOIN tl_dc_course_modules m ON m.id = s.module_id
+             LEFT JOIN tl_member i ON i.id = s.instructor
+             WHERE s.pid = ?
+             ORDER BY s.planned_at, s.sorting, s.id",
+            [$eventId]
+        );
+    }
+
+    private function decodeScheduleSnapshot(string $snapshot): array
+    {
+        if ('' === trim($snapshot)) {
+            return [];
+        }
+
+        $decoded = json_decode($snapshot, true);
+
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    private function createScheduleSnapshot(array $scheduleRows): array
+    {
+        $snapshot = [];
+
+        foreach ($scheduleRows as $row) {
+            $snapshot[(string)$row['id']] = $this->normalizeScheduleRow($row);
+        }
+
+        ksort($snapshot);
+
+        return $snapshot;
+    }
+
+    private function normalizeScheduleRow(array $row): array
+    {
+        return [
+            'id' => (int)($row['id'] ?? 0),
+            'planned_at' => (int)($row['planned_at'] ?? 0),
+            'module_title' => trim((string)($row['module_title'] ?? '')),
+            'location' => trim((string)($row['location'] ?? '')),
+            'instructor_name' => trim((string)($row['instructor_name'] ?? '')),
+            'notes' => $this->normalizeTextValue((string)($row['notes'] ?? '')),
+            'published' => !empty($row['published']) ? 1 : 0,
+        ];
+    }
+
+    private function normalizeTextValue(string $value): string
+    {
+        $value = strip_tags(html_entity_decode($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'));
+        $value = preg_replace('/\s+/u', ' ', $value);
+
+        return trim((string)$value);
+    }
+
+    private function calculateScheduleChanges(array $previousSnapshot, array $currentSnapshot): array
+    {
+        $changes = [];
+
+        foreach ($currentSnapshot as $id => $currentRow) {
+            if (!isset($previousSnapshot[$id])) {
+                $changes[] = ['type' => 'added', 'current' => $currentRow];
+                continue;
+            }
+
+            if ($previousSnapshot[$id] !== $currentRow) {
+                $changes[] = ['type' => 'updated', 'current' => $currentRow, 'previous' => $previousSnapshot[$id]];
+            }
+        }
+
+        foreach ($previousSnapshot as $id => $previousRow) {
+            if (!isset($currentSnapshot[$id])) {
+                $changes[] = ['type' => 'removed', 'previous' => $previousRow];
+            }
+        }
+
+        usort($changes, static function (array $left, array $right): int {
+            $leftRow = $left['current'] ?? $left['previous'] ?? [];
+            $rightRow = $right['current'] ?? $right['previous'] ?? [];
+
+            return ((int)($leftRow['planned_at'] ?? 0) <=> (int)($rightRow['planned_at'] ?? 0))
+                ?: ((int)($leftRow['id'] ?? 0) <=> (int)($rightRow['id'] ?? 0));
+        });
+
+        return $changes;
+    }
+
+    private function extractPrimaryChangeRow(array $changes): array
+    {
+        $firstChange = $changes[0] ?? [];
+
+        return $firstChange['current'] ?? $firstChange['previous'] ?? [];
+    }
+
+    private function formatScheduleText(array $scheduleRows): string
+    {
+        $lines = [];
+
+        foreach ($scheduleRows as $row) {
+            $lines[] = $this->formatScheduleLine($this->normalizeScheduleRow($row));
+        }
+
+        return implode("\n", $lines);
+    }
+
+    private function formatScheduleChangesText(array $changes): string
+    {
+        $lines = [];
+
+        foreach ($changes as $change) {
+            $row = $change['current'] ?? $change['previous'] ?? [];
+            $type = (string)($change['type'] ?? 'updated');
+            $prefix = $GLOBALS['TL_LANG']['tl_dc_course_event']['notify_change_' . $type] ?? ucfirst($type);
+
+            if ('updated' === $type && isset($change['previous'], $change['current'])) {
+                $lines[] = sprintf(
+                    '%s: %s -> %s',
+                    $prefix,
+                    $this->formatScheduleLine($change['previous']),
+                    $this->formatScheduleLine($change['current'])
+                );
+                continue;
+            }
+
+            $lines[] = sprintf('%s: %s', $prefix, $this->formatScheduleLine($row));
+        }
+
+        return implode("\n", $lines);
+    }
+
+    private function formatScheduleLine(array $row): string
+    {
+        $date = !empty($row['planned_at']) ? Date::parse(Config::get('datimFormat'), (int)$row['planned_at']) : '-';
+        $line = sprintf('%s - %s', $date, (string)($row['module_title'] ?? '-'));
+
+        if ('' !== (string)($row['location'] ?? '')) {
+            $line .= ' | ' . ($GLOBALS['TL_LANG']['tl_dc_course_event_schedule']['location'][0] ?? 'Location') . ': ' . $row['location'];
+        }
+
+        if ('' !== (string)($row['instructor_name'] ?? '')) {
+            $line .= ' | ' . ($GLOBALS['TL_LANG']['tl_dc_course_event_schedule']['instructor'][0] ?? 'Instructor') . ': ' . $row['instructor_name'];
+        }
+
+        if ('' !== (string)($row['notes'] ?? '')) {
+            $line .= ' | ' . ($GLOBALS['TL_LANG']['tl_dc_course_event_schedule']['notes'][0] ?? 'Notes') . ': ' . $row['notes'];
+        }
+
+        if (isset($row['published']) && !$row['published']) {
+            $line .= ' | ' . ($GLOBALS['TL_LANG']['tl_dc_course_event_schedule']['published'][0] ?? 'Unpublished');
+        }
+
+        return $line;
     }
 
     #[AsCallback(table: 'tl_dc_course_exercises', target: 'fields.alias.save')]

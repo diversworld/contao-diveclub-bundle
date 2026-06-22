@@ -14,4 +14,9 @@ $GLOBALS['TL_LANG']['tl_dc_course_event_schedule'] = [
     'plan_legend' => 'Planning',
     'notes_legend' => 'Details',
     'publish_legend' => 'Publication',
+
+    'notify_students' => ['Notify dive students', 'Notify dive students about the schedule change via Notification Center.'],
+    'notify_missing_notification' => 'No Notification Center notification of type "%s" was found.',
+    'notify_no_recipients' => 'No dive students with an e-mail address were found for this course event.',
+    'notify_sent' => 'The schedule change was sent to %d dive students.',
 ];

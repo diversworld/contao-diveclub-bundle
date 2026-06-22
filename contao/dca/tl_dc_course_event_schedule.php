@@ -131,5 +131,3 @@ $GLOBALS['TL_DCA']['tl_dc_course_event_schedule'] = [
         ],
     ],
 ];
-
-

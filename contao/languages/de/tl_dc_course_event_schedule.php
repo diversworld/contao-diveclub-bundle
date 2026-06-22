@@ -15,4 +15,9 @@ $GLOBALS['TL_LANG']['tl_dc_course_event_schedule'] = [
     'plan_legend' => 'Planung',
     'notes_legend' => 'Details',
     'publish_legend' => 'Veröffentlichung',
+
+    'notify_students' => ['Tauchschüler informieren', 'Tauchschüler per Notification Center über die Terminplanänderung informieren.'],
+    'notify_missing_notification' => 'Es wurde keine Notification-Center-Benachrichtigung vom Typ "%s" gefunden.',
+    'notify_no_recipients' => 'Es wurden keine Tauchschüler mit E-Mail-Adresse für diese Kursveranstaltung gefunden.',
+    'notify_sent' => 'Die Terminplanänderung wurde an %d Tauchschüler gesendet.',
 ];
