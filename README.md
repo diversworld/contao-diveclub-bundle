@@ -8,8 +8,8 @@
 
 # Welcome to ContaoDiveclubBundle
 
-This bundle provides several modules that allow dive clubs to manage equipment data. In a future version, booking and
-managing dive courses will also be added.
+This bundle provides several modules for dive clubs to manage equipment, reservations, dive courses, course schedules,
+student progress, and TÜV workflows in Contao.
 
 ## Features
 
@@ -21,7 +21,8 @@ managing dive courses will also be added.
     - Manage diving gear, including TÜV inspection dates. Options for adding offers from inspection companies are
       available. In a future version, it will also be possible to book a TÜV inspection directly.
 - **Dive Courses**
-    - Add information about dive courses, such as course content and requirements.
+    - Manage course templates, course events, training modules, exercises, students, and training progress.
+    - Maintain course schedules per event and notify students about schedule changes via Notification Center.
 - **TÜV Inspections**
     - Manage offers for TÜV inspections. In the child table, individual items in a TÜV inspection can be added; for
       example, item name, cylinder size, price in net and gross amounts. The other price (net or gross) is automatically
@@ -88,8 +89,11 @@ return [
 
 ### The Dive Courses Module
 
-In the Dive Courses module, the data for a dive course can be entered. _(Development is ongoing and will be further
-enhanced in upcoming releases.)_
+In the Dive Courses module, course templates, modules, and exercises can be defined centrally. Based on these templates,
+you can create concrete course events, assign students, and track their progress across all required exercises.
+
+Each course event has its own schedule (`tl_dc_course_event_schedule`). Schedule entries can include date/time, module,
+location, instructor, publication status, and notes.
 
 ### The TÜV Inspection Module
 
@@ -145,6 +149,41 @@ created depending on the association.
 
 The text files can be created by the user. The name is irrelevant. The respective text files can then be assigned in the
 settings (Configuration).
+
+### Course Schedule Notifications
+
+Course schedule notifications are integrated with the **Notification Center**.
+
+- A dedicated notification type `dc_course_schedule_update` is registered by the bundle.
+- The notification action is available on the **course event** (`tl_dc_course_event`) level, not on each individual
+  schedule row.
+- Clicking the bell icon on the parent course event sends:
+    - a list of all schedule entries that have changed since the last notification
+    - the complete current schedule of the event
+- If no schedule changes are detected since the last notification, no message is sent.
+
+Before using this feature, create a Notification Center notification of type **Course schedule change**
+(`dc_course_schedule_update`) in the Contao backend.
+
+Available notification tokens include:
+
+| Token                       | Description                                                   |
+|:----------------------------|:--------------------------------------------------------------|
+| `##student_email##`         | Recipient e-mail address                                      |
+| `##student_firstname##`     | Student first name                                            |
+| `##student_lastname##`      | Student last name                                             |
+| `##student_name##`          | Student full name                                             |
+| `##event_title##`           | Title of the course event                                     |
+| `##module_title##`          | Module title of the first detected changed schedule item      |
+| `##planned_at##`            | Planned date/time of the first detected changed schedule item |
+| `##location##`              | Location of the first detected changed schedule item          |
+| `##instructor_name##`       | Instructor name of the first detected changed schedule item   |
+| `##changed_schedule_text##` | Plain text overview of all changed schedule entries           |
+| `##changed_schedule_html##` | HTML overview of all changed schedule entries                 |
+| `##current_schedule_text##` | Plain text overview of the complete current schedule          |
+| `##current_schedule_html##` | HTML overview of the complete current schedule                |
+| `##schedule_text##`         | Alias for the complete current schedule in plain text         |
+| `##schedule_html##`         | Alias for the complete current schedule in HTML               |
 
 ### Global Configuration
 The bundle uses a central configuration table (`tl_dc_config`) where you can define:
@@ -266,7 +305,7 @@ Since these tags utilize the modern Contao 5 system, they can be combined with s
 
 - Automatic notification when course status changes
 - Automatic notification when equipment checks are needed
-- Members will be able to record their own equipment.
+- Members will be able to record their own equipment
 
 ### [Weitere Informationen im WIKI](https://github.com/EckhardBecker/Diversworld_DiveClubManager/wiki)
 
