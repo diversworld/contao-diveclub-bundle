@@ -313,7 +313,7 @@ class StudentsListener
         $sorting = 128;
         foreach ($allModules as $moduleId => $modData) {
             $exercisesForThisModule = [];
-            foreach ($moduleExercises as $key => $exData) {
+            foreach ($moduleExercises as $exData) {
                 if ($exData['module_id'] === $moduleId) {
                     $exercisesForThisModule[] = $exData;
                 }
@@ -428,6 +428,6 @@ class StudentsListener
         $buttonTitle = $isCompleted ? 'Status auf Wartend zurücksetzen und Abschlussdatum entfernen' : 'Status auf OK setzen und Datum eintragen';
         $buttonIcon = $isCompleted ? 'undo.svg' : (string)$icon;
 
-        return sprintf('<a href="%s" title="%s"%s>%s</a> ', $url, StringUtil::specialchars($buttonTitle), $attributes, Image::getHtml($buttonIcon, $buttonLabel));
+        return sprintf('<a href="%s" title="%s" %s>%s</a> ', $url, StringUtil::specialchars($buttonTitle), $attributes, Image::getHtml($buttonIcon, $buttonLabel));
     }
 }

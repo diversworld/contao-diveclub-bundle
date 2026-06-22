@@ -526,7 +526,7 @@ class BookingController extends AbstractFrontendModuleController
     private function groupAssetsByType(array $assets, array $equipmentTypes): array
     {
         $groupedAssets = [];
-        $types = $this->helper->getEquipmentTypes();
+//        $types = $this->helper->getEquipmentTypes();
 
         foreach ($assets as $asset) {
             $typeId = $asset['typeId'] ?? 'unknown';
@@ -954,8 +954,8 @@ class BookingController extends AbstractFrontendModuleController
         }
 
         // Falls übergeben, `type` und `subType` aus dem Formular abrufen
-        $type = $data['type'] ?? null;
-        $subType = $data['subType'] ?? null;
+        //$type = $data['type'] ?? null;
+        //$subType = $data['subType'] ?? null;
 
         // Gesamtpreis dieser Auswahl berechnen
         $totalRentalFee = array_reduce($selectedAssets, function ($carry, $assetId) use ($data) {
