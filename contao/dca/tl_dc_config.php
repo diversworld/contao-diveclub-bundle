@@ -216,7 +216,7 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_config']['instructor_groups'],
             'exclude' => true,
             'inputType' => 'checkboxWizard',
-            'options_callback' => [Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ConfigListener::class, 'getMemberGroupOptions'],
+            'options_callback' => [ConfigListener::class, 'getMemberGroupOptions'],
             'eval' => ['multiple' => true, 'tl_class' => 'clr'],
             'sql' => "blob NULL",
             'relation' => ['type' => 'hasMany', 'load' => 'lazy', 'table' => 'tl_member_group']
@@ -224,11 +224,11 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
         'training_manager' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_config']['training_manager'],
             'exclude' => true,
-            'inputType' => 'select',
-            'options_callback' => [Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\ConfigListener::class, 'getMemberOptions'],
-            'eval' => ['chosen' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'],
-            'sql' => "int unsigned NOT NULL default 0",
-            'relation' => ['type' => 'hasOne', 'load' => 'lazy', 'table' => 'tl_member']
+            'inputType' => 'checkboxWizard',
+            'options_callback' => [ConfigListener::class, 'getMemberOptions'],
+            'eval' => ['multiple' => true, 'tl_class' => 'clr'],
+            'sql' => "blob NULL",
+            'relation' => ['type' => 'hasMany', 'load' => 'lazy', 'table' => 'tl_member']
         ],
         'dashboard_options' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_config']['dashboard_options'],

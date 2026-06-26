@@ -35,7 +35,9 @@ class TrainingManagerDashboardController extends AbstractFrontendModuleControlle
         $db = Database::getInstance();
         $config = $db->prepare("SELECT training_manager, dashboard_options FROM tl_dc_config WHERE published='1' LIMIT 1")->execute();
 
-        if ($config->numRows < 1 || (int)$config->training_manager !== (int)$user->id) {
+        $trainingManagers = StringUtil::deserialize($config->training_manager, true);
+
+        if ($config->numRows < 1 || !in_array((string)$user->id, array_map('strval', $trainingManagers), true)) {
             return new Response('Access Denied', Response::HTTP_FORBIDDEN);
         }
 
