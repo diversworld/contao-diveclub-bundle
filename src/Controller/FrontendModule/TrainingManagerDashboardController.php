@@ -27,11 +27,6 @@ class TrainingManagerDashboardController extends AbstractFrontendModuleControlle
 
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
-        $user = System::getContainer()->get('security.helper')->getUser();
-        if (!$user instanceof FrontendUser) {
-            return new Response('Access Denied', Response::HTTP_FORBIDDEN);
-        }
-
         $db = Database::getInstance();
         $config = $db->prepare("SELECT dashboard_options FROM tl_dc_config WHERE published='1' LIMIT 1")->execute();
 
