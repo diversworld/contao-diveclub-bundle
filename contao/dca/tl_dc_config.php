@@ -225,7 +225,7 @@ $GLOBALS['TL_DCA']['tl_dc_config'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_config']['training_manager'],
             'exclude' => true,
             'inputType' => 'checkboxWizard',
-            'options_callback' => [ConfigListener::class, 'getMemberOptions'],
+            'options_callback' => [ConfigListener::class, 'getTrainingManagerOptions'],
             'eval' => ['multiple' => true, 'tl_class' => 'clr'],
             'sql' => "blob NULL",
             'relation' => ['type' => 'hasMany', 'load' => 'lazy', 'table' => 'tl_member']

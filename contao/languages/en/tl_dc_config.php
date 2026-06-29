@@ -65,6 +65,15 @@ $GLOBALS['TL_LANG']['tl_dc_config']['apiNewsArchive'] = ['News archive', 'Please
 $GLOBALS['TL_LANG']['tl_dc_config']['apiImprint'] = ['Imprint (App)', 'This text will be shown in the app under Imprint.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['apiPrivacy'] = ['Privacy policy (App)', 'This text will be shown in the app under Privacy.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['apiTerms'] = ['Terms of Use (App)', 'This text will be shown in the app under Terms of Use.'];
+$GLOBALS['TL_LANG']['tl_dc_config']['instructor_groups'] = ['Instructor groups', 'Choose the member groups that should count as instructors.'];
+$GLOBALS['TL_LANG']['tl_dc_config']['training_manager'] = ['Training managers', 'Choose members from the instructor groups who act as training managers.'];
+$GLOBALS['TL_LANG']['tl_dc_config']['dashboard_options'] = ['Dashboard options', 'Choose which information should be shown in the dashboard.'];
+$GLOBALS['TL_LANG']['tl_dc_config']['dashboard_options_ref'] = [
+    'courses' => 'Active courses',
+    'instructors' => 'Instructor assignment',
+    'progress' => 'Course progress',
+    'workload' => 'Instructor workload'
+];
 $GLOBALS['TL_LANG']['tl_dc_config']['addReservations'] = ['Add reservations', 'Show the reservations module in the backend.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['addChecks'] = ['Add checks', 'Show the checks module in the backend.'];
 $GLOBALS['TL_LANG']['tl_dc_config']['default'] = ['Default template', 'Select the default template configuration.'];

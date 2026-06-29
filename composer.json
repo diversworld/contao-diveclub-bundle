@@ -22,8 +22,8 @@
         "source": "https://github.com/diversworld/contao-diveclub-bundle"
     },
     "require": {
-        "php": "^8.2",
-        "contao/core-bundle": "^5.3",
+      "php": "^8.3",
+      "contao/core-bundle": "^5.7 || ^6.0",
         "tecnickcom/tcpdf": "^6.6",
         "setasign/fpdi": "^2.6"
     },
