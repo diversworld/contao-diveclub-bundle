@@ -333,13 +333,14 @@ class StudentsListener
 
     private function upsertStudentExercise(int $assignmentId, int $exerciseId, int $moduleId, $plannedAt, $instructor, int $sorting): void
     {
+        $instructorId = (int)$instructor;
         $checkId = $this->connection->fetchOne("SELECT id FROM tl_dc_student_exercises WHERE pid=? AND exercise_id=? AND module_id=?", [$assignmentId, $exerciseId, $moduleId]);
         if (!$checkId) {
             $this->connection->insert('tl_dc_student_exercises', [
-                'pid' => $assignmentId, 'tstamp' => time(), 'sorting' => $sorting, 'exercise_id' => $exerciseId, 'module_id' => $moduleId, 'status' => 'pending', 'dateCompleted' => (int)$plannedAt, 'instructor' => $instructor, 'published' => 1
+                'pid' => $assignmentId, 'tstamp' => time(), 'sorting' => $sorting, 'exercise_id' => $exerciseId, 'module_id' => $moduleId, 'status' => 'pending', 'dateCompleted' => (int)$plannedAt, 'instructor' => $instructorId, 'published' => 1
             ]);
         } else {
-            $this->connection->executeStatement("UPDATE tl_dc_student_exercises SET dateCompleted=?, instructor=? WHERE id=? AND (dateCompleted=0 OR dateCompleted IS NULL)", [(int)$plannedAt, $instructor, (int)$checkId]);
+            $this->connection->executeStatement("UPDATE tl_dc_student_exercises SET dateCompleted=?, instructor=? WHERE id=? AND (dateCompleted=0 OR dateCompleted IS NULL)", [(int)$plannedAt, $instructorId, (int)$checkId]);
         }
     }
 
