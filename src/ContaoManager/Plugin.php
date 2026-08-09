@@ -27,26 +27,27 @@ use Symfony\Component\Routing\RouteCollection;
 
 class Plugin implements BundlePluginInterface, RoutingPluginInterface
 {
-    /**
-     * @return array
-     */
-    public function getBundles(ParserInterface $parser)
+    public function getBundles(ParserInterface $parser): array
     {
+        $loadAfter = [
+            ContaoCoreBundle::class,
+            ContaoCalendarBundle::class,
+        ];
+
+        if (class_exists('Terminal42\NotificationCenterBundle\Terminal42NotificationCenterBundle')) {
+            $loadAfter[] = 'Terminal42\NotificationCenterBundle\Terminal42NotificationCenterBundle';
+        }
+
         return [
             BundleConfig::create(DiversworldContaoDiveclubBundle::class)
-                ->setLoadAfter([
-                    ContaoCoreBundle::class,
-                    ContaoCalendarBundle::class]),
+                ->setLoadAfter($loadAfter),
         ];
     }
 
-    /**
-     * @return RouteCollection|null
-     */
-    public function getRouteCollection(LoaderResolverInterface $resolver, KernelInterface $kernel)
+    public function getRouteCollection(LoaderResolverInterface $resolver, KernelInterface $kernel): ?RouteCollection
     {
         return $resolver
             ->resolve(__DIR__ . '/../Controller', 'attribute')
-            ->load(__DIR__ . '/../Controller', 'attribute');
+            ?->load(__DIR__ . '/../Controller', 'attribute');
     }
 }

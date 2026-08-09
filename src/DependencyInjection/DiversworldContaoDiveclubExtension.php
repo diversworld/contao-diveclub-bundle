@@ -14,14 +14,14 @@ declare(strict_types=1);
 
 namespace Diversworld\ContaoDiveclubBundle\DependencyInjection;
 
+use Diversworld\ContaoDiveclubBundle\NotificationType\CourseScheduleUpdateNotificationType;
 use Exception;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
-class
-DiversworldContaoDiveclubExtension extends Extension
+class DiversworldContaoDiveclubExtension extends Extension
 {
     /**
      * @throws Exception
@@ -40,6 +40,16 @@ DiversworldContaoDiveclubExtension extends Extension
         $loader->load('parameters.yaml');
         $loader->load('services.yaml');
         $loader->load('listener.yaml');
+
+        if (class_exists('Terminal42\NotificationCenterBundle\Terminal42NotificationCenterBundle')) {
+            $container->setParameter('diversworld.contao_diveclub.nc_available', true);
+
+            $container->register(CourseScheduleUpdateNotificationType::class)
+                ->setAutowired(true)
+                ->setAutoconfigured(true);
+        } else {
+            $container->setParameter('diversworld.contao_diveclub.nc_available', false);
+        }
 
         $rootKey = $this->getAlias();
 

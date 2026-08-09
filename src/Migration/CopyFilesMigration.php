@@ -14,19 +14,33 @@ namespace Diversworld\ContaoDiveclubBundle\Migration;
 
 use Contao\CoreBundle\Migration\AbstractMigration;
 use Contao\CoreBundle\Migration\MigrationResult;
-use Contao\File;
-use Contao\Folder;
-use Contao\StringUtil;
-use Contao\System;
 use Symfony\Component\Filesystem\Filesystem;
 
 class CopyFilesMigration extends AbstractMigration // Klasse für die Migration von Beispieldateien
 {
     private readonly Filesystem $fs; // Variable für das Symfony Filesystem Tool
+    private readonly string $projectDir;
+    private readonly string $webDir;
 
-    public function __construct() // Konstruktor der Migrationsklasse
+    public function __construct(string $projectDir, string $webDir) // Konstruktor der Migrationsklasse
     {
         $this->fs = new Filesystem(); // Initialisierung des Filesystems
+        $this->projectDir = $projectDir;
+
+        // Strip root dir manually to avoid System::getContainer() call in StringUtil::stripRootDir
+        $this->webDir = $this->stripRootDir($webDir, $projectDir);
+    }
+
+    private function stripRootDir(string $path, string $projectDir): string
+    {
+        $projectDir = str_replace('\\', '/', $projectDir);
+        $path = str_replace('\\', '/', $path);
+
+        if (str_starts_with($path, $projectDir)) {
+            return ltrim(substr($path, strlen($projectDir)), '/');
+        }
+
+        return $path;
     }
 
     public function getName(): string // Gibt den Namen der Migration zurück
@@ -43,45 +57,58 @@ class CopyFilesMigration extends AbstractMigration // Klasse für die Migration 
     {
         $path = \sprintf( // Ermittle den Pfad zu den Vorlagen im Bundle-Verzeichnis
             '%s/%s/bundles/diversworldcontaodiveclub/templates',
-            self::getRootDir(),
-            self::getWebDir(),
+            $this->getRootDir(),
+            $this->getWebDir(),
         );
 
-        new Folder('files/diveclub'); // Erstelle den Zielordner im Projekt-Dateisystem
+        if (!$this->fs->exists($this->getRootDir() . '/files/diveclub')) {
+            $this->fs->mkdir($this->getRootDir() . '/files/diveclub');
+        }
 
         $this->getFiles($path); // Kopiere alle Dateien aus dem Bundle-Verzeichnis in das Projekt
 
         return $this->createResult(true); // Gib ein erfolgreiches Migrationsergebnis zurück
     }
 
-    public static function getRootDir(): string // Ermittelt das Wurzelverzeichnis des Projekts
+    public function getRootDir(): string // Ermittelt das Wurzelverzeichnis des Projekts
     {
-        return System::getContainer()->getParameter('kernel.project_dir'); // Nutze den Symfony-Parameter für das Projektverzeichnis
+        return $this->projectDir;
     }
 
-    public static function getWebDir(): string // Ermittelt das Web-Verzeichnis (z.B. public oder web)
+    public function getWebDir(): string // Ermittelt das Web-Verzeichnis (z.B. public oder web)
     {
-        return StringUtil::stripRootDir(System::getContainer()->getParameter('contao.web_dir')); // Entferne das Root-Verzeichnis vom Web-Pfad
+        return $this->webDir;
     }
 
     protected function getFiles(string $path): void // Rekursive Methode zum Kopieren von Dateien und Ordnern
     {
-        foreach (Folder::scan($path) as $dir) { // Scanne den aktuellen Pfad nach Inhalten
-            if (!is_dir($path . '/' . $dir)) { // Wenn es sich um eine Datei handelt
-                $pos = strpos($path, 'diversworldcontaodiveclub'); // Finde die Position des Bundle-Namens im Pfad
-                $filesFolder = 'files/diveclub' . str_replace('diversworldcontaodiveclub', '', substr($path, $pos)) . '/' . $dir; // Berechne den Zielpfad im files-Ordner
-                if (!$this->fs->exists(self::getRootDir() . '/' . $filesFolder)) { // Wenn die Datei am Zielort noch nicht existiert
-                    $objFile = new File(self::getWebDir() . '/bundles/' . substr($path, $pos) . '/' . $dir); // Erstelle ein Contao-File Objekt der Quelldatei
-                    $objFile->copyTo($filesFolder); // Kopiere die Datei an den Zielort
+        if (!is_dir($path)) {
+            return;
+        }
+
+        $items = array_diff(scandir($path), ['.', '..']);
+
+        foreach ($items as $item) {
+            $source = $path . '/' . $item;
+            $pos = strpos($path, 'diversworldcontaodiveclub');
+
+            if (false === $pos) {
+                continue;
+            }
+
+            $relPath = str_replace('diversworldcontaodiveclub', '', substr($path, $pos));
+            $targetRelPath = 'files/diveclub' . $relPath . '/' . $item;
+            $targetAbsPath = $this->getRootDir() . '/' . $targetRelPath;
+
+            if (is_dir($source)) {
+                if (!$this->fs->exists($targetAbsPath)) {
+                    $this->fs->mkdir($targetAbsPath);
                 }
-            } else { // Wenn es sich um einen Ordner handelt
-                $folder = $path . '/' . $dir; // Setze den neuen Pfad für die Rekursion
-                $pos = strpos($path, 'diversworldcontaodiveclub'); // Finde Bundle-Name im Pfad
-                $filesFolder = 'files/diveclub' . str_replace('diversworldcontaodiveclub', '', substr($path, $pos)) . '/' . $dir; // Berechne den Zielordner-Pfad
-                if (!$this->fs->exists($filesFolder)) { // Wenn der Zielordner nicht existiert
-                    new Folder($filesFolder); // Erstelle den neuen Ordner im Zielverzeichnis
+                $this->getFiles($source);
+            } else {
+                if (!$this->fs->exists($targetAbsPath)) {
+                    $this->fs->copy($source, $targetAbsPath);
                 }
-                $this->getFiles($folder); // Rufe die Methode rekursiv für den Unterordner auf
             }
         }
     }

@@ -44,6 +44,8 @@ use Symfony\Component\HttpFoundation\Response;
 use function is_array;
 
 
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+
 #[AsFrontendModule(BookingController::TYPE, category: 'dc_manager')]
 class BookingController extends AbstractFrontendModuleController
 {
@@ -54,18 +56,21 @@ class BookingController extends AbstractFrontendModuleController
     private ContaoFramework $framework;
     private RequestStack $requestStack;
     private Connection $db;
+    private CsrfTokenManagerInterface $csrfTokenManager;
 
     public function __construct(
         DcaTemplateHelper $helper,
         Connection        $db,
         RequestStack      $requestStack,
         ContaoFramework   $framework,
+        CsrfTokenManagerInterface $csrfTokenManager
     )
     {
         $this->helper = $helper;
         $this->db = $db;
         $this->framework = $framework;
         $this->requestStack = $requestStack;
+        $this->csrfTokenManager = $csrfTokenManager;
     }
 
     /**
@@ -92,7 +97,8 @@ class BookingController extends AbstractFrontendModuleController
         System::loadLanguageFile('tl_dc_reservation_items');
 
         // Request Token für Twig bereitstellen
-        $templateData['request_token'] = System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue();
+        $tokenId = (string)System::getContainer()->getParameter('contao.csrf_token_name');
+        $templateData['request_token'] = $this->csrfTokenManager->getToken($tokenId)->getValue();
 
         $sessionData = $this->getSessionData();
         $equipmentTypes = $this->helper->getEquipmentTypes(); // Typen/Subtypen laden

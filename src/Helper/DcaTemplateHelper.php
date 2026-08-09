@@ -12,7 +12,12 @@ use Exception;
 
 class DcaTemplateHelper // Hilfsklasse zum Laden von Template-Daten für DCA-Dropdowns
 {
-    public function __construct(private readonly Connection $db)
+    public function __construct(
+        private readonly Connection                                     $db,
+        private readonly string                                         $projectDir,
+        private readonly object                                         $scopeMatcher,
+        private readonly \Symfony\Component\HttpFoundation\RequestStack $requestStack
+    )
     {
     }
 
@@ -32,7 +37,7 @@ class DcaTemplateHelper // Hilfsklasse zum Laden von Template-Daten für DCA-Dro
         // Überprüfen, ob der Pfad leer ist oder die Datei nicht existiert
         if (empty($templatePath) || !file_exists($templatePath)) { // Falls kein Pfad gefunden oder Datei fehlt
             // Im Backend eine Fehlermeldung anzeigen, wenn nichts konfiguriert ist
-            if (System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest(System::getContainer()->get('request_stack')->getCurrentRequest())) { // Wenn im Backend-Kontext
+            if ($this->scopeMatcher->isBackendRequest($this->requestStack->getCurrentRequest())) { // Wenn im Backend-Kontext
                 $message = $GLOBALS['TL_LANG']['ERR']['noConfigFound'] ?? 'Es wurde keine Konfiguration gefunden. Bitte erstellen Sie zuerst eine Konfiguration in den Einstellungen.'; // Fehlermeldung holen
                 \Contao\Message::addError($message); // Fehlermeldung in Contao ausgeben
             }
@@ -57,7 +62,7 @@ class DcaTemplateHelper // Hilfsklasse zum Laden von Template-Daten für DCA-Dro
 
     private function getTemplateFromConfig($templateName): ?string // Ermittelt den absoluten Dateipfad aus der Konfiguration
     {
-        $rootDir = System::getContainer()->getParameter('kernel.project_dir'); // Projekt-Wurzelverzeichnis
+        $rootDir = $this->projectDir; // Projekt-Wurzelverzeichnis
         $configArray = []; // Array für die Pfade
 
         // Lade die erforderlichen Felder aus der Tabelle tl_dc_config
@@ -101,7 +106,7 @@ class DcaTemplateHelper // Hilfsklasse zum Laden von Template-Daten für DCA-Dro
             }
         } else {
             // Im Backend eine Fehlermeldung anzeigen, wenn keine Einträge in der Tabelle vorhanden sind
-            if (System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest(System::getContainer()->get('request_stack')->getCurrentRequest())) { // Backend-Check
+            if ($this->scopeMatcher->isBackendRequest($this->requestStack->getCurrentRequest())) { // Backend-Check
                 $message = $GLOBALS['TL_LANG']['ERR']['noConfigFound'] ?? 'Es wurde keine Konfiguration gefunden. Bitte erstellen Sie zuerst eine Konfiguration in den Einstellungen.'; // Sprach-String
                 \Contao\Message::addError($message); // Fehlermeldung setzen
             }

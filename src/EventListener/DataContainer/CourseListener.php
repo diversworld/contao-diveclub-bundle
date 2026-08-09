@@ -19,18 +19,18 @@ use Contao\System;
 use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
 use Diversworld\ContaoDiveclubBundle\NotificationType\CourseScheduleUpdateNotificationType;
 use Doctrine\DBAL\Connection;
-use Symfony\Component\Security\Csrf\CsrfToken;
-use Terminal42\NotificationCenterBundle\NotificationCenter;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class CourseListener
 {
     use AliasHandlerTrait;
 
     public function __construct(
-        private readonly Connection         $connection,
-        private readonly Slug               $slug,
-        private readonly DcaTemplateHelper  $templateHelper,
-        private readonly NotificationCenter $notificationCenter
+        private readonly Connection                $connection,
+        private readonly Slug                      $slug,
+        private readonly DcaTemplateHelper         $templateHelper,
+        private readonly CsrfTokenManagerInterface $csrfTokenManager,
+        private readonly ?object                   $notificationCenter = null
     )
     {
     }
@@ -256,10 +256,9 @@ class CourseListener
     #[AsCallback(table: 'tl_dc_course_event', target: 'list.operations.notify_students.button')]
     public function showCourseEventNotificationButton(array $row, ?string $href, string $label, string $title, ?string $icon, string $attributes): string
     {
-        $tokenManager = System::getContainer()->get('contao.csrf.token_manager');
         $tokenId = (string)System::getContainer()->getParameter('contao.csrf_token_name');
         $url = Backend::addToUrl(
-            'id=' . (int)$row['id'] . '&key=notifyStudents&' . $tokenId . '=' . $tokenManager->getDefaultTokenValue(),
+            'id=' . (int)$row['id'] . '&key=notifyStudents&' . $tokenId . '=' . $this->csrfTokenManager->getToken($tokenId)->getValue(),
             true,
             [$tokenId]
         );
@@ -269,11 +268,15 @@ class CourseListener
 
     private function sendCourseEventScheduleNotification(int $eventId): void
     {
-        $tokenManager = System::getContainer()->get('contao.csrf.token_manager');
+        if (null === $this->notificationCenter) {
+            Message::addError($GLOBALS['TL_LANG']['tl_dc_course_event']['notify_nc_not_available'] ?? 'Das Notification Center ist nicht installiert.');
+            return;
+        }
+
         $tokenId = (string)System::getContainer()->getParameter('contao.csrf_token_name');
         $rt = (string)Input::get($tokenId) ?: (string)Input::get('rt');
 
-        if ($rt === '' || !$tokenManager->isTokenValid(new CsrfToken($tokenId, $rt))) {
+        if ($rt === '' || !$this->csrfTokenManager->isTokenValid(new CsrfToken($tokenId, $rt))) {
             throw new AccessDeniedException('Invalid request token.');
         }
 
@@ -348,23 +351,26 @@ class CourseListener
             }
 
             $studentName = trim((string)$student['firstname'] . ' ' . (string)$student['lastname']);
-            $this->notificationCenter->sendNotification((int)$notificationId, [
-                'student_email' => $email,
-                'student_firstname' => (string)$student['firstname'],
-                'student_lastname' => (string)$student['lastname'],
-                'student_name' => $studentName,
-                'event_title' => (string)($event['title'] ?? ''),
-                'module_title' => (string)($primaryChange['module_title'] ?? ''),
-                'planned_at' => !empty($primaryChange['planned_at']) ? Date::parse(Config::get('datimFormat'), (int)$primaryChange['planned_at']) : '',
-                'location' => (string)($primaryChange['location'] ?? ''),
-                'instructor_name' => trim((string)($primaryChange['instructor_name'] ?? $event['instructor_name'] ?? '')),
-                'schedule_text' => $currentScheduleText,
-                'schedule_html' => $currentScheduleHtml,
-                'current_schedule_text' => $currentScheduleText,
-                'current_schedule_html' => $currentScheduleHtml,
-                'changed_schedule_text' => $changedScheduleText,
-                'changed_schedule_html' => $changedScheduleHtml,
-            ]);
+
+            if (null !== $this->notificationCenter && method_exists($this->notificationCenter, 'sendNotification')) {
+                $this->notificationCenter->sendNotification((int)$notificationId, [
+                    'student_email' => $email,
+                    'student_firstname' => (string)$student['firstname'],
+                    'student_lastname' => (string)$student['lastname'],
+                    'student_name' => $studentName,
+                    'event_title' => (string)($event['title'] ?? ''),
+                    'module_title' => (string)($primaryChange['module_title'] ?? ''),
+                    'planned_at' => !empty($primaryChange['planned_at']) ? Date::parse(Config::get('datimFormat'), (int)$primaryChange['planned_at']) : '',
+                    'location' => (string)($primaryChange['location'] ?? ''),
+                    'instructor_name' => trim((string)($primaryChange['instructor_name'] ?? $event['instructor_name'] ?? '')),
+                    'schedule_text' => $currentScheduleText,
+                    'schedule_html' => $currentScheduleHtml,
+                    'current_schedule_text' => $currentScheduleText,
+                    'current_schedule_html' => $currentScheduleHtml,
+                    'changed_schedule_text' => $changedScheduleText,
+                    'changed_schedule_html' => $changedScheduleHtml,
+                ]);
+            }
             ++$sent;
         }
 

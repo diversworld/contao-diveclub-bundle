@@ -21,13 +21,15 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class StudentsListener
 {
     public function __construct(
-        private readonly Connection                  $connection,
+        private readonly Connection                $connection,
         private readonly UserPasswordHasherInterface $passwordHasher,
-        private readonly RequestStack                $requestStack
+        private readonly RequestStack              $requestStack,
+        private readonly CsrfTokenManagerInterface $csrfTokenManager
     )
     {
     }
@@ -388,11 +390,10 @@ class StudentsListener
 
     public function completeExercise(int $id): void
     {
-        $tokenManager = System::getContainer()->get('contao.csrf.token_manager');
         $tokenId = (string)System::getContainer()->getParameter('contao.csrf_token_name');
         $rt = (string)Input::get($tokenId) ?: (string)Input::get('rt');
 
-        if ($rt === '' || !$tokenManager->isTokenValid(new CsrfToken($tokenId, $rt))) {
+        if ($rt === '' || !$this->csrfTokenManager->isTokenValid(new CsrfToken($tokenId, $rt))) {
             throw new AccessDeniedException('Invalid request token.');
         }
 
@@ -421,9 +422,8 @@ class StudentsListener
     #[AsCallback(table: 'tl_dc_student_exercises', target: 'list.operations.complete.button')]
     public function showCompleteButton(array $row, ?string $href, string $label, string $title, ?string $icon, string $attributes): string
     {
-        $tokenManager = System::getContainer()->get('contao.csrf.token_manager');
         $tokenId = (string)System::getContainer()->getParameter('contao.csrf_token_name');
-        $url = Backend::addToUrl('id=' . (int)$row['pid'] . '&key=completeExercise&rid=' . (int)$row['id'] . '&' . $tokenId . '=' . $tokenManager->getDefaultTokenValue(), true, ['id', 'rid', $tokenId]);
+        $url = Backend::addToUrl('id=' . (int)$row['pid'] . '&key=completeExercise&rid=' . (int)$row['id'] . '&' . $tokenId . '=' . $this->csrfTokenManager->getToken($tokenId)->getValue(), true, ['id', 'rid', $tokenId]);
         $isCompleted = ($row['status'] ?? '') === 'ok';
         $buttonLabel = $isCompleted ? 'Übung zurücksetzen' : 'Übung abschließen';
         $buttonTitle = $isCompleted ? 'Status auf Wartend zurücksetzen und Abschlussdatum entfernen' : 'Status auf OK setzen und Datum eintragen';

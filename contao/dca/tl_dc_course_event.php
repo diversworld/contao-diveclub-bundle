@@ -158,7 +158,7 @@ $GLOBALS['TL_DCA']['tl_dc_course_event'] = [
             'reference' => &$GLOBALS['TL_LANG']['MSC'],
             'eval' => ['rgxp' => 'natural', 'includeBlankOption' => true, 'nospace' => true, 'helpwizard' => true, 'tl_class' => 'w50 clr'],
             'options_callback' => ['contao.listener.image_size_options', '__invoke'],
-            'sql' => ['type' => 'string', 'length' => 255, 'default' => '', 'customSchemaOptions' => ['collation' => 'ascii_bin']]
+            'sql' => ['type' => 'string', 'length' => 255, 'default' => '', 'platformOptions' => ['collation' => 'ascii_bin']]
         ],
         'floating' => [
             'label' => &$GLOBALS['TL_LANG']['tl_dc_course_event']['floating'],

@@ -9,11 +9,17 @@ services:
 
     Diversworld\ContaoDiveclubBundle\:
         resource: ../src/
-        exclude: ../src/{DependencyInjection,Model,Session,Controller/Backend/TankCheckPdfController.php}
+        exclude: ../src/{DependencyInjection,Model,Session,NotificationType,Controller/Backend/TankCheckPdfController.php}
 
     diversworld.template.helper:
         alias: Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper
         public: true
+
+    Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+            $scopeMatcher: '@contao.routing.scope_matcher'
+            $requestStack: '@request_stack'
 
     # Make the FQCN service explicitly public to allow fetching via container by class name
     Diversworld\ContaoDiveclubBundle\Helper\CourseProgressHelper:
@@ -24,10 +30,20 @@ services:
         autowire: true
         tags: ['controller.service_arguments']
 
-    Diversworld\ContaoDiveclubBundle\Controller\Backend\TuvListExportController:
-        public: true
-        autowire: true
-        tags: ['controller.service_arguments']
+    Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseListener:
+        arguments:
+            $notificationCenter: '@?terminal42_notification_center'
+
+    Diversworld\ContaoDiveclubBundle\Migration\CopyFilesMigration:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+            $webDir: '%contao.web_dir%'
+
+    Diversworld\ContaoDiveclubBundle\Service\TankCheckPdfGenerator:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+            $insertTagParser: '@contao.insert_tag.parser'
+            $requestStack: '@request_stack'
 
     # Add a session bag
     diversworld.contao_diveclub_bundle.session.factory:

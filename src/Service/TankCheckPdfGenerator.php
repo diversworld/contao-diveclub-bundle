@@ -18,7 +18,12 @@ use setasign\Fpdi\TcpdfFpdi as Fpdi;
 
 class TankCheckPdfGenerator
 {
-    public function __construct(private readonly ContaoFramework $framework)
+    public function __construct(
+        private readonly ContaoFramework                                $framework,
+        private readonly string                                         $projectDir,
+        private readonly object                                         $insertTagParser,
+        private readonly \Symfony\Component\HttpFoundation\RequestStack $requestStack
+    )
     {
     }
 
@@ -39,8 +44,8 @@ class TankCheckPdfGenerator
         $templatePath = null; // Initialisiere den Pfad zur Vorlage
         if ($config && $config->invoiceTemplate) { // Falls eine Rechnungsvorlage konfiguriert ist
             $fileModel = FilesModel::findByUuid($config->invoiceTemplate); // Hole das FilesModel über die UUID
-            if ($fileModel && is_file(System::getContainer()->getParameter('kernel.project_dir') . '/' . $fileModel->path)) { // Wenn die Datei existiert
-                $templatePath = System::getContainer()->getParameter('kernel.project_dir') . '/' . $fileModel->path; // Setze den absoluten Pfad zur Vorlage
+            if ($fileModel && is_file($this->projectDir . '/' . $fileModel->path)) { // Wenn die Datei existiert
+                $templatePath = $this->projectDir . '/' . $fileModel->path; // Setze den absoluten Pfad zur Vorlage
             }
         }
 
@@ -140,11 +145,14 @@ class TankCheckPdfGenerator
 
         if ($config && $config->invoiceText) { // Falls ein Rechnungs-Zusatztext konfiguriert ist
             //Nutze den Insert-Tag Parser von Contao
-            $parser = System::getContainer()->get('contao.insert_tag.parser'); // Hole den Insert-Tag-Parser-Service
+            $parser = $this->insertTagParser; // Hole den Insert-Tag-Parser-Service
 
             // Stelle sicher, dass die aktuelle Buchungs-ID in der Session bekannt ist,
             // damit deine Insert-Tags (DcCheckInsertTag) darauf zugreifen können.
-            System::getContainer()->get('request_stack')->getCurrentRequest()?->getSession()->set('last_tank_check_order', $booking->id); // Setze Buchungs-ID in Session für Insert-Tags
+            $request = $this->requestStack->getCurrentRequest();
+            if ($request) {
+                $request->getSession()->set('last_tank_check_order', $booking->id); // Setze Buchungs-ID in Session für Insert-Tags
+            }
 
             $invoiceText = $parser->replace($config->invoiceText); // Ersetze Insert-Tags im Rechnungstext
             $html .= '<div style="margin-top: 20px;">' . $invoiceText . '</div>'; // Text zum HTML hinzufügen
@@ -164,7 +172,7 @@ class TankCheckPdfGenerator
             }
         }
 
-        $projectDir = System::getContainer()->getParameter('kernel.project_dir'); // Projekt-Wurzelverzeichnis ermitteln
+        $projectDir = $this->projectDir; // Projekt-Wurzelverzeichnis ermitteln
         $fileName = $booking->bookingNumber . '.pdf'; // Dateiname generieren
         $filePath = $projectDir . '/' . $pdfFolder . '/' . $fileName; // Absoluter Zielpfad zur Datei
 
