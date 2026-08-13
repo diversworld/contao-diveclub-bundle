@@ -219,7 +219,11 @@ $GLOBALS['TL_DCA']['tl_dc_dive_course'] = [
             'reference' => &$GLOBALS['TL_LANG']['MSC'],
             'eval' => ['rgxp' => 'natural', 'includeBlankOption' => true, 'nospace' => true, 'helpwizard' => true, 'tl_class' => 'w50 clr'],
             'options_callback' => static function () {
-                return System::getContainer()->get('contao.image.sizes')->getOptionsForUser(BackendUser::getInstance());
+                try {
+                    return System::getContainer()->get('contao.image.sizes')->getOptionsForUser(BackendUser::getInstance());
+                } catch (\Exception $e) {
+                    return [];
+                }
             },
             'sql' => "varchar(64) NOT NULL default ''"
         ],

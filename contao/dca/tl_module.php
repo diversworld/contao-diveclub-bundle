@@ -8,6 +8,10 @@ declare(strict_types=1);
  * Ergänzt das FE-Modul "dc_student_courses" um die Template-Auswahl (customTpl).
  */
 
+if (!isset($GLOBALS['TL_DCA']['tl_module']['palettes']) || !is_array($GLOBALS['TL_DCA']['tl_module']['palettes'])) {
+    $GLOBALS['TL_DCA']['tl_module']['palettes'] = [];
+}
+
 // Palette für das eigene Frontend-Modul registrieren, inkl. Template-Auswahl
 $GLOBALS['TL_DCA']['tl_module']['palettes']['dc_student_courses'] =
     '{title_legend},name,headline,type;' .

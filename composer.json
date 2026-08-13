@@ -25,9 +25,11 @@
       "php": "^8.3",
       "contao/core-bundle": "^5.7 || ^6.0",
         "tecnickcom/tcpdf": "^6.6",
-      "setasign/fpdi": "^2.6",
-      "terminal42/notification_center": "^2.0 || ^3.0@dev"
+      "setasign/fpdi": "^2.6"
     },
+  "suggest": {
+    "terminal42/notification_center": "For email notifications on course schedule updates"
+  },
     "require-dev": {
         "contao/manager-plugin": "^2.12",
         "slevomat/coding-standard": "^8.0",

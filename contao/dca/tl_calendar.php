@@ -14,11 +14,17 @@ declare(strict_types=1);
 
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 
+if (!isset($GLOBALS['TL_DCA']['tl_calendar']['palettes']) || !is_array($GLOBALS['TL_DCA']['tl_calendar']['palettes'])) {
+    $GLOBALS['TL_DCA']['tl_calendar']['palettes'] = [];
+}
+
 // Palettes
-PaletteManipulator::create()
-    ->addLegend('dive_check_legend', 'title_legend')
-    ->addField(['diveCourse, tankChecks'], 'dive_check_legend', PaletteManipulator::POSITION_APPEND)
-    ->applyToPalette('default', 'tl_calendar');
+if (isset($GLOBALS['TL_DCA']['tl_calendar']['palettes']) && is_array($GLOBALS['TL_DCA']['tl_calendar']['palettes'])) {
+    PaletteManipulator::create()
+        ->addLegend('dive_check_legend', 'title_legend')
+        ->addField(['diveCourse', 'tankChecks'], 'dive_check_legend', PaletteManipulator::POSITION_APPEND)
+        ->applyToPalette('default', 'tl_calendar');
+}
 
 // Fields
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['tankChecks'] = [

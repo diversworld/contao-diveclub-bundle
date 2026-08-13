@@ -35,14 +35,14 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface
         ];
 
         if (class_exists('Terminal42\NotificationCenterBundle\Terminal42NotificationCenterBundle')) {
-            $loadAfter[] = 'Terminal42\NotificationCenterBundle\Terminal42NotificationCenterBundle';
+            $loadAfter[] = 'notification-center';
         }
-
         return [
             BundleConfig::create(DiversworldContaoDiveclubBundle::class)
                 ->setLoadAfter($loadAfter),
         ];
     }
+
 
     public function getRouteCollection(LoaderResolverInterface $resolver, KernelInterface $kernel): ?RouteCollection
     {

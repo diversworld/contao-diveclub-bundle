@@ -41,7 +41,9 @@ use Diversworld\ContaoDiveclubBundle\Model\DcTanksModel;
 // Add child table tl_calendar_events_member to tl_calendar_events
 //$GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_dc_tanks';
 
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['ctable'][] = 'tl_dc_dive_course';
+if (isset($GLOBALS['TL_DCA']['tl_calendar_events']['config'])) {
+    $GLOBALS['TL_DCA']['tl_calendar_events']['config']['ctable'][] = 'tl_dc_dive_course';
+}
 
 $GLOBALS['BE_MOD']['diveclub'] = [
 
