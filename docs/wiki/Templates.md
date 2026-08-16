@@ -6,13 +6,13 @@ Twig-Template-Vererbung angepasst werden.
 ## Allgemeine Anpassung via Vererbung
 
 Um ein Template anzupassen, erstellen Sie eine neue Datei im Contao-Verzeichnis `templates/` (z. B.
-`mod_dc_course_events_list_custom.html.twig`) und erben Sie vom Original-Template. Dank der flachen Block-Struktur
+`dc_course_events_list_custom.html.twig`) und erben Sie vom Original-Template. Dank der flachen Block-Struktur
 können Sie gezielt einzelne Bereiche überschreiben.
 
 **Beispiel:**
 
 ```twig
-{% extends "@Contao/frontend_module/mod_dc_course_events_list" %}
+{% extends "@Contao/frontend_module/dc_course_events_list.html.twig" %}
 
 {% block event_title %}
     <h3>Exklusiv: {{ ev.title }}</h3>
@@ -27,7 +27,7 @@ können Sie gezielt einzelne Bereiche überschreiben.
 
 Zeigt eine Übersicht aller veröffentlichten Kurs-Events an.
 
-**Template:** `mod_dc_course_events_list.html.twig`
+**Template:** `dc_course_events_list.html.twig`
 
 ```twig
 {% block content %}
@@ -75,7 +75,7 @@ Zeigt eine Übersicht aller veröffentlichten Kurs-Events an.
 
 Zeigt die Details eines einzelnen Kurs-Events inklusive Zeitplan und Anmeldeformular.
 
-**Template:** `mod_dc_course_event_reader.html.twig`
+**Template:** `dc_course_event_reader.html.twig`
 
 ```twig
 {% block content %}
@@ -125,7 +125,7 @@ Zeigt die Details eines einzelnen Kurs-Events inklusive Zeitplan und Anmeldeform
 
 Stellt die Termine eines Events in einer Kalenderansicht dar.
 
-**Template:** `mod_dc_course_event_calendar.html.twig`
+**Template:** `dc_course_event_calendar.html.twig`
 
 ```twig
 {% block content %}
@@ -168,7 +168,7 @@ Stellt die Termine eines Events in einer Kalenderansicht dar.
 
 Ermöglicht Mitgliedern und Gästen die Anmeldung von Tauchflaschen für eine TÜV-Prüfung.
 
-**Template:** `mod_dc_tank_check.html.twig`
+**Template:** `dc_tank_check.html.twig`
 
 ```twig
 {% block content %}
@@ -208,7 +208,7 @@ Ermöglicht Mitgliedern und Gästen die Anmeldung von Tauchflaschen für eine T�
 
 Zeigt den aktuellen Ausbildungsstand eines Tauchschülers an.
 
-**Template:** `mod_dc_course_progress.html.twig`
+**Template:** `dc_course_progress.html.twig`
 
 ```twig
 {% block content %}
@@ -249,7 +249,7 @@ Zeigt den aktuellen Ausbildungsstand eines Tauchschülers an.
 
 #### Buchungsübersicht (`dc_booking`)
 
-**Template:** `mod_dc_booking.html.twig`
+**Template:** `dc_booking.html.twig`
 
 - `items`: Liste der Buchungen.
 
@@ -266,25 +266,25 @@ Zeigt den aktuellen Ausbildungsstand eines Tauchschülers an.
 
 #### Ausrüstungs-Auflistung (`dc_equipment_listing`)
 
-**Template:** `mod_dc_equipment_listing.html.twig`
+**Template:** `dc_equipment_listing.html.twig`
 
 - `data`: Array mit Ausrüstungstypen (`id`, `title`, `type`).
 
 #### Vereinsflaschen (`dc_tanks_listing`)
 
-**Template:** `mod_dc_tanks_listing.html.twig`
+**Template:** `dc_tanks_listing.html.twig`
 
 - `tanks`: Array mit Flaschendaten (Seriennummer, Größe, TÜV-Datum etc.).
 
 #### Kursübersicht Schüler (`dc_student_courses`)
 
-**Template:** `mod_dc_student_courses.html.twig`
+**Template:** `dc_student_courses.html.twig`
 
 - `courses`: Liste der Kurse eines Schülers.
 
 #### Allgemeine Auflistung (`dc_listing`)
 
-**Template:** `mod_dc_listing.html.twig`
+**Template:** `dc_listing.html.twig`
 
 - `event`, `proposal`, `articles`: Verknüpfte Daten eines Events.
 
@@ -294,8 +294,8 @@ Zeigt den aktuellen Ausbildungsstand eines Tauchschülers an.
 
 1. **Nicht das Original ändern:** Ändern Sie niemals Dateien direkt im `vendor/`-Verzeichnis oder im Bundle-Ordner
    selbst (außer Sie entwickeln das Bundle). Nutzen Sie immer das Contao `templates/`-Verzeichnis.
-2. **Dateinamen:** Wenn Sie ein Template für alle Instanzen eines Moduls ändern wollen, nutzen Sie den gleichen Namen (
-   z. B. `mod_dc_course_events_list.html.twig`). Wenn Sie eine Variante erstellen wollen, hängen Sie ein Suffix an (z.
+2. **Dateinamen:** Wenn Sie ein Template für alle Instanzen eines Moduls ändern wollen, nutzen Sie den gleichen Namen (z.
+   B. `dc_course_events_list.html.twig`). Wenn Sie eine Variante erstellen wollen, hängen Sie ein Suffix an (z.
    B. `_custom`) und wählen Sie dieses im Contao-Backend beim Modul aus.
 3. **Debugging:** Nutzen Sie `{{ dump() }}`, um alle verfügbaren Variablen in einem Template einzusehen (erfordert den
    Debug-Modus von Contao).

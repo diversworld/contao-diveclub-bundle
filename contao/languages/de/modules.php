@@ -45,4 +45,4 @@ $GLOBALS['TL_LANG']['FMD']['dc_course_event_reader'] = ['Kursveranstaltung (Read
 $GLOBALS['TL_LANG']['FMD']['dc_course_event_calendar'] = ['Kursveranstaltung (Zeitplan)', 'Zeigt den Zeitplan der aktuell im Reader angezeigten Kursveranstaltung an.'];
 $GLOBALS['TL_LANG']['FMD']['dc_training_manager_dashboard'] = ['Ausbildungsleiter Dashboard', 'Dashboard für den Ausbildungsleiter zur Kurs- und Instructor-Übersicht.'];
 $GLOBALS['TL_LANG']['FMD']['dc_tank_check'] = ['Flaschenprüfung (TÜV)', 'Ermöglicht Mitgliedern die Buchung von Flaschenprüfungen.'];
-$GLOBALS['TL_LANG']['FMD']['dc_check_confirmation'] = ['Buchungsbestätigung (TÜV)', 'Zeigt eine Bestätignug der Buchung von Flaschenprüfungen an.'];
+$GLOBALS['TL_LANG']['FMD']['dc_check_confirmation'] = ['Buchungsbestätigung (TÜV)', 'Zeigt eine Bestätigung der Buchung von Flaschenprüfungen an.'];

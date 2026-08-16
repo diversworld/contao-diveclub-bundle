@@ -27,6 +27,11 @@ $GLOBALS['TL_LANG']['FMD']['dc_booking'] = ['Equipment rental', 'Rent club equip
 
 // Diveclub FE
 $GLOBALS['TL_LANG']['FMD']['dc_student_courses'] = ['My dive courses', 'Shows the logged-in member (linked student) his courses.'];
-$GLOBALS['TL_LANG']['FMD']['dc_course_progress'] = ['Courseprogress', 'Shows the logged-in member (linked student) the progress of the actual courses.'];
+$GLOBALS['TL_LANG']['FMD']['dc_course_progress'] = ['Course progress', 'Shows the logged-in member (linked student) the progress of the actual courses.'];
 $GLOBALS['TL_LANG']['FMD']['dc_course_events_list'] = ['Course events (list)', 'Lists published course events and links to the detail view.'];
 $GLOBALS['TL_LANG']['FMD']['dc_course_event_reader'] = ['Course event (reader)', 'Shows details and schedule of a course event and allows registration.'];
+$GLOBALS['TL_LANG']['FMD']['dc_course_event_calendar'] = ['Course event (schedule)', 'Shows the schedule of the course event currently displayed in the reader.'];
+$GLOBALS['TL_LANG']['FMD']['dc_training_manager_dashboard'] = ['Training Manager Dashboard', 'Dashboard for the training manager providing an overview of courses and instructors.'];
+$GLOBALS['TL_LANG']['FMD']['dc_tank_check'] = ['Tank check (TÜV)', 'Allows members to book tank inspections.'];
+$GLOBALS['TL_LANG']['FMD']['dc_check_confirmation'] = ['Booking confirmation (TÜV)', 'Displays confirmation of a booked tank inspection.'];
+$GLOBALS['TL_LANG']['FMD']['dc_course_instructor'] = ['Course management', 'Management of course events and their schedules by instructors.'];

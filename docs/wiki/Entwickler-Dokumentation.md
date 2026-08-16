@@ -33,10 +33,11 @@ Das Bundle nutzt Contao 5 Twig Templates. Diese können über Vererbung im globa
 
 ### Beispiel: Anpassung der Kursliste
 
-Erstellen Sie eine Datei `templates/mod_dc_course_events_list.html.twig`:
+Erstellen Sie eine Datei `templates/dc_course_events_list_custom.html.twig` und wählen Sie diese Variante anschließend
+in der Konfiguration des Frontend-Moduls aus:
 
 ```twig
-{% extends "@Contao/frontend_module/mod_dc_course_events_list" %}
+{% extends "@Contao/frontend_module/dc_course_events_list.html.twig" %}
 
 {% block event_title %}
     <h3>Kurs: {{ ev.title }}</h3>
@@ -45,10 +46,10 @@ Erstellen Sie eine Datei `templates/mod_dc_course_events_list.html.twig`:
 
 ### Wichtige Templates:
 
-- `mod_dc_course_events_list.html.twig`: Liste der Kurstermine.
-- `mod_dc_course_event_reader.html.twig`: Detailansicht eines Kurses.
-- `mod_dc_tank_check.html.twig`: Formular für die TÜV-Anmeldung.
-- `mod_dc_course_progress.html.twig`: Fortschrittsanzeige für Schüler.
+- `dc_course_events_list.html.twig`: Liste der Kurstermine.
+- `dc_course_event_reader.html.twig`: Detailansicht eines Kurses.
+- `dc_tank_check.html.twig`: Formular für die TÜV-Anmeldung.
+- `dc_course_progress.html.twig`: Fortschrittsanzeige für Schüler.
 
 ---
 [[Zurück zur Startseite](Home)]

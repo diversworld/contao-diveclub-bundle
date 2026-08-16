@@ -7,7 +7,8 @@ TÜV-Prüfungen für Tauchflaschen sowie die Organisation von Tauchkursen.
 
 1. **[Installation & Konfiguration](Installation-und-Konfiguration)**
     - Systemvoraussetzungen
-    - Einrichtung der globalen Einstellungen
+   - Ersteinrichtung und globale Einstellungen
+   - Frontend-Seiten und Weiterleitungen
    - Tabellenstruktur
 2. **[Ausrüstungsverwaltung](Ausruestung-und-Regler)**
     - Verwaltung von Leihausrüstung

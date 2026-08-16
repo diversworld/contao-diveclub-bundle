@@ -21,7 +21,7 @@ Speziell für Atemregler gibt es eine detaillierte Erfassung der ersten und zwei
 ### Konfiguration der Modelldaten
 
 Die Hersteller und Modelle werden über externe Textdateien definiert, um flexibel auf den Bestand reagieren zu können.
-Beispiel für `equipment_manufacturer.txt`:
+Beispiel für `dc_equipment_manufacturers.txt`:
 
 ```php
 <?php
@@ -41,7 +41,7 @@ Revisionen im Blick zu behalten.
 
 Mitglieder können im Frontend verfügbare Ausrüstung reservieren.
 
-1. **Frontend-Modul:** "Equipment Reservation" auf einer Seite einbinden.
+1. **Frontend-Modul:** **Ausrüstungsverleih** (`dc_booking`) auf einer geschützten Seite einbinden.
 2. **Prozess:** Mitglied wählt Zeitspanne und Artikel -> Status springt auf `reserved`.
 3. **Ausgabe:** Der Administrator markiert bei Abholung den Status als `borrowed`.
 

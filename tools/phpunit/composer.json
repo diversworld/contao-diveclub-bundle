@@ -1,7 +1,6 @@
 {
-    "require": {
-        "phpstan/phpstan": "^1.7",
-        "phpstan/phpstan-phpunit": "^1.1",
-        "phpstan/phpstan-symfony": "^1.2"
+  "license": "GPL-3.0-or-later",
+  "require": {
+    "phpunit/phpunit": "^9.5"
   }
 }

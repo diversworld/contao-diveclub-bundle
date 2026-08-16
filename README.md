@@ -11,6 +11,34 @@
 This bundle provides several modules for dive clubs to manage equipment, reservations, dive courses, course schedules,
 student progress, and TÜV workflows in Contao.
 
+## Requirements and installation
+
+- PHP 8.3 or newer
+- Contao 5.7 or 6.x
+- Optional: Notification Center for course schedule notifications
+
+```bash
+composer require diversworld/contao-diveclub-bundle
+php vendor/bin/contao-console contao:migrate
+```
+
+The migration creates the database tables and copies editable sample data files to `files/diveclub/templates/`.
+Afterwards, create and publish one central record under **Diveclub > Configuration**, enable the data sources you need,
+and select the corresponding sample files. Detailed setup instructions are available in
+[Installation & Configuration](docs/wiki/Installation-und-Konfiguration.md).
+
+### Required frontend redirects
+
+Redirect fields always point to a Contao page containing the specified frontend module:
+
+| Source module                                                    | Target page must contain                                                     |
+|:-----------------------------------------------------------------|:-----------------------------------------------------------------------------|
+| Course events list (`dc_course_events_list`) – course target     | Course event reader (`dc_course_event_reader`)                               |
+| Course events list (`dc_course_events_list`) – tank-check target | Tank check (`dc_tank_check`)                                                 |
+| Student courses (`dc_student_courses`)                           | Course progress (`dc_course_progress`)                                       |
+| Course event reader (`dc_course_event_reader`)                   | Course registration confirmation content; `{{course::*}}` tags are available |
+| Tank check (`dc_tank_check`)                                     | Tank-check booking confirmation (`dc_check_confirmation`)                    |
+
 ## Features
 
 - **Equipment**
@@ -18,27 +46,26 @@ student progress, and TÜV workflows in Contao.
 - **Regulators**
     - Manage regulators, including their servicing history.
 - **Diving Equipment**
-    - Manage diving gear, including TÜV inspection dates. Options for adding offers from inspection companies are
-      available. In a future version, it will also be possible to book a TÜV inspection directly.
+    - Manage diving gear, including TÜV inspection dates and tank-check bookings.
 - **Dive Courses**
     - Manage course templates, course events, training modules, exercises, students, and training progress.
     - Maintain course schedules per event and notify students about schedule changes via Notification Center.
 - **TÜV Inspections**
     - Manage offers for TÜV inspections. In the child table, individual items in a TÜV inspection can be added; for
       example, item name, cylinder size, price in net and gross amounts. The other price (net or gross) is automatically
-      calculated based on the entered value. In a future version, it is planned to enable bookings for club members.
-      Members can register their cylinders and book an inspection.
+      calculated based on the entered value. Members can register their cylinders and book an inspection in the
+      frontend.
 
 ### The Regulator Module
 
 The data for the manufacturers and models of the regulators are entered in files, allowing flexible customization of the
-equipment used by a club.
-There is a file for regulators (`regulator_data`). In this file, data for manufacturers and the models of the first and
+equipment used by a club. There is a file for regulators (`dc_regulator_data.txt`). In this file, data for manufacturers
+and the models of the first and
 second stages are stored.
 The template content defines the array that is read into the module. The array contains data per manufacturer for first
 and second stages:
 
-The manufacturers are defined in the template `equipment_manufacturer.txt` as follows:
+The manufacturers are defined in the template `dc_equipment_manufacturers.txt` as follows:
 
 ```
 <?php
@@ -51,7 +78,8 @@ return [
 ]
 ```
 
-The regulator models are defined in the file `regulator_data.txt`. The number corresponds to the manufacturer's index:
+The regulator models are defined in the file `dc_regulator_data.txt`. The number corresponds to the manufacturer's
+index:
 
 ```
 <?php
@@ -111,13 +139,12 @@ In the Diving Equipment module, the dive cylinders owned by the club can be reco
 equipment, individual inspection dates can be logged.
 This makes it easier to track which cylinders need to be inspected and which still have a valid inspection.
 There is a frontend module that allows the data of the diving equipment to be displayed on the frontend. To do this, the
-frontend module **Diving Equipment List** must be added to a page.
-In a future version, it is planned to enable bookings of a dive cylinder for a TÜV inspection directly via this
-overview.
+frontend module **Diving Equipment List** must be added to a page. Tank-check appointments can be linked from the
+combined course-event list to the frontend booking module.
 
 ## The Equipment reservation Module
 
-With the registration module, members of the diving clubs have the opportunity to reserve and borrow club equipment.
+With the equipment rental module, members of the diving clubs have the opportunity to reserve and borrow club equipment.
 Members can reserve equipment in the frontend, and once it is picked up, the reservation is processed by the admin
 responsible for issuing the equipment.
 Each piece of equipment is assigned a status, making it possible to track whether an item is available or borrowed.
@@ -194,7 +221,7 @@ The bundle uses a central configuration table (`tl_dc_config`) where you can def
 - **Reservations:** Configure confirmation messages and email notification addresses for equipment reservations.
 - **Rental Conditions:** Define the terms and conditions for equipment rental.
 
-The manufacturers are defined in the template `dc_course_categories.txt` as follows:
+The course types are defined in the template `dc_course_types.txt` as follows:
 
 ```
 <?php
@@ -208,7 +235,7 @@ return [
 ];
 ```
 
-The manufacturers are defined in the template `dc_course_types.txt` as follows:
+The course categories are defined in the template `dc_course_categories.txt` as follows:
 
 ```
 <?php
@@ -307,7 +334,7 @@ Since these tags utilize the modern Contao 5 system, they can be combined with s
 - Automatic notification when equipment checks are needed
 - Members will be able to record their own equipment
 
-### [Weitere Informationen im WIKI](https://github.com/EckhardBecker/Diversworld_DiveClubManager/wiki)
+### [Further information in the wiki](docs/wiki/Home.md)
 
 ## Donation
 

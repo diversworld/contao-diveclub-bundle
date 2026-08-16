@@ -17,7 +17,8 @@ Der Ablauf eines Verleihs gliedert sich typischerweise in folgende Schritte:
 
 ### 1. Reservierung (Frontend)
 
-Mitglieder können über das Frontend-Modul "Equipment Reservation" Ausrüstung für einen bestimmten Zeitraum anfragen.
+Mitglieder können über das Frontend-Modul **Ausrüstungsverleih** (`dc_booking`) Ausrüstung für einen bestimmten Zeitraum
+anfragen.
 
 - Auswahl des Zeitraums (Start- und Enddatum).
 - Auswahl der gewünschten Gegenstände (Flaschen, Regler, Jackets etc.).
