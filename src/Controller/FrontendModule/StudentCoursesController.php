@@ -124,10 +124,10 @@ class StudentCoursesController extends AbstractFrontendModuleController
         )->execute((int)$student->id);
 
         // Fortschritt-Seite (Reader)
-        $jumpToPage = null;
-        if ($model->jumpTo > 0) {
-            $jumpToPage = PageModel::findByPk($model->jumpTo);
-        }
+        $jumpToValue = $model->courseProgressJumpTo ?? null;
+        $jumpToPage = $jumpToValue instanceof PageModel
+            ? $jumpToValue
+            : PageModel::findById((int)$jumpToValue);
 
         // Systemweite Datums-/Zeitformate aus Contao-Konfiguration
         $dateFormat = Config::get('dateFormat');

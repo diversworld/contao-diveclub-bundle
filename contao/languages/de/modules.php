@@ -16,33 +16,31 @@ declare(strict_types=1);
  * Backend modules
  */
 
-//$GLOBALS['TL_LANG']['MOD']['diveclub'] = ['Tauchclub Manager', 'Verwalten von Equipment, Tauchkursen, usw.'];
-
-$GLOBALS['TL_LANG']['MOD']['dc_course_collection'] = ['Tauchkurse', 'Verwalten von Tauchkursen'];
-$GLOBALS['TL_LANG']['MOD']['dc_regulators_collection'] = ['Atemregler', 'Verwalten der Atemregler'];
-$GLOBALS['TL_LANG']['MOD']['dc_tanks_collection'] = ['Tauchgeräte', 'Verwalten von Tauchgeräten'];
-$GLOBALS['TL_LANG']['MOD']['dc_check_collection'] = ['TÜV Prüfungen', 'Verwalten der TÜV Prüfungen'];
-$GLOBALS['TL_LANG']['MOD']['dc_equipment_collection'] = ['Equipment', 'Verwalten von Ausrüstung'];
-$GLOBALS['TL_LANG']['MOD']['dc_config_collection'] = ['Einstellungen', 'Einstellungen für den Diveclub Manager'];
-$GLOBALS['TL_LANG']['MOD']['dc_reservation_collection'] = ['Reservierungen', 'Verwalten der Reservierungen für Ausrüstung'];
-$GLOBALS['TL_LANG']['MOD']['dc_dive_module_collection'] = ['Module', 'Verwalten der Kursmodule'];
-$GLOBALS['TL_LANG']['MOD']['dc_dive_student_collection'] = ['Tauchschüler', 'Verwalten der Tauchschüler'];
-$GLOBALS['TL_LANG']['MOD']['dc_course_event_collection'] = ['Kursveranstaltungen', 'Verwalten von Kursveranstaltungen und deren Zeitplänen'];
+$GLOBALS['TL_LANG']['MOD']['dc_course_collection'] = ['Tauchkurse und Ausbildungsinhalte', 'Verwaltet Kursvorlagen sowie die zugehörigen Ausbildungsmodule und Übungen.'];
+$GLOBALS['TL_LANG']['MOD']['dc_regulators_collection'] = ['Atemregler und Wartungen', 'Verwaltet Atemregler sowie deren Prüf-, Wartungs- und Kontrolldaten.'];
+$GLOBALS['TL_LANG']['MOD']['dc_tanks_collection'] = ['Tauchflaschen und Prüfdaten', 'Verwaltet Tauchflaschen, Eigentümerdaten und prüfungsrelevante Angaben.'];
+$GLOBALS['TL_LANG']['MOD']['dc_check_collection'] = ['Flaschenprüfungen und TÜV-Buchungen', 'Verwaltet Prüfungstermine, Prüfleistungen, Buchungen und einzelne Prüfaufträge.'];
+$GLOBALS['TL_LANG']['MOD']['dc_equipment_collection'] = ['Leihausrüstung', 'Verwaltet die ausleihbaren Ausrüstungsgegenstände des Tauchclubs.'];
+$GLOBALS['TL_LANG']['MOD']['dc_config_collection'] = ['Diveclub-Grundeinstellungen', 'Verwaltet allgemeine Texte und Einstellungen für Reservierungen und Ausleihe.'];
+$GLOBALS['TL_LANG']['MOD']['dc_reservation_collection'] = ['Ausrüstungsreservierungen', 'Verwaltet Reservierungen und die darin gebuchten Ausrüstungsgegenstände.'];
+$GLOBALS['TL_LANG']['MOD']['dc_dive_module_collection'] = ['Ausbildungsmodule und Übungen', 'Verwaltet die Ausbildungsabschnitte und Übungen der Tauchkurse.'];
+$GLOBALS['TL_LANG']['MOD']['dc_dive_student_collection'] = ['Tauchschüler und Kursfortschritt', 'Verwaltet Tauchschüler, Kurszuweisungen und absolvierte Übungen.'];
+$GLOBALS['TL_LANG']['MOD']['dc_course_event_collection'] = ['Kursveranstaltungen und Terminpläne', 'Verwaltet konkrete Kursveranstaltungen, Ausbildungstermine und deren Übungen.'];
 
 /**
  * Frontend modules
  */
-$GLOBALS['TL_LANG']['FMD']['dc_course_instructor'] = ['Kursverwaltung', 'Verwaltung von Kursveranstaltungen und deren Zeitplänen durch Instruktoren'];
-$GLOBALS['TL_LANG']['FMD']['dc_manager'] = ['Tauchclubmanager', 'Module des Tauchclubmanagers'];
-$GLOBALS['TL_LANG']['FMD']['dc_listing'] = ['Angebotsdetails', 'Diveclub Manager'];
-$GLOBALS['TL_LANG']['FMD']['dc_tanks_listing'] = ['Tauchgeräte', 'Liste der erfassten Tauchgeräte'];
-$GLOBALS['TL_LANG']['FMD']['dc_equipment_listing'] = ['Ausrüstung', 'Liste der erfassten Ausrüstung'];
-$GLOBALS['TL_LANG']['FMD']['dc_booking'] = ['Ausrüstungsverleih', 'Vereinsausrüstung ausleihen.'];
-$GLOBALS['TL_LANG']['FMD']['dc_student_courses'] = ['Meine Tauchkurse', 'Zeigt dem angemeldeten Mitglied bzw. verknüpften Tauchschüler seine Tauchkurse an.'];
-$GLOBALS['TL_LANG']['FMD']['dc_course_progress'] = ['Kursfortschritt', 'Zeigt dem angemeldeten Mitglied bzw. verknüpften Tauchschüler den Fortschritt im aktuellen Kurs an.'];
-$GLOBALS['TL_LANG']['FMD']['dc_course_events_list'] = ['Kursveranstaltungen (Liste)', 'Listet veröffentlichte Kursveranstaltungen auf und verlinkt zur Detailansicht.'];
-$GLOBALS['TL_LANG']['FMD']['dc_course_event_reader'] = ['Kursveranstaltung (Reader)', 'Zeigt Details und Zeitplan einer Kursveranstaltung an und erlaubt die Anmeldung.'];
-$GLOBALS['TL_LANG']['FMD']['dc_course_event_calendar'] = ['Kursveranstaltung (Zeitplan)', 'Zeigt den Zeitplan der aktuell im Reader angezeigten Kursveranstaltung an.'];
-$GLOBALS['TL_LANG']['FMD']['dc_training_manager_dashboard'] = ['Ausbildungsleiter Dashboard', 'Dashboard für den Ausbildungsleiter zur Kurs- und Instructor-Übersicht.'];
-$GLOBALS['TL_LANG']['FMD']['dc_tank_check'] = ['Flaschenprüfung (TÜV)', 'Ermöglicht Mitgliedern die Buchung von Flaschenprüfungen.'];
-$GLOBALS['TL_LANG']['FMD']['dc_check_confirmation'] = ['Buchungsbestätigung (TÜV)', 'Zeigt eine Bestätigung der Buchung von Flaschenprüfungen an.'];
+$GLOBALS['TL_LANG']['FMD']['dc_course_instructor'] = ['Instruktorenbereich – Kursdurchführung', 'Ermöglicht Instruktoren die Bearbeitung von Kursveranstaltungen, Terminplänen und Übungsfortschritten.'];
+$GLOBALS['TL_LANG']['FMD']['dc_manager'] = ['Diveclub-Frontendmodule', 'Frontendmodule für Ausbildung, Ausrüstungsverleih und Flaschenprüfungen.'];
+$GLOBALS['TL_LANG']['FMD']['dc_listing'] = ['Flaschenprüfung – Angebotsdetails', 'Zeigt zu einem TÜV-Termin das Prüfangebot und die auswählbaren Prüfleistungen an.'];
+$GLOBALS['TL_LANG']['FMD']['dc_tanks_listing'] = ['Tauchflaschen – Bestandsliste', 'Zeigt eine Übersicht der im Diveclub Manager erfassten Tauchflaschen an.'];
+$GLOBALS['TL_LANG']['FMD']['dc_equipment_listing'] = ['Leihausrüstung – Bestandsliste', 'Zeigt eine Übersicht der im Diveclub Manager erfassten Ausrüstungsgegenstände an.'];
+$GLOBALS['TL_LANG']['FMD']['dc_booking'] = ['Ausrüstungsverleih – Reservierung', 'Ermöglicht Mitgliedern die Auswahl und Reservierung verfügbarer Vereinsausrüstung.'];
+$GLOBALS['TL_LANG']['FMD']['dc_student_courses'] = ['Mitgliederbereich – Meine Tauchkurse', 'Zeigt dem angemeldeten Mitglied seine zugeordneten Tauchkurse und die Links zum jeweiligen Kursfortschritt an.'];
+$GLOBALS['TL_LANG']['FMD']['dc_course_progress'] = ['Tauchschüler – Kursfortschritt', 'Zeigt einem Tauchschüler Ausbildungsmodule, Übungen und den aktuellen Bearbeitungsstand eines zugeordneten Kurses an.'];
+$GLOBALS['TL_LANG']['FMD']['dc_course_events_list'] = ['Kursveranstaltungen – Übersicht', 'Listet veröffentlichte Kursveranstaltungen und TÜV-Termine mit Links zu den jeweiligen Detail- oder Buchungsseiten auf.'];
+$GLOBALS['TL_LANG']['FMD']['dc_course_event_reader'] = ['Kursveranstaltung – Details und Anmeldung', 'Zeigt Beschreibung und Terminplan einer ausgewählten Kursveranstaltung und ermöglicht die Kursanmeldung.'];
+$GLOBALS['TL_LANG']['FMD']['dc_course_event_calendar'] = ['Kursveranstaltung – Terminplan', 'Zeigt die Ausbildungstermine einer ausgewählten Kursveranstaltung als Kalender oder Liste an.'];
+$GLOBALS['TL_LANG']['FMD']['dc_training_manager_dashboard'] = ['Ausbildungsleitung – Kursübersicht', 'Zeigt der Ausbildungsleitung eine Übersicht über Kurse, Veranstaltungen, Instruktoren und Ausbildungsinhalte.'];
+$GLOBALS['TL_LANG']['FMD']['dc_tank_check'] = ['Flaschenprüfung – Buchungsformular', 'Zeigt veröffentlichte TÜV-Termine und ermöglicht Mitgliedern die Buchung einer oder mehrerer Tauchflaschen zur Prüfung.'];
+$GLOBALS['TL_LANG']['FMD']['dc_check_confirmation'] = ['Flaschenprüfung – Buchungsbestätigung', 'Zeigt nach einer erfolgreichen TÜV-Buchung die in der Session gespeicherten Buchungs- und Auftragsdaten an.'];

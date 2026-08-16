@@ -548,9 +548,13 @@ class CourseEventReaderController extends AbstractFrontendModuleController
             // Bestätigungs-Meldung setzen
             $this->addHtml5Message('Erfolgreich zur Veranstaltung angemeldet.', 'confirm');
 
-            // Weiterleitung zur Bestätigungsseite (jumpTo)
-            $jumpTo = (int)($model->jumpTo ?? 0);
-            if ($jumpTo > 0 && ($jumpToPage = PageModel::findByPk($jumpTo)) !== null) {
+            // Weiterleitung zur Bestätigungsseite
+            $jumpToValue = $model->courseConfirmationJumpTo ?? null;
+            $jumpToPage = $jumpToValue instanceof PageModel
+                ? $jumpToValue
+                : PageModel::findById((int)$jumpToValue);
+
+            if (null !== $jumpToPage) {
                 return new RedirectResponse($jumpToPage->getFrontendUrl());
             }
 

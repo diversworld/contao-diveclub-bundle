@@ -15,7 +15,7 @@ if (!isset($GLOBALS['TL_DCA']['tl_module']['palettes']) || !is_array($GLOBALS['T
 // Palette für das eigene Frontend-Modul registrieren, inkl. Template-Auswahl
 $GLOBALS['TL_DCA']['tl_module']['palettes']['dc_student_courses'] =
     '{title_legend},name,headline,type;' .
-    '{dc_progress_redirect_legend},jumpTo;' .
+    '{dc_progress_redirect_legend},courseProgressJumpTo;' .
     '{template_legend:hide},customTpl;' .
     '{protected_legend:hide},protected;' .
     '{expert_legend:hide},guests,cssID';
@@ -38,7 +38,7 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['dc_course_events_list'] =
 // Reader einer Kursveranstaltung
 $GLOBALS['TL_DCA']['tl_module']['palettes']['dc_course_event_reader'] =
     '{title_legend},name,headline,type;' .
-    '{dc_course_confirmation_redirect_legend},jumpTo;' .
+    '{dc_course_confirmation_redirect_legend},courseConfirmationJumpTo;' .
     '{template_legend:hide},customTpl;' .
     '{protected_legend:hide},protected;' .
     '{expert_legend:hide},guests,cssID';
@@ -77,7 +77,7 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['dc_tanks_listing'] =
 
 $GLOBALS['TL_DCA']['tl_module']['palettes']['dc_tank_check'] =
     '{title_legend},name,headline,type;' .
-    '{dc_tank_confirmation_redirect_legend},jumpTo;' .
+    '{dc_tank_confirmation_redirect_legend},tankConfirmationJumpTo;' .
     '{config_legend},reg_notification,reg_subject,reg_text;' .
     '{template_legend:hide},customTpl;' .
     '{protected_legend:hide},protected;' .
@@ -139,6 +139,36 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['tankCheckJumpTo'] = [
     'relation'                => ['type' => 'hasOne', 'load' => 'lazy']
 ];
 
+$GLOBALS['TL_DCA']['tl_module']['fields']['courseProgressJumpTo'] = [
+    'label' => &$GLOBALS['TL_LANG']['tl_module']['courseProgressJumpTo'],
+    'exclude' => true,
+    'inputType' => 'pageTree',
+    'foreignKey' => 'tl_page.title',
+    'eval' => ['mandatory' => false, 'fieldType' => 'radio', 'tl_class' => 'clr'],
+    'sql' => "int unsigned NOT NULL default 0",
+    'relation' => ['type' => 'hasOne', 'load' => 'lazy'],
+];
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['courseConfirmationJumpTo'] = [
+    'label' => &$GLOBALS['TL_LANG']['tl_module']['courseConfirmationJumpTo'],
+    'exclude' => true,
+    'inputType' => 'pageTree',
+    'foreignKey' => 'tl_page.title',
+    'eval' => ['mandatory' => false, 'fieldType' => 'radio', 'tl_class' => 'clr'],
+    'sql' => "int unsigned NOT NULL default 0",
+    'relation' => ['type' => 'hasOne', 'load' => 'lazy'],
+];
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['tankConfirmationJumpTo'] = [
+    'label' => &$GLOBALS['TL_LANG']['tl_module']['tankConfirmationJumpTo'],
+    'exclude' => true,
+    'inputType' => 'pageTree',
+    'foreignKey' => 'tl_page.title',
+    'eval' => ['mandatory' => false, 'fieldType' => 'radio', 'tl_class' => 'clr'],
+    'sql' => "int unsigned NOT NULL default 0",
+    'relation' => ['type' => 'hasOne', 'load' => 'lazy'],
+];
+
 // Felder für die Tank-Check E-Mail-Konfiguration (analog zu anderen Modulen falls vorhanden)
 $GLOBALS['TL_DCA']['tl_module']['fields']['reg_notification'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_module']['reg_notification'],
@@ -181,6 +211,3 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['dc_calendar_view'] = [
     'eval'      => ['tl_class' => 'w50'],
     'sql'       => "varchar(32) NOT NULL default 'dayGridMonth'"
 ];
-
-// Das Standardfeld "jumpTo" wird von mehreren Modultypen unterschiedlich genutzt.
-// ModuleListener setzt deshalb beim Laden des Datensatzes das passende Label.

@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 /*
- * This file is part of Diveclub App.
+ * This file is part of Contao Diveclub Bundle.
  *
- * (c) Eckhard Becker 2025 <info@diversworld.eu>
+ * (c) Eckhard Becker 2026 <info@diversworld.eu>
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
@@ -32,10 +32,11 @@ class Configuration implements ConfigurationInterface
                     ->defaultValue('Diveclub Manager') // Standardwert
                 ->end()
                 ->scalarNode('module_description')
-                    ->defaultValue('This is the Diveclub Manager.') // Optionale Beschreibung
+            ->defaultValue('Manage dive courses, students, equipment, reservations, and tank inspections.') // Optionale Beschreibung
                 ->end()
             ->end()
         ;
+
         return $treeBuilder;
     }
 }

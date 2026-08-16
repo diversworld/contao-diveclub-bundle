@@ -31,12 +31,12 @@ $GLOBALS['TL_LANG']['tl_module']['confirmation_text'] = ['Confirmation text', 'P
 $GLOBALS['TL_LANG']['tl_module']['showCourseEvents']  = ['Show course events', 'Select this option to show course events in the list.'];
 $GLOBALS['TL_LANG']['tl_module']['showTankChecks']   = ['Show tank checks', 'Select this option to show tank checks (TÜV) in the list.'];
 
-// Redirect fields (jumpTo)
-$GLOBALS['TL_LANG']['tl_module']['dc_progress_jumpTo'] = ['Course progress page', 'Select the page containing the Course progress frontend module (dc_course_progress). Each course assignment in the student course list links to this page with its assignment ID.'];
-$GLOBALS['TL_LANG']['tl_module']['dc_course_confirmation_jumpTo'] = ['Course registration confirmation page', 'Select the page shown after a successful course-event registration. The {{course::*}} insert tags can be used on this page.'];
-$GLOBALS['TL_LANG']['tl_module']['dc_tank_confirmation_jumpTo'] = ['Tank-check booking confirmation page', 'Select the page containing the Tank-check booking confirmation frontend module (dc_check_confirmation). The booking data is stored in the session before redirecting.'];
-$GLOBALS['TL_LANG']['tl_module']['tankCheckJumpTo'] = ['Tank-check booking page', 'Select the page containing the Tank check frontend module (dc_tank_check). Links for published tank-check dates lead to this page.'];
-$GLOBALS['TL_LANG']['tl_module']['courseJumpTo'] = ['Course-event detail page', 'Select the page containing the Course event reader frontend module (dc_course_event_reader). Links for published course events lead to this page.'];
+// Dedicated redirect fields
+$GLOBALS['TL_LANG']['tl_module']['courseProgressJumpTo'] = ['Target page for course progress', 'Redirect from the “My dive courses” frontend module (dc_student_courses): Select the page containing the “Course progress” frontend module (dc_course_progress). Without this target page, the course overview does not generate progress links.'];
+$GLOBALS['TL_LANG']['tl_module']['courseConfirmationJumpTo'] = ['Confirmation page after course registration', 'Redirect from the “Course event (reader)” frontend module (dc_course_event_reader): Select the page shown after a successful course registration. No additional frontend module is required on the target page; registration data can be displayed there using {{course::*}} insert tags. Without a target page, the user remains on the reader page.'];
+$GLOBALS['TL_LANG']['tl_module']['tankConfirmationJumpTo'] = ['Target page for the tank-check booking confirmation', 'Redirect from the “Tank check (TÜV)” frontend module (dc_tank_check): Select the page containing the “Booking confirmation (TÜV)” frontend module (dc_check_confirmation). The booking data is stored in the session before redirecting. Without a target page, the booking module displays the confirmation itself.'];
+$GLOBALS['TL_LANG']['tl_module']['tankCheckJumpTo'] = ['Target page for tank-check bookings', 'Redirect from the “Course events (list)” frontend module (dc_course_events_list): Select the page containing the “Tank check (TÜV)” frontend module (dc_tank_check). Links for published tank-check dates lead to this booking page.'];
+$GLOBALS['TL_LANG']['tl_module']['courseJumpTo'] = ['Target page for course events', 'Redirect from the “Course events (list)” frontend module (dc_course_events_list): Select the page containing the “Course event (reader)” frontend module (dc_course_event_reader). Links for published course events lead to this detail and registration page.'];
 
 // Calendar view
 $GLOBALS['TL_LANG']['tl_module']['dc_calendar_view'] = ['Defaultview', 'Choose the default view for the course calendar.'];

@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 /*
- * This file is part of Diveclub App.
+ * This file is part of Contao Diveclub Bundle.
  *
- * (c) Eckhard Becker 2025 <info@diversworld.eu>
+ * (c) Eckhard Becker 2026 <info@diversworld.eu>
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Diversworld\ContaoDiveclubBundle\DependencyInjection;
 
 use Diversworld\ContaoDiveclubBundle\NotificationType\CourseScheduleUpdateNotificationType;
-use Exception;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -24,7 +23,7 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 class DiversworldContaoDiveclubExtension extends Extension
 {
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
@@ -34,7 +33,7 @@ class DiversworldContaoDiveclubExtension extends Extension
 
         $loader = new YamlFileLoader(
             $container,
-            new FileLocator(__DIR__ . '/../../config')
+            new FileLocator(__DIR__ . '/../../config'),
         );
 
         $loader->load('parameters.yaml');
@@ -58,7 +57,7 @@ class DiversworldContaoDiveclubExtension extends Extension
 
         // Werte aus Configuration nach $GLOBALS['TL_LANG'] für MOD übernehmen
         $moduleTitle = $config['module_title'] ?? 'Diveclub Manager'; // Fallback
-        $moduleDescription = $config['module_description'] ?? 'Manage equipment, dive courses, etc.'; // Fallback
+        $moduleDescription = $config['module_description'] ?? 'Manage dive courses, students, equipment, reservations, and tank inspections.'; // Fallback
 
         $GLOBALS['TL_LANG']['MOD']['diveclub'] = [
             $moduleTitle,
@@ -66,9 +65,6 @@ class DiversworldContaoDiveclubExtension extends Extension
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAlias(): string
     {
         return Configuration::ROOT_KEY;

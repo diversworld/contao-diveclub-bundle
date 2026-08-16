@@ -395,12 +395,14 @@ class TankCheckController extends AbstractFrontendModuleController
                 $bag->remove('tank_check_items');
 
                 // Weiterleitung oder Erfolgsmeldung
-                if ($model->jumpTo) {
-                    $page = PageModel::findByPk($model->jumpTo);
-                    if ($page) {
-                        $request->getSession()->set('last_tank_check_order', $orders[0]->id);
-                        return new Response('', 303, ['Location' => $page->getFrontendUrl()]);
-                    }
+                $jumpToValue = $model->tankConfirmationJumpTo ?? null;
+                $page = $jumpToValue instanceof PageModel
+                    ? $jumpToValue
+                    : PageModel::findById((int)$jumpToValue);
+
+                if (null !== $page) {
+                    $request->getSession()->set('last_tank_check_order', $orders[0]->id);
+                    return new Response('', 303, ['Location' => $page->getFrontendUrl()]);
                 }
 
                 $templateData['success'] = true;
