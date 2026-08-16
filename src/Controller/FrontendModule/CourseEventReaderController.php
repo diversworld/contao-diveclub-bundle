@@ -6,6 +6,7 @@ namespace Diversworld\ContaoDiveclubBundle\Controller\FrontendModule;
 
 use Contao\Config;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
+use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Database;
@@ -16,14 +17,19 @@ use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\System;
+use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\StudentsListener;
 use Diversworld\ContaoDiveclubBundle\Model\DcCourseEventModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcCourseStudentsModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcDiveCourseModel;
 use Diversworld\ContaoDiveclubBundle\Model\DcStudentsModel;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseStudentOnSubmitListener;
+use Doctrine\DBAL\Connection;
 use Exception;
+use Psr\Log\LoggerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Csrf\CsrfToken;
 
@@ -38,7 +44,17 @@ class CourseEventReaderController extends AbstractFrontendModuleController
 {
     public const TYPE = 'dc_course_event_reader';
 
-    public function __construct()
+    public function __construct(
+        private readonly Connection             $connection,
+        private readonly ContaoCsrfTokenManager $csrfTokenManager,
+        private readonly Security               $security,
+        private readonly StudentsListener       $studentsListener,
+        private readonly RequestStack           $requestStack,
+        #[Autowire(service: 'monolog.logger.contao.general')]
+        private readonly LoggerInterface        $logger,
+        #[Autowire('%contao.csrf_token_name%')]
+        private readonly string                 $csrfTokenName,
+    )
     {
     }
 
@@ -70,10 +86,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
         $identifier = Input::get('event') ?: Input::get('items');
         if (!$identifier) {
             $templateData['notFound'] = true;
-            return $this->render(
-                '@Contao/frontend_module/dc_course_event_reader.html.twig',
-                $templateData
-            );
+            return $this->getTemplateResponse($template, $templateData);
         }
 
         // Per ID oder Alias laden
@@ -85,10 +98,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
 
         if (!$event || (int)$event->published !== 1) {
             $templateData['notFound'] = true;
-            return $this->render(
-                '@Contao/frontend_module/dc_course_event_reader.html.twig',
-                $templateData
-            );
+            return $this->getTemplateResponse($template, $templateData);
         }
 
         $dateFormat = Config::get('datimFormat');
@@ -120,10 +130,10 @@ class CourseEventReaderController extends AbstractFrontendModuleController
         }
 
         // Request Token für Twig bereitstellen
-        $templateData['request_token'] = System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue();
+        $templateData['request_token'] = $this->csrfTokenManager->getDefaultTokenValue();
 
         // Zeitplan laden (mit Modulnamen)
-        $schedule = System::getContainer()->get('database_connection')->fetchAllAssociative(
+        $schedule = $this->connection->fetchAllAssociative(
             'SELECT s.id, s.planned_at, s.location, s.instructor, s.notes, s.module_id,
                     m.title AS module_title
              FROM tl_dc_course_event_schedule s
@@ -137,7 +147,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
         foreach ($schedule as $row) {
             $exercises = [];
             // Zuerst spezifische Übungen aus dem Zeitplan laden
-            $scheduleExercises = System::getContainer()->get('database_connection')->fetchAllAssociative(
+            $scheduleExercises = $this->connection->fetchAllAssociative(
                 'SELECT se.planned_at, se.instructor, se.title, se.description
                  FROM tl_dc_event_schedule_exercises se
                  WHERE se.pid = ?
@@ -156,7 +166,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
                 }
             } elseif ($row['module_id'] > 0) {
                 // Fallback: Übungen zum Modul aus Stammdaten laden
-                $exercisesData = System::getContainer()->get('database_connection')->fetchAllAssociative(
+                $exercisesData = $this->connection->fetchAllAssociative(
                     'SELECT title, description FROM tl_dc_course_exercises WHERE pid = ? ORDER BY sorting',
                     [(int)$row['module_id']]
                 );
@@ -203,7 +213,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
 
         // Anmeldung: eingeloggte Member (bestehend) ODER Gäste (neu)
         /** @var FrontendUser|null $user */
-        $user = System::getContainer()->get('security.helper')->getUser();
+        $user = $this->security->getUser();
         $templateData['isLoggedIn'] = ($user instanceof FrontendUser);
 
         $studentId = null;
@@ -231,7 +241,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
         // Falls angemeldet, Übungen (Kursfortschritt) laden
         if ($assignmentId) {
             try {
-                $studentExercises = System::getContainer()->get('database_connection')->fetchAllAssociative(
+                $studentExercises = $this->connection->fetchAllAssociative(
                     'SELECT se.exercise_id, se.status, se.dateCompleted, se.instructor, e.title AS exercise_title, m.title AS module_title
                      FROM tl_dc_student_exercises se
                      LEFT JOIN tl_dc_course_exercises e ON e.id = se.exercise_id
@@ -242,7 +252,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
                 );
             } catch (\Exception $e) {
                 // Fallback falls module_id Spalte noch fehlt (Migration ausstehend)
-                $studentExercises = System::getContainer()->get('database_connection')->fetchAllAssociative(
+                $studentExercises = $this->connection->fetchAllAssociative(
                     'SELECT se.exercise_id, se.status, se.dateCompleted, se.instructor, e.title AS exercise_title, m.title AS module_title
                      FROM tl_dc_student_exercises se
                      LEFT JOIN tl_dc_course_exercises e ON e.id = se.exercise_id
@@ -275,7 +285,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
         }
 
         // Debug-Log
-        System::getContainer()->get('monolog.logger.contao.general')->info('CourseEventReaderController::getResponse called. Method: ' . $request->getMethod() . ', FORM_SUBMIT: ' . Input::post('FORM_SUBMIT'));
+        $this->logger->info('CourseEventReaderController::getResponse called. Method: ' . $request->getMethod() . ', FORM_SUBMIT: ' . Input::post('FORM_SUBMIT'));
 
         // Check registration possibility
         $registrationPossible = true;
@@ -308,27 +318,19 @@ class CourseEventReaderController extends AbstractFrontendModuleController
 
             // CSRF prüfen – bei ungültigem Token abbrechen und Meldung setzen
             $tokenValue = (string)Input::post('REQUEST_TOKEN');
-            $container = System::getContainer();
-            $tokenId = $container->getParameter('contao.csrf_token_name');
-            $isValidToken = $container->get('contao.csrf.token_manager')->isTokenValid(new CsrfToken($tokenId, $tokenValue));
+            $isValidToken = $this->csrfTokenManager->isTokenValid(new CsrfToken($this->csrfTokenName, $tokenValue));
 
             if (!$isValidToken) {
-                System::getContainer()->get('monolog.logger.contao.general')->error('CSRF-Token Validierung fehlgeschlagen für dc_event_signup. Token: ' . substr($tokenValue, 0, 8) . '...');
+                $this->logger->error('CSRF-Token Validierung fehlgeschlagen für dc_event_signup. Token: ' . substr($tokenValue, 0, 8) . '...');
                 $this->addHtml5Message('Ungültiges Request-Token. Bitte Seite neu laden und erneut versuchen.', 'error');
                 //return new Response($this->twig->render(
-                return $this->render(
-                    '@Contao/frontend_module/dc_course_event_reader.html.twig',
-                    $templateData
-                );
+                return $this->getTemplateResponse($template, $templateData);
             }
 
             // Honeypot (Spam) – wenn gefüllt, abbrechen
             if (trim((string)Input::post('website')) !== '') {
                 $this->addHtml5Message('Ihre Anmeldung konnte nicht verarbeitet werden.', 'error');
-                return $this->render(
-                    '@Contao/frontend_module/dc_course_event_reader.html.twig',
-                    $templateData
-                );
+                return $this->getTemplateResponse($template, $templateData);
             }
 
             $currentStudentId = $studentId; // kann null sein (Gast)
@@ -374,10 +376,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
                     foreach ($errors as $err) {
                         $this->addHtml5Message($err, 'error');
                     }
-                    return $this->render(
-                        '@Contao/frontend_module/dc_course_event_reader.html.twig',
-                        $templateData
-                    );
+                    return $this->getTemplateResponse($template, $templateData);
                 }
 
                 // Dublettenprüfung: existiert Schüler mit gleicher E‑Mail?
@@ -410,14 +409,11 @@ class CourseEventReaderController extends AbstractFrontendModuleController
                         $newStudent->save();
 
                         $currentStudentId = (int)$newStudent->id;
-                        System::getContainer()->get('monolog.logger.contao.general')->info('Gast-Schüler erfolgreich angelegt: ID ' . $currentStudentId);
+                        $this->logger->info('Gast-Schüler erfolgreich angelegt: ID ' . $currentStudentId);
                     } catch (Exception $e) {
-                        System::getContainer()->get('monolog.logger.contao.general')->error('Fehler beim Anlegen des Gast-Schülers: ' . $e->getMessage());
+                        $this->logger->error('Fehler beim Anlegen des Gast-Schülers: ' . $e->getMessage());
                         $this->addHtml5Message('Fehler beim Speichern Ihrer Daten.', 'error');
-                        return $this->render(
-                            '@Contao/frontend_module/dc_course_event_reader.html.twig',
-                            $templateData
-                        );
+                        return $this->getTemplateResponse($template, $templateData);
                     }
                 }
             } else {
@@ -448,7 +444,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
 
                         $currentStudentId = (int)$newStudent->id;
                     } catch (Exception $e) {
-                        System::getContainer()->get('monolog.logger.contao.general')->error('Fehler beim automatischen Schüler-Insert: ' . $e->getMessage());
+                        $this->logger->error('Fehler beim automatischen Schüler-Insert: ' . $e->getMessage());
                     }
                 }
             }
@@ -456,10 +452,7 @@ class CourseEventReaderController extends AbstractFrontendModuleController
             // WICHTIG: Prüfung, ob die ID jetzt gesetzt ist
             if (!$currentStudentId) {
                 $this->addHtml5Message('Fehler beim Erstellen des Schüler-Profils.', 'error');
-                return $this->render(
-                    '@Contao/frontend_module/dc_course_event_reader.html.twig',
-                    $templateData
-                );
+                return $this->getTemplateResponse($template, $templateData);
             }
 
             // Falls bereits zugewiesen (Rennbedingungen), nochmal prüfen
@@ -468,15 +461,12 @@ class CourseEventReaderController extends AbstractFrontendModuleController
                 $templateData['alreadyRegistered'] = true;
                 $templateData['assignmentId'] = (int)$check2->id;
                 $this->addHtml5Message('Sie sind bereits für diese Veranstaltung angemeldet.', 'info');
-                return $this->render(
-                    '@Contao/frontend_module/dc_course_event_reader.html.twig',
-                    $templateData
-                );
+                return $this->getTemplateResponse($template, $templateData);
             }
             // Zuweisung anlegen
             try {
                 $db = Database::getInstance();
-                $logger = System::getContainer()->get('monolog.logger.contao.general');
+                $logger = $this->logger;
 
                 $logger->info('Starte Kurs-Zuweisung für Student ID ' . $currentStudentId . ', Event ID ' . $event->id . ', Course ID ' . $event->course_id);
 
@@ -500,46 +490,20 @@ class CourseEventReaderController extends AbstractFrontendModuleController
                 }
                 $logger->info('Kurs-Zuweisung erfolgreich angelegt. Neue ID: ' . $newAssignmentId);
             } catch (Exception $e) {
-                System::getContainer()->get('monolog.logger.contao.general')->error('Fehler beim Anlegen der Kurs-Zuweisung: ' . $e->getMessage());
+                $this->logger->error('Fehler beim Anlegen der Kurs-Zuweisung: ' . $e->getMessage());
                 $this->addHtml5Message('Fehler bei der Kursanmeldung.', 'error');
-                return $this->render(
-                    '@Contao/frontend_module/dc_course_event_reader.html.twig',
-                    $templateData
-                );
+                return $this->getTemplateResponse($template, $templateData);
             }
 
             // Debug-Log
-            System::getContainer()->get('monolog.logger.contao.general')->info('Kursanmeldung erfolgreich: Student ID ' . $currentStudentId . ', Assignment ID ' . $newAssignmentId);
+            $this->logger->info('Kursanmeldung erfolgreich: Student ID ' . $currentStudentId . ', Assignment ID ' . $newAssignmentId);
 
             // Übungen erzeugen
-            $listener = new CourseStudentOnSubmitListener($container->get('database_connection'));
-            $dc = new class extends \Contao\DataContainer {
-                public function __construct()
-                {
-                    // Do nothing
-                }
-
-                public function save($varValue)
-                {
-                }
-
-                public function isChanged()
-                {
-                    return false;
-                }
-
-                public function getPalette()
-                {
-                    return '';
-                }
-            };
-            $dc->id = $newAssignmentId;
-            $dc->activeRecord = (object)[
-                'id' => $newAssignmentId,
-                'course_id' => $event->course_id,
-                'event_id' => $event->id
-            ];
-            $listener->__invoke($dc);
+            $this->studentsListener->generateCourseExercises(
+                $newAssignmentId,
+                (int)$event->course_id,
+                (int)$event->id,
+            );
 
             // Speichere die ID in der Session für Insert-Tags
             $request->getSession()->set('last_course_order', (int)$newAssignmentId);
@@ -589,18 +553,21 @@ class CourseEventReaderController extends AbstractFrontendModuleController
         return '';
     }
 
+    private function getTemplateResponse(FragmentTemplate $template, array $templateData): Response
+    {
+        foreach ($templateData as $key => $value) {
+            $template->set($key, $value);
+        }
+
+        return $template->getResponse();
+    }
+
     private function addHtml5Message(string $message, string $type): void
     {
-        $container = System::getContainer();
-        $session = $container->get('request_stack')->getSession();
+        $session = $this->requestStack->getSession();
         $flashBag = $session->getFlashBag();
 
         $flashBag->add('contao.FE.' . $type, $message);
     }
 
-    private function generateExercises(int $assignmentId, int $courseId): void
-    {
-        // Veraltet, wird durch tl_dc_course_students::generateDefaultExercises ersetzt
-        // Bleibt als Fallback oder kann später entfernt werden
-    }
 }

@@ -12,8 +12,6 @@ use Contao\Database;
 use Contao\DataContainer;
 use Contao\DC_Table;
 use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseListener;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseStudentLabelCallback;
-use Diversworld\ContaoDiveclubBundle\EventListener\DataContainer\CourseStudentOnSubmitListener;
 
 $GLOBALS['TL_DCA']['tl_dc_course_students'] = [
     'config' => [
@@ -165,4 +163,3 @@ $GLOBALS['TL_DCA']['tl_dc_course_students'] = [
         ]
     ],
 ];
-

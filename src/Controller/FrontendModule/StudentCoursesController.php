@@ -15,6 +15,9 @@ use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\System;
+use Psr\Log\LoggerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -25,9 +28,17 @@ class StudentCoursesController extends AbstractFrontendModuleController
 {
     public const TYPE = 'dc_student_courses';
 
+    public function __construct(
+        private readonly Security        $security,
+        #[Autowire(service: 'monolog.logger.contao.general')]
+        private readonly LoggerInterface $logger,
+    )
+    {
+    }
+
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
-        System::getContainer()->get('monolog.logger.contao.general')->info('StudentCoursesController::getResponse start. REQUEST_URI: ' . $request->getUri());
+        $this->logger->info('StudentCoursesController::getResponse start. REQUEST_URI: ' . $request->getUri());
 
         $templateData = [
             'element_html_id' => 'mod_' . $model->id,
@@ -55,7 +66,7 @@ class StudentCoursesController extends AbstractFrontendModuleController
         $labels = $GLOBALS['TL_LANG']['MSC']['dc_student_courses'] ?? null;
 
         if (null === $labels) {
-            System::getContainer()->get('monolog.logger.contao.general')->error('StudentCoursesController: Labels for dc_student_courses not found in $GLOBALS[\'TL_LANG\'][\'MSC\']');
+            $this->logger->error('StudentCoursesController: Labels for dc_student_courses not found in $GLOBALS[\'TL_LANG\'][\'MSC\']');
         }
 
         $templateData['labels'] = $labels ?? [
@@ -74,15 +85,12 @@ class StudentCoursesController extends AbstractFrontendModuleController
         ];
 
         /** @var FrontendUser|null $user */
-        $user = System::getContainer()->get('security.helper')->getUser();
+        $user = $this->security->getUser();
 
         if (!$user instanceof FrontendUser) {
             $templateData['isLoggedIn'] = false;
             $templateData['courses'] = [];
-            return $this->render(
-                '@Contao/frontend_module/dc_student_courses.html.twig',
-                $templateData
-            );
+            return $this->getTemplateResponse($template, $templateData);
         }
 
         $templateData['isLoggedIn'] = true;
@@ -97,10 +105,7 @@ class StudentCoursesController extends AbstractFrontendModuleController
         if ($student->numRows < 1) {
             $templateData['studentFound'] = false;
             $templateData['courses'] = [];
-            return $this->render(
-                '@Contao/frontend_module/dc_student_courses.html.twig',
-                $templateData
-            );
+            return $this->getTemplateResponse($template, $templateData);
         }
 
         $templateData['studentFound'] = true;
@@ -193,6 +198,15 @@ class StudentCoursesController extends AbstractFrontendModuleController
         foreach ($templateData as $key => $value) {
             $template->set($key, $value);
         };
+
+        return $template->getResponse();
+    }
+
+    private function getTemplateResponse(FragmentTemplate $template, array $templateData): Response
+    {
+        foreach ($templateData as $key => $value) {
+            $template->set($key, $value);
+        }
 
         return $template->getResponse();
     }

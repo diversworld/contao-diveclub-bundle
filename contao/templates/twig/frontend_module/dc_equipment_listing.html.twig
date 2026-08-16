@@ -29,8 +29,28 @@
     {% set item_attributes = attrs().addClass('equipment-item').mergeWith(item_attributes|default) %}
     <li{{ item_attributes }}>
         {{ block('item_title') }}
+        {{ block('item_details') }}
         {{ block('item_description') }}
     </li>
+{% endblock %}
+
+{% block item_details %}
+    <dl class="equipment-details">
+        <dt>Art</dt>
+        <dd>{{ item.type }}{% if item.subType %} – {{ item.subType }}{% endif %}</dd>
+        {% if item.manufacturer or item.model %}
+            <dt>Hersteller / Modell</dt>
+            <dd>{{ item.manufacturer }}{% if item.model %} {{ item.model }}{% endif %}</dd>
+        {% endif %}
+        {% if item.size %}
+            <dt>Größe</dt>
+            <dd>{{ item.size }}</dd>{% endif %}
+        {% if item.color %}
+            <dt>Farbe</dt>
+            <dd>{{ item.color }}</dd>{% endif %}
+        <dt>Leihgebühr</dt>
+        <dd>{{ item.rentalFee|number_format(2, ',', '.') }} €</dd>
+    </dl>
 {% endblock %}
 
 {% block item_title %}

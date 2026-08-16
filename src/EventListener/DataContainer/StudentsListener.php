@@ -243,16 +243,27 @@ class StudentsListener
             return;
         }
 
-        $assignmentId = (int)($dc->id ?: $dc->activeRecord->id);
-        $courseTemplateId = (int)$dc->activeRecord->course_id;
+        $this->generateCourseExercises(
+            (int)($dc->id ?: $dc->activeRecord->id),
+            (int)$dc->activeRecord->course_id,
+            (int)$dc->activeRecord->event_id,
+        );
+    }
 
-        if ((int)$dc->activeRecord->event_id > 0) {
-            $eventCourseId = (int)$this->connection->fetchOne("SELECT course_id FROM tl_dc_course_event WHERE id=?", [(int)$dc->activeRecord->event_id]);
+    public function generateCourseExercises(int $assignmentId, int $courseTemplateId, int $eventId): void
+    {
+        if ($assignmentId <= 0) {
+            return;
+        }
+
+        if ($eventId > 0) {
+            $eventCourseId = (int)$this->connection->fetchOne('SELECT course_id FROM tl_dc_course_event WHERE id=?', [$eventId]);
             if ($eventCourseId > 0) {
-                $courseTemplateId = $eventCourseId;
-                if (!(int)$dc->activeRecord->course_id) {
-                    $this->connection->update('tl_dc_course_students', ['course_id' => $courseTemplateId], ['id' => $assignmentId]);
+                if ($courseTemplateId <= 0) {
+                    $this->connection->update('tl_dc_course_students', ['course_id' => $eventCourseId], ['id' => $assignmentId]);
                 }
+
+                $courseTemplateId = $eventCourseId;
             }
         }
 
@@ -263,10 +274,10 @@ class StudentsListener
         $moduleExercises = [];
         $allModules = [];
 
-        if ((int)$dc->activeRecord->event_id > 0) {
+        if ($eventId > 0) {
             $scheduleRows = $this->connection->fetchAllAssociative(
-                "SELECT s.id, s.module_id, s.planned_at, s.instructor FROM tl_dc_course_event_schedule s WHERE s.pid = ? ORDER BY s.planned_at ASC, s.sorting ASC",
-                [(int)$dc->activeRecord->event_id]
+                "SELECT s.id, s.module_id, s.planned_at, s.instructor FROM tl_dc_course_event_schedule s WHERE s.pid = ? ORDER BY s.planned_at, s.sorting",
+                [$eventId]
             );
 
             foreach ($scheduleRows as $objSchedule) {
@@ -429,6 +440,8 @@ class StudentsListener
         $buttonTitle = $isCompleted ? 'Status auf Wartend zurücksetzen und Abschlussdatum entfernen' : 'Status auf OK setzen und Datum eintragen';
         $buttonIcon = $isCompleted ? 'undo.svg' : (string)$icon;
 
-        return sprintf('<a href="%s" title="%s" %s>%s</a> ', $url, StringUtil::specialchars($buttonTitle), $attributes, Image::getHtml($buttonIcon, $buttonLabel));
+        return '<a href="' . StringUtil::specialchars($url) . '" title="' . StringUtil::specialchars($buttonTitle) . '" ' . $attributes . '>'
+            . Image::getHtml($buttonIcon, $buttonLabel)
+            . '</a> ';
     }
 }

@@ -16,6 +16,7 @@ namespace Diversworld\ContaoDiveclubBundle\Controller\FrontendModule;
 
 use Contao\Config;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
+use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Twig\FragmentTemplate;
@@ -44,8 +45,6 @@ use Symfony\Component\HttpFoundation\Response;
 use function is_array;
 
 
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-
 #[AsFrontendModule(BookingController::TYPE, category: 'dc_manager')]
 class BookingController extends AbstractFrontendModuleController
 {
@@ -56,14 +55,14 @@ class BookingController extends AbstractFrontendModuleController
     private ContaoFramework $framework;
     private RequestStack $requestStack;
     private Connection $db;
-    private CsrfTokenManagerInterface $csrfTokenManager;
+    private ContaoCsrfTokenManager $csrfTokenManager;
 
     public function __construct(
         DcaTemplateHelper $helper,
         Connection        $db,
         RequestStack      $requestStack,
         ContaoFramework   $framework,
-        CsrfTokenManagerInterface $csrfTokenManager
+        ContaoCsrfTokenManager $csrfTokenManager
     )
     {
         $this->helper = $helper;
@@ -97,14 +96,15 @@ class BookingController extends AbstractFrontendModuleController
         System::loadLanguageFile('tl_dc_reservation_items');
 
         // Request Token für Twig bereitstellen
-        $tokenId = (string)System::getContainer()->getParameter('contao.csrf_token_name');
-        $templateData['request_token'] = $this->csrfTokenManager->getToken($tokenId)->getValue();
+        $templateData['request_token'] = $this->csrfTokenManager->getDefaultTokenValue();
 
         $sessionData = $this->getSessionData();
         $equipmentTypes = $this->helper->getEquipmentTypes(); // Typen/Subtypen laden
         $templateData['equipmentTypes'] = $equipmentTypes;
 
-        $category = $request->get('category');
+        // Die allgemeine Ausrüstung ist die Standardansicht des Verleihmoduls.
+        // Dadurch werden vorhandene Artikel bereits beim ersten Seitenaufruf angezeigt.
+        $category = $request->query->get('category') ?: 'tl_dc_equipment';
 
         // NEW: Vorgemerkte Reservierungen abrufen
         $templateData['storedAssets'] = $this->loadStoredAssets($sessionData);
@@ -406,10 +406,10 @@ class BookingController extends AbstractFrontendModuleController
             case 'tl_dc_equipment':
                 // Verarbeitung für Equipment Types
                 foreach ($assets as $asset) {
-                    $equipmentSubTypes = $this->helper->getSubTypes($asset['id']);
+                    $equipmentSubTypes = $this->helper->getSubTypes((int)$asset['type']);
                     $updatedAssets[] = [
                         'id' => $asset['id'],
-                        'type' => $equipmentTypes[$asset['type']] ?? $asset['type'],
+                        'type' => $equipmentTypes[$asset['type']]['name'] ?? $asset['type'],
                         'subType' => $equipmentSubTypes[$asset['subType']] ?? $asset['subType'],
                         'typeId' => $asset['type'], // Indexwert behalten
                         'subTypeId' => $asset['subType'], // Indexwert behalten

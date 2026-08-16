@@ -59,24 +59,34 @@ class EquipmentDetailController extends AbstractFrontendModuleController
         }
 
         $equipmentTypes = $this->helper->getEquipmentTypes();
-        $types = DcEquipmentModel::findAll(); // Alle Typ-Modelle laden
+        $manufacturers = $this->helper->getManufacturers();
+        $sizes = $this->helper->getSizes();
+        $equipment = DcEquipmentModel::findPublished();
 
-        $data = []; // Datenstruktur vorbereiten
+        $items = [];
 
-        if ($types) {
-            foreach ($types as $type) {
-                // Haupttyp speichern (Subtypen werden ignoriert)
-                $data[] = [
-                    'types' => [
-                        'id' => $type->id,
-                        'title' => $type->title,
-                        'type' => $equipmentTypes[$type->title] ?? $type->title,
-                    ],
+        if (null !== $equipment) {
+            foreach ($equipment as $item) {
+                $type = $equipmentTypes[(int)$item->type] ?? [];
+                $subTypes = $type['subtypes'] ?? [];
+
+                $items[] = [
+                    'id' => (int)$item->id,
+                    'title' => (string)$item->title,
+                    'type' => $type['name'] ?? (string)$item->type,
+                    'subType' => $subTypes[(int)$item->subType] ?? (string)$item->subType,
+                    'manufacturer' => $manufacturers[$item->manufacturer] ?? (string)$item->manufacturer,
+                    'model' => (string)$item->model,
+                    'size' => $sizes[$item->size] ?? (string)$item->size,
+                    'color' => (string)$item->color,
+                    'status' => (string)$item->status,
+                    'rentalFee' => (float)$item->rentalFee,
+                    'description' => (string)$item->notes,
                 ];
             }
         }
 
-        $templateData['data'] = $data; // Daten dem Template übergeben
+        $templateData['items'] = $items;
         foreach ($templateData as $key => $value) {
             $template->set($key, $value);
         }

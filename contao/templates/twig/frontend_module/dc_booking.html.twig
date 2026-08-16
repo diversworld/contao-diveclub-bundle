@@ -47,7 +47,6 @@
 
 {% block category_selection %}
     <form method="get" id="categorySelectionForm" action="{{ action }}">
-        <input type="hidden" name="REQUEST_TOKEN" value="{{ request_token }}">
         <input type="hidden" name="FORM_SUBMIT" value="reservationSelectSubmit"/>
         <label for="category">Kategorie auswählen:</label>
         <select name="category" id="category" class="form-control" onchange="this.form.submit();">
