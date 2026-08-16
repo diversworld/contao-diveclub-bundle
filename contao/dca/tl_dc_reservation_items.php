@@ -47,13 +47,13 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
             'mode' => DataContainer::MODE_PARENT,
             'fields' => ['item_type', 'reservation_status', 'created_at', 'updated_at'],
             'headerFields' => ['title', 'member_id', 'reservedFor', 'reservation_status', 'created_at', 'updated_at'],
-            'flag' => DataContainer::SORT_ASC,
+            //'flag' => DataContainer::MODE_SORTED,
             'panelLayout' => 'filter;sort,search,limit'
         ],
         'label' => [
-            'fields' => ['item_type', 'item_id', 'types', 'sub_type', 'reservation_status', 'created_at', 'updated_at'],
+            'fields' => ['item_type', 'item_id', 'types', 'sub_type', 'created_at', 'updated_at', 'reservation_status'],
             'showColumns' => true,
-            'format' => '%s, %s - %s | %s - %s - %s - %s!',
+            'format' => '%s, %s, %s, %s | %s - %s | %s',
         ],
         'global_operations' => [
             'all' => [
@@ -78,7 +78,6 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
                                     {publish_legend},published,start,stop;',
     ],
     'subpalettes' => [
-        'addNotes' => 'notes',
         'item_type_tl_dc_equipment' => 'types,sub_type', // Subpalette für "tl_dc_equipment_types"
     ],
     'fields' => [
@@ -114,7 +113,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
             'exclude' => true,
             'filter' => true,
             'sorting' => true,
-            'eval' => ['mandatory' => false, 'submitOnChange' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w25'],
+            'eval' => ['mandatory' => false, 'disabled' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w25'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'sub_type' => [
@@ -123,7 +122,7 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
             'exclude' => true,
             'filter' => true,
             'sorting' => true,
-            'eval' => ['mandatory' => false, 'submitOnChange' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w25'],
+            'eval' => ['mandatory' => false, 'disabled' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w25'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'reservation_status' => [
@@ -223,4 +222,3 @@ $GLOBALS['TL_DCA']['tl_dc_reservation_items'] = [
         ]
     ]
 ];
-

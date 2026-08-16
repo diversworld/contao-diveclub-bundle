@@ -24,6 +24,8 @@
     "require": {
       "php": "^8.3",
       "contao/core-bundle": "^5.7 || ^6.0",
+      "contao/calendar-bundle": "^5.7 || ^6.0",
+      "contao/manager-plugin": "^2.12",
         "tecnickcom/tcpdf": "^6.6",
       "setasign/fpdi": "^2.6"
     },
@@ -31,7 +33,6 @@
     "terminal42/notification_center": "For email notifications on course schedule updates"
   },
     "require-dev": {
-        "contao/manager-plugin": "^2.12",
         "slevomat/coding-standard": "^8.0",
         "squizlabs/php_codesniffer": "^3.8"
     },

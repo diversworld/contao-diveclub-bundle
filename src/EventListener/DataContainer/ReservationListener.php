@@ -6,9 +6,11 @@ namespace Diversworld\ContaoDiveclubBundle\EventListener\DataContainer;
 
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Slug\Slug;
+use Contao\Config;
 use Contao\DataContainer;
-use Contao\MemberModel;
-use Contao\System;
+use Contao\Date;
+use Contao\Input;
+use Diversworld\ContaoDiveclubBundle\Helper\DcaTemplateHelper;
 use Diversworld\ContaoDiveclubBundle\Model\DcReservationItemsModel;
 use Doctrine\DBAL\Connection;
 use Exception;
@@ -19,9 +21,10 @@ class ReservationListener
     use AliasHandlerTrait;
 
     public function __construct(
-        private readonly Connection      $db,
+        private readonly Connection        $db,
         private readonly LoggerInterface $logger,
-        private readonly Slug            $slug
+        private readonly Slug              $slug,
+        private readonly DcaTemplateHelper $templateHelper,
     )
     {
     }
@@ -238,6 +241,35 @@ class ReservationListener
             return;
         }
 
+        // Keep the detail record in sync with the selected asset. Type and
+        // subtype belong to general equipment only; for tanks and regulators
+        // they must stay empty instead of containing stale values.
+        $equipmentClassification = ['types' => '', 'sub_type' => ''];
+
+        if ('tl_dc_equipment' === $itemType) {
+            $equipment = $this->db->fetchAssociative(
+                'SELECT type, subType FROM tl_dc_equipment WHERE id = ?',
+                [$assetId],
+            );
+
+            if (!$equipment) {
+                $this->logger->error(sprintf('Equipment ID %d wurde nicht gefunden.', $assetId), [__METHOD__]);
+
+                return;
+            }
+
+            $equipmentClassification = [
+                'types' => (string)$equipment['type'],
+                'sub_type' => (string)$equipment['subType'],
+            ];
+        }
+
+        $this->db->update(
+            'tl_dc_reservation_items',
+            $equipmentClassification,
+            ['id' => (int)$dc->id],
+        );
+
         // 1. Überprüfen, ob der Status einer der speziellen Werte ist
         $specialStatuses = ['overdue', 'lost', 'damaged', 'missing'];
 
@@ -280,21 +312,97 @@ class ReservationListener
         );
     }
 
+    /**
+     * Return the assets belonging to the selected asset type.
+     *
+     * All assets are deliberately returned here, irrespective of their current
+     * status. Otherwise an already reserved asset would disappear from the
+     * select field when an existing reservation item is edited.
+     */
+    #[AsCallback(table: 'tl_dc_reservation_items', target: 'fields.item_id.options')]
+    public function getAssetOptions(DataContainer $dc): array
+    {
+        $allowedTables = [
+            'tl_dc_tanks',
+            'tl_dc_regulators',
+            'tl_dc_equipment',
+        ];
+
+        $postedItemType = Input::post('item_type');
+        $itemType = \is_string($postedItemType) && '' !== $postedItemType
+            ? $postedItemType
+            : (string)($dc->activeRecord->item_type ?? '');
+
+        if (!\in_array($itemType, $allowedTables, true)) {
+            return [];
+        }
+
+        return $this->db->fetchAllKeyValue(
+            sprintf('SELECT id, title FROM %s ORDER BY title', $itemType),
+        );
+    }
+
+    #[AsCallback(table: 'tl_dc_reservation_items', target: 'fields.types.options')]
+    public function getEquipmentTypeOptions(): array
+    {
+        return $this->templateHelper->getEquipmentFlatTypes();
+    }
+
+    #[AsCallback(table: 'tl_dc_reservation_items', target: 'fields.sub_type.options')]
+    public function getEquipmentSubTypeOptions(DataContainer $dc): array
+    {
+        $postedType = Input::post('types');
+        $type = \is_scalar($postedType) && '' !== (string)$postedType
+            ? (int)$postedType
+            : (int)($dc->activeRecord->types ?? 0);
+
+        return $type > 0 ? $this->templateHelper->getSubTypes($type) : [];
+    }
+
     #[AsCallback(table: 'tl_dc_reservation_items', target: 'list.label.label')]
     public function onLabelCallback(array $row, string $label, DataContainer $dc, ?array $args = null): array|string
     {
         if (null !== $args) {
             $labels = $args;
-            $member = MemberModel::findById((int)$row['member_id']);
-            $reservedFor = MemberModel::findById((int)$row['reservedFor']);
+            $itemType = (string)($row['item_type'] ?? '');
+            $allowedTables = ['tl_dc_tanks', 'tl_dc_regulators', 'tl_dc_equipment'];
+            $assetTitle = '-';
 
-            $labels[1] = $member ? $member->firstname . ' ' . $member->lastname : '-';
-            $labels[2] = $reservedFor ? $reservedFor->firstname . ' ' . $reservedFor->lastname : '-';
-            $labels[3] = $GLOBALS['TL_LANG']['tl_dc_reservation']['itemStatus'][$row['reservation_status']] ?? $row['reservation_status'];
-            $labels[4] = !empty($row['reserved_at']) ? date($GLOBALS['TL_CONFIG']['datimFormat'], (int)$row['reserved_at']) : '-';
-            $labels[5] = number_format((float)$row['rentalFee'], 2, ',', '.') . ' €';
+            if (in_array($itemType, $allowedTables, true) && !empty($row['item_id'])) {
+                $assetTitle = (string)($this->db->fetchOne(
+                    sprintf('SELECT title FROM %s WHERE id = ?', $itemType),
+                    [(int)$row['item_id']],
+                ) ?: '-');
+            }
 
-            return $labels;
+            $labels[0] = $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemTypes'][$itemType] ?? $itemType;
+            $labels[1] = $assetTitle;
+            $labels[2] = '-';
+            $labels[3] = '-';
+
+            if ('tl_dc_equipment' === $itemType) {
+                $equipmentTypes = $this->templateHelper->getEquipmentFlatTypes();
+                $equipmentSubTypes = $this->templateHelper->getSubTypes((int)($row['types'] ?? 0));
+                $labels[2] = $equipmentTypes[$row['types'] ?? ''] ?? ' ';
+                $labels[3] = $equipmentSubTypes[$row['sub_type'] ?? ''] ?? ' ';
+            }
+            $labels[4] = !empty($row['created_at'])
+                ? Date::parse(Config::get('datimFormat'), (int)$row['created_at'])
+                : '-';
+            $labels[5] = !empty($row['updated_at'])
+                ? Date::parse(Config::get('datimFormat'), (int)$row['updated_at'])
+                : '-';
+            $labels[6] = $GLOBALS['TL_LANG']['tl_dc_reservation_items']['itemStatus'][$row['reservation_status'] ?? '']
+                ?? (string)($row['reservation_status'] ?? '');
+
+            // In MODE_PARENT Contao does not render showColumns. If an array
+            // is returned, only its first element becomes the child label.
+            // Therefore all configured columns must be combined into the
+            // label string here.
+            return vsprintf(
+                $GLOBALS['TL_DCA']['tl_dc_reservation_items']['list']['label']['format'] ?? '%s',
+                array_values($labels),
+            );
         }
 
         return $label;

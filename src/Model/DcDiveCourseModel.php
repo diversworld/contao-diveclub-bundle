@@ -19,7 +19,6 @@ use Contao\Model;
 /**
  * Model-Klasse für die Tabelle tl_dc_dive_course.
  */
-#[AsModel(table: 'tl_dc_dive_course')]
 class DcDiveCourseModel extends Model
 {
     protected static $strTable = 'tl_dc_dive_course';

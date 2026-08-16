@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Diversworld\ContaoDiveclubBundle\Model;
 
-use Contao\CoreBundle\DependencyInjection\Attribute\AsModel;
 use Contao\Model;
 
 /**
@@ -35,7 +34,6 @@ use Contao\Model;
  * @property string $phone
  * @property string $notes
  */
-#[AsModel(table: 'tl_dc_check_booking')] // Attribut zur Registrierung als Contao-Modell für die Tabelle tl_dc_check_booking
 class DcCheckBookingModel extends Model // Modell-Klasse für Buchungs-Datensätze
 {
     /**

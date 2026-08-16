@@ -45,10 +45,10 @@ $GLOBALS['TL_LANG']['tl_dc_reservation_items']['size']                  = ["Size
 $GLOBALS['TL_LANG']['tl_dc_reservation_items']['member']                = ["Owner", "Owner of the bottle."];
 $GLOBALS['TL_LANG']['tl_dc_reservation_items']['reservation_status']    = ['Status','Reservation status'];
 $GLOBALS['TL_LANG']['tl_dc_reservation_items']['item_type']             = ['Category', 'Please select the type of equipment.'];
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['item_id']               = ['Selected item', 'Please select the type of equipment.'];
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['item_id'] = ['Selected asset', 'The specific asset assigned to this reservation item.'];
 
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['types']                 = ['Equipment', 'Please select the type of equipment.'];
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['sub_type']              = ['Equipment part', 'Please select the equipment part.'];
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['types'] = ['Equipment type', 'Automatically copied from general equipment; not applicable to tanks and regulators.'];
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['sub_type'] = ['Equipment subtype', 'Automatically copied from general equipment; not applicable to tanks and regulators.'];
 $GLOBALS['TL_LANG']['tl_dc_reservation_items']['reserved_at']           = ['Reserved', 'Please specify the reservation date.'];
 $GLOBALS['TL_LANG']['tl_dc_reservation_items']['created_at']            = ['Created', 'The creation date of the reservation is generated automatically.'];
 $GLOBALS['TL_LANG']['tl_dc_reservation_items']['updated_at']            = ['Updated', 'The update date of the reservation is generated automatically.'];

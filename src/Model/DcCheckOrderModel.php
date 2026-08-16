@@ -14,10 +14,8 @@ declare(strict_types=1);
 
 namespace Diversworld\ContaoDiveclubBundle\Model;
 
-use Contao\CoreBundle\DependencyInjection\Attribute\AsModel;
 use Contao\Model;
 
-#[AsModel(table: 'tl_dc_check_order')] // Registriert die Klasse als Modell für die Bestellpositionen-Tabelle
 class DcCheckOrderModel extends Model // Modell-Klasse für den Zugriff auf einzelne Geräte/Bestellungen innerhalb einer Buchung
 {
     protected static $strTable = 'tl_dc_check_order'; // Name der Tabelle für die Bestellpositionen in der Datenbank

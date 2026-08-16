@@ -46,11 +46,11 @@ $GLOBALS['TL_LANG']['tl_dc_reservation_items']['size']                  = ["Grö
 $GLOBALS['TL_LANG']['tl_dc_reservation_items']['member']                = ["Eigentümer", "Eigentümer der Flasche."];
 $GLOBALS['TL_LANG']['tl_dc_reservation_items']['reservation_status']    = ['Status','Status der Reservierung'];
 $GLOBALS['TL_LANG']['tl_dc_reservation_items']['item_type']             = ['Kategorie', 'Bitte wähle den Ausrüstungstyp aus.'];
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['item_id']               = ['Gewähltes Teil', 'Bitte wähle die Art der Ausrüstungs aus.'];
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['item_id'] = ['Gewähltes Asset', 'Das konkrete Asset dieser Reservierungsposition.'];
 
 
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['types']                 = ['Ausrüstung', 'Bitte wähle die Art der Ausrüstungs aus.'];
-$GLOBALS['TL_LANG']['tl_dc_reservation_items']['sub_type']              = ['Ausrüstungsteil', 'Bitte wähle die Art der Ausrüstungs aus.'];
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['types'] = ['Equipment-Typ', 'Wird bei allgemeinem Equipment automatisch aus dem gewählten Asset übernommen; für Flaschen und Atemregler nicht zutreffend.'];
+$GLOBALS['TL_LANG']['tl_dc_reservation_items']['sub_type'] = ['Equipment-Untertyp', 'Wird bei allgemeinem Equipment automatisch aus dem gewählten Asset übernommen; für Flaschen und Atemregler nicht zutreffend.'];
 $GLOBALS['TL_LANG']['tl_dc_reservation_items']['reserved_at']           = ['Reserviert', 'Bitte geben Sie das Reservierungsdatum an.'];
 $GLOBALS['TL_LANG']['tl_dc_reservation_items']['created_at']            = ['Erstellt', 'Das Datum der Erstellung der Reservierung wird automatisch erstellt.'];
 $GLOBALS['TL_LANG']['tl_dc_reservation_items']['updated_at']            = ['Aktualisiert', 'Das Datum der Aktualisierung der Reservierung wird automatisch erstellt.'];

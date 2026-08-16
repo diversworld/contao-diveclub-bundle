@@ -16,16 +16,16 @@ declare(strict_types=1);
  * Backend modules
  */
 
-$GLOBALS['TL_LANG']['MOD']['dc_course_collection'] = ['Tauchkurse und Ausbildungsinhalte', 'Verwaltet Kursvorlagen sowie die zugehörigen Ausbildungsmodule und Übungen.'];
-$GLOBALS['TL_LANG']['MOD']['dc_regulators_collection'] = ['Atemregler und Wartungen', 'Verwaltet Atemregler sowie deren Prüf-, Wartungs- und Kontrolldaten.'];
-$GLOBALS['TL_LANG']['MOD']['dc_tanks_collection'] = ['Tauchflaschen und Prüfdaten', 'Verwaltet Tauchflaschen, Eigentümerdaten und prüfungsrelevante Angaben.'];
-$GLOBALS['TL_LANG']['MOD']['dc_check_collection'] = ['Flaschenprüfungen und TÜV-Buchungen', 'Verwaltet Prüfungstermine, Prüfleistungen, Buchungen und einzelne Prüfaufträge.'];
+$GLOBALS['TL_LANG']['MOD']['dc_course_collection'] = ['Tauchkursvorlage', 'Verwaltet Kursvorlagen sowie die zugehörigen Ausbildungsmodule und Übungen.'];
+$GLOBALS['TL_LANG']['MOD']['dc_regulators_collection'] = ['Atemregler', 'Verwaltet Atemregler sowie deren Prüf-, Wartungs- und Kontrolldaten.'];
+$GLOBALS['TL_LANG']['MOD']['dc_tanks_collection'] = ['Tauchflaschen', 'Verwaltet Tauchflaschen, Eigentümerdaten und prüfungsrelevante Angaben.'];
+$GLOBALS['TL_LANG']['MOD']['dc_check_collection'] = ['Flaschenprüfungen', 'Verwaltet Prüfungstermine, Prüfleistungen, Buchungen und einzelne Prüfaufträge.'];
 $GLOBALS['TL_LANG']['MOD']['dc_equipment_collection'] = ['Leihausrüstung', 'Verwaltet die ausleihbaren Ausrüstungsgegenstände des Tauchclubs.'];
 $GLOBALS['TL_LANG']['MOD']['dc_config_collection'] = ['Diveclub-Grundeinstellungen', 'Verwaltet allgemeine Texte und Einstellungen für Reservierungen und Ausleihe.'];
 $GLOBALS['TL_LANG']['MOD']['dc_reservation_collection'] = ['Ausrüstungsreservierungen', 'Verwaltet Reservierungen und die darin gebuchten Ausrüstungsgegenstände.'];
-$GLOBALS['TL_LANG']['MOD']['dc_dive_module_collection'] = ['Ausbildungsmodule und Übungen', 'Verwaltet die Ausbildungsabschnitte und Übungen der Tauchkurse.'];
-$GLOBALS['TL_LANG']['MOD']['dc_dive_student_collection'] = ['Tauchschüler und Kursfortschritt', 'Verwaltet Tauchschüler, Kurszuweisungen und absolvierte Übungen.'];
-$GLOBALS['TL_LANG']['MOD']['dc_course_event_collection'] = ['Kursveranstaltungen und Terminpläne', 'Verwaltet konkrete Kursveranstaltungen, Ausbildungstermine und deren Übungen.'];
+$GLOBALS['TL_LANG']['MOD']['dc_dive_module_collection'] = ['Ausbildungsmodule', 'Verwaltet die Ausbildungsabschnitte und Übungen der Tauchkurse.'];
+$GLOBALS['TL_LANG']['MOD']['dc_dive_student_collection'] = ['Tauchschüler', 'Verwaltet Tauchschüler, Kurszuweisungen und absolvierte Übungen.'];
+$GLOBALS['TL_LANG']['MOD']['dc_course_event_collection'] = ['Kursveranstaltungen', 'Verwaltet konkrete Kursveranstaltungen, Ausbildungstermine und deren Übungen.'];
 
 /**
  * Frontend modules
